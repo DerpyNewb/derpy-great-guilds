@@ -1,0 +1,420 @@
+key	text	tooltip
+#Loc;1;text/db/derpy_great_guilds.loc		
+derpy_gg_rank_name_1	Unmarked	false
+derpy_gg_rank_name_2	Indebted	false
+derpy_gg_rank_name_3	Sworn	false
+derpy_gg_rank_name_4	Favoured	false
+derpy_gg_rank_name_5	Exalted	false
+derpy_gg_guild_name_brass	The Brass Tablets	false
+derpy_gg_guild_desc_brass	Tally-keepers and caravan masters. They record every debt in the Dark Lands and forgive none of them.||Reputation accrues from your trade and treasury income.||Ranks pay, for every region you own: +3% income from all buildings at 100 rep / +6% income from all buildings at 300 rep / +10% income from all buildings at 700 rep / +15% income from all buildings at 1500 rep.	false
+effect_bundles_localised_title_derpy_gg_rank_brass_2	The Brass Tablets - Indebted	false
+effect_bundles_localised_description_derpy_gg_rank_brass_2	Rank 2 of 5 with The Brass Tablets, held at 100 reputation. +3% income from all buildings, for every region you own. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_brass_3	The Brass Tablets - Sworn	false
+effect_bundles_localised_description_derpy_gg_rank_brass_3	Rank 3 of 5 with The Brass Tablets, held at 300 reputation. +6% income from all buildings, for every region you own. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_brass_4	The Brass Tablets - Favoured	false
+effect_bundles_localised_description_derpy_gg_rank_brass_4	Rank 4 of 5 with The Brass Tablets, held at 700 reputation. +10% income from all buildings, for every region you own. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_brass_5	The Brass Tablets - Exalted	false
+effect_bundles_localised_description_derpy_gg_rank_brass_5	Rank 5 of 5 with The Brass Tablets, held at 1500 reputation. +15% income from all buildings, for every region you own. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_lead_brass	The Brass Tablets - Foremost	false
+effect_bundles_localised_description_derpy_gg_lead_brass	You hold more reputation with The Brass Tablets than any other faction in the world. +10% income from all buildings, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
+derpy_gg_guild_name_immortals	The Immortals	false
+derpy_gg_guild_desc_immortals	The oath-sworn companies who fight for whoever holds their bond, and never break it.||Reputation accrues from battles you win, and doubles when you win outnumbered.||Ranks pay, for every army: +3% replenishment rate at 100 rep / +6% replenishment rate at 300 rep / +10% replenishment rate at 700 rep / +15% replenishment rate at 1500 rep. And, for your faction: +1 recruitment capacity at 300 rep / +2 recruitment capacity at 700 rep / +3 recruitment capacity at 1500 rep.	false
+effect_bundles_localised_title_derpy_gg_rank_immortals_2	The Immortals - Indebted	false
+effect_bundles_localised_description_derpy_gg_rank_immortals_2	Rank 2 of 5 with The Immortals, held at 100 reputation. +3% replenishment rate, for every army. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_immortals_3	The Immortals - Sworn	false
+effect_bundles_localised_description_derpy_gg_rank_immortals_3	Rank 3 of 5 with The Immortals, held at 300 reputation. +6% replenishment rate, for every army. +1 recruitment capacity, for your faction. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_immortals_4	The Immortals - Favoured	false
+effect_bundles_localised_description_derpy_gg_rank_immortals_4	Rank 4 of 5 with The Immortals, held at 700 reputation. +10% replenishment rate, for every army. +2 recruitment capacity, for your faction. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_immortals_5	The Immortals - Exalted	false
+effect_bundles_localised_description_derpy_gg_rank_immortals_5	Rank 5 of 5 with The Immortals, held at 1500 reputation. +15% replenishment rate, for every army. +3 recruitment capacity, for your faction. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_lead_immortals	The Immortals - Foremost	false
+effect_bundles_localised_description_derpy_gg_lead_immortals	You hold more reputation with The Immortals than any other faction in the world. +10% replenishment rate, for every army, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
+derpy_gg_guild_name_daemonsmiths	The Daemonsmiths	false
+derpy_gg_guild_desc_daemonsmiths	Those who bind daemons into iron. They sell knowledge, never cheaply.||Reputation accrues from technologies you complete.||Ranks pay, for your faction: +3% research rate at 100 rep / +6% research rate at 300 rep / +10% research rate at 700 rep / +15% research rate at 1500 rep.	false
+effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_2	The Daemonsmiths - Indebted	false
+effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_2	Rank 2 of 5 with The Daemonsmiths, held at 100 reputation. +3% research rate, for your faction. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_3	The Daemonsmiths - Sworn	false
+effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_3	Rank 3 of 5 with The Daemonsmiths, held at 300 reputation. +6% research rate, for your faction. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_4	The Daemonsmiths - Favoured	false
+effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_4	Rank 4 of 5 with The Daemonsmiths, held at 700 reputation. +10% research rate, for your faction. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_5	The Daemonsmiths - Exalted	false
+effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_5	Rank 5 of 5 with The Daemonsmiths, held at 1500 reputation. +15% research rate, for your faction. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_lead_daemonsmiths	The Daemonsmiths - Foremost	false
+effect_bundles_localised_description_derpy_gg_lead_daemonsmiths	You hold more reputation with The Daemonsmiths than any other faction in the world. +10% research rate, for your faction, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
+derpy_gg_guild_name_khanate	The Khanate	false
+derpy_gg_guild_desc_khanate	Hobgoblin knives and hobgoblin eyes, for hire to anyone, including against you.||Reputation accrues from agent actions you carry out.||Ranks pay, for every province you own: -3% agent recruitment cost at 100 rep / -6% agent recruitment cost at 300 rep / -10% agent recruitment cost at 700 rep / -15% agent recruitment cost at 1500 rep.	false
+effect_bundles_localised_title_derpy_gg_rank_khanate_2	The Khanate - Indebted	false
+effect_bundles_localised_description_derpy_gg_rank_khanate_2	Rank 2 of 5 with The Khanate, held at 100 reputation. -3% agent recruitment cost, for every province you own. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_khanate_3	The Khanate - Sworn	false
+effect_bundles_localised_description_derpy_gg_rank_khanate_3	Rank 3 of 5 with The Khanate, held at 300 reputation. -6% agent recruitment cost, for every province you own. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_khanate_4	The Khanate - Favoured	false
+effect_bundles_localised_description_derpy_gg_rank_khanate_4	Rank 4 of 5 with The Khanate, held at 700 reputation. -10% agent recruitment cost, for every province you own. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_khanate_5	The Khanate - Exalted	false
+effect_bundles_localised_description_derpy_gg_rank_khanate_5	Rank 5 of 5 with The Khanate, held at 1500 reputation. -15% agent recruitment cost, for every province you own. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_lead_khanate	The Khanate - Foremost	false
+effect_bundles_localised_description_derpy_gg_lead_khanate	You hold more reputation with The Khanate than any other faction in the world. -10% agent recruitment cost, for every province you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
+derpy_gg_guild_name_overseers	The Overseers	false
+derpy_gg_guild_desc_overseers	The gang-masters who drive the building of Zharr Naggrund and everything like it.||Reputation accrues from buildings you complete, and more from higher levels.||Ranks pay, for every region you own: -3% building construction cost at 100 rep / -6% building construction cost at 300 rep / -10% building construction cost at 700 rep / -15% building construction cost at 1500 rep.	false
+effect_bundles_localised_title_derpy_gg_rank_overseers_2	The Overseers - Indebted	false
+effect_bundles_localised_description_derpy_gg_rank_overseers_2	Rank 2 of 5 with The Overseers, held at 100 reputation. -3% building construction cost, for every region you own. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_overseers_3	The Overseers - Sworn	false
+effect_bundles_localised_description_derpy_gg_rank_overseers_3	Rank 3 of 5 with The Overseers, held at 300 reputation. -6% building construction cost, for every region you own. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_overseers_4	The Overseers - Favoured	false
+effect_bundles_localised_description_derpy_gg_rank_overseers_4	Rank 4 of 5 with The Overseers, held at 700 reputation. -10% building construction cost, for every region you own. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_overseers_5	The Overseers - Exalted	false
+effect_bundles_localised_description_derpy_gg_rank_overseers_5	Rank 5 of 5 with The Overseers, held at 1500 reputation. -15% building construction cost, for every region you own. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_lead_overseers	The Overseers - Foremost	false
+effect_bundles_localised_description_derpy_gg_lead_overseers	You hold more reputation with The Overseers than any other faction in the world. -10% building construction cost, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
+derpy_gg_guild_name_slavers	The Slavers	false
+derpy_gg_guild_desc_slavers	The coffle-drivers. Their ledger is measured in bodies, and it is always growing.||Reputation accrues from settlements you sack, and more from those you raze.||Ranks pay, for every army: +3% income from sacking and razing at 100 rep / +6% income from sacking and razing at 300 rep / +10% income from sacking and razing at 700 rep / +15% income from sacking and razing at 1500 rep.	false
+effect_bundles_localised_title_derpy_gg_rank_slavers_2	The Slavers - Indebted	false
+effect_bundles_localised_description_derpy_gg_rank_slavers_2	Rank 2 of 5 with The Slavers, held at 100 reputation. +3% income from sacking and razing, for every army. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_slavers_3	The Slavers - Sworn	false
+effect_bundles_localised_description_derpy_gg_rank_slavers_3	Rank 3 of 5 with The Slavers, held at 300 reputation. +6% income from sacking and razing, for every army. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_slavers_4	The Slavers - Favoured	false
+effect_bundles_localised_description_derpy_gg_rank_slavers_4	Rank 4 of 5 with The Slavers, held at 700 reputation. +10% income from sacking and razing, for every army. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_rank_slavers_5	The Slavers - Exalted	false
+effect_bundles_localised_description_derpy_gg_rank_slavers_5	Rank 5 of 5 with The Slavers, held at 1500 reputation. +15% income from sacking and razing, for every army. This lasts as long as the rank does.	false
+effect_bundles_localised_title_derpy_gg_lead_slavers	The Slavers - Foremost	false
+effect_bundles_localised_description_derpy_gg_lead_slavers	You hold more reputation with The Slavers than any other faction in the world. +10% income from sacking and razing, for every army, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
+effect_bundles_localised_title_derpy_gg_patron	Guild Patron	false
+effect_bundles_localised_description_derpy_gg_patron	This lord speaks for one of the Great Guilds, and the guild answers. +10% replenishment and +10% campaign movement for their army. While they hold the post, that guild's reputation pays half again and its services cost 10% less. Only one lord may hold it.	false
+derpy_gg_service_name_caravan_levy	Caravan Levy	false
+derpy_gg_service_desc_caravan_levy	Calls in debts across the trade roads. Adds 2,500 gold to your treasury at once.||Costs 50 favour. Cooldown 8 turns. Needs rank 2, Indebted.	false
+derpy_gg_service_name_writ_monopoly	Writ of Monopoly	false
+derpy_gg_service_desc_writ_monopoly	+32% income from all buildings, for every region you own, for 10 turns.||Costs 150 favour. Cooldown 12 turns. Needs rank 3, Sworn.	false
+effect_bundles_localised_title_derpy_gg_svc_writ_monopoly	Writ of Monopoly	false
+effect_bundles_localised_description_derpy_gg_svc_writ_monopoly	Bought from The Brass Tablets with favour. +32% income from all buildings, for every region you own. Runs for 10 turns.	false
+derpy_gg_service_name_long_ledger	The Long Ledger	false
+derpy_gg_service_desc_long_ledger	+45% income from all buildings, for every region you own, for 15 turns.||Costs 400 favour. Cooldown 20 turns. Needs rank 4, Favoured. Only the faction that leads The Brass Tablets may buy it.	false
+effect_bundles_localised_title_derpy_gg_svc_long_ledger	The Long Ledger	false
+effect_bundles_localised_description_derpy_gg_svc_long_ledger	Bought from The Brass Tablets with favour. +45% income from all buildings, for every region you own. Runs for 15 turns.	false
+derpy_gg_service_name_oathbound_draft	Oathbound Draft	false
+derpy_gg_service_desc_oathbound_draft	+20% replenishment rate, for every army, for 5 turns.||Costs 50 favour. Cooldown 6 turns. Needs rank 2, Indebted.	false
+effect_bundles_localised_title_derpy_gg_svc_oathbound_draft	Oathbound Draft	false
+effect_bundles_localised_description_derpy_gg_svc_oathbound_draft	Bought from The Immortals with favour. +20% replenishment rate, for every army. Runs for 5 turns.	false
+derpy_gg_service_name_hire_immortals	Hire the Immortals	false
+derpy_gg_service_desc_hire_immortals	A company already sworn and already armed. Adds one unit of Infernal Guard (Great Weapons) to an army of your choosing.||Costs 150 favour. Cooldown 10 turns. Needs rank 3, Sworn.	false
+derpy_gg_service_name_astragoths_levy	Astragoth's Levy	false
+derpy_gg_service_desc_astragoths_levy	+45% replenishment rate, for every army, for 10 turns.||Costs 400 favour. Cooldown 15 turns. Needs rank 4, Favoured. Only the faction that leads The Immortals may buy it.	false
+effect_bundles_localised_title_derpy_gg_svc_astragoths_levy	Astragoth's Levy	false
+effect_bundles_localised_description_derpy_gg_svc_astragoths_levy	Bought from The Immortals with favour. +45% replenishment rate, for every army. Runs for 10 turns.	false
+derpy_gg_service_name_forge_rite	Forge-Rite	false
+derpy_gg_service_desc_forge_rite	+20% research rate, for your faction, for 8 turns.||Costs 50 favour. Cooldown 8 turns. Needs rank 2, Indebted.	false
+effect_bundles_localised_title_derpy_gg_svc_forge_rite	Forge-Rite	false
+effect_bundles_localised_description_derpy_gg_svc_forge_rite	Bought from The Daemonsmiths with favour. +20% research rate, for your faction. Runs for 8 turns.	false
+derpy_gg_service_name_bound_blueprint	Bound Blueprint	false
+derpy_gg_service_desc_bound_blueprint	The Daemonsmiths hand over work already done. Completes the technology you are currently researching, at once.||Costs 150 favour. Cooldown 14 turns. Needs rank 3, Sworn.	false
+derpy_gg_service_name_bound_ordnance	Daemon-Bound Ordnance	false
+derpy_gg_service_desc_bound_ordnance	+45% research rate, for your faction, for 10 turns.||Costs 400 favour. Cooldown 15 turns. Needs rank 4, Favoured. Only the faction that leads The Daemonsmiths may buy it.	false
+effect_bundles_localised_title_derpy_gg_svc_bound_ordnance	Daemon-Bound Ordnance	false
+effect_bundles_localised_description_derpy_gg_svc_bound_ordnance	Bought from The Daemonsmiths with favour. +45% research rate, for your faction. Runs for 10 turns.	false
+derpy_gg_service_name_hobgoblin_eyes	Hobgoblin Eyes	false
+derpy_gg_service_desc_hobgoblin_eyes	Hobgoblin scouts sell what they have seen. Reveals one region through the shroud, permanently.||Costs 50 favour. Cooldown 6 turns. Needs rank 2, Indebted.	false
+derpy_gg_service_name_knife_in_dark	Knife in the Dark	false
+derpy_gg_service_desc_knife_in_dark	-32% agent recruitment cost, for every province you own, for 8 turns.||Costs 150 favour. Cooldown 10 turns. Needs rank 3, Sworn.	false
+effect_bundles_localised_title_derpy_gg_svc_knife_in_dark	Knife in the Dark	false
+effect_bundles_localised_description_derpy_gg_svc_knife_in_dark	Bought from The Khanate with favour. -32% agent recruitment cost, for every province you own. Runs for 8 turns.	false
+derpy_gg_service_name_khans_price	The Khan's Price	false
+derpy_gg_service_desc_khans_price	Inflicts +45% agent recruitment cost on a faction you are at war with, across their provinces, for 10 turns. You gain nothing directly - they simply pay more.||Costs 400 favour. Cooldown 18 turns. Needs rank 4, Favoured. Only the faction that leads The Khanate may buy it.	false
+effect_bundles_localised_title_derpy_gg_svc_khans_price	The Khan's Price	false
+effect_bundles_localised_description_derpy_gg_svc_khans_price	Inflicted by The Khanate, bought with favour. +45% agent recruitment cost, across their provinces. Runs for 10 turns.	false
+derpy_gg_service_name_lash_the_gangs	Lash the Gangs	false
+derpy_gg_service_desc_lash_the_gangs	-20% building construction cost, for every region you own, for 6 turns.||Costs 50 favour. Cooldown 6 turns. Needs rank 2, Indebted.	false
+effect_bundles_localised_title_derpy_gg_svc_lash_the_gangs	Lash the Gangs	false
+effect_bundles_localised_description_derpy_gg_svc_lash_the_gangs	Bought from The Overseers with favour. -20% building construction cost, for every region you own. Runs for 6 turns.	false
+derpy_gg_service_name_raise_ziggurat	Raise the Ziggurat	false
+derpy_gg_service_desc_raise_ziggurat	Overseer gangs work through the night. Upgrades one of your buildings to its next level at once, and free.||Costs 150 favour. Cooldown 12 turns. Needs rank 3, Sworn.	false
+derpy_gg_service_name_works_of_zharr	Works of Zharr	false
+derpy_gg_service_desc_works_of_zharr	-45% building construction cost, for every region you own, for 12 turns.||Costs 400 favour. Cooldown 15 turns. Needs rank 4, Favoured. Only the faction that leads The Overseers may buy it.	false
+effect_bundles_localised_title_derpy_gg_svc_works_of_zharr	Works of Zharr	false
+effect_bundles_localised_description_derpy_gg_svc_works_of_zharr	Bought from The Overseers with favour. -45% building construction cost, for every region you own. Runs for 12 turns.	false
+derpy_gg_service_name_coffle_drive	Coffle Drive	false
+derpy_gg_service_desc_coffle_drive	+20% income from sacking and razing, for every army, for 8 turns.||Costs 50 favour. Cooldown 8 turns. Needs rank 2, Indebted.	false
+effect_bundles_localised_title_derpy_gg_svc_coffle_drive	Coffle Drive	false
+effect_bundles_localised_description_derpy_gg_svc_coffle_drive	Bought from The Slavers with favour. +20% income from sacking and razing, for every army. Runs for 8 turns.	false
+derpy_gg_service_name_slave_tithe	Slave Tithe	false
+derpy_gg_service_desc_slave_tithe	A column of slaves, delivered. Adds 400 armaments and 800 raw materials. A faction that keeps no such stockpiles is paid 3,000 gold instead.||Costs 150 favour. Cooldown 10 turns. Needs rank 3, Sworn.	false
+derpy_gg_service_name_great_coffle	The Great Coffle	false
+derpy_gg_service_desc_great_coffle	+45% income from sacking and razing, for every army, for 12 turns.||Costs 400 favour. Cooldown 18 turns. Needs rank 4, Favoured. Only the faction that leads The Slavers may buy it.	false
+effect_bundles_localised_title_derpy_gg_svc_great_coffle	The Great Coffle	false
+effect_bundles_localised_description_derpy_gg_svc_great_coffle	Bought from The Slavers with favour. +45% income from sacking and razing, for every army. Runs for 12 turns.	false
+derpy_gg_panel_title	The Great Guilds	false
+derpy_gg_favour	Favour	false
+derpy_gg_reputation	Reputation	false
+derpy_gg_you	You	false
+derpy_gg_standing_help	REPUTATION only rises and sets your rank. FAVOUR accrues beside it and is what you spend - spending never costs you rank.||Unmarked 0 / Indebted 100 / Sworn 300 / Favoured 700 / Exalted 1500||Help tab: the full rules.	false
+derpy_gg_cost_label	Favour cost	false
+derpy_gg_tab_guilds	Guilds	false
+derpy_gg_tab_stand	Standings	false
+derpy_gg_tab_bounty	Bounties	false
+derpy_gg_tab_help	Help	false
+derpy_gg_tab_log	Log	false
+derpy_gg_hdr_log	What has happened, newest first.	false
+derpy_gg_log_help	Every rank you gain or lose, every service you buy, every service your rivals buy or use against you, and every guild lead that changes hands. The most recent entries are kept.	false
+derpy_gg_log_empty	Nothing yet. Ranks gained and lost, services bought and leads changing hands are recorded here.	false
+derpy_gg_log_turn	Turn	false
+derpy_gg_log_rose	you rose to	false
+derpy_gg_log_fell	you fell to	false
+derpy_gg_log_bought	you bought	false
+derpy_gg_log_ai_bought	bought	false
+derpy_gg_log_hit	was used against you by	false
+derpy_gg_log_lead_won	you took the lead	false
+derpy_gg_log_lead_lost	you lost the lead to	false
+derpy_gg_log_from	from	false
+derpy_gg_take	Take	false
+derpy_gg_bounty_none	No bounty on offer	false
+derpy_gg_bounty_taken	Taken	false
+derpy_gg_bounty_pays	Pays	false
+derpy_gg_bounty_turns	turns left	false
+derpy_gg_bounty_lord	Their general	false
+derpy_gg_leader	Leader	false
+derpy_gg_nobody	Nobody yet	false
+derpy_gg_hdr_stand	Hover a row for the full table.	false
+derpy_gg_hdr_bounty	Three offers, drawn from every guild.	false
+derpy_gg_hdr_help	How the Great Guilds work.	false
+derpy_gg_rival	Rival:	false
+derpy_gg_bounty_routine	Routine	false
+derpy_gg_bounty_hard	Hard	false
+derpy_gg_bounty_grim	Grim	false
+derpy_gg_cost_base	base	false
+derpy_gg_cost_loyal	The guild knows you, and charges less.	false
+derpy_gg_cost_rival	You wear their rival's mark, and they charge for it.	false
+derpy_gg_needs_target	Select an enemy character on the campaign map first - this service is aimed at their faction.	false
+derpy_gg_needs_target_short	Pick a target	false
+derpy_gg_needs_army	Select one of your own armies on the campaign map first - the regiment joins whoever is selected.	false
+derpy_gg_needs_region_any	Select a settlement on the campaign map first - its region is what gets revealed.	false
+derpy_gg_needs_region_own	Select one of your OWN settlements on the campaign map first, with a building that still has somewhere to go.	false
+derpy_gg_needs_research	Start researching something first - this finishes whatever technology you have queued in the tech tree.	false
+derpy_gg_no_unit	This guild keeps no regiment your people would muster. Their other services are open to you.	false
+derpy_gg_per_turn	/turn	false
+derpy_gg_upkeep_on	Upkeep, taken every turn:	false
+derpy_gg_upkeep_soon	An upkeep begins on turn	false
+derpy_gg_upkeep_help	Standing has to be held, not just won. Every guild you have reputation with charges a little back each turn, and the higher your rank the more it costs to sit on - so a guild you stop feeding slides back down the ladder, and its bonus goes with it.	false
+derpy_gg_table_head	Standing with this guild:	false
+derpy_gg_more	more	false
+derpy_gg_unranked	no standing yet	false
+derpy_gg_buy	Buy	false
+derpy_gg_prev	<	false
+derpy_gg_next	>	false
+derpy_gg_tab_court	Court	false
+derpy_gg_hdr_court	Demands, patronage and who leads.	false
+derpy_gg_needs_lead	Foremost only	false
+derpy_gg_lead_you	You lead them	false
+derpy_gg_lead_by	Led by	false
+derpy_gg_lead_title	Foremost	false
+derpy_gg_lead_hint	Only the faction holding the most reputation with this guild may buy this. Out-earn whoever holds it.	false
+derpy_gg_patron_none	No patron appointed	false
+derpy_gg_patron_appoint	Appoint	false
+derpy_gg_patron_dismiss	Dismiss	false
+derpy_gg_patron_of	Patron	false
+derpy_gg_patron_needs_char	Select one of your own lords on the campaign map, then press Appoint.	false
+derpy_gg_patron_elsewhere	Your patron already serves another guild. Appointing here moves them.	false
+derpy_gg_demand_none	No demand stands against you	false
+derpy_gg_demand_pay	Pay	false
+derpy_gg_demand_owed	They want	false
+derpy_gg_demand_due	turns to pay	false
+derpy_gg_demand_short	You cannot pay this yet	false
+derpy_gg_demand_gold	gold	false
+derpy_gg_demand_favour	favour	false
+derpy_gg_needs	Needs	false
+derpy_gg_demand_name_renounce	Renunciation	false
+derpy_gg_demand_desc_renounce	The guild wants you to burn what you have built with its rival. The favour goes; the reputation stays.	false
+derpy_gg_demand_name_tribute	Tribute	false
+derpy_gg_demand_desc_tribute	The guild wants gold, and it wants it now.	false
+derpy_gg_help_t1	The Guilds	false
+derpy_gg_help_p1	#Two numbers, per guild||-REPUTATION is earned by playing and is never spent. It alone sets your rank.||-But it is not a ratchet. It falls to a rival you have been feeding, to a demand you let expire, to a bounty you took and did not finish, and to the upkeep every guild charges to keep you on its books.||-FAVOUR accrues beside it and is the currency services are bought with. Spending it never costs you rank, so there is no reason to hoard it.||#The five ranks||-Unmarked 0 / Indebted 100 / Sworn 300 / Favoured 700 / Exalted 1500||-Each rank grants a permanent bonus that lasts exactly as long as the rank does. The Guilds tab names the one you hold.||#Services||-Each guild sells three, gated by rank and paid for in favour. Each has a cooldown.||-The price moves with your standing: a guild that knows you charges less, one whose rival you have been courting charges more.	false
+derpy_gg_help_t2	Earning	false
+derpy_gg_help_p2	#What each guild pays for||-The Brass Tablets: trade and treasury income||-The Immortals: battles won, doubled when outnumbered||-The Daemonsmiths: technologies completed||-The Khanate: agent actions carried out||-The Overseers: settlements grown, and buildings no other guild claims||-The Slavers: settlements sacked, more when razed||-And a completed BUILDING pays whichever guild it belongs to - a forge the Daemonsmiths, a dock the Brass Tablets, a barracks the Immortals - more at higher levels.||#Every guild at once||-Completing any MISSION raises your standing with all six. It is the only thing that does, and it is how a guild whose trade you never touch comes to know your name.||#Rivalry||-Brass Tablets and Khanate / Immortals and Daemonsmiths / Overseers and Slavers||-Earning with one takes reputation from its rival - never a rank you hold, and nothing before Indebted.||#Per-turn caps||-Most guilds pay only so much in a turn, so no empire can max one passively.	false
+derpy_gg_help_t3	Bounties	false
+derpy_gg_help_p3	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Finish it and that guild pays gold and a large amount of reputation - far more than an ordinary mission.||-Leave it alone, or hand it back, and nothing is lost but the offer.||-Take it and FAIL it and that guild takes back what finishing it would have paid. Declining work is free; promising it and not delivering is not.||#The price is the target||-A defended provincial capital is worth several times a ruined border town.||-A veteran faction leader several times a fresh general.||-Every offer is rated Routine, Hard or Grim, which is the guild saying why the number is what it is.||#Two rules about the price||-An offer you have NOT taken re-prices as the world moves.||-One you HAVE taken keeps the price you agreed.	false
+derpy_gg_help_t4	The Court	false
+derpy_gg_help_p4	#Leading a guild||-Held by whichever faction in the world has the most reputation with it - you or a rival.||-The leader carries an extra bonus, and the guild's dearest service is sold to nobody else.||-It can be taken from you. The Standings tab is the league table.||#Demands||-Every so often a guild that already knows you asks for something, with a deadline on it.||-It wants either gold, or the favour you hold with its own rival.||-Pay it and your standing jumps. Let the deadline pass and it falls, far enough to cost you a rank.||#A patron||-One of your lords, bound to one guild. Select them on the campaign map, then press Appoint.||-Their army gains replenishment and campaign movement.||-That guild's reputation pays half again and its services cost less.||-One lord, one guild. Appointing a second moves the post.	false
+derpy_gg_help_t5	Losing standing	false
+derpy_gg_help_p5	#Reputation is not a ratchet||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Leaving an offer alone costs nothing, and handing one back costs nothing.||-Failing one you accepted costs what finishing it would have paid.	false
+derpy_gg_help_of	of	false
+derpy_gg_court_help	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or an AI. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your standing with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
+message_event_text_text_derpy_gg_demand_title	A Guild Asks	false
+message_event_text_text_derpy_gg_demand_primary	One of the Great Guilds has made a demand of you. The Court tab holds the terms and the deadline.	false
+message_event_text_text_derpy_gg_demand_secondary	They do not ask twice.	false
+message_event_text_text_derpy_gg_demand_fail_title	A Guild Is Answered With Silence	false
+message_event_text_text_derpy_gg_demand_fail_primary	The deadline has passed and nothing was paid. Your standing with that guild has fallen.	false
+message_event_text_text_derpy_gg_demand_fail_secondary	The ledger is kept whether you read it or not.	false
+message_event_text_text_derpy_gg_bounty_fail_title	A Guild Is Left Waiting	false
+message_event_text_text_derpy_gg_bounty_fail_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs nothing; taking it and failing costs what finishing it would have paid.	false
+message_event_text_text_derpy_gg_bounty_fail_secondary	A promise in the ledger is a debt.	false
+derpy_gg_bounty_help	A guild posts work it wants done. Take one and it becomes a mission; finish it and that guild pays gold and a large amount of reputation - far more than a normal mission. Leave an offer alone, or hand it back through the objectives panel, and nothing is lost but the offer.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline costs that guild's reputation - by default exactly what finishing it would have paid. Declining work is free; promising it and not delivering is not.||The pay is read off the target, not fixed: a defended provincial capital is worth several times a ruined border town, and a rank-40 faction leader several times a fresh general. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
+derpy_gg_locked_hint	Your rank with this guild is too low. Keep earning reputation.	false
+message_event_text_text_derpy_gg_hit_title	A Guild Moves Against You	false
+message_event_text_text_derpy_gg_hit_primary	A rival has bought the favour of a guild, and it has been spent on you.	false
+message_event_text_text_derpy_gg_hit_secondary	Their standing buys more than goods.	false
+message_event_text_text_derpy_gg_lead_won_brass_title	The Brass Tablets Answer To You	false
+message_event_text_text_derpy_gg_lead_won_brass_primary	You now hold more reputation with The Brass Tablets than any other power in the world. Their leader's grant is yours, and their finest service is sold to nobody else.	false
+message_event_text_text_derpy_gg_lead_won_brass_secondary	It is taken back the same way it was won.	false
+message_event_text_text_derpy_gg_lead_lost_brass_title	The Brass Tablets Have Turned Away	false
+message_event_text_text_derpy_gg_lead_lost_brass_primary	A rival has out-earned you with The Brass Tablets. Their leader's grant and the monopoly on their finest service went with them.	false
+message_event_text_text_derpy_gg_lead_lost_brass_secondary	The Standings tab names who holds it now.	false
+message_event_text_text_derpy_gg_lead_won_immortals_title	The Immortals Answer To You	false
+message_event_text_text_derpy_gg_lead_won_immortals_primary	You now hold more reputation with The Immortals than any other power in the world. Their leader's grant is yours, and their finest service is sold to nobody else.	false
+message_event_text_text_derpy_gg_lead_won_immortals_secondary	It is taken back the same way it was won.	false
+message_event_text_text_derpy_gg_lead_lost_immortals_title	The Immortals Have Turned Away	false
+message_event_text_text_derpy_gg_lead_lost_immortals_primary	A rival has out-earned you with The Immortals. Their leader's grant and the monopoly on their finest service went with them.	false
+message_event_text_text_derpy_gg_lead_lost_immortals_secondary	The Standings tab names who holds it now.	false
+message_event_text_text_derpy_gg_lead_won_daemonsmiths_title	The Daemonsmiths Answer To You	false
+message_event_text_text_derpy_gg_lead_won_daemonsmiths_primary	You now hold more reputation with The Daemonsmiths than any other power in the world. Their leader's grant is yours, and their finest service is sold to nobody else.	false
+message_event_text_text_derpy_gg_lead_won_daemonsmiths_secondary	It is taken back the same way it was won.	false
+message_event_text_text_derpy_gg_lead_lost_daemonsmiths_title	The Daemonsmiths Have Turned Away	false
+message_event_text_text_derpy_gg_lead_lost_daemonsmiths_primary	A rival has out-earned you with The Daemonsmiths. Their leader's grant and the monopoly on their finest service went with them.	false
+message_event_text_text_derpy_gg_lead_lost_daemonsmiths_secondary	The Standings tab names who holds it now.	false
+message_event_text_text_derpy_gg_lead_won_khanate_title	The Khanate Answer To You	false
+message_event_text_text_derpy_gg_lead_won_khanate_primary	You now hold more reputation with The Khanate than any other power in the world. Their leader's grant is yours, and their finest service is sold to nobody else.	false
+message_event_text_text_derpy_gg_lead_won_khanate_secondary	It is taken back the same way it was won.	false
+message_event_text_text_derpy_gg_lead_lost_khanate_title	The Khanate Have Turned Away	false
+message_event_text_text_derpy_gg_lead_lost_khanate_primary	A rival has out-earned you with The Khanate. Their leader's grant and the monopoly on their finest service went with them.	false
+message_event_text_text_derpy_gg_lead_lost_khanate_secondary	The Standings tab names who holds it now.	false
+message_event_text_text_derpy_gg_lead_won_overseers_title	The Overseers Answer To You	false
+message_event_text_text_derpy_gg_lead_won_overseers_primary	You now hold more reputation with The Overseers than any other power in the world. Their leader's grant is yours, and their finest service is sold to nobody else.	false
+message_event_text_text_derpy_gg_lead_won_overseers_secondary	It is taken back the same way it was won.	false
+message_event_text_text_derpy_gg_lead_lost_overseers_title	The Overseers Have Turned Away	false
+message_event_text_text_derpy_gg_lead_lost_overseers_primary	A rival has out-earned you with The Overseers. Their leader's grant and the monopoly on their finest service went with them.	false
+message_event_text_text_derpy_gg_lead_lost_overseers_secondary	The Standings tab names who holds it now.	false
+message_event_text_text_derpy_gg_lead_won_slavers_title	The Slavers Answer To You	false
+message_event_text_text_derpy_gg_lead_won_slavers_primary	You now hold more reputation with The Slavers than any other power in the world. Their leader's grant is yours, and their finest service is sold to nobody else.	false
+message_event_text_text_derpy_gg_lead_won_slavers_secondary	It is taken back the same way it was won.	false
+message_event_text_text_derpy_gg_lead_lost_slavers_title	The Slavers Have Turned Away	false
+message_event_text_text_derpy_gg_lead_lost_slavers_primary	A rival has out-earned you with The Slavers. Their leader's grant and the monopoly on their finest service went with them.	false
+message_event_text_text_derpy_gg_lead_lost_slavers_secondary	The Standings tab names who holds it now.	false
+message_event_text_text_derpy_gg_rank_brass_2_title	The Brass Tablets Name You Indebted	false
+message_event_text_text_derpy_gg_rank_brass_2_primary	Your standing with The Brass Tablets has risen to Indebted. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_brass_2_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_brass_3_title	The Brass Tablets Name You Sworn	false
+message_event_text_text_derpy_gg_rank_brass_3_primary	Your standing with The Brass Tablets has risen to Sworn. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_brass_3_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_brass_4_title	The Brass Tablets Name You Favoured	false
+message_event_text_text_derpy_gg_rank_brass_4_primary	Your standing with The Brass Tablets has risen to Favoured. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_brass_4_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_brass_5_title	The Brass Tablets Name You Exalted	false
+message_event_text_text_derpy_gg_rank_brass_5_primary	Your standing with The Brass Tablets has risen to Exalted. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_brass_5_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_immortals_2_title	The Immortals Name You Indebted	false
+message_event_text_text_derpy_gg_rank_immortals_2_primary	Your standing with The Immortals has risen to Indebted. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_immortals_2_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_immortals_3_title	The Immortals Name You Sworn	false
+message_event_text_text_derpy_gg_rank_immortals_3_primary	Your standing with The Immortals has risen to Sworn. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_immortals_3_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_immortals_4_title	The Immortals Name You Favoured	false
+message_event_text_text_derpy_gg_rank_immortals_4_primary	Your standing with The Immortals has risen to Favoured. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_immortals_4_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_immortals_5_title	The Immortals Name You Exalted	false
+message_event_text_text_derpy_gg_rank_immortals_5_primary	Your standing with The Immortals has risen to Exalted. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_immortals_5_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_daemonsmiths_2_title	The Daemonsmiths Name You Indebted	false
+message_event_text_text_derpy_gg_rank_daemonsmiths_2_primary	Your standing with The Daemonsmiths has risen to Indebted. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_daemonsmiths_2_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_daemonsmiths_3_title	The Daemonsmiths Name You Sworn	false
+message_event_text_text_derpy_gg_rank_daemonsmiths_3_primary	Your standing with The Daemonsmiths has risen to Sworn. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_daemonsmiths_3_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_daemonsmiths_4_title	The Daemonsmiths Name You Favoured	false
+message_event_text_text_derpy_gg_rank_daemonsmiths_4_primary	Your standing with The Daemonsmiths has risen to Favoured. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_daemonsmiths_4_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_daemonsmiths_5_title	The Daemonsmiths Name You Exalted	false
+message_event_text_text_derpy_gg_rank_daemonsmiths_5_primary	Your standing with The Daemonsmiths has risen to Exalted. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_daemonsmiths_5_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_khanate_2_title	The Khanate Name You Indebted	false
+message_event_text_text_derpy_gg_rank_khanate_2_primary	Your standing with The Khanate has risen to Indebted. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_khanate_2_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_khanate_3_title	The Khanate Name You Sworn	false
+message_event_text_text_derpy_gg_rank_khanate_3_primary	Your standing with The Khanate has risen to Sworn. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_khanate_3_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_khanate_4_title	The Khanate Name You Favoured	false
+message_event_text_text_derpy_gg_rank_khanate_4_primary	Your standing with The Khanate has risen to Favoured. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_khanate_4_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_khanate_5_title	The Khanate Name You Exalted	false
+message_event_text_text_derpy_gg_rank_khanate_5_primary	Your standing with The Khanate has risen to Exalted. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_khanate_5_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_overseers_2_title	The Overseers Name You Indebted	false
+message_event_text_text_derpy_gg_rank_overseers_2_primary	Your standing with The Overseers has risen to Indebted. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_overseers_2_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_overseers_3_title	The Overseers Name You Sworn	false
+message_event_text_text_derpy_gg_rank_overseers_3_primary	Your standing with The Overseers has risen to Sworn. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_overseers_3_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_overseers_4_title	The Overseers Name You Favoured	false
+message_event_text_text_derpy_gg_rank_overseers_4_primary	Your standing with The Overseers has risen to Favoured. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_overseers_4_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_overseers_5_title	The Overseers Name You Exalted	false
+message_event_text_text_derpy_gg_rank_overseers_5_primary	Your standing with The Overseers has risen to Exalted. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_overseers_5_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_slavers_2_title	The Slavers Name You Indebted	false
+message_event_text_text_derpy_gg_rank_slavers_2_primary	Your standing with The Slavers has risen to Indebted. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_slavers_2_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_slavers_3_title	The Slavers Name You Sworn	false
+message_event_text_text_derpy_gg_rank_slavers_3_primary	Your standing with The Slavers has risen to Sworn. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_slavers_3_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_slavers_4_title	The Slavers Name You Favoured	false
+message_event_text_text_derpy_gg_rank_slavers_4_primary	Your standing with The Slavers has risen to Favoured. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_slavers_4_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_rank_slavers_5_title	The Slavers Name You Exalted	false
+message_event_text_text_derpy_gg_rank_slavers_5_primary	Your standing with The Slavers has risen to Exalted. Their grant to you has grown, and a service that was closed to you is open.	false
+message_event_text_text_derpy_gg_rank_slavers_5_secondary	Favour is spent on the Guilds tab.	false
+message_event_text_text_derpy_gg_notice_first_brass_title	The Brass Tablets Have Noticed You	false
+message_event_text_text_derpy_gg_notice_first_brass_primary	Word of your doings has reached The Brass Tablets. They keep a ledger of every power in the world, and your name is now in it. Standing with them is earned by playing as you already play; what it buys is on the Guilds panel.	false
+message_event_text_text_derpy_gg_notice_first_brass_secondary	The crest on your HUD opens it.	false
+message_event_text_text_derpy_gg_notice_first_immortals_title	The Immortals Have Noticed You	false
+message_event_text_text_derpy_gg_notice_first_immortals_primary	Word of your doings has reached The Immortals. They keep a ledger of every power in the world, and your name is now in it. Standing with them is earned by playing as you already play; what it buys is on the Guilds panel.	false
+message_event_text_text_derpy_gg_notice_first_immortals_secondary	The crest on your HUD opens it.	false
+message_event_text_text_derpy_gg_notice_first_daemonsmiths_title	The Daemonsmiths Have Noticed You	false
+message_event_text_text_derpy_gg_notice_first_daemonsmiths_primary	Word of your doings has reached The Daemonsmiths. They keep a ledger of every power in the world, and your name is now in it. Standing with them is earned by playing as you already play; what it buys is on the Guilds panel.	false
+message_event_text_text_derpy_gg_notice_first_daemonsmiths_secondary	The crest on your HUD opens it.	false
+message_event_text_text_derpy_gg_notice_first_khanate_title	The Khanate Have Noticed You	false
+message_event_text_text_derpy_gg_notice_first_khanate_primary	Word of your doings has reached The Khanate. They keep a ledger of every power in the world, and your name is now in it. Standing with them is earned by playing as you already play; what it buys is on the Guilds panel.	false
+message_event_text_text_derpy_gg_notice_first_khanate_secondary	The crest on your HUD opens it.	false
+message_event_text_text_derpy_gg_notice_first_overseers_title	The Overseers Have Noticed You	false
+message_event_text_text_derpy_gg_notice_first_overseers_primary	Word of your doings has reached The Overseers. They keep a ledger of every power in the world, and your name is now in it. Standing with them is earned by playing as you already play; what it buys is on the Guilds panel.	false
+message_event_text_text_derpy_gg_notice_first_overseers_secondary	The crest on your HUD opens it.	false
+message_event_text_text_derpy_gg_notice_first_slavers_title	The Slavers Have Noticed You	false
+message_event_text_text_derpy_gg_notice_first_slavers_primary	Word of your doings has reached The Slavers. They keep a ledger of every power in the world, and your name is now in it. Standing with them is earned by playing as you already play; what it buys is on the Guilds panel.	false
+message_event_text_text_derpy_gg_notice_first_slavers_secondary	The crest on your HUD opens it.	false
+message_event_text_text_derpy_gg_notice_half_brass_title	The Brass Tablets Are Watching Closely	false
+message_event_text_text_derpy_gg_notice_half_brass_primary	You are halfway to a standing The Brass Tablets will act on. At Indebted they open their first service to you.	false
+message_event_text_text_derpy_gg_notice_half_brass_secondary	The Guilds panel shows how far every guild has come.	false
+message_event_text_text_derpy_gg_notice_half_immortals_title	The Immortals Are Watching Closely	false
+message_event_text_text_derpy_gg_notice_half_immortals_primary	You are halfway to a standing The Immortals will act on. At Indebted they open their first service to you.	false
+message_event_text_text_derpy_gg_notice_half_immortals_secondary	The Guilds panel shows how far every guild has come.	false
+message_event_text_text_derpy_gg_notice_half_daemonsmiths_title	The Daemonsmiths Are Watching Closely	false
+message_event_text_text_derpy_gg_notice_half_daemonsmiths_primary	You are halfway to a standing The Daemonsmiths will act on. At Indebted they open their first service to you.	false
+message_event_text_text_derpy_gg_notice_half_daemonsmiths_secondary	The Guilds panel shows how far every guild has come.	false
+message_event_text_text_derpy_gg_notice_half_khanate_title	The Khanate Are Watching Closely	false
+message_event_text_text_derpy_gg_notice_half_khanate_primary	You are halfway to a standing The Khanate will act on. At Indebted they open their first service to you.	false
+message_event_text_text_derpy_gg_notice_half_khanate_secondary	The Guilds panel shows how far every guild has come.	false
+message_event_text_text_derpy_gg_notice_half_overseers_title	The Overseers Are Watching Closely	false
+message_event_text_text_derpy_gg_notice_half_overseers_primary	You are halfway to a standing The Overseers will act on. At Indebted they open their first service to you.	false
+message_event_text_text_derpy_gg_notice_half_overseers_secondary	The Guilds panel shows how far every guild has come.	false
+message_event_text_text_derpy_gg_notice_half_slavers_title	The Slavers Are Watching Closely	false
+message_event_text_text_derpy_gg_notice_half_slavers_primary	You are halfway to a standing The Slavers will act on. At Indebted they open their first service to you.	false
+message_event_text_text_derpy_gg_notice_half_slavers_secondary	The Guilds panel shows how far every guild has come.	false
+derpy_gg_rivals	Rivals last turn:	false
+derpy_gg_rivals_bought	services bought	false
+derpy_gg_rivals_demands	demands paid	false
+derpy_gg_rivals_patrons	patrons afield	false
+derpy_gg_rivals_idle	Rivals have not moved yet - end a turn.	false
+derpy_gg_rivals_help	What the other powers of the world did with their guilds on the round just past: services they bought with favour, demands they answered, and lords they have standing as guild patrons.||Every one of these is a tool you have too. The rivals are playing for the same six guilds you are.||Each row below names who leads that guild, how much reputation the leader gained on that round, and marks the name in yellow when the guild changed hands.	false
+derpy_gg_took	changed hands this turn	false
+derpy_gg_gained	gained	false
+missions_localised_title_derpy_gg_bounty_brass	Seize the Market	false
+missions_localised_description_derpy_gg_bounty_brass	The Tablets want the tolls of that place counted in our column. Take it standing.	false
+missions_localised_mission_completed_text_derpy_gg_bounty_brass	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_bounty_immortals	Break Their Champion	false
+missions_localised_description_derpy_gg_bounty_immortals	A general is being spoken of with respect. Correct that.	false
+missions_localised_mission_completed_text_derpy_gg_bounty_immortals	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_bounty_daemonsmiths	Strip the Works	false
+missions_localised_description_derpy_gg_bounty_daemonsmiths	Everything in that place that was forged can be forged again, here. Bring it back in pieces.	false
+missions_localised_mission_completed_text_derpy_gg_bounty_daemonsmiths	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_bounty_khanate	A Knife for a Name	false
+missions_localised_description_derpy_gg_bounty_khanate	The Khanate does not care how it is done, only that the name stops being used.	false
+missions_localised_mission_completed_text_derpy_gg_bounty_khanate	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_bounty_overseers	Hands, Not Ashes	false
+missions_localised_description_derpy_gg_bounty_overseers	Take it whole. Ashes cannot be put to work, and the Overseers are counting hands.	false
+missions_localised_mission_completed_text_derpy_gg_bounty_overseers	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_bounty_slavers	Fill the Coffles	false
+missions_localised_description_derpy_gg_bounty_slavers	Empty it. The column that leaves is the payment, and it is measured in bodies.	false
+missions_localised_mission_completed_text_derpy_gg_bounty_slavers	The guild has been paid in full, and so have you.	false

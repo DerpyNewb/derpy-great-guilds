@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.skilltree_cache/
+TWUI_Studio/
+*.pack
+*.bak*
+
+# Creative Assembly-derived art is never published. It ships in the .pack only.
+*.png
+*.dds
+*.jpg
+*.jpeg
+*.webp
+*.tga

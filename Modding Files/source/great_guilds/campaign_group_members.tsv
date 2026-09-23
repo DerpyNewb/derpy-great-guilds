@@ -1,0 +1,6 @@
+group	id	priority
+#campaign_group_members_tables;1;db/campaign_group_members_tables/derpy_great_guilds		
+derpy_gg_event_feed_hit	derpy_gg_event_feed_hit	0
+derpy_gg_event_feed_demand	derpy_gg_event_feed_demand	0
+derpy_gg_event_feed_lead	derpy_gg_event_feed_lead	0
+derpy_gg_event_feed_rank	derpy_gg_event_feed_rank	0

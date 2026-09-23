@@ -1,0 +1,45 @@
+key	localised_description	localised_title	bundle_target	priority	ui_icon	is_global_effect	show_in_3d_space	owner_only
+#effect_bundles_tables;4;db/effect_bundles_tables/derpy_great_guilds								
+derpy_gg_rank_brass_2		The Brass Tablets - Indebted	faction	1		true	false	true
+derpy_gg_rank_brass_3		The Brass Tablets - Sworn	faction	1		true	false	true
+derpy_gg_rank_brass_4		The Brass Tablets - Favoured	faction	1		true	false	true
+derpy_gg_rank_brass_5		The Brass Tablets - Exalted	faction	1		true	false	true
+derpy_gg_lead_brass		The Brass Tablets - Foremost	faction	1		true	false	true
+derpy_gg_rank_immortals_2		The Immortals - Indebted	faction	1		true	false	true
+derpy_gg_rank_immortals_3		The Immortals - Sworn	faction	1		true	false	true
+derpy_gg_rank_immortals_4		The Immortals - Favoured	faction	1		true	false	true
+derpy_gg_rank_immortals_5		The Immortals - Exalted	faction	1		true	false	true
+derpy_gg_lead_immortals		The Immortals - Foremost	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_2		The Daemonsmiths - Indebted	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_3		The Daemonsmiths - Sworn	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_4		The Daemonsmiths - Favoured	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_5		The Daemonsmiths - Exalted	faction	1		true	false	true
+derpy_gg_lead_daemonsmiths		The Daemonsmiths - Foremost	faction	1		true	false	true
+derpy_gg_rank_khanate_2		The Khanate - Indebted	faction	1		true	false	true
+derpy_gg_rank_khanate_3		The Khanate - Sworn	faction	1		true	false	true
+derpy_gg_rank_khanate_4		The Khanate - Favoured	faction	1		true	false	true
+derpy_gg_rank_khanate_5		The Khanate - Exalted	faction	1		true	false	true
+derpy_gg_lead_khanate		The Khanate - Foremost	faction	1		true	false	true
+derpy_gg_rank_overseers_2		The Overseers - Indebted	faction	1		true	false	true
+derpy_gg_rank_overseers_3		The Overseers - Sworn	faction	1		true	false	true
+derpy_gg_rank_overseers_4		The Overseers - Favoured	faction	1		true	false	true
+derpy_gg_rank_overseers_5		The Overseers - Exalted	faction	1		true	false	true
+derpy_gg_lead_overseers		The Overseers - Foremost	faction	1		true	false	true
+derpy_gg_rank_slavers_2		The Slavers - Indebted	faction	1		true	false	true
+derpy_gg_rank_slavers_3		The Slavers - Sworn	faction	1		true	false	true
+derpy_gg_rank_slavers_4		The Slavers - Favoured	faction	1		true	false	true
+derpy_gg_rank_slavers_5		The Slavers - Exalted	faction	1		true	false	true
+derpy_gg_lead_slavers		The Slavers - Foremost	faction	1		true	false	true
+derpy_gg_patron		Guild Patron	force	1		true	false	true
+derpy_gg_svc_writ_monopoly		Writ of Monopoly	faction	1		true	false	true
+derpy_gg_svc_long_ledger		The Long Ledger	faction	1		true	false	true
+derpy_gg_svc_oathbound_draft		Oathbound Draft	faction	1		true	false	true
+derpy_gg_svc_astragoths_levy		Astragoth's Levy	faction	1		true	false	true
+derpy_gg_svc_forge_rite		Forge-Rite	faction	1		true	false	true
+derpy_gg_svc_bound_ordnance		Daemon-Bound Ordnance	faction	1		true	false	true
+derpy_gg_svc_knife_in_dark		Knife in the Dark	faction	1		true	false	true
+derpy_gg_svc_khans_price		The Khan's Price	faction	1		true	false	true
+derpy_gg_svc_lash_the_gangs		Lash the Gangs	faction	1		true	false	true
+derpy_gg_svc_works_of_zharr		Works of Zharr	faction	1		true	false	true
+derpy_gg_svc_coffle_drive		Coffle Drive	faction	1		true	false	true
+derpy_gg_svc_great_coffle		The Great Coffle	faction	1		true	false	true
