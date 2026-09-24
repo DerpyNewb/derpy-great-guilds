@@ -6,7 +6,8 @@ Date: 2026-09-23. Status: approved in conversation section by section; this file
 
 A player who runs the Empire or the Dwarfs sees their own race's six guilds everywhere the
 mod speaks: the panel, Help, the Log, event messages, Faction Effects bundle titles, bounty
-missions, icons, panel grounds and the crest. Chaos Dwarfs see exactly what they see today.
+missions, icons, panel grounds and the crest. Chaos Dwarfs see exactly what they see today,
+except for one shortened Help bullet (section 4d).
 
 What the user decided:
 
@@ -196,7 +197,10 @@ Dwarfs:
 - Help page 2 says "a forge the Daemonsmiths, a dock the Brass Tablets, a barracks the
   Immortals". It is derived from each race's names instead. Page 2 is at 21 of 21 lines
   today, so longer names can push it over; `check_help_pages` runs per race and refuses.
-  If it does, the fix is to shorten wording on that page, not to drop a line.
+  If it does, the fix is to shorten wording on that page, not to drop a line. Measured while
+  planning: the Empire's rivalry bullet wraps and puts page 2 at 22, so the MISSION bullet
+  on that page is shortened to one line for every race, Chaos Dwarfs included. That one
+  bullet is the only Chaos Dwarf text this work changes.
 - Message titles use collective plural verbs ("The Masons' Guild Have Noticed You"). That is
   British usage and already how "The Khanate" reads; no per-guild verb table.
 
@@ -293,10 +297,13 @@ textured and would flatten into blobs.
 | daemonsmiths | empire_gunnery_school | dwarf_engineering |
 | khanate | empire_tavern | dwarf_rangers |
 | overseers | empire_walls | dwarf_industry |
-| slavers | empire_shooting_range | dwf_underdeep_grudges |
-| crest | empire_imperial_cult | dwarf_hall_of_oaths |
+| slavers | empire_shooting_range | dwarf_slayer_cult |
+| crest | empire_imperial_cult | dwarf_city_karaz_a_karak |
 
-All from `ui/buildings/icons/` in CA's ui packs, read offline (zstd behind a `u32` prefix).
+All from `ui/buildings/icons/` in `ui.pack`, read offline (zstd behind a `u32` prefix), all
+74x74. Two first picks were replaced after measuring: `dwarf_hall_of_oaths` (commonest colour
+51% of visible pixels) and `dwf_underdeep_grudges` (69%) are textured, not silhouettes, and
+the transform would flatten them into blobs.
 
 ### 8b. Grounds
 
@@ -305,8 +312,20 @@ native-resolution box. For each race the source is the loading-screen painting
 (`ui/loading_ui/load_images/campaign_empire1.png` / `campaign_dwarfs1.png` in `ui.pack`,
 1920x1200, about 1560x900 of painting inside a foliage frame). Six boxes per race, each
 centred on a different part of the painting, all kept inside the frame. Paging between guilds
-pans across one picture. The boxes are chosen by rendering the six and looking, then written
-into the tool.
+pans across one picture. The boxes were chosen by rendering the six and looking:
+
+| Window | Box (native 1920x1200, 790x700 each) |
+|---|---|
+| 1 | 200, 200, 990, 900 |
+| 2 | 565, 200, 1355, 900 |
+| 3 | 930, 200, 1720, 900 |
+| 4 | 200, 330, 990, 1030 |
+| 5 | 565, 330, 1355, 1030 |
+| 6 | 930, 330, 1720, 1030 |
+
+Empire: brass 1, overseers 2, daemonsmiths 3, immortals 4, slavers 5, khanate 6.
+Dwarfs: brass 1, immortals 2, slavers 3, overseers 4, khanate 5, daemonsmiths 6.
+The top row starts at y=200 because at y=160 the frame's foliage showed.
 
 Each ground then goes through the existing pipeline unchanged: cover-crop to 790x700, then
 multiply down until it measures what CA's `tier_01` ground measures under the scrim (p99

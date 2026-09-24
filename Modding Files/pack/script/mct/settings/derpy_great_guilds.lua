@@ -29,7 +29,7 @@ m:add_new_section("preset", "Difficulty")
 m:add_new_section("systems", "Systems")
 m:add_new_section("court", "The Court")
 m:add_new_section("rates", "Earn rates")
-m:add_new_section("caps", "Per-turn caps")
+m:add_new_section("caps", "Limit per turn")
 m:add_new_section("debug", "Debug")
 
 -- ----------------------------------------------------------------- difficulty --
@@ -43,40 +43,40 @@ m:add_new_section("debug", "Debug")
 -- whether you want feed notices.
 local o_preset = m:add_new_option("preset", "dropdown")
 o_preset:set_text("Difficulty")
-o_preset:set_tooltip_text("How fast standing accrues and how hard the Court presses. "
+o_preset:set_tooltip_text("How fast reputation is earned and how hard the Court presses. "
     .. "Fixed for the life of a campaign - change it from the main menu before starting "
     .. "a new one. The switches under Systems are yours on every difficulty.")
 o_preset:set_assigned_section("preset")
 o_preset:add_dropdown_value("easy", "Easy",
-    "A faster climb and a gentler Court. About a third more standing per event against "
-    .. "raised caps, demands half as often with twice as long to answer and half the "
-    .. "sting for missing one, and the rivalry drain halved so courting a wide spread of "
-    .. "guilds stays viable.", false)
+    "A faster climb and a gentler Court. About a third more reputation per event with "
+    .. "higher limits per turn, demands half as often with twice as long to answer and "
+    .. "half the sting for missing one, and rivalry costing half as much so courting a "
+    .. "wide spread of guilds stays viable.", false)
 o_preset:add_dropdown_value("default", "Default",
     "The Guilds as designed, and as every build so far has played.", true)
 o_preset:add_dropdown_value("hard", "Hard",
-    "Slower, and the Court presses. About a quarter less standing per event against "
-    .. "tighter caps, demands every nine turns with six to answer, and an ignored demand "
-    .. "costing half again what it does by default.", false)
+    "Slower, and the Court presses. About a quarter less reputation per event with "
+    .. "lower limits per turn, demands every nine turns with six to answer, and an "
+    .. "ignored demand costing half again what it does on Default.", false)
 o_preset:add_dropdown_value("ultra", "Cutthroat",
-    "Standing accrues at roughly half the default rate against caps to match, the "
-    .. "rivalry drain is more than doubled, and the Court asks every six turns with five "
+    "Reputation comes at roughly half the Default rate with limits to match, "
+    .. "rivalry costs more than double, and the Court asks every six turns with five "
     .. "to answer and a penalty larger than its own reward - so a demand you cannot pay "
     .. "is a rank lost rather than a delay. Specialising stops being a style and becomes "
     .. "the way through.", false)
 o_preset:add_dropdown_value("custom", "Custom",
-    "Every rate, cap and Court value below becomes live. Set them before you start a "
+    "Every rate, limit and Court value below can be changed. Set them before you start a "
     .. "campaign; they are fixed once one is running.", false)
 o_preset:set_default_value("default")
 
 -- ------------------------------------------------------------------ systems --
 
 local o_ai = m:add_new_option("ai_spending", "checkbox")
-o_ai:set_text("AI factions spend standing")
-o_ai:set_tooltip_text("Rival factions build their own standing and use it the way you "
+o_ai:set_text("Rival factions use the guilds")
+o_ai:set_tooltip_text("Rival factions earn their own reputation and use it the way you "
     .. "do: they buy services, including the one that can be aimed at you, they answer "
-    .. "the guilds' demands, and they appoint patrons of their own. Off, the AI still "
-    .. "accrues - so the league table still means something - but never acts on it.")
+    .. "the guilds' demands, and they appoint patrons of their own. Off, rivals still "
+    .. "earn - so the leaderboard still means something - but never act on it.")
 o_ai:set_default_value(true)
 o_ai:set_assigned_section("systems")
 
@@ -97,10 +97,10 @@ o_notices:set_tooltip_text("Announce a rank gained, and the first time a guild t
 o_notices:set_assigned_section("systems")
 
 local o_mono = m:add_new_option("lead_monopoly", "checkbox")
-o_mono:set_text("The leader holds a monopoly")
+o_mono:set_text("Only the leader buys the finest service")
 o_mono:set_tooltip_text("Each guild's dearest service is sold only to the faction "
-    .. "holding the most reputation with it - you or an AI. Off, the leadership bonus "
-    .. "still applies but the service goes back to being rank-gated only.")
+    .. "holding the most reputation with it - you or a rival. Off, the leader's bonus "
+    .. "still applies, and anyone with the rank can buy the service.")
 o_mono:set_default_value(true)
 o_mono:set_assigned_section("systems")
 
@@ -113,7 +113,7 @@ local COURT = {
      "How long a guild waits before asking something of you. 0 switches demands off "
      .. "entirely."},
     {"demand_turns", "Turns to pay a demand", 8, 2, 30,
-     "The deadline. Let it pass and your standing with that guild falls."},
+     "The deadline. Let it pass and your reputation with that guild falls."},
     {"demand_reward", "Reputation for paying", 120, 0, 400,
      "Paid to the demanding guild when you meet its terms."},
     {"demand_penalty", "Reputation for refusing", 60, 0, 400,
@@ -121,9 +121,9 @@ local COURT = {
      .. "costs you a rank, and the rank's bonus with it."},
     {"rate_patron", "Patron's share", 50, 0, 200,
      "Extra reputation, as a percentage, for the guild your patron serves. The guild's "
-     .. "own per-turn cap still applies, so this cannot be used to outrun it."},
+     .. "own limit per turn still applies, so this cannot be used to outrun it."},
     {"rate_decay", "Upkeep", 100, 0, 400,
-     "What standing costs to hold. Every guild you have reputation with charges some "
+     "What reputation costs to hold. Every guild you have reputation with charges some "
      .. "back each turn, scaled by the rank you hold there - 100 means one point a turn "
      .. "at Unmarked and five at Exalted, so the top of the ladder is the dearest seat. "
      .. "0 switches it off and reputation only ever falls to a rival or a demand."},
@@ -152,18 +152,23 @@ end
 -- ------------------------------------------------------------------- rates --
 -- One slider per guild. These are the reputation and favour paid per event, and
 -- they are STARTING VALUES rather than measurements - the design says so plainly.
+--
+-- NAMED BY ROLE, because the frontend has no race to name them for. In a campaign
+-- GGUI.name_mct renames all twelve guild sliders to the player's own flavour at the
+-- first tick. gen_great_guilds.py checks these labels against its generic flavour.
 
 local RATES = {
-    {"rate_brass", "The Brass Tablets", 250, 50, 1000,
+    {"rate_brass", "The Merchant Houses", 250, 50, 1000,
      "Gold of net income per point. Lower is faster."},
-    {"rate_immortals", "The Immortals", 15, 1, 60, "Points per battle won."},
-    {"rate_daemonsmiths", "The Daemonsmiths", 60, 5, 200,
+    {"rate_immortals", "The Veterans' Company", 15, 1, 60, "Points per battle won."},
+    {"rate_daemonsmiths", "The Artisans' Guild", 60, 5, 200,
      "Points per technology researched."},
-    {"rate_khanate", "The Khanate", 8, 1, 40,
-     "Points per successful agent action."},
-    {"rate_overseers", "The Overseers", 10, 1, 40,
-     "Points per building level completed."},
-    {"rate_slavers", "The Slavers", 25, 1, 100,
+    {"rate_khanate", "The Shadow Guild", 8, 1, 40,
+     "Points per successful hero action."},
+    {"rate_overseers", "The Builders' Guild", 10, 1, 40,
+     "Points per building level completed, paid to whichever guild the building "
+     .. "belongs to - its card names the guild."},
+    {"rate_slavers", "The Raiders' Guild", 25, 1, 100,
      "Points per settlement sacked. A raze pays this plus half again."},
     -- Not a guild: the one signal that pays ALL SIX. Each guild's own per-turn cap
     -- still applies, so this cannot be used to outrun them.
@@ -200,20 +205,20 @@ end
 -- 0 means no cap, which is what the Daemonsmiths ship with.
 
 local CAPS = {
-    {"cap_brass", "The Brass Tablets", 40},
-    {"cap_immortals", "The Immortals", 60},
-    {"cap_daemonsmiths", "The Daemonsmiths", 0},
-    {"cap_khanate", "The Khanate", 40},
-    {"cap_overseers", "The Overseers", 40},
-    {"cap_slavers", "The Slavers", 80},
+    {"cap_brass", "The Merchant Houses", 40},
+    {"cap_immortals", "The Veterans' Company", 60},
+    {"cap_daemonsmiths", "The Artisans' Guild", 0},
+    {"cap_khanate", "The Shadow Guild", 40},
+    {"cap_overseers", "The Builders' Guild", 40},
+    {"cap_slavers", "The Raiders' Guild", 80},
 }
 
 for i = 1, #CAPS do
     local key, label, def = unpack(CAPS[i])
     local o = m:add_new_option(key, "slider")
-    o:set_text(label .. " cap")
+    o:set_text(label .. " limit")
     o:set_tooltip_text("Most reputation this guild can pay in one turn. 0 removes "
-        .. "the cap entirely.")
+        .. "the limit entirely.")
     o:slider_set_min_max(0, 400)
     o:slider_set_step_size(5)
     o:set_default_value(def)
@@ -226,9 +231,9 @@ end
 -- live, which is what makes it usable mid-campaign.
 
 local o_log = m:add_new_option("log_accrual", "checkbox")
-o_log:set_text("Log every accrual")
+o_log:set_text("Log every reputation gain")
 o_log:set_tooltip_text("Writes a line to script_log.txt each time any faction "
-    .. "earns standing. Noisy, and read live rather than frozen into the save, so "
+    .. "earns reputation. Noisy, and read live rather than frozen into the save, so "
     .. "it can be turned on in a running campaign.")
 o_log:set_default_value(false)
 o_log:set_assigned_section("debug")
@@ -247,12 +252,12 @@ o_log:set_assigned_section("debug")
 -- An action button has its own constructor, signed
 -- add_new_action(option_key, button_text, callback) - it wraps the "action" type and
 -- sets the callback itself, so there is no add_option_set_callback here.
-local o_dump = m:add_new_action("dump_standings", "Dump standings to log", function()
+local o_dump = m:add_new_action("dump_standings", "Write every reputation to the log", function()
     if core and core.trigger_custom_event then
         core:trigger_custom_event("DerpyGGDumpStandings", {})
     end
 end)
-o_dump:set_tooltip_text("Writes every faction's standing to script_log.txt. Does "
+o_dump:set_tooltip_text("Writes every faction's reputation to script_log.txt. Does "
     .. "nothing outside a campaign.")
 o_dump:set_assigned_section("debug")
 

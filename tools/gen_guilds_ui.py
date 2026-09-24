@@ -63,6 +63,9 @@ PANEL_LAYOUT = {
     "gg_card_3":     (20,  430, 750, 120),
     "gg_prev":       (20,  596, 38,  38),
     "gg_next":       (732, 596, 38,  38),
+    # WHAT THIS GUILD PAID YOU, AND FOR WHAT, on the Guilds tab only - the clear band
+    # between the third card (ends y=550) and the pager (starts y=596).
+    "gg_earned":     (20,  562, 750, 24),
     "gg_footer":     (20,  640, 750, 30),
 }
 for _i, _name in enumerate(TABS):
@@ -667,6 +670,10 @@ def build_xml():
     out = {}
     for fname, builder, comment in FILES:
         root = EU.assign(builder(), GUID_PREFIX)
+        if fname not in UNSCALED_FILES:
+            for c in root.walk():
+                if c.kw.get("text"):
+                    c.kw["font_anim"] = SCALE_ANIM
         out[fname] = EU.layout(root, comment)
     return out
 
@@ -698,6 +705,11 @@ def _lua_xy_tables():
             found[name] = (int(x), int(y))
         out[tbl] = found
     return out
+
+
+def flavoured(path, tag):
+    """The path the panel Lua builds for a flavour: the tag before ".png" (GGUI.art)."""
+    return path[:-len(".png")] + tag + ".png" if tag else path
 
 
 def _assets():
@@ -736,7 +748,9 @@ def check_help_fits(lua):
     out = []
     try:
         import gen_great_guilds as GG
-        pages = GG.help_pages()
+        # EVERY FLAVOUR. The Empire's names are longer and wrap where ours do not, so a
+        # page that fits in Chaos Dwarf can drop its last line for an Empire player.
+        flavours = [(tag, GG.help_pages(tag)) for tag in GG.FLAVOURS]
     except Exception as e:
         return ["help fit check could not read the pages: %r" % (e,)]
 
@@ -752,23 +766,24 @@ def check_help_fits(lua):
     import textwrap
     WIDTH = 100
     INDENT = len("  -  ")
-    for i, lines in enumerate(pages):
-        n = 0
-        for j, line in enumerate(lines):
-            if line == "":
-                n += 1
-            elif line.startswith("#"):
-                if j:
-                    n += 1          # the blank above every heading but the first
-                n += 1
-            elif line.startswith("-"):
-                n += max(1, len(textwrap.wrap(line[1:], WIDTH - INDENT)))
-            else:
-                n += max(1, len(textwrap.wrap(line, WIDTH)))
-        if n > HELP_SLOTS:
-            out.append("help page %d needs about %d lines and there are %d slots - the "
-                       "text past the last one is dropped in silence"
-                       % (i + 1, n, HELP_SLOTS))
+    for tag, pages in flavours:
+        for i, lines in enumerate(pages):
+            n = 0
+            for j, line in enumerate(lines):
+                if line == "":
+                    n += 1
+                elif line.startswith("#"):
+                    if j:
+                        n += 1      # the blank above every heading but the first
+                    n += 1
+                elif line.startswith("-"):
+                    n += max(1, len(textwrap.wrap(line[1:], WIDTH - INDENT)))
+                else:
+                    n += max(1, len(textwrap.wrap(line, WIDTH)))
+            if n > HELP_SLOTS:
+                out.append("help page %d (%s) needs about %d lines and there are %d slots "
+                           "- the text past the last one is dropped in silence"
+                           % (i + 1, tag or "chd", n, HELP_SLOTS))
     return out
 
 
@@ -980,6 +995,17 @@ def check_panel_bg(lua_src):
         if not os.path.isfile(disk):
             out.append("GGUI.PANEL_BG[%s] points at %s, which is not staged - "
                        "SetImagePath draws nothing and logs nothing" % (guild, path))
+    for tag in [t for t in G.FLAVOURS if t]:
+        for guild in G.GUILDS:
+            path = got.get(guild)
+            if not path:
+                continue
+            fpath = flavoured(path, tag)
+            disk = os.path.join(ROOT, "Modding Files", "pack", *fpath.split("/"))
+            if not os.path.isfile(disk):
+                out.append("GGUI.PANEL_BG[%s] has no %s ground - %s is not staged, so "
+                           "that race's panel keeps whichever ground was painted last"
+                           % (guild, tag, fpath))
     for extra in sorted(set(got) - set(G.GUILDS)):
         out.append("GGUI.PANEL_BG has an entry for %r, which is not one of the six "
                    "guilds - nothing will ever ask for it" % extra)
@@ -989,6 +1015,66 @@ def check_panel_bg(lua_src):
         out += ["panel ground: " + p for p in BG.check()]
     except Exception as e:                                    # noqa: BLE001
         out.append("could not measure the panel grounds: %r" % (e,))
+    return out
+
+
+# THE PANEL GROWS ITS TEXT THROUGH ONE ANIMATION PER TEXT CELL. The Lua rewrites that
+# animation's font_scale frame and plays it, the way CA's lib_topic_leader.lua shrinks its
+# own text; nothing else in the uicomponent API changes the size a label draws at. A cell
+# without it stays at 1x inside a box GGUI.S times its size, which errors nowhere: the
+# words are simply small. 512 is the font-scale bit of interpolationpropertymask, read off
+# CA's own frames (512 alone, and 576 = 512 + colour).
+SCALE_ANIM = "derpy_gg_scale"
+# The opener sits in CA's HUD row beside the resource strip and stays HUD-sized.
+UNSCALED_FILES = {"derpy_gg_opener.twui.xml"}
+
+
+def check_scale_anim(files, lua_src):
+    out = []
+    m = re.search(r'GGUI\.SCALE_ANIM\s*=\s*"([^"]+)"', lua_src)
+    if not m:
+        out.append("zzz_derpy_guilds_ui.lua declares no GGUI.SCALE_ANIM, so no text "
+                   "grows with the panel")
+    elif m.group(1) != SCALE_ANIM:
+        out.append("GGUI.SCALE_ANIM is %r but the .twui.xml files carry %r"
+                   % (m.group(1), SCALE_ANIM))
+    for fname, text in sorted(files.items()):
+        if fname in UNSCALED_FILES:
+            continue
+        body = text.split("<components>", 1)[1]
+        for name, block in re.findall(r"(?ms)^\t\t<(\w+)\n(.*?)^\t\t</\1>", body):
+            if "<component_text" not in block:
+                continue
+            if ('id="%s"' % SCALE_ANIM not in block
+                    or 'interpolationpropertymask="512"' not in block
+                    or "targetmetrics_m_font_scale=" not in block):
+                out.append("%s: %s carries text but no %s font-scale animation, so it "
+                           "stays small on a large screen" % (fname, name, SCALE_ANIM))
+    return out
+
+
+def check_opener_crest(lua):
+    """The crest repaints go by IMAGE INDEX, so their numbers must be where the crest sits.
+
+    derpy_gg_opener lists OPENER_LAYERS and then OPENER_HOVER; gg_crest has CREST_LAYERS.
+    A wrong number repaints the button's plate with a crest and leaves the old crest on
+    top, which is wrong on screen and says nothing.
+    """
+    out = []
+    for fn_name, layers, crest in (
+            ("paint_opener", OPENER_LAYERS + OPENER_HOVER, OPENER_ICON),
+            ("paint_crest", CREST_LAYERS, CREST_LAYERS[0]["path"])):
+        want = [i for i, l in enumerate(layers) if l["path"] == crest]
+        fn = re.search(r"function GGUI\.%s\(b?\)(.*?)\nend" % fn_name, lua, re.S)
+        if not fn:
+            out.append("zzz_derpy_guilds_ui.lua has no GGUI.%s, so a flavoured player "
+                       "keeps the Chaos Dwarf crest there" % fn_name)
+            continue
+        got = sorted(int(x) for x in re.findall(r"SetImagePath\(path,\s*(\d+)\)",
+                                                 fn.group(1)))
+        if got != want:
+            out.append("GGUI.%s repaints image(s) %r and the crest is image(s) %r"
+                       % (fn_name, got, want))
     return out
 
 
@@ -1031,6 +1117,8 @@ def check():
         out += check_help_fits(lua_src)
         out += check_loc_keys(lua_src)
         out += check_panel_bg(lua_src)
+        out += check_opener_crest(lua_src)
+        out += check_scale_anim(files, lua_src)
 
     # THE OPENER STACKS UNDER THE ZHARR EXCHANGE'S BUTTON, and when that mod is not
     # installed it takes the slot the Exchange would have used. The uninstalled case
@@ -1111,6 +1199,10 @@ def check():
                 box = CARD_LAYOUT["card_icon"][2]
                 for _g, _p in re.findall(r'(\w+)\s*=\s*"([^"]+)"', m.group(1)):
                     drawn.append((_p, box))
+        # EVERY FLAVOUR'S COPY is drawn in the same box as ours.
+        ours = [(p, px) for p, px in drawn if "derpy_gg_icons/" in p]
+        for tag in [t for t in G.FLAVOURS if t]:
+            drawn += [(flavoured(p, tag), px) for p, px in ours]
         for path, px in drawn:
             if path not in sizes:
                 out.append("%s is drawn at %dpx but its native size was never "
@@ -1173,12 +1265,25 @@ def check():
                 assets = _assets()
                 named = dict(re.findall(r'(\w+)\s*=\s*"([^"]+)"', m.group(1)))
                 import gen_great_guilds as GEN
+                tags = [t for t in GEN.FLAVOURS if t]
                 for g in GEN.GUILDS:
                     if g not in named:
                         out.append("GGUI.GUILD_ICON has no entry for %s" % g)
                     elif named[g] not in assets:
                         out.append("GGUI.GUILD_ICON[%s] does not exist in any ui "
                                    "pack: %s" % (g, named[g]))
+                    else:
+                        for tag in tags:
+                            if flavoured(named[g], tag) not in assets:
+                                out.append("GGUI.GUILD_ICON[%s] has no %s copy - %s is "
+                                           "not staged, so that race's cards draw a "
+                                           "blank square"
+                                           % (g, tag, flavoured(named[g], tag)))
+                for tag in tags:
+                    if flavoured(OPENER_ICON, tag) not in assets:
+                        out.append("the %s crest %s is not staged - GGUI.paint_crest and "
+                                   "GGUI.paint_opener would paint a blank square"
+                                   % (tag, flavoured(OPENER_ICON, tag)))
             except Exception as e:
                 out.append("could not verify guild icons: %r" % (e,))
 
@@ -1203,7 +1308,7 @@ def check():
     # draws blank - a plate with no caption, which is how the tab row, the pager and
     # the Buy buttons shipped once they had art.
     for fname, names in (("derpy_gg_panel.twui.xml",
-                          ["gg_title", "gg_rank_line", "gg_footer"] + TABS
+                          ["gg_title", "gg_rank_line", "gg_earned", "gg_footer"] + TABS
                           + ["gg_prev", "gg_next"]),
                          ("derpy_gg_card.twui.xml",
                           ["card_name", "card_desc_1", "card_desc_2",
@@ -1378,6 +1483,14 @@ def check():
     if LIST_XY[1] + LIST_H > pager_top:
         out.append("the faction list ends at y=%d and the pager starts at y=%d"
                    % (LIST_XY[1] + LIST_H, pager_top))
+    # THE EARNED LINE SITS IN THE BAND UNDER THE THIRD CARD AND OVER THE PAGER - the
+    # Guilds tab shows all three, so anywhere else it is drawn on top of one of them.
+    _ex, ey, _ew, eh = PANEL_LAYOUT["gg_earned"]
+    card_end = PANEL_LAYOUT["gg_card_3"][1] + CARD_H
+    if ey < card_end or ey + eh > pager_top:
+        out.append("gg_earned runs y=%d..%d, outside the clear band y=%d..%d between the "
+                   "third card and the pager - it would draw on top of one of them"
+                   % (ey, ey + eh, card_end, pager_top))
     # A ROW WITH CHILDREN IS A ROW THAT COMES APART WHEN IT SCROLLS. Children here are
     # placed by absolute MoveTo and the engine's list layout moves the row without telling
     # anyone, so a cell would be left behind mid-panel. The crest is inline markup for

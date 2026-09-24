@@ -66,6 +66,86 @@ BACKGROUNDS = {
     "slavers":      ("alex-voysey-chd-underground-7.jpg", 0.5),
 }
 
+# THE EMPIRE AND THE DWARFS PAN ONE PAINTING EACH: six 790x700 windows out of the race's
+# loading-screen art, so paging from guild to guild moves across one picture. Native
+# resolution, so no crop-and-scale; the brightness gate below is the same one. Boxes
+# chosen by rendering all six and looking (2026-09-23): the top row starts at y=200
+# because at y=160 the frame's foliage showed.
+GAME_UI = os.path.join(r"F:\SteamLibrary\steamapps\common\Total War WARHAMMER III",
+                       "data", "ui.pack")
+CA_ART = {
+    "emp": "ui/loading_ui/load_images/campaign_empire1.png",
+    "dwf": "ui/loading_ui/load_images/campaign_dwarfs1.png",
+    # EVERY OTHER RACE. No race's own loading screen can be theirs, so a prologue battle
+    # sketch that shows nobody's banner: two cloaked watchers and a column crossing a
+    # plain. Chosen over battle_scene_a2 and the loading screens by rendering all six
+    # windows darkened (2026-09-24); its factors, 0.31-0.39, sit with the Empire's and
+    # the Dwarfs'.
+    "gen": "ui/loading_ui/load_images/prologue/battle_scene_b1.png",
+    # Each race's own loading screen, as the Empire and the Dwarfs. Factors 0.30-0.41,
+    # measured 2026-09-24. Bretonnia's is 1920x1200, which every window fits inside.
+    "brt": "ui/loading_ui/load_images/campaign_bretonnia1.png",
+    "cth": "ui/loading_ui/load_images/campaign_cathay1.png",
+    "ksl": "ui/loading_ui/load_images/campaign_kislev1.png",
+    # The two elf races, 2026-09-24, both 1920x1200. Windows by content: Naggarond's
+    # towers to the builders, the sorceress on the ark to the Convent, the halberdiers to
+    # the Black Guard; the High Elf lord to the Swordmasters, his dark cloak to the Shadow
+    # Warriors, the far white tower to the Loremasters.
+    "def": "ui/loading_ui/load_images/campaign_dark_elves1.png",
+    "hef": "ui/loading_ui/load_images/campaign_high_elves1.png",
+}
+WINDOWS = {
+    1: (200, 200, 990, 900), 2: (565, 200, 1355, 900), 3: (930, 200, 1720, 900),
+    4: (200, 330, 990, 1030), 5: (565, 330, 1355, 1030), 6: (930, 330, 1720, 1030),
+}
+CA_BACKGROUNDS = {
+    "brass_emp": ("emp", 1), "overseers_emp": ("emp", 2),
+    "daemonsmiths_emp": ("emp", 3), "immortals_emp": ("emp", 4),
+    "slavers_emp": ("emp", 5), "khanate_emp": ("emp", 6),
+    "brass_dwf": ("dwf", 1), "immortals_dwf": ("dwf", 2),
+    "slavers_dwf": ("dwf", 3), "overseers_dwf": ("dwf", 4),
+    "khanate_dwf": ("dwf", 5), "daemonsmiths_dwf": ("dwf", 6),
+    "immortals_gen": ("gen", 1), "overseers_gen": ("gen", 2),
+    "brass_gen": ("gen", 3), "khanate_gen": ("gen", 4),
+    "daemonsmiths_gen": ("gen", 5), "slavers_gen": ("gen", 6),
+    # The castle to the builders, the riders to the raiders, the lead knight or guard to
+    # the soldiers - chosen from a rendered sheet of all eighteen windows.
+    "immortals_brt": ("brt", 1), "slavers_brt": ("brt", 2),
+    "overseers_brt": ("brt", 3), "khanate_brt": ("brt", 4),
+    "brass_brt": ("brt", 5), "daemonsmiths_brt": ("brt", 6),
+    "slavers_cth": ("cth", 1), "immortals_cth": ("cth", 2),
+    "daemonsmiths_cth": ("cth", 3), "khanate_cth": ("cth", 4),
+    "brass_cth": ("cth", 5), "overseers_cth": ("cth", 6),
+    "slavers_ksl": ("ksl", 1), "immortals_ksl": ("ksl", 2),
+    "overseers_ksl": ("ksl", 3), "khanate_ksl": ("ksl", 4),
+    "brass_ksl": ("ksl", 5), "daemonsmiths_ksl": ("ksl", 6),
+    "overseers_def": ("def", 1), "khanate_def": ("def", 2),
+    "daemonsmiths_def": ("def", 3), "brass_def": ("def", 4),
+    "slavers_def": ("def", 5), "immortals_def": ("def", 6),
+    "immortals_hef": ("hef", 1), "slavers_hef": ("hef", 2),
+    "brass_hef": ("hef", 3), "khanate_hef": ("hef", 4),
+    "overseers_hef": ("hef", 5), "daemonsmiths_hef": ("hef", 6),
+}
+_PICTURES = {}
+
+
+def ca_picture(pack_path):
+    """A CA ui picture, read offline: zstd behind a u32 length when compressed."""
+    if pack_path not in _PICTURES:
+        import io
+        from PIL import Image
+        sys.path.insert(0, os.path.join(ROOT, "tools"))
+        import read_pack_index as rpi
+        import read_vanilla_loc as rvl
+        hits = [h for h in rpi.read(GAME_UI, pack_path) if h[0].lower() == pack_path]
+        if not hits:
+            raise IOError("%s is not in %s" % (pack_path, GAME_UI))
+        _path, comp, data = hits[0]
+        if comp:
+            data = rvl._decompress(data)
+        _PICTURES[pack_path] = Image.open(io.BytesIO(data)).convert("RGB")
+    return _PICTURES[pack_path]
+
 
 def measure(im):
     """(p99, peak) luminance at panel size under the panel's scrim.
@@ -194,6 +274,24 @@ def build(write=True):
             im.save(dst, optimize=True)
         made.append((guild, fname, factor, p99, peak,
                      os.path.getsize(dst) if os.path.isfile(dst) else 0))
+    for name in sorted(CA_BACKGROUNDS):
+        race, window = CA_BACKGROUNDS[name]
+        try:
+            src = ca_picture(CA_ART[race])
+        except (IOError, OSError, ValueError) as e:
+            out.append("%s: %s" % (name, e))
+            continue
+        im, factor = darken(src.crop(WINDOWS[window]), max_p99, max_peak)
+        p99, peak = measure(im)
+        if p99 > max_p99 + 0.5 or peak > max_peak + 0.5:
+            out.append("%s: window %d of %s cannot be darkened into the ground's numbers"
+                       % (name, window, CA_ART[race]))
+            continue
+        dst = os.path.join(DST, name + ".png")
+        if write:
+            im.save(dst, optimize=True)
+        made.append((name, "%s #%d" % (CA_ART[race].rsplit("/", 1)[-1], window), factor,
+                     p99, peak, os.path.getsize(dst) if os.path.isfile(dst) else 0))
     return out, made
 
 
@@ -206,7 +304,7 @@ def check():
     from PIL import Image
     out = []
     (max_p99, max_peak), _ = ceiling()
-    for guild in sorted(BACKGROUNDS):
+    for guild in sorted(BACKGROUNDS) + sorted(CA_BACKGROUNDS):
         path = os.path.join(DST, guild + ".png")
         if not os.path.isfile(path):
             out.append("%s: %s does not ship - the Lua's SetImagePath would silently "
@@ -276,6 +374,16 @@ def selftest():
             os.remove(keep)
         if os.path.isfile(backup):
             os.rename(backup, keep)
+    # EVERY FLAVOUR has a ground per guild, each a different window of its race's picture,
+    # and every window is the panel's size and inside the painting.
+    for race in CA_ART:
+        mine = dict((n[:-len(race) - 1], w) for n, (r, w) in CA_BACKGROUNDS.items()
+                    if r == race)
+        assert sorted(mine) == sorted(BACKGROUNDS), (race, sorted(mine))
+        assert sorted(mine.values()) == sorted(WINDOWS), (race, mine)
+    for x0, y0, x1, y1 in WINDOWS.values():
+        assert (x1 - x0, y1 - y0) == (PANEL_W, PANEL_H), (x0, y0, x1, y1)
+        assert 0 <= x0 and x1 <= 1920 and 0 <= y0 and y1 <= 1200, (x0, y0, x1, y1)
     print("selftest ok: crop, anchor, ceiling reached, bright file and missing file "
           "both refused")
 
@@ -297,7 +405,7 @@ if __name__ == "__main__":
     total = 0
     for guild, fname, factor, p99, peak, size in made:
         total += size
-        print("  %-13s x%.2f  p99 %4.1f  peak %5.1f  %6.1f KB  <- %s"
+        print("  %-17s x%.2f  p99 %4.1f  peak %5.1f  %6.1f KB  <- %s"
               % (guild, factor, p99, peak, size / 1024.0, fname[:44]))
-    print("  %-13s %38.1f KB" % ("total", total / 1024.0))
+    print("  %-17s %38.1f KB" % ("total", total / 1024.0))
     sys.exit(1 if [p for p in problems if not p.startswith("NOTE")] else 0)

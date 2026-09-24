@@ -173,14 +173,12 @@ def extract_art(prefix=GG, extra=()):
 # The tab this renders. Standings is the one with the faction list on it.
 HIDDEN_ON_STANDINGS = ("gg_prev", "gg_next", "gg_rep_bar", "gg_bar_track")
 
-DEMO_GUILDS = ("The Brass Tablets", "The Immortals", "The Daemonsmiths",
-               "The Khanate", "The Overseers", "The Slavers")
 DEMO_FACTIONS = ("You", "Uzkul Mingol Company", "Slaves of the Black Dwarf",
                  "Labourfleet of Uzkulak", "Disciples of Hashut",
                  "The Legion of Azgorh", "Sentinels of Zharr", "Drazhoath's Host")
 
 
-def render(path=None, guild=None):
+def render(path=None, guild=None, tag=""):
     """Draw the panel. `guild` swaps the ground for that guild's baked background.
 
     THE GROUND IS NOT IN THE .twui.xml. The file names CA's tier_01 background and the
@@ -195,7 +193,7 @@ def render(path=None, guild=None):
     n_art, missing = extract_art()
     ground = None
     if guild:
-        ground = Path(os.path.join(OURS, "derpy_gg_bg", guild + ".png"))
+        ground = Path(os.path.join(OURS, "derpy_gg_bg", guild + tag + ".png"))
         if not ground.is_file():
             raise SystemExit("no baked ground for %r: %s (py tools/"
                              "make_guild_backgrounds.py writes them)" % (guild, ground))
@@ -206,9 +204,9 @@ def render(path=None, guild=None):
     panel, row, lst = (doc_of("derpy_gg_panel.twui.xml"), doc_of("derpy_gg_row.twui.xml"),
                        doc_of("derpy_gg_list.twui.xml"))
     named = {}
-    for d, tag in ((panel, "panel"), (row, "row"), (lst, "list")):
+    for d, kind in ((panel, "panel"), (row, "row"), (lst, "list")):
         for c in d.components:
-            named[(tag, c.get("id", c.tag))] = c
+            named[(kind, c.get("id", c.tag))] = c
 
     canvas = Image.new("RGBA", (G.PANEL_W, G.PANEL_H), (0, 0, 0, 255))
 
@@ -230,6 +228,11 @@ def render(path=None, guild=None):
             asset = Path(os.path.join(UI, os.path.relpath(p, "ui").replace("/", os.sep)))
             if ground is not None and p == G.PANEL_ART:
                 asset = ground
+            # OUR OWN ART is not in CA's packs, so it is read where it is staged, in the
+            # flavour asked for - the Lua appends the same tag at runtime (GGUI.art).
+            if p.startswith("ui/campaign ui/derpy_gg_"):
+                stem, ext = os.path.splitext(os.path.relpath(p, "ui/campaign ui"))
+                asset = Path(os.path.join(OURS, stem + tag + ext))
             if not asset.is_file():
                 continue
             iw = int(model.number(n.get("width"), w or 0)) or (w or 1)
@@ -250,17 +253,20 @@ def render(path=None, guild=None):
     pale, gold = (235, 225, 200, 255), (255, 211, 122, 255)
     draw.text((58, 18), "The Great Guilds", fill=pale)
     # Pitch read off the generator's own TABS, so a re-pitched strip draws where it is.
-    for i, lbl in enumerate(("Guilds", "Standings", "Bounties", "Court", "Log", "Help")):
+    for i, lbl in enumerate(("Guilds", "Leaderboard", "Bounties", "Court", "Log", "Help")):
         draw.text((20 + i * G.TAB_W + 40, 68), lbl, fill=gold if i == 1 else pale)
     draw.text((24, 110), "Hover a row for the full table.   Rivals last turn: 0 services "
                          "bought, 0 demands paid, 0 patrons afield", fill=pale)
 
-    for i, g in enumerate(DEMO_GUILDS):
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import gen_great_guilds as GEN
+    low = GEN.FLAVOURS[tag]["ranks"][0]          # the flavour's own lowest rank
+    for i, g in enumerate(GEN.FLAVOURS[tag]["guilds"][k] for k in GEN.GUILDS):
         ry = 170 + i * 44
         paste(row, named[("row", "derpy_gg_row")], 20, ry, G.ROW_W, G.ROW_H)
         sel = (i == 0)
         for dx, s in ((14, g),
-                      (212, "You: Unmarked (%d)  %d/8" % (9 if sel else 0, 1 if sel else 5)),
+                      (212, "You: %s (%d)  %d/8" % (low, 9 if sel else 0, 1 if sel else 5)),
                       (416, "Leader: " + ("You" if sel else "Nobody yet"))):
             draw.text((20 + dx, ry + 14), s, fill=gold if sel and dx == 14 else pale)
 
@@ -277,14 +283,14 @@ def render(path=None, guild=None):
         if ry >= ch:
             break
         cd.rectangle([2, ry + 2, 22, ry + 22], outline=(120, 100, 70, 255))
-        cd.text((28, ry + 6), "%d.  %s   %d   Unmarked" % (i + 1, f, 9 if i == 0 else 0),
+        cd.text((28, ry + 6), "%d.  %s   %d   %s" % (i + 1, f, 9 if i == 0 else 0, low),
                 fill=gold if i == 0 else pale)
     canvas.alpha_composite(clip, (lx + cx, ly + cy))
     draw.rectangle([lx + cx, ly + cy, lx + cx + cw, ly + cy + ch], outline=(90, 80, 60, 255))
     draw.text((24, 646), "Favour: 9", fill=pale)
 
-    out = path or os.path.join(CACHE, "gg_standings%s.png"
-                               % (guild and "_" + guild or ""))
+    out = path or os.path.join(CACHE, "gg_standings%s%s.png"
+                               % (guild and "_" + guild or "", tag))
     os.makedirs(os.path.dirname(out), exist_ok=True)
     canvas.convert("RGB").save(out)
     return out, n_art, missing, (ch // G.FROW_H, len(DEMO_FACTIONS))
@@ -336,8 +342,15 @@ if __name__ == "__main__":
         problems = validate()
         for p in problems:
             print("PROBLEM: " + p)
-        want = [a for a in sys.argv[1:] if not a.startswith("--")]
-        out, n_art, missing, (shown, total) = render(guild=want[0] if want else None)
+        args = sys.argv[1:]
+        tag = ""
+        if "--flavour" in args:
+            at = args.index("--flavour")
+            tag = "_" + args[at + 1]
+            del args[at:at + 2]
+        want = [a for a in args if not a.startswith("--")]
+        out, n_art, missing, (shown, total) = render(guild=want[0] if want else None,
+                                                     tag=tag)
         for m in missing:
             print("  art not found in any ui pack: " + m)
         print("wrote %s  (%d art files, %d of %d faction rows visible)"

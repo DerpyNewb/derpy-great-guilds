@@ -108,7 +108,8 @@ DB_DEST = {
 LOC_DEST = "text/db/derpy_great_guilds.loc"
 
 for _t in ("campaign_groups", "campaign_group_members",
-           "campaign_group_member_criteria_values", "event_feed_message_events"):
+           "campaign_group_member_criteria_values", "event_feed_message_events",
+           "effects", "building_effects_junction"):
     DB_DEST[_t] = "db/%s_tables/derpy_great_guilds" % _t
 
 

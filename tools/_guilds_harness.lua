@@ -440,6 +440,28 @@ GG.grant("cr_human", "slavers", 400)
 GG.buy("cr_human", "slave_tithe")
 assert(#pooled == 2, "no pooled grant for a non-CHD culture, got " .. #pooled)
 assert(#gold == g0 + 2, "non-CHD slave tithe pays gold instead, got " .. (#gold - g0))
+assert(gold[#gold][2] == 3000, "the Empire's tithe is 3,000 gold, got " .. tostring(gold[#gold][2]))
+
+-- THE DWARFS ARE PAID IN OATHGOLD, 250 of it under "missions" - the factor CA's own
+-- dwf_oathgold_quest_rewards junction binds, and the only one of its nine that takes
+-- either sign. No gold at all: the blurb says Oathgold.
+do
+CULTURE["cr_dwarf"] = "wh_main_dwf_dwarfs"
+cm.get_human_factions = function() return {"cr_dwarf"} end
+GG.player_cultures_cache = nil
+GG.CULTURE_OF["cr_dwarf"] = "wh_main_dwf_dwarfs"
+GG.state["cr_dwarf"] = nil
+GG.grant("cr_dwarf", "slavers", 400)
+local g1 = #gold
+GG.buy("cr_dwarf", "slave_tithe")
+assert(#pooled == 3, "a Dwarf tithe is one pooled grant, got " .. (#pooled - 2))
+assert(pooled[3][1] == "cr_dwarf" and pooled[3][2] == "dwf_oathgold"
+       and pooled[3][3] == "missions" and pooled[3][4] == 250,
+       "a Dwarf tithe is 250 dwf_oathgold under missions, got "
+       .. table.concat({tostring(pooled[3][2]), tostring(pooled[3][3]),
+                        tostring(pooled[3][4])}, " "))
+assert(#gold == g1, "a Dwarf tithe pays no gold")
+end
 cm.get_human_factions = tithe_getter
 GG.player_cultures_cache = nil
 
@@ -513,7 +535,10 @@ cm.model = function() return nil end
 
 dofile("Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_ai.lua")
 
--- The three cut services are never chosen, however rich the faction is.
+-- A SERVICE THAT NEEDS A TARGET IS NEVER CHOSEN WITHOUT ONE, however rich the faction.
+-- cr_ai has no war, no region and no research on record, so the three that need one of
+-- those stay out of reach - and choosing one anyway would spend the faction's one
+-- purchase of the turn on a sale GG.buy then refuses.
 GG.state["cr_ai"] = nil
 GG.cooldowns["cr_ai"] = nil
 for _, g in ipairs(GG.GUILDS) do GG.grant("cr_ai", g, 5000) end
@@ -522,9 +547,9 @@ for _ = 1, 300 do
     local k = GGAI.choose("cr_ai")
     if k then picked[k] = true end
 end
-assert(not picked["hobgoblin_eyes"], "AI must not buy hobgoblin_eyes")
-assert(not picked["bound_blueprint"], "AI must not buy bound_blueprint")
-assert(not picked["raise_ziggurat"], "AI must not buy raise_ziggurat")
+assert(not picked["hobgoblin_eyes"], "hobgoblin_eyes chosen with no enemy region to reveal")
+assert(not picked["bound_blueprint"], "bound_blueprint chosen with no research on record")
+assert(not picked["raise_ziggurat"], "raise_ziggurat chosen with no region to build in")
 local nkinds = 0
 for _ in pairs(picked) do nkinds = nkinds + 1 end
 assert(nkinds >= 10, "AI should reach most of the 15 over 300 rolls, got " .. nkinds)
@@ -583,6 +608,168 @@ assert(GGAI.pick_target("cr_x", GG.service("writ_monopoly")) == nil,
 GGAI.TEST_FORCES = {{armed_citizenry = false, cqi = 9}}
 assert(GGAI.pick_target("cr_x", GG.service("hire_immortals")) == 9,
        "the unit service targets an army")
+
+-- --------------------------------------- the three services the AI never bought --
+-- Hobgoblin Eyes, Bound Blueprint and Raise the Ziggurat were cut from the AI because
+-- each needed a target it had no way to pick. Each has one now: an enemy's region, the
+-- research ResearchStarted recorded, and the first legal upgrade in one of its own
+-- regions - built by GG.upgrade_target, the same function the panel reads.
+;(function()
+    local F = "cr_ai_three"
+    local prev_region, prev_upg = cm.get_region, cm.get_building_level_upgrades
+    local prev_getf = cm.get_faction
+    local HAS_TECH = {}
+    cm.get_faction = function(self, k)
+        local f = prev_getf(self, k)
+        if f then f.has_technology = function(_, t) return HAS_TECH[t] == true end end
+        return f
+    end
+    local function slot(tag, b)
+        return {tag = tag, is_null_interface = function() return false end,
+                has_building = function() return b ~= nil end,
+                building = function()
+                    return {is_null_interface = function() return false end,
+                            name = function() return b end}
+                end}
+    end
+    local function region(key, owner, primary, others)
+        local slots = {}
+        for i, b in ipairs(others) do slots[i] = slot(key .. "/" .. i, b) end
+        return {is_null_interface = function() return false end,
+                name = function() return key end,
+                owning_faction = function() return {name = function() return owner end} end,
+                settlement = function()
+                    return {is_null_interface = function() return false end,
+                            primary_slot = function() return slot(key .. "/primary", primary) end,
+                            slot_list = function() return LIST(slots) end}
+                end}
+    end
+    local UPG = {bld_t1 = {"bld_t2"}, bld_max = {}}
+    local REGIONS = {
+        r_up = region("r_up", F, "bld_t1", {}),
+        r_side = region("r_side", F, "bld_max", {"bld_max", "bld_t1"}),
+        r_max = region("r_max", F, "bld_max", {"bld_max"}),
+        r_theirs = region("r_theirs", "cr_other", "bld_t1", {}),
+    }
+    cm.get_region = function(_, k) return REGIONS[k] or false end
+    cm.get_building_level_upgrades = function(_, b) return UPG[b] or {} end
+
+    -- THE TARGET, from nothing but a region key.
+    local t = GG.upgrade_target(F, "r_up")
+    assert(t and t.building == "bld_t2" and t.slot.tag == "r_up/primary",
+           "the settlement's own chain is tried first")
+    t = GG.upgrade_target(F, "r_side")
+    assert(t and t.building == "bld_t2" and t.slot.tag == "r_side/2",
+           "a maxed settlement falls back to its other slots")
+    assert(GG.upgrade_target(F, "r_max") == nil, "nothing left to upgrade is no target")
+    assert(GG.upgrade_target(F, "r_theirs") == nil,
+           "another faction's region is no target - the upgrade would be a gift to them")
+    assert(GG.upgrade_target(F, "r_nowhere") == nil, "a region the map lacks is no target")
+    assert(GG.upgrade_target(F, nil) == nil and GG.upgrade_target(nil, "r_up") == nil,
+           "no faction or no region is no target")
+
+    -- THE AI WALKS ITS OWN REGIONS for the first one with something to build.
+    GGAI.TEST_REGIONS = {"r_max", "r_side"}
+    t = GGAI.pick_building(F)
+    assert(t and t.slot.tag == "r_side/2", "the AI skips a maxed region")
+    GGAI.TEST_REGIONS = {"r_max"}
+    assert(GGAI.pick_building(F) == nil, "nothing to build anywhere is no target")
+
+    -- ITS RESEARCH, read back from the save - GG.researching starts empty on a load.
+    GG.set_research(F, "tech_ai_x"); GG.save_research(F); GG.researching[F] = nil
+    assert(GGAI.pick_research(F) == "tech_ai_x",
+           "the AI must read its research record back from the save")
+    -- ResearchCompleted never reaches an AI faction, so its record outlives the research.
+    HAS_TECH = {tech_ai_x = true}
+    assert(GGAI.pick_research(F) == nil and GG.research_target(F) == nil,
+           "a technology the faction already has is not for sale")
+    HAS_TECH = {}
+
+    -- AN ENEMY'S REGION, for the shroud.
+    GGAI.TEST_WARS = {"cr_foe"}
+    GGAI.TEST_ENEMY_REGIONS = {cr_foe = {"reg_foe_a"}}
+    assert(GGAI.pick_enemy_region(F) == "reg_foe_a", "the AI reveals an enemy's region")
+    GGAI.TEST_ENEMY_REGIONS = {cr_foe = {}}
+    assert(GGAI.pick_enemy_region(F) == nil, "an enemy with no regions is no target")
+    GGAI.TEST_WARS = {}
+    assert(GGAI.pick_enemy_region(F) == nil, "no war is no target")
+
+    -- pick_target ROUTES ALL THREE.
+    GGAI.TEST_WARS = {"cr_foe"}
+    GGAI.TEST_ENEMY_REGIONS = {cr_foe = {"reg_foe_a"}}
+    GGAI.TEST_REGIONS = {"r_up"}
+    assert(GGAI.pick_target(F, GG.service("hobgoblin_eyes")) == "reg_foe_a",
+           "hobgoblin_eyes targets an enemy region")
+    assert(GGAI.pick_target(F, GG.service("bound_blueprint")) == "tech_ai_x",
+           "bound_blueprint targets the recorded research")
+    t = GGAI.pick_target(F, GG.service("raise_ziggurat"))
+    assert(t and t.building == "bld_t2", "raise_ziggurat targets an upgrade")
+
+    -- AND THE AI BUYS THEM, with the target reaching the payload.
+    GG.state[F], GG.cooldowns[F] = nil, nil
+    for _, g in ipairs(GG.GUILDS) do GG.grant(F, g, 5000) end
+    local seen = {}
+    for _ = 1, 400 do
+        local k = GGAI.choose(F)
+        if k then seen[k] = true end
+    end
+    assert(seen.hobgoblin_eyes and seen.bound_blueprint and seen.raise_ziggurat,
+           "the AI never chose one of the three it now has targets for")
+    local prev_can = GG.can_buy
+    local function only(key)
+        GG.can_buy = function(f, k) return k == key and prev_can(f, k) end
+        GGAI.bought_this_turn[F] = nil
+        return GGAI.step(F)
+    end
+    local b0, s0, r0 = #built, #shroud, #research
+    assert(only("raise_ziggurat"), "the AI must be able to buy raise_ziggurat")
+    assert(#built == b0 + 1 and built[#built][2] == "bld_t2", "the upgrade must land")
+    assert(only("hobgoblin_eyes"), "the AI must be able to buy hobgoblin_eyes")
+    assert(#shroud == s0 + 1 and shroud[#shroud][1] == F
+           and shroud[#shroud][2] == "reg_foe_a", "the enemy region must be revealed")
+    assert(only("bound_blueprint"), "the AI must be able to buy bound_blueprint")
+    assert(#research == r0 + 1 and research[#research][2] == "tech_ai_x",
+           "the recorded research must complete")
+    GG.can_buy = prev_can
+
+    GGAI.TEST_WARS, GGAI.TEST_ENEMY_REGIONS, GGAI.TEST_REGIONS = nil, nil, nil
+    cm.get_region, cm.get_building_level_upgrades = prev_region, prev_upg
+    cm.get_faction = prev_getf
+    GG.clear_research(F); GG.save_research(F)
+    GG.state[F], GG.cooldowns[F] = nil, nil
+end)()
+
+-- --------------------------------------------------------------- no repeats --
+-- NEVER THE SAME SERVICE TWICE IN A ROW while anything else is affordable. A faction
+-- whose only open guild offers one service - the Daemonsmiths below rank 4 sell only the
+-- Forge-Rite - bought it every time its cooldown ran out and nothing else, all campaign.
+;(function()
+    local F = "cr_ai_norepeat"
+    GG.state[F], GG.cooldowns[F] = nil, nil
+    for _, g in ipairs(GG.GUILDS) do GG.grant(F, g, 5000) end
+    local prev_can = GG.can_buy
+    local function allow(set)
+        GG.can_buy = function(f, k) return set[k] == true and prev_can(f, k) end
+    end
+    allow({caravan_levy = true, writ_monopoly = true})
+    GGAI.bought_this_turn[F] = nil
+    assert(GGAI.step(F), "setup: the AI must buy one of the two")
+    local first = GGAI.last_bought(F)
+    assert(first == "caravan_levy" or first == "writ_monopoly",
+           "the purchase must be remembered, got " .. tostring(first))
+    -- IN THE SAVE, not the session: every machine in a multiplayer game must agree.
+    assert(saved["derpy_gg_ai_last_" .. F] == first, "the last purchase must be saved")
+    GG.cooldowns[F] = {}
+    for _ = 1, 100 do
+        assert(GGAI.choose(F) ~= first, "the AI bought " .. first .. " twice in a row "
+               .. "with something else affordable")
+    end
+    -- THE ONLY THING AFFORDABLE MAY REPEAT - the rule is against a rut, not a refusal.
+    allow({[first] = true})
+    assert(GGAI.choose(F) == first, "the only affordable service must still be bought")
+    GG.can_buy = prev_can
+    GG.state[F], GG.cooldowns[F] = nil, nil
+end)()
 
 -- ------------------------------------------------- plan 3, task 6 standings ---
 -- Enough of a UI environment to load the panel file and exercise its pure logic.
@@ -1138,20 +1325,25 @@ do
     GG.grant(RV, "overseers", 320)          -- rank 3 at 300
     assert(GG.rank_of(select(1, GG.get(RV, "overseers"))) == 3, "setup: not rank 3")
 
-    -- RIVALRY TAKES IT TO THE THRESHOLD AND STOPS. 100 earned by the slavers is a 40
-    -- loss unfloored, which would land on 280 and cost the rank.
+    -- RIVALRY STOPS ONE TURN'S UPKEEP ABOVE THE THRESHOLD. 100 earned by the slavers is
+    -- a 40 loss unfloored, which would land on 280 and cost the rank; floored ON the
+    -- threshold it would land on 300 and the next upkeep would cost it anyway.
     GG.grant(RV, "slavers", 100)
-    assert(select(1, GG.get(RV, "overseers")) == 300,
-           "rivalry must stop at the rank threshold, got "
+    assert(select(1, GG.get(RV, "overseers")) == 300 + GG.decay_amount(3),
+           "rivalry must stop one turn's upkeep above the rank threshold, got "
            .. select(1, GG.get(RV, "overseers")))
     assert(GG.rank_of(select(1, GG.get(RV, "overseers"))) == 3,
            "and the rank must survive it")
 
-    -- UPKEEP TAKES IT THROUGH. One turn at rank 3 is 3 points at the default rate,
-    -- which is all it takes from a threshold.
+    -- UPKEEP STILL TAKES IT THROUGH, one turn later than it would have: the first turn
+    -- spends the margin rivalry left, the second crosses. 3 points a turn at rank 3.
     GG.TUNE = GG.unpack_tune(GG.pack_tune({rate_decay = 100, decay_from = 25}))
-    RM_BEFORE_DEMOTE = #removed
     GG.decay(RV, 30)
+    assert(GG.rank_of(select(1, GG.get(RV, "overseers"))) == 3,
+           "the margin rivalry leaves must absorb one turn of upkeep, got rep "
+           .. select(1, GG.get(RV, "overseers")))
+    RM_BEFORE_DEMOTE = #removed
+    GG.decay(RV, 31)
     assert(GG.rank_of(select(1, GG.get(RV, "overseers"))) == 2,
            "upkeep must still demote, got rep "
            .. select(1, GG.get(RV, "overseers")))
@@ -1227,30 +1419,49 @@ assert(GG.covered(CHD) == true, "a Chaos Dwarf faction must be covered")
 GG.capped_grant(CHD, "brass", 500)
 assert(select(1, GG.get(CHD, "brass")) > 0, "a covered culture earned nothing")
 
--- NOW PUT A LIZARDMAN AT THE KEYBOARD. Nothing else changes - no list is edited, no
--- culture key appears anywhere in the mod - and coverage swaps over completely. This is
--- the assertion that separates "the player's culture" from "a hardcoded list that
--- happens to contain the player's culture", and a hardcoded list passes every other
--- assertion in this block.
+-- NOW PUT AN EMPIRE PLAYER AT THE KEYBOARD. Nothing else changes and coverage swaps
+-- over completely: the Empire races, the Chaos Dwarfs drop out. This is the assertion
+-- that separates "the player's culture" from "a hardcoded list that happens to contain
+-- the player's culture".
 local prev_getter = cm.get_human_factions
+do
+local EMP_PLAYER, EMP = "cr_empire_player", "cr_empire_other"
+CULTURE[EMP_PLAYER], CULTURE[EMP] = "wh_main_emp_empire", "wh_main_emp_empire"
+GG.CULTURE_OF[EMP_PLAYER], GG.CULTURE_OF[EMP] = nil, nil
+cm.get_human_factions = function() return {EMP_PLAYER} end
+GG.player_cultures_cache = nil
+assert(GG.covered(EMP) == true,
+       "with an Empire player at the keyboard an Empire faction must be covered")
+assert(GG.covered(CHD) == false,
+       "and the Chaos Dwarfs must drop out, because it is not their campaign")
+GG.state[EMP] = nil
+GG.reset_turn(EMP)
+GG.capped_grant(EMP, "brass", 500)
+assert(select(1, GG.get(EMP, "brass")) > 0,
+       "an Empire faction must earn in an Empire campaign")
+GG.state[EMP], GG.CULTURE_OF[EMP], GG.CULTURE_OF[EMP_PLAYER] = nil, nil, nil
+end
+
+-- ONLY THE RACES THIS MOD WRITES GUILDS FOR. A Lizardman at the keyboard gets no guilds
+-- at all - no button, no standing, no rank-up or demand messages for a panel they cannot
+-- open. The user's ruling, 2026-09-24: "the button shouldnt appear to other factions
+-- except the included ones".
 local LZD_PLAYER = "cr_lizard_player"
 CULTURE[LZD_PLAYER] = "wh2_main_lzd_lizardmen"
 GG.CULTURE_OF[LZD_PLAYER] = nil
 cm.get_human_factions = function() return {LZD_PLAYER} end
 GG.player_cultures_cache = nil
-assert(GG.covered(LZD) == true,
-       "with a Lizardman at the keyboard a Lizardmen faction must be covered - if it is "
-       .. "not, the scope is still a list and no mod-added culture will ever play")
-assert(GG.covered(CHD) == false,
-       "and the Chaos Dwarfs must drop out, because it is not their campaign")
+assert(GG.covered(LZD) == false,
+       "a Lizardmen faction is covered because a Lizardman plays it - but this mod writes "
+       .. "no guilds for the Lizardmen, so it has a race with no panel to show it")
+assert(GG.covered(LZD_PLAYER) == false, "nor is the Lizardmen player")
 GG.state[LZD] = nil
 GG.reset_turn(LZD)
 GG.capped_grant(LZD, "brass", 500)
-assert(select(1, GG.get(LZD, "brass")) > 0,
-       "a Lizardmen faction must earn in a Lizardmen campaign")
+assert(select(1, GG.get(LZD, "brass")) == 0,
+       "a Lizardmen faction earned standing in a Lizardmen campaign")
 
--- A CULTURE NO MOD IN THIS GAME HAS IS STILL FINE. The scope never needs to know the
--- key, which is the whole point: a culture invented tomorrow works the same way.
+-- AND A CULTURE SOME MOD INVENTS IS REFUSED THE SAME WAY, played or not.
 local INVENTED = "cr_invented"
 CULTURE[INVENTED] = "some_culture_that_ships_next_year"
 GG.CULTURE_OF[INVENTED] = nil
@@ -1258,8 +1469,8 @@ assert(GG.covered(INVENTED) == false, "not this campaign's culture")
 cm.get_human_factions = function() return {INVENTED} end
 GG.player_cultures_cache = nil
 GG.CULTURE_OF[INVENTED] = nil
-assert(GG.covered(INVENTED) == true,
-       "a culture this mod has never heard of must work the moment somebody plays it")
+assert(GG.covered(INVENTED) == false,
+       "a culture this mod has no guilds for is covered the moment somebody plays it")
 
 -- AN UNREADABLE PLAYER COVERS NOBODY NEW. get_human_factions is not answerable during
 -- loading, and the two possible fallbacks are not equally bad: covering everyone writes
@@ -1275,9 +1486,15 @@ GG.state[FRESH] = nil
 assert(GG.covered(FRESH) == false,
        "with no readable player, a faction holding nothing must not start earning - "
        .. "standing granted wrongly stays in the save, a missed turn does not")
-assert(GG.covered(LZD) == true,
+assert(GG.state[CHD] ~= nil, "setup: the Chaos Dwarf faction holds standing")
+GG.CULTURE_OF[CHD] = nil
+assert(GG.covered(CHD) == true,
        "but a faction already holding standing must keep earning, or one unreadable "
        .. "turn stalls the whole campaign")
+GG.grant(LZD, "brass", 500)         -- what a build that covered every race left behind
+assert(GG.state[LZD] ~= nil, "setup: the Lizardmen faction holds standing")
+assert(GG.covered(LZD) == false,
+       "a race with no guilds must not be let back in by standing an old build gave it")
 
 -- AND THE TILL REFUSES IT TOO, not just the earning. Stopping a faction earning does
 -- nothing about the standing a faction ALREADY HAS: a save written under the build that
@@ -1944,9 +2161,13 @@ assert(GG.leaders_now[GG.lead_slot("brass", GG.CHD_CULTURE)] == L2,
     local mark, rmark = #applied, #removed
     GG.reassert_leaders()
 
+    -- EACH CULTURE'S OWN KEY since the flavours (2026-09-23): the Dwarf foremost holds
+    -- derpy_gg_lead_brass_dwf, the Chaos Dwarf one derpy_gg_lead_brass.
+    local own = {[CHD_LEAD] = GG.lead_key("brass", GG.CHD_CULTURE),
+                 [DWF_LEAD] = GG.lead_key("brass", DWF)}
     local crowned = {}
     for i = mark + 1, #applied do
-        if applied[i][1] == "derpy_gg_lead_brass" then crowned[applied[i][2]] = true end
+        if own[applied[i][2]] == applied[i][1] then crowned[applied[i][2]] = true end
     end
     assert(crowned[CHD_LEAD] and crowned[DWF_LEAD],
            "each culture's foremost must get the bundle - CHD="
@@ -1954,12 +2175,10 @@ assert(GG.leaders_now[GG.lead_slot("brass", GG.CHD_CULTURE)] == L2,
            .. tostring(crowned[DWF_LEAD] or false))
 
     for i = rmark + 1, #removed do
-        if removed[i][1] == "derpy_gg_lead_brass" then
-            assert(removed[i][2] ~= CHD_LEAD and removed[i][2] ~= DWF_LEAD,
-                   "crowning one culture's foremost stripped the other's bundle ("
-                   .. tostring(removed[i][2]) .. ") - the sweep must only touch "
-                   .. "factions of the culture it is settling")
-        end
+        assert(own[removed[i][2]] ~= removed[i][1],
+               "crowning one culture's foremost stripped the other's bundle ("
+               .. tostring(removed[i][2]) .. ") - the sweep must only touch "
+               .. "factions of the culture it is settling")
     end
 
     -- AND IT STAYS SETTLED. This runs on every faction's turn start, so a sweep that
@@ -2414,14 +2633,25 @@ do
            "rivalry must still take its 40% inside the rank, got "
            .. tostring(GG.state[R]["khanate"].rep))
 
-    -- AND IT MUST STOP AT THE THRESHOLD, not at zero. Twenty rounds of a brass income
-    -- at the per-turn cap is far more than enough to clear 110 if nothing holds it.
+    -- AND IT MUST STOP ONE TURN'S UPKEEP ABOVE THE THRESHOLD, not at zero and not ON
+    -- the threshold. Twenty rounds of a brass income at the per-turn cap is far more than
+    -- enough to clear 110 if nothing holds it.
+    --
+    -- NOT ON IT, measured live 2026-09-23 (Azeros, turns 31-33): rivalry pinned the slavers
+    -- at exactly 100, the next turn start's upkeep took the rank-2 charge of 2, the save read
+    -- 98 and the player was demoted - then promoted again by the next sack, with a second
+    -- "Name You Indebted" popup. A floor ON the threshold is a demotion deferred one turn.
     for _ = 1, 20 do GG.rival_cost(R, "brass", 40) end
-    assert(GG.state[R]["khanate"].rep == 100,
-           "rivalry must floor at the rank held (Indebted, 100), got "
-           .. tostring(GG.state[R]["khanate"].rep))
+    local pinned = GG.RANKS[2] + GG.decay_amount(2)
+    assert(GG.state[R]["khanate"].rep == pinned,
+           "rivalry must floor one turn's upkeep above the rank held (Indebted 100 + "
+           .. GG.decay_amount(2) .. "), got " .. tostring(GG.state[R]["khanate"].rep))
     assert(GG.rank_of(GG.state[R]["khanate"].rep) == 2,
            "and the rank must survive it, since the bundle hangs off the rank")
+    GG.decay(R, 30)
+    assert(GG.rank_of(GG.state[R]["khanate"].rep) == 2,
+           "one turn of upkeep after rivalry pinned the guild must not demote it, got rep "
+           .. tostring(GG.state[R]["khanate"].rep) .. " - rivalry has cost a rank you hold")
 
     -- AND BELOW INDEBTED IT TAKES NOTHING AT ALL (2026-09-23, the author's choice). Rank
     -- 1's threshold is 0, so "floor at the rank held" let rivalry drain an Unmarked guild
@@ -2565,6 +2795,46 @@ assert(#feed == fmark,
 -- promotion, several times a round.
 GG.announce_rank(RAI, "brass", 1, 2)
 assert(#feed == fmark, "an AI faction's promotion is not an interrupt for the player")
+
+-- ONLY THE FIRST TIME A RANK IS REACHED. Upkeep demotes a guild the player stops feeding,
+-- by design, so a faction hovering at a threshold crosses it again and again - and each
+-- crossing popped "Name You Indebted" once more (Azeros, turns 31 and 33, 2026-09-23). The
+-- bundle swap and the Log tab still record every crossing; only the popup is once.
+;(function()
+    local ONCE, AI = "cr_popup_once_human", "cr_popup_once_ai"
+    local prev_humans = cm.get_human_factions
+    cm.get_human_factions = function() return {ONCE} end
+
+    local mark = #feed
+    GG.announce_rank(ONCE, "slavers", 1, 2)
+    assert(#feed == mark + 1, "the first promotion to a rank must pop up")
+    GG.announce_rank(ONCE, "slavers", 2, 1)
+    GG.announce_rank(ONCE, "slavers", 1, 2)
+    assert(#feed == mark + 1,
+           "regaining a rank already announced must not pop up again - a guild hovering "
+           .. "at a threshold would announce the same rank every turn")
+
+    GG.announce_rank(ONCE, "slavers", 2, 3)
+    assert(#feed == mark + 2, "a rank never reached before must still announce")
+    GG.announce_rank(ONCE, "slavers", 3, 4)
+    mark = #feed
+    GG.announce_rank(ONCE, "slavers", 2, 3)
+    assert(#feed == mark,
+           "climbing back to a rank BELOW the best ever reached must stay silent too")
+
+    GG.announce_rank(ONCE, "brass", 1, 2)
+    assert(#feed == mark + 1, "each guild keeps its own record")
+
+    -- NOTHING WRITTEN FOR THE AI. announce_rank is reached from GG.grant for every faction
+    -- in the world; a record per AI faction per guild would be hundreds of save keys.
+    GG.announce_rank(AI, "slavers", 1, 2)
+    for k, _ in pairs(saved) do
+        assert(not string.find(k, AI, 1, true),
+               "an AI promotion wrote save key " .. k)
+    end
+    cm.get_human_factions = prev_humans
+    fmark = #feed   -- the tests below measure from here, not from before this block
+end)()
 
 -- THE MCT SWITCH MUST ACTUALLY GATE IT, THROUGH THE REAL PIPELINE. Overriding GG.setting
 -- here would prove only that the function was called - and it was, against a key that was
@@ -3345,7 +3615,7 @@ end)()
         -- EVERY MAPPED CULTURE IS ONE THIS MOD CLAIMS TO FLAVOUR. GG.CULTURES is no
         -- longer a list - it is discovered from the campaign - so the pairing to hold
         -- is with GG.FLAVOURED, the cultures that have their own names and regiment.
-        assert(GG.FLAVOURED[culture] == true,
+        assert(GG.FLAVOURED[culture] ~= nil,
                culture .. " has a hire unit and is not in GG.FLAVOURED - either it lost "
                .. "its guild names or the unit is dead weight")
     end
@@ -3355,53 +3625,63 @@ end)()
                .. "service its flavour exists for")
     end
 
-    -- AN UNMAPPED CULTURE GETS NOTHING, AND THAT IS THE POINT. This used to fall back to
-    -- the Chaos Dwarf regiment, which was harmless while the mapped three were also the
-    -- gate. They are not the gate any more: the scope is the player's culture, read off
-    -- the human faction at runtime, so THE PLAYER CAN BELONG TO A CULTURE SOME MOD ADDED
-    -- - and the fallback would drop Chaos Dwarf infantry into an Araby or Nippon army,
-    -- bought with their own favour, a unit their roster cannot support.
+    -- AN UNMAPPED CULTURE GETS NOTHING. This used to fall back to the Chaos Dwarf
+    -- regiment, which would drop Chaos Dwarf infantry into an Araby or Nippon army. Since
+    -- 2026-09-24 such a culture is not in the race at all - GG.covered refuses any culture
+    -- outside GG.FLAVOURED even when a human plays it - so the till refuses it on scope
+    -- before the hire is ever asked about.
     --
     -- SO THIS FACTION IS THE ONE AT THE KEYBOARD. Its culture is deliberately a key no
-    -- table in this mod contains, which is the case that has to work.
+    -- table in this mod contains.
     local UK = "cr_hire_unknown"
     local hire_getter = cm.get_human_factions
     CULTURE[UK] = "some_culture_nobody_mapped"
     cm.get_human_factions = function() return {UK} end
     GG.player_cultures_cache = nil
     GG.CULTURE_OF[UK] = "some_culture_nobody_mapped"
-    assert(GG.covered(UK) == true,
-           "a player of a culture this mod ships no flavour for must still be in their "
-           .. "own race - flavour and scope are different questions")
+    assert(GG.covered(UK) == false,
+           "a culture this mod writes no guilds for is in the race because a human plays it")
     assert(GG.hire_unit(UK) == nil,
            "an unmapped culture was handed " .. tostring(GG.hire_unit(UK))
            .. " - a regiment from somebody else's roster")
     assert(GG.hire_unit("cr_hire_never_seen") == nil,
            "and a faction whose culture was never read must get nothing either")
-
-    -- THE TILL REFUSES IT RATHER THAN CHARGING. A payload that cannot deliver must not
-    -- be sold; this is the same rule the five targeted services were fixed under. The
-    -- reason has to be 'no_unit' and not 'scope': this faction IS in the race, it just
-    -- has no regiment, and the panel prints a different sentence for each.
     GG.state[UK] = nil
     GG.grant(UK, "immortals", 99999)
     GG.cooldowns[UK] = {}
     local uok, uwhy = GG.can_buy(UK, "hire_immortals")
-    assert(uok == false and uwhy == "no_unit",
-           "an unmapped culture must be refused the hire with 'no_unit', got "
-           .. tostring(uwhy))
-    -- AND ONLY THAT ONE SERVICE. Refusing a culture the whole board because one payload
-    -- cannot be delivered would cost it seventeen services it can have.
-    GG.grant(UK, "brass", 99999)
-    GG.cooldowns[UK] = {}
-    assert(GG.can_buy(UK, "caravan_levy") == true,
-           "an unmapped culture must still be sold the services that do not hand out a "
-           .. "regiment, got " .. tostring(select(2, GG.can_buy(UK, "caravan_levy"))))
+    assert(uok == false and uwhy == "scope",
+           "an unmapped culture must be refused at the till on scope, got "
+           .. tostring(uok) .. "/" .. tostring(uwhy))
     local before = #units
     GG.buy(UK, "hire_immortals", 77)
     assert(#units == before,
            "and no unit may be granted even if the sale is forced past the till")
     GG.state[UK] = nil
+
+    -- A RACE IN THE RACE WITH NO REGIMENT IS REFUSED THE HIRE, NOT THE BOARD. No shipped
+    -- flavour lacks a unit (asserted above), so this is the second line of defence for a
+    -- flavour added without one: 'no_unit', never 'scope', and only for that service.
+    local EP, emp = "cr_hire_emp_player", "wh_main_emp_empire"
+    CULTURE[EP] = emp
+    GG.CULTURE_OF[EP] = emp
+    cm.get_human_factions = function() return {EP} end
+    GG.player_cultures_cache = nil
+    local emp_unit = GG.HIRE_UNIT_BY_CULTURE[emp]
+    GG.HIRE_UNIT_BY_CULTURE[emp] = nil
+    GG.state[EP] = nil
+    GG.grant(EP, "immortals", 99999)
+    GG.grant(EP, "brass", 99999)
+    GG.cooldowns[EP] = {}
+    local eok, ewhy = GG.can_buy(EP, "hire_immortals")
+    GG.HIRE_UNIT_BY_CULTURE[emp] = emp_unit
+    assert(eok == false and ewhy == "no_unit",
+           "a covered culture with no regiment must be refused the hire with 'no_unit', "
+           .. "got " .. tostring(eok) .. "/" .. tostring(ewhy))
+    GG.cooldowns[EP] = {}
+    assert(GG.can_buy(EP, "caravan_levy") == true,
+           "and still be sold the services that do not hand out a regiment")
+    GG.state[EP], GG.CULTURE_OF[EP], CULTURE[EP] = nil, nil, nil
     cm.get_human_factions = hire_getter
     GG.player_cultures_cache = nil
 
@@ -3672,16 +3952,23 @@ end)()
            "ResearchCompleted must clear the subject, or the service keeps selling a "
            .. "technology the faction already has")
 
-    -- AN AI FACTION IS NOT RECORDED. The event fires for every faction in the campaign
-    -- - about 190 in Immortal Empires - and a saved value each would put 190 keys in the
-    -- save. This was gated on GG.covered, which stopped being a gate the moment every
-    -- culture in the campaign became covered; GGAI.EXCLUDED keeps the AI off Bound
-    -- Blueprint, so only the faction at the keyboard ever spends this record.
-    local AIF = "cr_research_ai"
+    -- AN AI OF THE PLAYER'S CULTURE IS RECORDED - the AI buys Bound Blueprint now, and
+    -- a record is the only way it can. ONE OF ANY OTHER CULTURE IS NOT: the event fires
+    -- for every faction in the campaign, about 190 in Immortal Empires, and a saved value
+    -- each would be 190 keys in the save for factions that can never buy anything here.
+    local AIF, OTHER = "cr_research_ai", "cr_research_other"
+    GG.CULTURE_OF[AIF] = GG.CHD_CULTURE
+    GG.CULTURE_OF[OTHER] = "wh2_main_lzd_lizardmen"
+    GG.player_cultures_cache = nil
     handlers["gg_research_started"](ctx(AIF, "tech_ai_something"))
-    assert(GG.research_target(AIF) == nil,
-           "an AI faction's research was recorded - that is ~190 saved values for a "
-           .. "service GGAI.EXCLUDED never lets the AI buy")
+    assert(GG.research_target(AIF) == "tech_ai_something",
+           "an AI of the player's culture must have its research recorded, or it can "
+           .. "never buy Bound Blueprint")
+    handlers["gg_research_started"](ctx(OTHER, "tech_other"))
+    assert(GG.research_target(OTHER) == nil,
+           "a faction of another culture was recorded - a saved value for a faction "
+           .. "that can never spend it")
+    GG.clear_research(AIF); GG.save_research(AIF)
     -- and the human's still is.
     handlers["gg_research_started"](ctx(F, "tech_human_something"))
     assert(GG.research_target(F) == "tech_human_something",
@@ -4966,9 +5253,8 @@ end
 ;(function()
     local F = "cr_reentry"
     local REWARD = GG.setting("rate_daemonsmiths") or 60
-    -- A HUMAN BUYER. Bound Blueprint is human-only (GGAI.EXCLUDED), and since 2026-09-23
-    -- ResearchCompleted pays humans only - the AI is paid off its technology count - so a
-    -- fixture that is not a human would test a purchase nobody can make.
+    -- A HUMAN BUYER. Since 2026-09-23 ResearchCompleted pays humans only - the AI is
+    -- paid off its technology count - so the re-entry this block tests is a human's.
     local prev_humans = cm.get_human_factions
     cm.get_human_factions = function() return {F} end
     GG.humans, GG.player_cultures_cache = nil, nil
@@ -5187,6 +5473,892 @@ end
     GG.CULTURE_OF[H], GG.CULTURE_OF[AI] = nil, nil
     cm.get_human_factions = prev_humans
     GG.humans, GG.player_cultures_cache = nil, nil
+end)()
+
+-- ------------------------------------------------------------- the flavours --
+-- ONE TAG PER CULTURE ON EVERY KEY THE PLAYER READS. Chaos Dwarfs carry the empty tag, so
+-- every test above this line is also the proof that their keys did not move.
+;(function()
+    local E, D, L, X = "cr_flav_emp", "cr_flav_dwf", "cr_flav_lzd", "cr_flav_gone"
+    CULTURE[E], CULTURE[D] = "wh_main_emp_empire", "wh_main_dwf_dwarfs"
+    CULTURE[L] = "wh2_main_lzd_lizardmen"
+    NO_SUCH_FACTION[X] = true
+    for _, f in ipairs({E, D, L, X, THE_PLAYER}) do GG.CULTURE_OF[f] = nil end
+    assert(GG.tag(THE_PLAYER) == "", "Chaos Dwarfs carry the empty tag")
+    assert(GG.tag(E) == "_emp", "the Empire's tag, got " .. tostring(GG.tag(E)))
+    assert(GG.tag(D) == "_dwf", "the Dwarfs' tag, got " .. tostring(GG.tag(D)))
+    -- EVERY OTHER RACE READS THE GENERIC FLAVOUR, not the Chaos Dwarf one: a Lizardmen
+    -- player was shown the Brass Tablets and Hashut's crest until 2026-09-24.
+    assert(GG.tag(L) == "_gen", "a culture with no flavour of its own reads the generic "
+           .. "words, got " .. tostring(GG.tag(L)))
+    assert(GG.tag(X) == "", "an unreadable culture reads the Chaos Dwarf words")
+    assert(GG.tag(nil) == "", "no faction is the untagged key")
+    assert(GG.feed(E, 5004) == 5014 and GG.feed(D, 5004) == 5024,
+           "feed offsets 10 and 20, got " .. GG.feed(E, 5004) .. " and " .. GG.feed(D, 5004))
+    assert(GG.feed(L, 5001) == 5031, "the generic feed offset is 30, got " .. GG.feed(L, 5001))
+    assert(GG.feed(THE_PLAYER, 5004) == 5004 and GG.feed(X, 5001) == 5001,
+           "Chaos Dwarfs and the unreadable keep the base index")
+    assert(GG.lead_key("brass", "wh2_main_lzd_lizardmen") == "derpy_gg_lead_brass_gen",
+           "a generic culture's lead bundle, got "
+           .. GG.lead_key("brass", "wh2_main_lzd_lizardmen"))
+    assert(GG.lead_key("brass", GG.CHD_CULTURE) == "derpy_gg_lead_brass"
+           and GG.lead_key("brass", nil) == "derpy_gg_lead_brass",
+           "Chaos Dwarfs and no culture keep the untagged lead bundle")
+    CULTURE[E], CULTURE[D], CULTURE[L], NO_SUCH_FACTION[X] = nil, nil, nil, nil
+    for _, f in ipairs({E, D, L, X}) do GG.CULTURE_OF[f] = nil end
+end)()
+
+-- BRETONNIA, CATHAY, KISLEV AND THE TWO ELF RACES each read their own words at their own
+-- feed offset, and hire their own regiment - never the generic flavour, and never nothing.
+;(function()
+    local cases = {
+        {"cr_flav_brt", "wh_main_brt_bretonnia", "_brt", 40,
+         "wh_main_brt_cav_knights_of_the_realm"},
+        {"cr_flav_cth", "wh3_main_cth_cathay", "_cth", 50, "wh3_main_cth_inf_dragon_guard_0"},
+        {"cr_flav_ksl", "wh3_main_ksl_kislev", "_ksl", 60, "wh3_main_ksl_inf_tzar_guard_1"},
+        {"cr_flav_def", "wh2_main_def_dark_elves", "_def", 70, "wh2_main_def_inf_black_guard_0"},
+        {"cr_flav_hef", "wh2_main_hef_high_elves", "_hef", 80,
+         "wh2_main_hef_inf_swordmasters_of_hoeth_0"},
+    }
+    for _, c in ipairs(cases) do
+        local f, culture, tag, off, unit = c[1], c[2], c[3], c[4], c[5]
+        CULTURE[f], GG.CULTURE_OF[f] = culture, nil
+        assert(GG.tag(f) == tag, culture .. " must read " .. tag .. ", got "
+               .. tostring(GG.tag(f)))
+        assert(GG.feed(f, 5001) == 5001 + off, culture .. " feed offset " .. off .. ", got "
+               .. GG.feed(f, 5001))
+        assert(GG.lead_key("brass", culture) == "derpy_gg_lead_brass" .. tag,
+               culture .. "'s lead bundle, got " .. GG.lead_key("brass", culture))
+        assert(GG.hire_unit(f) == unit, culture .. " must hire " .. unit .. ", got "
+               .. tostring(GG.hire_unit(f)))
+        CULTURE[f], GG.CULTURE_OF[f] = nil, nil
+    end
+end)()
+
+-- AN EMPIRE RANK IS AN EMPIRE BUNDLE, and the sweep that clears the other ranks clears
+-- only the Empire's own - never another race's.
+;(function()
+    local E = "cr_flav_rank_emp"
+    CULTURE[E] = "wh_main_emp_empire"
+    GG.CULTURE_OF[E] = nil
+    local a0, r0 = #applied, #removed
+    GG.apply_rank(E, "brass", 2, 3)
+    assert(removed[r0 + 1] and removed[r0 + 1][1] == "derpy_gg_rank_brass_2_emp",
+           "the old Empire rank must go by its tagged key, got "
+           .. tostring(removed[r0 + 1] and removed[r0 + 1][1]))
+    assert(applied[a0 + 1] and applied[a0 + 1][1] == "derpy_gg_rank_brass_3_emp",
+           "the new Empire rank must land by its tagged key, got "
+           .. tostring(applied[a0 + 1] and applied[a0 + 1][1]))
+    GG.state[E] = {brass = {rep = 300, fav = 0}}
+    GG.asserted[E] = nil
+    a0, r0 = #applied, #removed
+    GG.assert_ranks(E)
+    assert(#removed > r0, "assert_ranks must clear the other ranks")
+    -- Its own tagged keys, and the stale untagged ones (the next block) - never the
+    -- Dwarfs', and never off anybody else.
+    for i = r0 + 1, #removed do
+        assert(removed[i][2] == E and string.sub(removed[i][1], -4) ~= "_dwf",
+               "an Empire sweep removed " .. removed[i][1] .. ", another race's bundle")
+    end
+    assert(applied[#applied][1] == "derpy_gg_rank_brass_3_emp",
+           "assert_ranks must apply the tagged bundle, got " .. applied[#applied][1])
+    assert(GG.bundle_key("brass", 3, THE_PLAYER) == "derpy_gg_rank_brass_3",
+           "a Chaos Dwarf rank key must not move")
+    GG.state[E], GG.asserted[E], CULTURE[E], GG.CULTURE_OF[E] = nil, nil, nil, nil
+end)()
+
+-- THE LEAD BUNDLE IS PER CULTURE, and reassert_leaders hands the engine that key.
+-- leader_of and the culture list are stubbed: what is under test is which key the sweep
+-- uses, not who wins.
+;(function()
+    local E = "cr_flav_lead_emp"
+    assert(GG.lead_key("brass", "wh_main_emp_empire") == "derpy_gg_lead_brass_emp")
+    assert(GG.lead_key("brass", "wh_main_dwf_dwarfs") == "derpy_gg_lead_brass_dwf")
+    assert(GG.lead_key("brass", GG.CHD_CULTURE) == "derpy_gg_lead_brass")
+    assert(GG.lead_key("brass", "wh2_main_lzd_lizardmen") == "derpy_gg_lead_brass_gen")
+    local prev_leader, prev_cip, prev_now = GG.leader_of, GG.cultures_in_play, GG.leaders_now
+    GG.cultures_in_play = function() return {["wh_main_emp_empire"] = true} end
+    GG.leader_of = function(guild, _culture)
+        if guild == "brass" then return E end
+        return nil
+    end
+    GG.leaders_now = {}
+    local a0, ok = #applied, false
+    GG.reassert_leaders()
+    for i = a0 + 1, #applied do
+        assert(applied[i][1] ~= "derpy_gg_lead_brass",
+               "an Empire leader was handed the Chaos Dwarf lead bundle")
+        if applied[i][1] == "derpy_gg_lead_brass_emp" and applied[i][2] == E then ok = true end
+    end
+    assert(ok, "the Empire's foremost must be given derpy_gg_lead_brass_emp")
+    GG.leader_of, GG.cultures_in_play, GG.leaders_now = prev_leader, prev_cip, prev_now
+end)()
+
+-- A SAVE FROM THE BUILD THAT COVERED ALL THREE RACES AT ONCE still has Empire and Dwarf AI
+-- factions wearing the UNTAGGED rank and lead bundles. Their tagged successors must not
+-- stack on top of them: the first assertion of the session takes the untagged copies off.
+;(function()
+    local E = "cr_flav_stale_emp"
+    CULTURE[E] = "wh_main_emp_empire"
+    GG.CULTURE_OF[E] = nil
+    GG.state[E] = {brass = {rep = 300, fav = 0}}
+    GG.asserted[E] = nil
+    local r0 = #removed
+    GG.assert_ranks(E)
+    local gone = {}
+    for i = r0 + 1, #removed do
+        if removed[i][2] == E then gone[removed[i][1]] = true end
+    end
+    for r = 2, 5 do
+        assert(gone["derpy_gg_rank_brass_" .. r],
+               "an Empire faction's stale untagged rank " .. r .. " bundle must come off")
+    end
+    local prev_leader, prev_cip, prev_now = GG.leader_of, GG.cultures_in_play, GG.leaders_now
+    GG.cultures_in_play = function() return {["wh_main_emp_empire"] = true} end
+    GG.leader_of = function(guild, _culture)
+        if guild == "brass" then return E end
+        return nil
+    end
+    GG.leaders_now = {}
+    r0 = #removed
+    GG.reassert_leaders()
+    local off = false
+    for i = r0 + 1, #removed do
+        if removed[i][1] == "derpy_gg_lead_brass" and removed[i][2] == E then off = true end
+    end
+    assert(off, "the Empire's foremost must lose the stale untagged lead bundle")
+    GG.leader_of, GG.cultures_in_play, GG.leaders_now = prev_leader, prev_cip, prev_now
+    GG.state[E], GG.asserted[E], CULTURE[E], GG.CULTURE_OF[E] = nil, nil, nil, nil
+end)()
+
+-- A SERVICE CARRIES THE BUYER'S TAG, the hostile one included: its victim is of another
+-- race and reads the name of who did it to them. And a bounty is keyed per holder.
+;(function()
+    local E, D = "cr_flav_svc_emp", "cr_flav_svc_dwf"
+    CULTURE[E], CULTURE[D] = "wh_main_emp_empire", "wh_main_dwf_dwarfs"
+    GG.CULTURE_OF[E], GG.CULTURE_OF[D] = nil, nil
+    GG.payload(E, GG.service("writ_monopoly"))
+    assert(applied[#applied][1] == "derpy_gg_svc_writ_monopoly_emp"
+           and applied[#applied][2] == E,
+           "an Empire purchase must land the _emp bundle on the buyer, got "
+           .. applied[#applied][1])
+    GG.payload(E, GG.service("khans_price"), D)
+    assert(applied[#applied][1] == "derpy_gg_svc_khans_price_emp"
+           and applied[#applied][2] == D,
+           "the hostile service must land the BUYER's tag on the target, got "
+           .. applied[#applied][1] .. " on " .. tostring(applied[#applied][2]))
+
+    assert(GG.bounty_mission_key("brass", E) == "derpy_gg_bounty_brass_emp")
+    assert(GG.bounty_mission_key("brass") == "derpy_gg_bounty_brass",
+           "no faction is the Chaos Dwarf key")
+    local str = GG.bounty_string(E, {guild = "brass", kind = "region_take",
+                                     target = "r", gold = 100})
+    assert(str and string.find(str, "key derpy_gg_bounty_brass_emp;", 1, true),
+           "an Empire bounty must be issued under its tagged key: " .. tostring(str))
+    local prev = GG.bounties[E]
+    GG.bounties[E] = {{guild = "brass", taken = true, rep = 0}}
+    assert(GG.bounty_done(E, "derpy_gg_bounty_brass") == false,
+           "the untagged key must not pay an Empire bounty")
+    assert(GG.bounty_done(E, "derpy_gg_bounty_brass_emp") == true,
+           "the Empire's own key must pay it")
+    GG.bounties[E] = prev
+    CULTURE[E], CULTURE[D], GG.CULTURE_OF[E], GG.CULTURE_OF[D] = nil, nil, nil, nil
+end)()
+
+-- EVERY MESSAGE IN ITS RECEIVER'S WORDS, at its receiver's feed index.
+;(function()
+    local E, D, X = "cr_flav_msg_emp", "cr_flav_msg_dwf", "cr_flav_msg_chd"
+    CULTURE[E], CULTURE[D] = "wh_main_emp_empire", "wh_main_dwf_dwarfs"
+    CULTURE[X] = "wh3_dlc23_chd_chaos_dwarfs"
+    for _, f in ipairs({E, D, X}) do GG.CULTURE_OF[f] = nil end
+    local prev_humans = cm.get_human_factions
+    cm.get_human_factions = function() return {E, D, X} end
+    GG.humans, GG.player_cultures_cache = nil, nil
+
+    local function heard(f, title, idx, why)
+        local l = feed[#feed]
+        assert(l and l[1] == f and l[2] == title and l[3] == idx,
+               why .. ": wanted " .. f .. " / " .. title .. " / " .. idx .. ", got "
+               .. tostring(l and l[1]) .. " / " .. tostring(l and l[2]) .. " / "
+               .. tostring(l and l[3]))
+    end
+
+    GG.announce_rank(E, "brass", 1, 3)
+    heard(E, "message_event_text_text_derpy_gg_rank_brass_3_emp_title", 5014,
+          "an Empire promotion")
+    GG.announce_rank(D, "brass", 1, 3)
+    heard(D, "message_event_text_text_derpy_gg_rank_brass_3_dwf_title", 5024,
+          "a Dwarf promotion")
+    GG.announce_rank(X, "brass", 1, 3)
+    heard(X, "message_event_text_text_derpy_gg_rank_brass_3_title", 5004,
+          "a Chaos Dwarf promotion must not move")
+    GG.announce_lead("brass", E, "cr_flav_nobody")
+    heard(E, "message_event_text_text_derpy_gg_lead_won_brass_emp_title", 5013,
+          "an Empire lead won")
+    GG.announce_demand(D, "expired")
+    heard(D, "message_event_text_text_derpy_gg_demand_fail_dwf_title", 5022,
+          "a Dwarf demand expiring")
+    GG.announce_bounty_fail(E, "brass", 100)
+    heard(E, "message_event_text_text_derpy_gg_bounty_fail_emp_title", 5012,
+          "an Empire bounty failing")
+    assert(GG.notice_once(D, "first", "khanate") == true, "the notice must fire")
+    heard(D, "message_event_text_text_derpy_gg_notice_first_khanate_dwf_title", 5024,
+          "a Dwarf notice")
+    -- HEAD-TO-HEAD: an Empire rival's hostile service lands on a Dwarf player, who reads
+    -- it in their own race's words.
+    GGAI.report(E, GG.service("khans_price"), D)
+    heard(D, "message_event_text_text_derpy_gg_hit_dwf_title", 5021,
+          "an Empire hit landing on a Dwarf player")
+
+    cm.get_human_factions = prev_humans
+    GG.humans, GG.player_cultures_cache = nil, nil
+    for _, f in ipairs({E, D, X}) do CULTURE[f], GG.CULTURE_OF[f] = nil, nil end
+    fmark = #feed
+end)()
+
+-- THE PANEL READS THE LOCAL PLAYER'S FLAVOUR: tagged loc keys, tagged art, and the crest
+-- and the opener repainted - and a player of a culture with no flavour reads the Chaos
+-- Dwarf words and art, with nothing repainted.
+;(function()
+    local E, L = "cr_flav_ui_emp", "cr_flav_ui_lzd"
+    CULTURE[E], CULTURE[L] = "wh_main_emp_empire", "wh2_main_lzd_lizardmen"
+    GG.CULTURE_OF[E], GG.CULTURE_OF[L] = nil, nil
+    local prev_local, me = cm.get_local_faction_name, E
+    cm.get_local_faction_name = function() return me end
+    local asked = {}
+    common = {get_localised_string = function(k) asked[#asked + 1] = k return "x" end}
+
+    GGUI.loc("guild_name_brass")
+    assert(asked[#asked] == "derpy_gg_guild_name_brass_emp",
+           "an Empire player's panel must ask for the _emp key, asked "
+           .. tostring(asked[#asked]))
+    GGUI.bounty_title({guild = "brass"})
+    assert(asked[#asked] == "missions_localised_title_derpy_gg_bounty_brass_emp",
+           "an Empire bounty's title is the Empire row's, asked " .. tostring(asked[#asked]))
+    assert(GGUI.icon("brass") == "ui/campaign ui/derpy_gg_icons/brass_emp.png",
+           tostring(GGUI.icon("brass")))
+    assert(GGUI.art(GGUI.PANEL_BG.brass) == "ui/campaign ui/derpy_gg_bg/brass_emp.png")
+    assert(GGUI.art(GGUI.CREST) == "ui/campaign ui/derpy_gg_icons/crest_emp.png")
+    assert(GGUI.art(nil) == nil, "no path stays no path")
+
+    local painted = {}
+    local fake = {SetImagePath = function(_, p, i) painted[#painted + 1] = p .. "#" .. i end}
+    local prev_find, prev_is = find_uicomponent, is_uicomponent
+    find_uicomponent = function(_, name)
+        if name == "gg_crest" then return fake end
+        return nil
+    end
+    is_uicomponent = function(x) return x == fake end
+    GGUI.paint_crest()
+    GGUI.paint_opener(fake)
+    local c = "ui/campaign ui/derpy_gg_icons/crest_emp.png"
+    assert(table.concat(painted, ",") == c .. "#0," .. c .. "#2," .. c .. "#5",
+           "the crest is image 0 of gg_crest and images 2 and 5 of the opener, got "
+           .. table.concat(painted, ","))
+
+    -- A RACE WITH NO FLAVOUR OF ITS OWN READS THE GENERIC ONE - words, icons and crest.
+    me = L
+    painted = {}
+    GGUI.loc("guild_name_brass")
+    assert(asked[#asked] == "derpy_gg_guild_name_brass_gen",
+           "a Lizardmen player reads the generic key, asked " .. tostring(asked[#asked]))
+    assert(GGUI.icon("brass") == "ui/campaign ui/derpy_gg_icons/brass_gen.png",
+           tostring(GGUI.icon("brass")))
+    GGUI.paint_crest()
+    GGUI.paint_opener(fake)
+    local g = "ui/campaign ui/derpy_gg_icons/crest_gen.png"
+    assert(table.concat(painted, ",") == g .. "#0," .. g .. "#2," .. g .. "#5",
+           "a generic player's crest is repainted, got " .. table.concat(painted, ","))
+
+    find_uicomponent, is_uicomponent = prev_find, prev_is
+    common = nil
+    cm.get_local_faction_name = prev_local
+    CULTURE[E], CULTURE[L], GG.CULTURE_OF[E], GG.CULTURE_OF[L] = nil, nil, nil, nil
+end)()
+
+-- THE PANEL GROWS WITH THE SCREEN. The screen the script is told about is the window
+-- divided by the player's UI Scale, so a 4K player at 100% reports 3840x2160 and gets a
+-- panel twice the size, while a 4K player who already set 200% reports 1920x1080 and
+-- gets the design size - the engine has doubled it already, and doubling it again
+-- would be four times.
+;(function()
+    local cases = {
+        {1920, 1080, 1},     {1600, 900, 1},      {1280, 720, 1},
+        {3840, 2160, 2},     {2560, 1440, 1.33},  {5120, 1440, 1.33},
+        {2560, 1600, 1.33},  {7680, 4320, 4},
+    }
+    for _, c in ipairs(cases) do
+        local s = GGUI.scale_for(c[1], c[2])
+        assert(math.abs(s - c[3]) < 0.005,
+               c[1] .. "x" .. c[2] .. " should scale " .. c[3] .. ", got " .. tostring(s))
+    end
+    assert(GGUI.scale_for(nil, nil) == 1, "an unreadable screen draws the design size")
+    assert(GGUI.scale_for(0, 0) == 1, "a zero screen draws the design size")
+
+    GGUI.S = 2
+    assert(GGUI.px(20) == 40 and GGUI.px(7) == 14, "px multiplies by the factor")
+    GGUI.S = 1.33
+    assert(GGUI.px(750) == 998, "px rounds to the nearest pixel, got " .. GGUI.px(750))
+
+    -- A fake component tree: the panel, a text cell, a picture, and a card with a text
+    -- child of its own, so the walk has to recurse.
+    local calls = {}
+    local function node(id, w, h, text, kids)
+        local n = {id = id, w = w, h = h, kids = kids or {}}
+        function n:Id() return self.id end
+        function n:Dimensions() return self.w, self.h end
+        function n:ChildCount() return #self.kids end
+        function n:Find(i) return self.kids[i + 1] end
+        function n:SetCanResizeWidth(v) calls[#calls + 1] = self.id .. " cw" end
+        function n:SetCanResizeHeight(v) calls[#calls + 1] = self.id .. " ch" end
+        function n:Resize(rw, rh)
+            calls[#calls + 1] = self.id .. " " .. rw .. "x" .. rh
+            self.w, self.h = rw, rh
+        end
+        function n:AnimationExists(a) return text and a == GGUI.SCALE_ANIM end
+        function n:SetAnimationFrameProperty(a, f, p, ...)
+            calls[#calls + 1] = self.id .. " " .. a .. " " .. f .. " " .. p .. " "
+                                .. table.concat({...}, ",")
+        end
+        function n:TriggerAnimation(a) calls[#calls + 1] = self.id .. " play " .. a end
+        return n
+    end
+    local function tree()
+        return node("panel", 790, 700, false, {
+            node("title", 366, 28, true),
+            node("crest", 34, 34, false),
+            node("card", 750, 120, false, {node("card_name", 440, 26, true)}),
+        })
+    end
+
+    GGUI.S = 1
+    GGUI.scale_tree(tree())
+    assert(#calls == 0, "at the design size nothing is touched, got " .. table.concat(calls, "; "))
+
+    GGUI.S = 2
+    GGUI.scale_tree(tree())
+    local got = table.concat(calls, "; ")
+    local a = GGUI.SCALE_ANIM
+    local want = table.concat({
+        "panel cw", "panel ch", "panel 1580x1400",
+        "title cw", "title ch", "title 732x56",
+        "title " .. a .. " 0 scale 732,56",
+        "title " .. a .. " 0 font_scale 2", "title play " .. a,
+        "crest cw", "crest ch", "crest 68x68",
+        "card cw", "card ch", "card 1500x240",
+        "card_name cw", "card_name ch", "card_name 880x52",
+        "card_name " .. a .. " 0 scale 880,52",
+        "card_name " .. a .. " 0 font_scale 2", "card_name play " .. a,
+    }, "; ")
+    assert(got == want, "scale_tree at 2x:\n got  " .. got .. "\n want " .. want)
+
+    -- LAYOUT OFFSETS SCALE WITH THE PARTS. A panel twice the size with its children at
+    -- the design offsets would stack them all in its top-left quarter.
+    local moved = {}
+    local function mover(id, x, y)
+        local m = {id = id, x = x, y = y}
+        function m:MoveTo(mx, my) moved[self.id] = mx .. "," .. my; self.x, self.y = mx, my end
+        function m:Position() return self.x, self.y end
+        return m
+    end
+    local panel = mover("derpy_gg_panel", 100, 50)
+    local parts = {}
+    local prev_find, prev_is = find_uicomponent, is_uicomponent
+    is_uicomponent = function(x) return x ~= nil end
+    find_uicomponent = function(parent, name)
+        if name == "derpy_gg_panel" then return panel end
+        parts[name] = parts[name] or mover(name, 0, 0)
+        return parts[name]
+    end
+    GGUI.S = 2
+    GGUI.layout()
+    find_uicomponent, is_uicomponent = prev_find, prev_is
+    assert(moved.gg_title == (100 + 54 * 2) .. "," .. (50 + 14 * 2),
+           "gg_title at 2x, got " .. tostring(moved.gg_title))
+    assert(moved.derpy_gg_row_2 == (100 + 20 * 2) .. "," .. (50 + (170 + 44) * 2),
+           "the second standings row at 2x, got " .. tostring(moved.derpy_gg_row_2))
+    assert(moved.vslider == (100 + (20 + 734) * 2) .. "," .. (50 + 440 * 2),
+           "the list's slider at 2x, got " .. tostring(moved.vslider))
+
+    -- THE HELP TAB WRAPS THE SAME AT EVERY SIZE. Text drawn at twice the size in a box
+    -- twice as wide breaks where it breaks at 1x - whether the engine measures the
+    -- string at the scaled size or at the design one, and nothing in CA's reference says
+    -- which. GGUI.text_ratio answers it from a probe measured before the scale.
+    local k = 1
+    local function cell(w)
+        local c = {}
+        function c:Dimensions() return w, 18 end
+        function c:TextDimensionsForText(s) return #s * 10 * k, 18 end
+        return c
+    end
+    local para = string.rep("abcd ", 60)
+    GGUI.S, GGUI.PROBE_W0 = 1, nil
+    local base = table.concat(GGUI.wrap(cell(750), para), "|")
+    local probe = cell(750)
+    local prev_find2, prev_is2 = find_uicomponent, is_uicomponent
+    is_uicomponent = function(x) return x ~= nil end
+    find_uicomponent = function(_, name)
+        if name == "gg_help_01" then return probe end
+        return nil
+    end
+    GGUI.S, GGUI.PROBE_W0 = 2, #GGUI.PROBE * 10
+    k = 1
+    local flat = table.concat(GGUI.wrap(cell(1500), para), "|")
+    k = 2
+    local grown = table.concat(GGUI.wrap(cell(1500), para), "|")
+    find_uicomponent, is_uicomponent = prev_find2, prev_is2
+    assert(flat == base, "at 2x, measured at the design size, the lines must match 1x")
+    assert(grown == base, "at 2x, measured at the scaled size, the lines must match 1x")
+    GGUI.S, GGUI.PROBE_W0 = 1, nil
+end)()
+
+-- ------------------------------------------------ multiplayer: clicks travel --
+-- A MODEL CHANGE MADE ON ONE MACHINE IS A DESYNC. Every change the panel makes goes
+-- through GG.mp_send: applied at once in single player, broadcast in multiplayer and
+-- applied by the UITrigger listener on every machine - never on the sender alone.
+;(function()
+    local H, OTHER = "cr_mp_h", "cr_mp_other"
+    local CQI = {[H] = 77, [OTHER] = 78}
+    local prev_humans, prev_getter = GG.humans, cm.get_human_factions
+    local prev_mp, prev_getf, prev_ui = cm.is_multiplayer, cm.get_faction, CampaignUI
+    GG.humans = nil
+    cm.get_human_factions = function() return {H, OTHER} end
+    cm.get_faction = function(self, k)
+        local f = prev_getf(self, k)
+        if f then f.command_queue_index = function() return CQI[k] or 0 end end
+        return f
+    end
+    local sent = {}
+    CampaignUI = {TriggerCampaignScriptEvent = function(cqi, id) sent[#sent + 1] = {cqi, id} end}
+    local function trig(id, cqi)
+        handlers["gg_mp"]({trigger = function() return id end,
+                           faction_cqi = function() return cqi end})
+    end
+    assert(handlers["gg_mp"], "no UITrigger listener is registered, so a multiplayer "
+           .. "click never reaches any machine")
+    GG.CULTURE_OF[H] = GG.CHD_CULTURE
+    GG.state[H], GG.cooldowns[H] = nil, nil
+    GG.grant(H, "brass", 400)
+    GG.save(H)
+
+    -- SINGLE PLAYER: applied at once, nothing broadcast.
+    cm.is_multiplayer = function() return false end
+    local g0 = #gold
+    GG.mp_send(H, "buy", "caravan_levy|")
+    assert(#sent == 0, "single player must not broadcast")
+    assert(#gold == g0 + 1, "single player must apply the purchase at once")
+
+    -- MULTIPLAYER: broadcast, and the sending machine's model is untouched.
+    cm.is_multiplayer = function() return true end
+    GG.cooldowns[H] = {}
+    GG.save(H)
+    g0 = #gold
+    GG.mp_send(H, "buy", "caravan_levy|")
+    assert(#sent == 1 and sent[1][1] == 77 and sent[1][2] == "gg1|buy|caravan_levy|",
+           "the click must go out as gg1|op|arg on the buyer's cqi, got "
+           .. tostring(sent[1] and sent[1][2]))
+    assert(#gold == g0, "a multiplayer click must not change the model on the sender")
+
+    -- THE LISTENER APPLIES IT, for the faction the cqi names.
+    trig("gg1|buy|caravan_levy|", 77)
+    assert(#gold == g0 + 1, "the UITrigger must apply the purchase")
+    GG.cooldowns[H] = {}
+    GG.save(H)
+    trig("gg1|buy|caravan_levy|", 999)
+    assert(#gold == g0 + 1, "a cqi that names no human must apply nothing")
+    trig("zx1|buy|caravan_levy|", 77)
+    assert(#gold == g0 + 1, "another mod's trigger must be ignored")
+    trig("gg1|no_such_op|x", 77)
+
+    -- A TARGET TRAVELS AS A STRING and is rebuilt on each machine.
+    local prev_up, prev_rt = GG.upgrade_target, GG.research_target
+    GG.upgrade_target = function(f, r) return {slot = "slot_of_" .. r, building = "b"} end
+    GG.research_target = function(f) return "tech_rec" end
+    local t = GG.target_from_wire(H, GG.service("raise_ziggurat"), "reg_x")
+    assert(t and t.slot == "slot_of_reg_x", "a building target is rebuilt from its region")
+    assert(GG.target_from_wire(H, GG.service("bound_blueprint"), "") == "tech_rec",
+           "research is read from the record every machine holds")
+    assert(GG.target_from_wire(H, GG.service("hire_immortals"), "42") == 42,
+           "an army target is a character cqi, a number")
+    assert(GG.target_from_wire(H, GG.service("khans_price"), "cr_victim") == "cr_victim",
+           "a hostile target is a faction key")
+    assert(GG.target_from_wire(H, GG.service("hobgoblin_eyes"), "reg_y") == "reg_y",
+           "a shroud target is a region key")
+    assert(GG.target_from_wire(H, GG.service("hire_immortals"), "") == nil,
+           "no target on the wire is no target")
+    GG.upgrade_target, GG.research_target = prev_up, prev_rt
+
+    -- THE BOARD, TAKEN ON A MACHINE THAT NEVER DREW IT: the op reads the save.
+    local n0 = #issued
+    GG.bounties[H] = {{guild = "brass", kind = "region_take", target = "reg_mp",
+                       gold = 100, rep = 10, diff = 1, posted = GG.turn_now(),
+                       taken = false}}
+    GG.save_bounties(H)
+    GG.bounties[H] = nil
+    trig("gg1|bounty|1", 77)
+    assert(#issued == n0 + 1, "the bounty op must issue the mission from the saved board")
+    assert(GG.bounties[H] and GG.bounties[H][1].taken, "and mark the offer taken")
+
+    -- THE COURT: each op loads its state, applies, saves.
+    local calls = {}
+    local keep = {}
+    for _, k in ipairs({"load_demand", "pay_demand", "save_demand", "load_patron",
+                        "set_patron", "clear_patron", "save_patron"}) do
+        keep[k] = GG[k]
+        GG[k] = function(...) calls[#calls + 1] = k; if k == "pay_demand" then
+            return true end end
+    end
+    trig("gg1|demand|", 77)
+    assert(table.concat(calls, ",") == "load_demand,pay_demand,save_demand",
+           "the demand op must load, pay and save, got " .. table.concat(calls, ","))
+    calls = {}
+    GG.patrons[H] = {guild = "brass", cqi = 5}
+    trig("gg1|patron|brass|5", 77)
+    assert(table.concat(calls, ",") == "load_patron,clear_patron,save_patron",
+           "the sitting guild's button dismisses, got " .. table.concat(calls, ","))
+    calls = {}
+    GG.patrons[H] = nil
+    trig("gg1|patron|slavers|5", 77)
+    assert(table.concat(calls, ",") == "load_patron,set_patron,save_patron",
+           "another guild's button appoints, got " .. table.concat(calls, ","))
+    for k, fn in pairs(keep) do GG[k] = fn end
+    GG.patrons[H] = nil
+
+    -- THE DRAW DOES NOT WRITE. The board is drawn on one machine; it may hide an offer
+    -- that stopped being true, but never remove it.
+    local prev_valid = GG.bounty_still_valid
+    GG.bounty_still_valid = function(_, o) return o.target ~= "gone" end
+    local turn = GG.turn_now()
+    GG.bounties[H] = {
+        {guild = "brass", target = "fine", posted = turn, taken = false},
+        {guild = "slavers", target = "gone", posted = turn, taken = false},
+        {guild = "khanate", target = "old", posted = turn - GG.BOUNTY_OFFER_LIFE,
+         taken = false},
+        {guild = "immortals", target = "gone", posted = turn, taken = true},
+    }
+    local v = GG.bounty_view(H)
+    assert(table.concat(v, ",") == "1,4", "the view shows the true and the taken, got "
+           .. table.concat(v, ","))
+    assert(#GG.bounties[H] == 4, "the view must not remove anything")
+    GG.bounty_still_valid = prev_valid
+
+    -- AND THE PANEL SENDS THE TARGET AS A STRING.
+    local prev_sel = GGUI.selected_region
+    GGUI.selected_region = function() return "reg_sel" end
+    assert(GGUI.wire_target(GG.service("raise_ziggurat"), H) == "reg_sel",
+           "a building target goes as the selected region")
+    assert(GGUI.wire_target(GG.service("bound_blueprint"), H) == "",
+           "research goes as nothing")
+    assert(GGUI.wire_target(GG.service("caravan_levy"), H) == "",
+           "an untargeted service goes as nothing")
+    GGUI.selected_region = prev_sel
+
+    -- THE FIRST TICK POSTS AN EMPTY BOARD, since the draw no longer does.
+    local posted = {}
+    local prev_post = GG.post_bounties
+    GG.post_bounties = function(f) posted[#posted + 1] = f end
+    GG.bounties[H] = nil
+    saved["derpy_gg_bounties_" .. H] = nil
+    GG.save_bounties(H)
+    GG.first_boards()
+    assert(posted[1] == H, "a human with an empty board must have it posted at the first "
+           .. "tick")
+    GG.post_bounties = prev_post
+
+    GG.bounties[H] = nil
+    GG.state[H], GG.cooldowns[H] = nil, nil
+    cm.is_multiplayer, cm.get_faction, CampaignUI = prev_mp, prev_getf, prev_ui
+    GG.humans, cm.get_human_factions = prev_humans, prev_getter
+end)()
+
+-- ---------------------------------------------- no guilds, no button --
+-- A race this mod writes no guilds for gets no opener, so no way into a panel that would
+-- show it nothing. An unreadable player is tried again - that is loading, not a verdict.
+;(function()
+    local E, L = "cr_gate_emp", "cr_gate_lzd"
+    CULTURE[E], CULTURE[L] = "wh_main_emp_empire", "wh2_main_lzd_lizardmen"
+    GG.CULTURE_OF[E], GG.CULTURE_OF[L] = nil, nil
+    local prev_local, me = cm.get_local_faction_name, L
+    cm.get_local_faction_name = function() return me end
+    local created, retries = 0, 0
+    local prev_root, prev_res, prev_cb = core.get_ui_root, core.get_screen_resolution,
+                                         cm.callback
+    core.get_ui_root = function()
+        return {CreateComponent = function() created = created + 1 end}
+    end
+    core.get_screen_resolution = function() return 1920, 1080 end
+    cm.callback = function() retries = retries + 1 end
+    local prev_at = GGUI.btn_at
+    GGUI.btn_at = nil
+
+    GGUI.place_opener(1)
+    assert(created == 0, "a Lizardmen player was given the guilds button")
+    assert(retries == 0, "and a race with no guilds is not a reason to keep trying")
+
+    me = E
+    GGUI.place_opener(1)
+    assert(created == 1, "an Empire player must be given the button, created "
+           .. created)
+
+    me = nil
+    created, retries = 0, 0
+    GGUI.place_opener(1)
+    assert(created == 0 and retries == 1,
+           "an unreadable player is tried again, not given a button: created "
+           .. created .. ", retries " .. retries)
+
+    core.get_ui_root, core.get_screen_resolution, cm.callback = prev_root, prev_res,
+                                                                 prev_cb
+    GGUI.btn_at = prev_at
+    cm.get_local_faction_name = prev_local
+    CULTURE[E], CULTURE[L], GG.CULTURE_OF[E], GG.CULTURE_OF[L] = nil, nil, nil, nil
+end)()
+
+-- ---------------------------------------------- the opener's tooltip, on hover --
+-- NO LOC FROM A TURN HANDLER: place_opener runs from FactionTurnStart, and a loc call
+-- there can crash at turn 1 past pcall. The tooltip is written when the button is
+-- hovered instead, which is a UI event.
+;(function()
+    local src = io.open("Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_ui.lua"):read("*a")
+    local body = string.match(src, "function GGUI%.place_opener%(attempt%)(.-)\nend")
+    assert(body, "place_opener not found")
+    assert(not string.find(body, "GGUI.loc", 1, true),
+           "place_opener resolves loc, and it runs from FactionTurnStart")
+    assert(handlers["gg_opener_tip"], "no hover listener writes the opener's tooltip")
+    local tips = {}
+    local btn = {SetTooltipText = function(_, t) tips[#tips + 1] = t end}
+    local prev_find, prev_is = find_uicomponent, is_uicomponent
+    is_uicomponent = function(x) return x ~= nil end
+    find_uicomponent = function(_, name) if name == GGUI.BTN then return btn end end
+    handlers["gg_opener_tip"]({string = "some_other_button"})
+    assert(#tips == 0, "hovering another component must not touch the opener")
+    handlers["gg_opener_tip"]({string = GGUI.BTN})
+    assert(#tips == 2 and string.find(tips[2], "||", 1, true),
+           "hovering the opener must write its two-part tooltip, got "
+           .. tostring(tips[#tips]))
+    find_uicomponent, is_uicomponent = prev_find, prev_is
+end)()
+
+-- ------------------------------------------------ the MCT page, in their words --
+-- The settings file names the guilds by role, because the frontend has no race. In a
+-- campaign the twelve guild sliders take the player's own flavour at the first tick,
+-- from literal names - never loc, which is the no-loc-in-turn-handlers trap.
+;(function()
+    local texts = {}
+    local prev_mct = get_mct
+    get_mct = function()
+        return {get_mod_by_key = function(_, k)
+            if k ~= "derpy_great_guilds" then return nil end
+            return {get_option_by_key = function(_, key)
+                return {set_text = function(_, t) texts[key] = t end}
+            end}
+        end}
+    end
+    local prev_me = GGUI.me
+    local who = "cr_mct_emp"
+    GGUI.me = function() return who end
+    GG.CULTURE_OF[who] = "wh_main_emp_empire"
+    GGUI.name_mct()
+    assert(texts.rate_brass == "The Merchant Guilds",
+           "an Empire player's MCT page must name the Empire's guild, got "
+           .. tostring(texts.rate_brass))
+    assert(texts.cap_slavers == "The Free Companies limit", tostring(texts.cap_slavers))
+    local n = 0
+    for _ in pairs(texts) do n = n + 1 end
+    assert(n == 12, "six rate and six cap sliders, got " .. n)
+    texts = {}
+    who = "cr_mct_chd"
+    GG.CULTURE_OF[who] = GG.CHD_CULTURE
+    GGUI.name_mct()
+    assert(texts.rate_brass == "The Brass Tablets", tostring(texts.rate_brass))
+    -- NO MCT IS NO ERROR.
+    get_mct = nil
+    GGUI.name_mct()
+    get_mct, GGUI.me = prev_mct, prev_me
+end)()
+
+-- ------------------------------------------------ debug lines behind the switch --
+-- WARNINGS ALWAYS PRINT, INFORMATION ONLY WITH MCT'S DEBUG LOGGING ON. The panel's
+-- informational lines are one per open; a warning is the one line that explains a
+-- missing button, and must be there when a player sends a log unasked.
+;(function()
+    local lines = {}
+    local prev_out, prev_logging = out, GG.logging
+    out = function(m) lines[#lines + 1] = m end
+    GG.logging = function() return false end
+    GGUI.info("quiet")
+    assert(#lines == 0, "an informational line printed with debug logging off")
+    GG.logging = function() return true end
+    GGUI.info("loud")
+    assert(#lines == 1 and string.find(lines[1], "loud", 1, true),
+           "an informational line must print with debug logging on")
+    out, GG.logging = prev_out, prev_logging
+    local src = io.open("Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_ui.lua"):read("*a")
+    for call in string.gmatch(src, 'GGUI%.say%(([^\n]*)') do
+        assert(string.find(call, "GAVE UP", 1, true) or string.find(call, "OVERRIDDEN", 1, true)
+               or string.sub(call, 1, 4) == "msg)",
+               "GGUI.say is for warnings; route this through GGUI.info: " .. call)
+    end
+end)()
+
+-- ------------------------------------------ what each guild earned, and from what --
+-- The panel's "Reputation this turn" line reads this. A building pays in script, not
+-- through an effect, so without it a finished forge changes a number somewhere and says
+-- nothing about why - and a market built on a turn the income already filled the Brass
+-- cap pays NOTHING, which is the case the withheld figure exists to explain.
+;(function()
+    local P = THE_PLAYER
+    local key = "derpy_gg_earned_" .. P
+    local prev_turn, prev_patron, prev_tune = TURN, GG.patrons[P], GG.TUNE
+    local prev_getter, prev_humans = cm.get_human_factions, GG.humans
+    cm.get_human_factions = function() return {P} end
+    GG.humans, GG.player_cultures_cache = nil, nil
+    GG.TUNE = nil                       -- the shipped defaults, whatever earlier blocks set
+    GG.patrons[P] = nil                 -- a patron's share would change every sum below
+    saved[key] = nil
+    TURN = 50
+    GG.state[P] = nil
+    GG.reset_turn(P)
+
+    local rate = GG.setting("rate_overseers")
+    GG.on_building(P, 3, "derpy_test_forge")
+    local now, last = GG.earned(P)
+    assert(now.daemonsmiths and now.daemonsmiths.buildings == rate * 3,
+           "a level-3 forge must show as buildings " .. rate * 3 .. " with the smiths")
+    assert(next(last) == nil, "nothing was earned last turn")
+
+    -- INCOME PAST THE CAP: the cap is paid, the rest is shown as withheld.
+    local cap, per = GG.setting("cap_brass"), GG.setting("rate_brass")
+    GG.on_turn_start(P, per * (cap + 10))
+    now = GG.earned(P)
+    assert(now.brass.income == cap, "income pays up to the cap, got "
+           .. tostring(now.brass.income))
+    assert(now.brass.withheld == 10, "and the 10 past it is withheld, got "
+           .. tostring(now.brass.withheld))
+    -- A MARKET ON A FULL TURN PAYS NOTHING, and says so.
+    GG.on_building(P, 1, "derpy_test_market")
+    now = GG.earned(P)
+    assert(now.brass.buildings == nil, "a building past a full cap paid something")
+    assert(now.brass.withheld == 10 + rate, "the whole market is withheld, got "
+           .. tostring(now.brass.withheld))
+
+    -- EVERY OTHER ROUTE NAMES ITSELF.
+    GG.on_battle(P, false)
+    GG.on_tech(P)
+    GG.on_agent_action(P, true)
+    GG.on_settlement(P, false)
+    GG.on_mission(P)
+    now = GG.earned(P)
+    assert(now.immortals.battles == GG.setting("rate_immortals"), "battles")
+    assert(now.daemonsmiths.research == GG.setting("rate_daemonsmiths"), "research")
+    assert(now.khanate.agents == GG.setting("rate_khanate"), "agents")
+    assert(now.slavers.settlements == GG.setting("rate_slavers"), "settlements")
+    assert(now.overseers.missions == GG.setting("rate_missions"), "missions")
+
+    -- THE TWO UNCAPPED ROUTES, through the functions that pay them.
+    local reward = GG.setting("demand_reward")
+    assert(reward and reward > 0, "setup: a demand pays something")
+    GG.demands[P] = {kind = "favour", guild = "slavers", amount = 0}
+    assert(GG.pay_demand(P), "setup: the demand was payable")
+    now = GG.earned(P)
+    assert(now.slavers.demands == reward, "a paid demand must show as demands")
+    GG.bounties[P] = {{guild = "khanate", taken = true, rep = 25}}
+    assert(GG.bounty_done(P, GG.bounty_mission_key("khanate", P)), "setup: bounty paid")
+    now = GG.earned(P)
+    assert(now.khanate.bounties == 25, "a finished bounty must show as bounties")
+
+    -- IT LIVES IN THE SAVE, so a reload of the turn-start autosave still shows it.
+    local packed = saved[key]
+    assert(type(packed) == "string" and packed ~= "", "the ledger was never saved")
+    saved[key] = nil
+    assert(next((GG.earned(P))) == nil, "the ledger is read from session memory, "
+           .. "so a reload would lose it")
+    saved[key] = packed
+    assert((GG.earned(P)).daemonsmiths.buildings == rate * 3, "and restored from the save")
+
+    -- NEXT TURN it is last turn; two turns on it is gone.
+    TURN = 51
+    now, last = GG.earned(P)
+    assert(next(now) == nil, "a new turn starts empty")
+    assert(last.daemonsmiths.buildings == rate * 3, "last turn keeps what it earned")
+    GG.on_battle(P, false)
+    now, last = GG.earned(P)
+    assert(now.immortals.battles == GG.setting("rate_immortals")
+           and last.daemonsmiths.buildings == rate * 3,
+           "earning this turn must not wipe last turn")
+    TURN = 53
+    now, last = GG.earned(P)
+    assert(next(now) == nil and next(last) == nil, "two turns on, both are empty")
+
+    -- THE AI KEEPS NO LEDGER. It opens no panel, and a saved key per rival is save bloat.
+    local AI = "cr_ledger_ai"
+    CULTURE[AI] = "wh3_dlc23_chd_chaos_dwarfs"
+    GG.CULTURE_OF[AI] = nil
+    assert(GG.covered(AI), "setup: the rival is covered, so it does earn")
+    GG.reset_turn(AI)
+    GG.on_building(AI, 3, "derpy_test_forge")
+    assert(select(1, GG.get(AI, "daemonsmiths")) > 0, "setup: the rival was paid")
+    assert(saved["derpy_gg_earned_" .. AI] == nil, "an AI faction wrote a ledger")
+
+    GG.state[AI], CULTURE[AI], GG.CULTURE_OF[AI] = nil, nil, nil
+    GG.demands[P], GG.bounties[P] = nil, nil
+    saved[key] = nil
+    TURN, GG.patrons[P], GG.TUNE = prev_turn, prev_patron, prev_tune
+    cm.get_human_factions, GG.humans = prev_getter, prev_humans
+    GG.player_cultures_cache = nil
+end)()
+
+-- ------------------------------------------ the "Reputation this turn" line --
+-- GGUI.loc returns the bare key here, so the assertions read keys, not English.
+;(function()
+    local line, tip
+    -- NOTHING YET says so rather than printing "+0".
+    line = GGUI.earned_line({}, {}, "brass")
+    assert(string.find(line, "earned_none", 1, true), "an empty turn must say so: " .. line)
+    assert(not string.find(line, "+0", 1, true), "an empty turn printed +0: " .. line)
+
+    -- ONE SOURCE, and last turn's total.
+    line = GGUI.earned_line({daemonsmiths = {buildings = 30}},
+                            {daemonsmiths = {research = 60, buildings = 20}},
+                            "daemonsmiths")
+    assert(string.find(line, "+30", 1, true) and string.find(line, "src_buildings 30", 1, true),
+           "the forge's 30 must show, named: " .. line)
+    assert(string.find(line, "earned_last", 1, true) and string.find(line, "+80", 1, true),
+           "last turn's total must show: " .. line)
+
+    -- ONLY THIS GUILD. The panel shows one guild a page.
+    line = GGUI.earned_line({brass = {income = 12}}, {}, "daemonsmiths")
+    assert(not string.find(line, "12", 1, true), "another guild's income leaked in: " .. line)
+
+    -- WHAT THE LIMIT KEPT BACK, in red, and not counted as paid.
+    line = GGUI.earned_line({brass = {income = 40, withheld = 30}}, {}, "brass")
+    assert(string.find(line, "+40", 1, true), "paid is 40: " .. line)
+    assert(not string.find(line, "+70", 1, true), "the withheld 30 was counted as paid")
+    assert(string.find(line, "[[col:red]]30", 1, true), "the withheld 30 must show red: "
+           .. line)
+
+    -- AT MOST THREE SOURCES on the line, biggest first; the rest are in the hover.
+    line = GGUI.earned_line({overseers = {income = 1, battles = 2, research = 3,
+                                          buildings = 40, missions = 10}}, {}, "overseers")
+    assert(string.find(line, "src_buildings 40, src_missions 10, src_research 3", 1, true),
+           "the three biggest, biggest first: " .. line)
+    assert(not string.find(line, "src_income", 1, true), "a fourth source on the line")
+    assert(string.find(line, "earned_more", 1, true), "and a word that there are more")
+
+    -- THE HOVER HAS EVERYTHING, both turns, and this guild's limit.
+    tip = GGUI.earned_tip({overseers = {income = 1, battles = 2, research = 3,
+                                        buildings = 40, missions = 10, withheld = 5}},
+                          {overseers = {income = 7}}, "overseers")
+    for _, s in ipairs({"src_income 1", "src_battles 2", "src_research 3",
+                        "src_buildings 40", "src_missions 10", "src_withheld 5",
+                        "src_income 7", "earned_help"}) do
+        assert(string.find(tip, s, 1, true), "the hover is missing " .. s .. ": " .. tip)
+    end
+    assert(string.find(tip, "earned_limit " .. GG.setting("cap_overseers"), 1, true),
+           "the hover must give this guild's limit: " .. tip)
+    tip = GGUI.earned_tip({}, {}, "daemonsmiths")
+    assert(string.find(tip, "earned_no_limit", 1, true),
+           "a guild with no limit must say so: " .. tip)
 end)()
 
 print("harness ok")

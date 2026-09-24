@@ -43,3 +43,339 @@ derpy_gg_svc_lash_the_gangs		Lash the Gangs	faction	1		true	false	true
 derpy_gg_svc_works_of_zharr		Works of Zharr	faction	1		true	false	true
 derpy_gg_svc_coffle_drive		Coffle Drive	faction	1		true	false	true
 derpy_gg_svc_great_coffle		The Great Coffle	faction	1		true	false	true
+derpy_gg_rank_brass_2_emp		The Merchant Guilds - Apprentice	faction	1		true	false	true
+derpy_gg_rank_brass_3_emp		The Merchant Guilds - Journeyman	faction	1		true	false	true
+derpy_gg_rank_brass_4_emp		The Merchant Guilds - Master	faction	1		true	false	true
+derpy_gg_rank_brass_5_emp		The Merchant Guilds - Grand Master	faction	1		true	false	true
+derpy_gg_lead_brass_emp		The Merchant Guilds - Foremost	faction	1		true	false	true
+derpy_gg_rank_immortals_2_emp		The Greatswords - Apprentice	faction	1		true	false	true
+derpy_gg_rank_immortals_3_emp		The Greatswords - Journeyman	faction	1		true	false	true
+derpy_gg_rank_immortals_4_emp		The Greatswords - Master	faction	1		true	false	true
+derpy_gg_rank_immortals_5_emp		The Greatswords - Grand Master	faction	1		true	false	true
+derpy_gg_lead_immortals_emp		The Greatswords - Foremost	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_2_emp		The Engineers' School - Apprentice	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_3_emp		The Engineers' School - Journeyman	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_4_emp		The Engineers' School - Master	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_5_emp		The Engineers' School - Grand Master	faction	1		true	false	true
+derpy_gg_lead_daemonsmiths_emp		The Engineers' School - Foremost	faction	1		true	false	true
+derpy_gg_rank_khanate_2_emp		The Thieves' Guild - Apprentice	faction	1		true	false	true
+derpy_gg_rank_khanate_3_emp		The Thieves' Guild - Journeyman	faction	1		true	false	true
+derpy_gg_rank_khanate_4_emp		The Thieves' Guild - Master	faction	1		true	false	true
+derpy_gg_rank_khanate_5_emp		The Thieves' Guild - Grand Master	faction	1		true	false	true
+derpy_gg_lead_khanate_emp		The Thieves' Guild - Foremost	faction	1		true	false	true
+derpy_gg_rank_overseers_2_emp		The Masons' Guild - Apprentice	faction	1		true	false	true
+derpy_gg_rank_overseers_3_emp		The Masons' Guild - Journeyman	faction	1		true	false	true
+derpy_gg_rank_overseers_4_emp		The Masons' Guild - Master	faction	1		true	false	true
+derpy_gg_rank_overseers_5_emp		The Masons' Guild - Grand Master	faction	1		true	false	true
+derpy_gg_lead_overseers_emp		The Masons' Guild - Foremost	faction	1		true	false	true
+derpy_gg_rank_slavers_2_emp		The Free Companies - Apprentice	faction	1		true	false	true
+derpy_gg_rank_slavers_3_emp		The Free Companies - Journeyman	faction	1		true	false	true
+derpy_gg_rank_slavers_4_emp		The Free Companies - Master	faction	1		true	false	true
+derpy_gg_rank_slavers_5_emp		The Free Companies - Grand Master	faction	1		true	false	true
+derpy_gg_lead_slavers_emp		The Free Companies - Foremost	faction	1		true	false	true
+derpy_gg_svc_writ_monopoly_emp		Imperial Charter	faction	1		true	false	true
+derpy_gg_svc_long_ledger_emp		The Altdorf Exchange	faction	1		true	false	true
+derpy_gg_svc_oathbound_draft_emp		Muster Roll	faction	1		true	false	true
+derpy_gg_svc_astragoths_levy_emp		The Emperor's Levy	faction	1		true	false	true
+derpy_gg_svc_forge_rite_emp		Proving Grounds	faction	1		true	false	true
+derpy_gg_svc_bound_ordnance_emp		Guns of Nuln	faction	1		true	false	true
+derpy_gg_svc_knife_in_dark_emp		Knife in the Alley	faction	1		true	false	true
+derpy_gg_svc_khans_price_emp		Protection Money	faction	1		true	false	true
+derpy_gg_svc_lash_the_gangs_emp		Overtime Wages	faction	1		true	false	true
+derpy_gg_svc_works_of_zharr_emp		The Emperor's Works	faction	1		true	false	true
+derpy_gg_svc_coffle_drive_emp		Plunder Rights	faction	1		true	false	true
+derpy_gg_svc_great_coffle_emp		The Grand Pillage	faction	1		true	false	true
+derpy_gg_rank_brass_2_dwf		The Merchant Clans - Beardling	faction	1		true	false	true
+derpy_gg_rank_brass_3_dwf		The Merchant Clans - Oathsworn	faction	1		true	false	true
+derpy_gg_rank_brass_4_dwf		The Merchant Clans - Longbeard	faction	1		true	false	true
+derpy_gg_rank_brass_5_dwf		The Merchant Clans - Elder	faction	1		true	false	true
+derpy_gg_lead_brass_dwf		The Merchant Clans - Foremost	faction	1		true	false	true
+derpy_gg_rank_immortals_2_dwf		The Hammerers - Beardling	faction	1		true	false	true
+derpy_gg_rank_immortals_3_dwf		The Hammerers - Oathsworn	faction	1		true	false	true
+derpy_gg_rank_immortals_4_dwf		The Hammerers - Longbeard	faction	1		true	false	true
+derpy_gg_rank_immortals_5_dwf		The Hammerers - Elder	faction	1		true	false	true
+derpy_gg_lead_immortals_dwf		The Hammerers - Foremost	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_2_dwf		The Engineers' Guild - Beardling	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_3_dwf		The Engineers' Guild - Oathsworn	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_4_dwf		The Engineers' Guild - Longbeard	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_5_dwf		The Engineers' Guild - Elder	faction	1		true	false	true
+derpy_gg_lead_daemonsmiths_dwf		The Engineers' Guild - Foremost	faction	1		true	false	true
+derpy_gg_rank_khanate_2_dwf		The Rangers - Beardling	faction	1		true	false	true
+derpy_gg_rank_khanate_3_dwf		The Rangers - Oathsworn	faction	1		true	false	true
+derpy_gg_rank_khanate_4_dwf		The Rangers - Longbeard	faction	1		true	false	true
+derpy_gg_rank_khanate_5_dwf		The Rangers - Elder	faction	1		true	false	true
+derpy_gg_lead_khanate_dwf		The Rangers - Foremost	faction	1		true	false	true
+derpy_gg_rank_overseers_2_dwf		The Miners' Guild - Beardling	faction	1		true	false	true
+derpy_gg_rank_overseers_3_dwf		The Miners' Guild - Oathsworn	faction	1		true	false	true
+derpy_gg_rank_overseers_4_dwf		The Miners' Guild - Longbeard	faction	1		true	false	true
+derpy_gg_rank_overseers_5_dwf		The Miners' Guild - Elder	faction	1		true	false	true
+derpy_gg_lead_overseers_dwf		The Miners' Guild - Foremost	faction	1		true	false	true
+derpy_gg_rank_slavers_2_dwf		The Grudge-Settlers - Beardling	faction	1		true	false	true
+derpy_gg_rank_slavers_3_dwf		The Grudge-Settlers - Oathsworn	faction	1		true	false	true
+derpy_gg_rank_slavers_4_dwf		The Grudge-Settlers - Longbeard	faction	1		true	false	true
+derpy_gg_rank_slavers_5_dwf		The Grudge-Settlers - Elder	faction	1		true	false	true
+derpy_gg_lead_slavers_dwf		The Grudge-Settlers - Foremost	faction	1		true	false	true
+derpy_gg_svc_writ_monopoly_dwf		Hold Charter	faction	1		true	false	true
+derpy_gg_svc_long_ledger_dwf		The Clan Ledger	faction	1		true	false	true
+derpy_gg_svc_oathbound_draft_dwf		Call to the Hold	faction	1		true	false	true
+derpy_gg_svc_astragoths_levy_dwf		The High King's Levy	faction	1		true	false	true
+derpy_gg_svc_forge_rite_dwf		Guild Workshop	faction	1		true	false	true
+derpy_gg_svc_bound_ordnance_dwf		Guild Artillery	faction	1		true	false	true
+derpy_gg_svc_knife_in_dark_dwf		Ambush in the Passes	faction	1		true	false	true
+derpy_gg_svc_khans_price_dwf		Cut Their Roads	faction	1		true	false	true
+derpy_gg_svc_lash_the_gangs_dwf		Double Shift	faction	1		true	false	true
+derpy_gg_svc_works_of_zharr_dwf		Works of Grungni	faction	1		true	false	true
+derpy_gg_svc_coffle_drive_dwf		Settle the Account	faction	1		true	false	true
+derpy_gg_svc_great_coffle_dwf		The Great Reckoning	faction	1		true	false	true
+derpy_gg_rank_brass_2_brt		The Wine Merchants - Yeoman	faction	1		true	false	true
+derpy_gg_rank_brass_3_brt		The Wine Merchants - Squire	faction	1		true	false	true
+derpy_gg_rank_brass_4_brt		The Wine Merchants - Knight	faction	1		true	false	true
+derpy_gg_rank_brass_5_brt		The Wine Merchants - Paladin	faction	1		true	false	true
+derpy_gg_lead_brass_brt		The Wine Merchants - Foremost	faction	1		true	false	true
+derpy_gg_rank_immortals_2_brt		The Knights Errant - Yeoman	faction	1		true	false	true
+derpy_gg_rank_immortals_3_brt		The Knights Errant - Squire	faction	1		true	false	true
+derpy_gg_rank_immortals_4_brt		The Knights Errant - Knight	faction	1		true	false	true
+derpy_gg_rank_immortals_5_brt		The Knights Errant - Paladin	faction	1		true	false	true
+derpy_gg_lead_immortals_brt		The Knights Errant - Foremost	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_2_brt		The Grail Damsels - Yeoman	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_3_brt		The Grail Damsels - Squire	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_4_brt		The Grail Damsels - Knight	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_5_brt		The Grail Damsels - Paladin	faction	1		true	false	true
+derpy_gg_lead_daemonsmiths_brt		The Grail Damsels - Foremost	faction	1		true	false	true
+derpy_gg_rank_khanate_2_brt		The Forest Outlaws - Yeoman	faction	1		true	false	true
+derpy_gg_rank_khanate_3_brt		The Forest Outlaws - Squire	faction	1		true	false	true
+derpy_gg_rank_khanate_4_brt		The Forest Outlaws - Knight	faction	1		true	false	true
+derpy_gg_rank_khanate_5_brt		The Forest Outlaws - Paladin	faction	1		true	false	true
+derpy_gg_lead_khanate_brt		The Forest Outlaws - Foremost	faction	1		true	false	true
+derpy_gg_rank_overseers_2_brt		The Castle-Wrights - Yeoman	faction	1		true	false	true
+derpy_gg_rank_overseers_3_brt		The Castle-Wrights - Squire	faction	1		true	false	true
+derpy_gg_rank_overseers_4_brt		The Castle-Wrights - Knight	faction	1		true	false	true
+derpy_gg_rank_overseers_5_brt		The Castle-Wrights - Paladin	faction	1		true	false	true
+derpy_gg_lead_overseers_brt		The Castle-Wrights - Foremost	faction	1		true	false	true
+derpy_gg_rank_slavers_2_brt		The Crusaders - Yeoman	faction	1		true	false	true
+derpy_gg_rank_slavers_3_brt		The Crusaders - Squire	faction	1		true	false	true
+derpy_gg_rank_slavers_4_brt		The Crusaders - Knight	faction	1		true	false	true
+derpy_gg_rank_slavers_5_brt		The Crusaders - Paladin	faction	1		true	false	true
+derpy_gg_lead_slavers_brt		The Crusaders - Foremost	faction	1		true	false	true
+derpy_gg_svc_writ_monopoly_brt		Ducal Charter	faction	1		true	false	true
+derpy_gg_svc_long_ledger_brt		The Vintners' Accord	faction	1		true	false	true
+derpy_gg_svc_oathbound_draft_brt		Call the Banners	faction	1		true	false	true
+derpy_gg_svc_astragoths_levy_brt		The King's Summons	faction	1		true	false	true
+derpy_gg_svc_forge_rite_brt		Lessons of the Lady	faction	1		true	false	true
+derpy_gg_svc_bound_ordnance_brt		Vision of the Grail	faction	1		true	false	true
+derpy_gg_svc_knife_in_dark_brt		Arrows from Cover	faction	1		true	false	true
+derpy_gg_svc_khans_price_brt		The Outlaws' Toll	faction	1		true	false	true
+derpy_gg_svc_lash_the_gangs_brt		Feudal Labour	faction	1		true	false	true
+derpy_gg_svc_works_of_zharr_brt		The Duke's Works	faction	1		true	false	true
+derpy_gg_svc_coffle_drive_brt		Spoils of Crusade	faction	1		true	false	true
+derpy_gg_svc_great_coffle_brt		The Errantry War	faction	1		true	false	true
+derpy_gg_rank_brass_2_cth		The Caravan Masters - Scholar	faction	1		true	false	true
+derpy_gg_rank_brass_3_cth		The Caravan Masters - Official	faction	1		true	false	true
+derpy_gg_rank_brass_4_cth		The Caravan Masters - Magistrate	faction	1		true	false	true
+derpy_gg_rank_brass_5_cth		The Caravan Masters - Minister	faction	1		true	false	true
+derpy_gg_lead_brass_cth		The Caravan Masters - Foremost	faction	1		true	false	true
+derpy_gg_rank_immortals_2_cth		The Dragon Guard - Scholar	faction	1		true	false	true
+derpy_gg_rank_immortals_3_cth		The Dragon Guard - Official	faction	1		true	false	true
+derpy_gg_rank_immortals_4_cth		The Dragon Guard - Magistrate	faction	1		true	false	true
+derpy_gg_rank_immortals_5_cth		The Dragon Guard - Minister	faction	1		true	false	true
+derpy_gg_lead_immortals_cth		The Dragon Guard - Foremost	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_2_cth		The Imperial Academy - Scholar	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_3_cth		The Imperial Academy - Official	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_4_cth		The Imperial Academy - Magistrate	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_5_cth		The Imperial Academy - Minister	faction	1		true	false	true
+derpy_gg_lead_daemonsmiths_cth		The Imperial Academy - Foremost	faction	1		true	false	true
+derpy_gg_rank_khanate_2_cth		The Crow Society - Scholar	faction	1		true	false	true
+derpy_gg_rank_khanate_3_cth		The Crow Society - Official	faction	1		true	false	true
+derpy_gg_rank_khanate_4_cth		The Crow Society - Magistrate	faction	1		true	false	true
+derpy_gg_rank_khanate_5_cth		The Crow Society - Minister	faction	1		true	false	true
+derpy_gg_lead_khanate_cth		The Crow Society - Foremost	faction	1		true	false	true
+derpy_gg_rank_overseers_2_cth		The Bastion Builders - Scholar	faction	1		true	false	true
+derpy_gg_rank_overseers_3_cth		The Bastion Builders - Official	faction	1		true	false	true
+derpy_gg_rank_overseers_4_cth		The Bastion Builders - Magistrate	faction	1		true	false	true
+derpy_gg_rank_overseers_5_cth		The Bastion Builders - Minister	faction	1		true	false	true
+derpy_gg_lead_overseers_cth		The Bastion Builders - Foremost	faction	1		true	false	true
+derpy_gg_rank_slavers_2_cth		The Punitive Host - Scholar	faction	1		true	false	true
+derpy_gg_rank_slavers_3_cth		The Punitive Host - Official	faction	1		true	false	true
+derpy_gg_rank_slavers_4_cth		The Punitive Host - Magistrate	faction	1		true	false	true
+derpy_gg_rank_slavers_5_cth		The Punitive Host - Minister	faction	1		true	false	true
+derpy_gg_lead_slavers_cth		The Punitive Host - Foremost	faction	1		true	false	true
+derpy_gg_svc_writ_monopoly_cth		Seal of Trade	faction	1		true	false	true
+derpy_gg_svc_long_ledger_cth		The Ivory Road	faction	1		true	false	true
+derpy_gg_svc_oathbound_draft_cth		Fresh Levies	faction	1		true	false	true
+derpy_gg_svc_astragoths_levy_cth		The Emperor's Mandate	faction	1		true	false	true
+derpy_gg_svc_forge_rite_cth		Hall of Scholars	faction	1		true	false	true
+derpy_gg_svc_bound_ordnance_cth		The Celestial Charts	faction	1		true	false	true
+derpy_gg_svc_knife_in_dark_cth		A Quiet Poison	faction	1		true	false	true
+derpy_gg_svc_khans_price_cth		Sow Disharmony	faction	1		true	false	true
+derpy_gg_svc_lash_the_gangs_cth		Conscript Labour	faction	1		true	false	true
+derpy_gg_svc_works_of_zharr_cth		Works of the Bastion	faction	1		true	false	true
+derpy_gg_svc_coffle_drive_cth		Punitive Raids	faction	1		true	false	true
+derpy_gg_svc_great_coffle_cth		The Great Expedition	faction	1		true	false	true
+derpy_gg_rank_brass_2_ksl		The Erengrad Merchants - Kossar	faction	1		true	false	true
+derpy_gg_rank_brass_3_ksl		The Erengrad Merchants - Druzhina	faction	1		true	false	true
+derpy_gg_rank_brass_4_ksl		The Erengrad Merchants - Boyar	faction	1		true	false	true
+derpy_gg_rank_brass_5_ksl		The Erengrad Merchants - Ataman	faction	1		true	false	true
+derpy_gg_lead_brass_ksl		The Erengrad Merchants - Foremost	faction	1		true	false	true
+derpy_gg_rank_immortals_2_ksl		The Tzar Guard - Kossar	faction	1		true	false	true
+derpy_gg_rank_immortals_3_ksl		The Tzar Guard - Druzhina	faction	1		true	false	true
+derpy_gg_rank_immortals_4_ksl		The Tzar Guard - Boyar	faction	1		true	false	true
+derpy_gg_rank_immortals_5_ksl		The Tzar Guard - Ataman	faction	1		true	false	true
+derpy_gg_lead_immortals_ksl		The Tzar Guard - Foremost	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_2_ksl		The Ice Court - Kossar	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_3_ksl		The Ice Court - Druzhina	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_4_ksl		The Ice Court - Boyar	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_5_ksl		The Ice Court - Ataman	faction	1		true	false	true
+derpy_gg_lead_daemonsmiths_ksl		The Ice Court - Foremost	faction	1		true	false	true
+derpy_gg_rank_khanate_2_ksl		The Oblast Smugglers - Kossar	faction	1		true	false	true
+derpy_gg_rank_khanate_3_ksl		The Oblast Smugglers - Druzhina	faction	1		true	false	true
+derpy_gg_rank_khanate_4_ksl		The Oblast Smugglers - Boyar	faction	1		true	false	true
+derpy_gg_rank_khanate_5_ksl		The Oblast Smugglers - Ataman	faction	1		true	false	true
+derpy_gg_lead_khanate_ksl		The Oblast Smugglers - Foremost	faction	1		true	false	true
+derpy_gg_rank_overseers_2_ksl		The Stanitsa Builders - Kossar	faction	1		true	false	true
+derpy_gg_rank_overseers_3_ksl		The Stanitsa Builders - Druzhina	faction	1		true	false	true
+derpy_gg_rank_overseers_4_ksl		The Stanitsa Builders - Boyar	faction	1		true	false	true
+derpy_gg_rank_overseers_5_ksl		The Stanitsa Builders - Ataman	faction	1		true	false	true
+derpy_gg_lead_overseers_ksl		The Stanitsa Builders - Foremost	faction	1		true	false	true
+derpy_gg_rank_slavers_2_ksl		The Ungol Raiders - Kossar	faction	1		true	false	true
+derpy_gg_rank_slavers_3_ksl		The Ungol Raiders - Druzhina	faction	1		true	false	true
+derpy_gg_rank_slavers_4_ksl		The Ungol Raiders - Boyar	faction	1		true	false	true
+derpy_gg_rank_slavers_5_ksl		The Ungol Raiders - Ataman	faction	1		true	false	true
+derpy_gg_lead_slavers_ksl		The Ungol Raiders - Foremost	faction	1		true	false	true
+derpy_gg_svc_writ_monopoly_ksl		Tzarina's Charter	faction	1		true	false	true
+derpy_gg_svc_long_ledger_ksl		The Erengrad Exchange	faction	1		true	false	true
+derpy_gg_svc_oathbound_draft_ksl		Call the Druzhina	faction	1		true	false	true
+derpy_gg_svc_astragoths_levy_ksl		The Tzarina's Levy	faction	1		true	false	true
+derpy_gg_svc_forge_rite_ksl		Winter Lessons	faction	1		true	false	true
+derpy_gg_svc_bound_ordnance_ksl		The Ice Queen's Favour	faction	1		true	false	true
+derpy_gg_svc_knife_in_dark_ksl		A Knife in the Snow	faction	1		true	false	true
+derpy_gg_svc_khans_price_ksl		Sabotage the Sledges	faction	1		true	false	true
+derpy_gg_svc_lash_the_gangs_ksl		Before the Thaw	faction	1		true	false	true
+derpy_gg_svc_works_of_zharr_ksl		Walls Against Chaos	faction	1		true	false	true
+derpy_gg_svc_coffle_drive_ksl		Steppe Plunder	faction	1		true	false	true
+derpy_gg_svc_great_coffle_ksl		The Long Raid	faction	1		true	false	true
+derpy_gg_rank_brass_2_def		The Karond Kar Traders - Corsair	faction	1		true	false	true
+derpy_gg_rank_brass_3_def		The Karond Kar Traders - Highborn	faction	1		true	false	true
+derpy_gg_rank_brass_4_def		The Karond Kar Traders - Dreadlord	faction	1		true	false	true
+derpy_gg_rank_brass_5_def		The Karond Kar Traders - Tyrant	faction	1		true	false	true
+derpy_gg_lead_brass_def		The Karond Kar Traders - Foremost	faction	1		true	false	true
+derpy_gg_rank_immortals_2_def		The Black Guard - Corsair	faction	1		true	false	true
+derpy_gg_rank_immortals_3_def		The Black Guard - Highborn	faction	1		true	false	true
+derpy_gg_rank_immortals_4_def		The Black Guard - Dreadlord	faction	1		true	false	true
+derpy_gg_rank_immortals_5_def		The Black Guard - Tyrant	faction	1		true	false	true
+derpy_gg_lead_immortals_def		The Black Guard - Foremost	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_2_def		The Convent of Ghrond - Corsair	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_3_def		The Convent of Ghrond - Highborn	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_4_def		The Convent of Ghrond - Dreadlord	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_5_def		The Convent of Ghrond - Tyrant	faction	1		true	false	true
+derpy_gg_lead_daemonsmiths_def		The Convent of Ghrond - Foremost	faction	1		true	false	true
+derpy_gg_rank_khanate_2_def		The Khainite Assassins - Corsair	faction	1		true	false	true
+derpy_gg_rank_khanate_3_def		The Khainite Assassins - Highborn	faction	1		true	false	true
+derpy_gg_rank_khanate_4_def		The Khainite Assassins - Dreadlord	faction	1		true	false	true
+derpy_gg_rank_khanate_5_def		The Khainite Assassins - Tyrant	faction	1		true	false	true
+derpy_gg_lead_khanate_def		The Khainite Assassins - Foremost	faction	1		true	false	true
+derpy_gg_rank_overseers_2_def		The Naggarond Builders - Corsair	faction	1		true	false	true
+derpy_gg_rank_overseers_3_def		The Naggarond Builders - Highborn	faction	1		true	false	true
+derpy_gg_rank_overseers_4_def		The Naggarond Builders - Dreadlord	faction	1		true	false	true
+derpy_gg_rank_overseers_5_def		The Naggarond Builders - Tyrant	faction	1		true	false	true
+derpy_gg_lead_overseers_def		The Naggarond Builders - Foremost	faction	1		true	false	true
+derpy_gg_rank_slavers_2_def		The Black Ark Corsairs - Corsair	faction	1		true	false	true
+derpy_gg_rank_slavers_3_def		The Black Ark Corsairs - Highborn	faction	1		true	false	true
+derpy_gg_rank_slavers_4_def		The Black Ark Corsairs - Dreadlord	faction	1		true	false	true
+derpy_gg_rank_slavers_5_def		The Black Ark Corsairs - Tyrant	faction	1		true	false	true
+derpy_gg_lead_slavers_def		The Black Ark Corsairs - Foremost	faction	1		true	false	true
+derpy_gg_svc_writ_monopoly_def		The Witch King's Seal	faction	1		true	false	true
+derpy_gg_svc_long_ledger_def		The Karond Kar Ledger	faction	1		true	false	true
+derpy_gg_svc_oathbound_draft_def		Call the Dreadspears	faction	1		true	false	true
+derpy_gg_svc_astragoths_levy_def		Malekith's Summons	faction	1		true	false	true
+derpy_gg_svc_forge_rite_def		Rites of the Convent	faction	1		true	false	true
+derpy_gg_svc_bound_ordnance_def		Morathi's Favour	faction	1		true	false	true
+derpy_gg_svc_knife_in_dark_def		A Knife for Khaine	faction	1		true	false	true
+derpy_gg_svc_khans_price_def		The Assassins' Price	faction	1		true	false	true
+derpy_gg_svc_lash_the_gangs_def		Drive the Thralls	faction	1		true	false	true
+derpy_gg_svc_works_of_zharr_def		Works of Naggarond	faction	1		true	false	true
+derpy_gg_svc_coffle_drive_def		Corsair Raids	faction	1		true	false	true
+derpy_gg_svc_great_coffle_def		The Black Ark Raid	faction	1		true	false	true
+derpy_gg_rank_brass_2_hef		The Lothern Merchants - Warden	faction	1		true	false	true
+derpy_gg_rank_brass_3_hef		The Lothern Merchants - Noble	faction	1		true	false	true
+derpy_gg_rank_brass_4_hef		The Lothern Merchants - Prince	faction	1		true	false	true
+derpy_gg_rank_brass_5_hef		The Lothern Merchants - Regent	faction	1		true	false	true
+derpy_gg_lead_brass_hef		The Lothern Merchants - Foremost	faction	1		true	false	true
+derpy_gg_rank_immortals_2_hef		The Swordmasters - Warden	faction	1		true	false	true
+derpy_gg_rank_immortals_3_hef		The Swordmasters - Noble	faction	1		true	false	true
+derpy_gg_rank_immortals_4_hef		The Swordmasters - Prince	faction	1		true	false	true
+derpy_gg_rank_immortals_5_hef		The Swordmasters - Regent	faction	1		true	false	true
+derpy_gg_lead_immortals_hef		The Swordmasters - Foremost	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_2_hef		The Loremasters - Warden	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_3_hef		The Loremasters - Noble	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_4_hef		The Loremasters - Prince	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_5_hef		The Loremasters - Regent	faction	1		true	false	true
+derpy_gg_lead_daemonsmiths_hef		The Loremasters - Foremost	faction	1		true	false	true
+derpy_gg_rank_khanate_2_hef		The Shadow Warriors - Warden	faction	1		true	false	true
+derpy_gg_rank_khanate_3_hef		The Shadow Warriors - Noble	faction	1		true	false	true
+derpy_gg_rank_khanate_4_hef		The Shadow Warriors - Prince	faction	1		true	false	true
+derpy_gg_rank_khanate_5_hef		The Shadow Warriors - Regent	faction	1		true	false	true
+derpy_gg_lead_khanate_hef		The Shadow Warriors - Foremost	faction	1		true	false	true
+derpy_gg_rank_overseers_2_hef		The Ulthuan Masons - Warden	faction	1		true	false	true
+derpy_gg_rank_overseers_3_hef		The Ulthuan Masons - Noble	faction	1		true	false	true
+derpy_gg_rank_overseers_4_hef		The Ulthuan Masons - Prince	faction	1		true	false	true
+derpy_gg_rank_overseers_5_hef		The Ulthuan Masons - Regent	faction	1		true	false	true
+derpy_gg_lead_overseers_hef		The Ulthuan Masons - Foremost	faction	1		true	false	true
+derpy_gg_rank_slavers_2_hef		The Ellyrian Reavers - Warden	faction	1		true	false	true
+derpy_gg_rank_slavers_3_hef		The Ellyrian Reavers - Noble	faction	1		true	false	true
+derpy_gg_rank_slavers_4_hef		The Ellyrian Reavers - Prince	faction	1		true	false	true
+derpy_gg_rank_slavers_5_hef		The Ellyrian Reavers - Regent	faction	1		true	false	true
+derpy_gg_lead_slavers_hef		The Ellyrian Reavers - Foremost	faction	1		true	false	true
+derpy_gg_svc_writ_monopoly_hef		The Phoenix Charter	faction	1		true	false	true
+derpy_gg_svc_long_ledger_hef		The Sea Lanes	faction	1		true	false	true
+derpy_gg_svc_oathbound_draft_hef		Call the Citizen Levy	faction	1		true	false	true
+derpy_gg_svc_astragoths_levy_hef		Summons of the Throne	faction	1		true	false	true
+derpy_gg_svc_forge_rite_hef		Lessons of Hoeth	faction	1		true	false	true
+derpy_gg_svc_bound_ordnance_hef		The Loremasters' Gift	faction	1		true	false	true
+derpy_gg_svc_knife_in_dark_hef		An Arrow from Shadow	faction	1		true	false	true
+derpy_gg_svc_khans_price_hef		Whispers at Court	faction	1		true	false	true
+derpy_gg_svc_lash_the_gangs_hef		Citizen Labour	faction	1		true	false	true
+derpy_gg_svc_works_of_zharr_hef		Works of Ulthuan	faction	1		true	false	true
+derpy_gg_svc_coffle_drive_hef		Reaver Raids	faction	1		true	false	true
+derpy_gg_svc_great_coffle_hef		Ulthuan's Vengeance	faction	1		true	false	true
+derpy_gg_rank_brass_2_gen		The Merchant Houses - Known	faction	1		true	false	true
+derpy_gg_rank_brass_3_gen		The Merchant Houses - Trusted	faction	1		true	false	true
+derpy_gg_rank_brass_4_gen		The Merchant Houses - Honoured	faction	1		true	false	true
+derpy_gg_rank_brass_5_gen		The Merchant Houses - Exalted	faction	1		true	false	true
+derpy_gg_lead_brass_gen		The Merchant Houses - Foremost	faction	1		true	false	true
+derpy_gg_rank_immortals_2_gen		The Veterans' Company - Known	faction	1		true	false	true
+derpy_gg_rank_immortals_3_gen		The Veterans' Company - Trusted	faction	1		true	false	true
+derpy_gg_rank_immortals_4_gen		The Veterans' Company - Honoured	faction	1		true	false	true
+derpy_gg_rank_immortals_5_gen		The Veterans' Company - Exalted	faction	1		true	false	true
+derpy_gg_lead_immortals_gen		The Veterans' Company - Foremost	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_2_gen		The Artisans' Guild - Known	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_3_gen		The Artisans' Guild - Trusted	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_4_gen		The Artisans' Guild - Honoured	faction	1		true	false	true
+derpy_gg_rank_daemonsmiths_5_gen		The Artisans' Guild - Exalted	faction	1		true	false	true
+derpy_gg_lead_daemonsmiths_gen		The Artisans' Guild - Foremost	faction	1		true	false	true
+derpy_gg_rank_khanate_2_gen		The Shadow Guild - Known	faction	1		true	false	true
+derpy_gg_rank_khanate_3_gen		The Shadow Guild - Trusted	faction	1		true	false	true
+derpy_gg_rank_khanate_4_gen		The Shadow Guild - Honoured	faction	1		true	false	true
+derpy_gg_rank_khanate_5_gen		The Shadow Guild - Exalted	faction	1		true	false	true
+derpy_gg_lead_khanate_gen		The Shadow Guild - Foremost	faction	1		true	false	true
+derpy_gg_rank_overseers_2_gen		The Builders' Guild - Known	faction	1		true	false	true
+derpy_gg_rank_overseers_3_gen		The Builders' Guild - Trusted	faction	1		true	false	true
+derpy_gg_rank_overseers_4_gen		The Builders' Guild - Honoured	faction	1		true	false	true
+derpy_gg_rank_overseers_5_gen		The Builders' Guild - Exalted	faction	1		true	false	true
+derpy_gg_lead_overseers_gen		The Builders' Guild - Foremost	faction	1		true	false	true
+derpy_gg_rank_slavers_2_gen		The Raiders' Guild - Known	faction	1		true	false	true
+derpy_gg_rank_slavers_3_gen		The Raiders' Guild - Trusted	faction	1		true	false	true
+derpy_gg_rank_slavers_4_gen		The Raiders' Guild - Honoured	faction	1		true	false	true
+derpy_gg_rank_slavers_5_gen		The Raiders' Guild - Exalted	faction	1		true	false	true
+derpy_gg_lead_slavers_gen		The Raiders' Guild - Foremost	faction	1		true	false	true
+derpy_gg_svc_writ_monopoly_gen		Trade Charter	faction	1		true	false	true
+derpy_gg_svc_long_ledger_gen		The Long Ledger	faction	1		true	false	true
+derpy_gg_svc_oathbound_draft_gen		Call to Arms	faction	1		true	false	true
+derpy_gg_svc_astragoths_levy_gen		Raise the Levy	faction	1		true	false	true
+derpy_gg_svc_forge_rite_gen		The Proving Forge	faction	1		true	false	true
+derpy_gg_svc_bound_ordnance_gen		Siege Engines	faction	1		true	false	true
+derpy_gg_svc_knife_in_dark_gen		Knife in the Dark	faction	1		true	false	true
+derpy_gg_svc_khans_price_gen		The Shadow Tax	faction	1		true	false	true
+derpy_gg_svc_lash_the_gangs_gen		Work Through the Night	faction	1		true	false	true
+derpy_gg_svc_works_of_zharr_gen		The Great Works	faction	1		true	false	true
+derpy_gg_svc_coffle_drive_gen		Raiding Rights	faction	1		true	false	true
+derpy_gg_svc_great_coffle_gen		The Great Raid	faction	1		true	false	true

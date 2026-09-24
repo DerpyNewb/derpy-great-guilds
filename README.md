@@ -1,76 +1,98 @@
 # The Great Guilds
 
 A campaign mod for **Total War: WARHAMMER III**. Six guilds span the world, and every
-faction of your race earns standing with them just by playing its campaign: trading,
-fighting, researching, running agents, building and raiding. You spend that standing on
-services, take on guild bounties, answer their demands, and compete with the AI factions of
-your own race to lead each guild.
+faction of your race earns reputation with them just by playing its campaign: trading,
+fighting, researching, sending out heroes, building and raiding. You spend the favour that
+comes with it on services, take on guild bounties, answer their demands, and compete with
+the AI factions of your own race to lead each guild.
 
 It is script-driven and self-contained. It overrides no CA file, and every DB row it adds
 has its own key.
 
 **Status:** playable, and tested live in Chaos Dwarf campaigns. It is not on the Steam
-Workshop yet. The guilds currently use Chaos Dwarf names for every race. Empire and Dwarf
-versions are designed but not built yet (see
-[the flavours design](docs/design/2026-09-23-great-guilds-flavours-design.md)).
+Workshop yet. Eight races take part, each with its own guild names, ranks, services and
+bounties (see [Which races take part](#which-races-take-part)).
 
 ## The six guilds
 
+Named here as the Chaos Dwarfs know them; every race has its own names for the same six.
+
 | Guild | Pays for | Its bonus scales with rank |
 |---|---|---|
-| The Brass Tablets | trade and treasury income | income from all buildings |
+| The Brass Tablets | your income, every turn | income from all buildings |
 | The Immortals | battles won, doubled when outnumbered | replenishment rate |
 | The Daemonsmiths | technologies completed | research rate |
-| The Khanate | agent actions carried out | cheaper agent recruitment |
-| The Overseers | settlements grown, and buildings no other guild claims | cheaper construction |
+| The Khanate | successful hero actions | cheaper hero recruitment |
+| The Overseers | settlements growing a level, and buildings no other guild claims | cheaper construction |
 | The Slavers | settlements sacked, more when razed | income from sacking and razing |
 
-A completed building also pays whichever guild it belongs to (a forge pays the
-Daemonsmiths, a dock the Brass Tablets, a barracks the Immortals), and pays more at higher
-levels. Completing any mission raises your standing with all six guilds at once.
+A finished building also pays the guild it belongs to (a forge pays the Daemonsmiths, a
+dock the Brass Tablets, a barracks the Immortals), and pays more at higher levels. Every
+building card says which guild it pays. Completing any mission raises your reputation with
+all six guilds at once.
 
 ## How it plays
 
 - **Two numbers per guild.** *Reputation* is earned by playing and is never spent, and it
-  alone sets your rank. *Favour* accrues beside it and is the currency services are bought
-  with. Spending favour never costs you rank.
-- **Five ranks:** Unmarked 0, Indebted 100, Sworn 300, Favoured 700, Exalted 1500. Each
-  rank grants a permanent bonus that lasts as long as you hold the rank.
+  alone sets your rank. *Favour* is earned alongside it and is the currency services are
+  bought with. Spending favour never costs you rank.
+- **Five ranks:** Unmarked 0, Indebted 100, Sworn 300, Favoured 700, Exalted 1500 (the
+  names change with your race). Each rank gives a bonus that lasts as long as you hold it.
+- **A limit each turn.** Most guilds pay only so much per turn. The Guilds tab shows what
+  each guild paid you this turn and last, from which sources, and anything the limit held
+  back.
 - **Eighteen services,** three per guild, unlocked by rank and paid for in favour, each
   with a cooldown. Examples: an instant gold levy, an elite regiment added to an army,
   finishing your current technology, revealing a region through the shroud, a free
   building upgrade, and a paid malus placed on an enemy. The price drops with a guild that
   knows you and rises with one whose rival you have been courting.
 - **Rivalry.** Three pairs of guilds argue: Brass Tablets and Khanate, Immortals and
-  Daemonsmiths, Overseers and Slavers. Earning with one takes reputation from its rival,
-  but never a rank you hold, and nothing before Indebted.
+  Daemonsmiths, Overseers and Slavers. Earning with one takes reputation from its rival
+  once you reach Indebted there, but never a rank you have reached.
 - **Bounties.** A board of three offers drawn from every guild. Taking one turns it into
   a real mission (take a region, kill a lord, sack a settlement) that pays gold and a
   large amount of reputation. Failing one you accepted costs what finishing it would have
   paid. The price reflects the target, rated Routine, Hard or Grim.
 - **Leadership.** Whichever faction of your race holds the most reputation with a guild
   leads it. The leader gets an extra bonus, and nobody else can buy that guild's dearest
-  service. The Standings tab is the league table.
+  service. The Leaderboard tab shows who leads each guild.
 - **The Court.** Guilds that know you make demands with a deadline: gold, or the favour you
-  hold with their rival. Pay and your standing jumps; ignore it and it falls. You can also
+  hold with their rival. Pay and your reputation jumps; ignore it and it falls. You can also
   appoint one lord as a guild's Patron, which gives their army replenishment and movement
   and makes that guild's reputation pay half again.
 - **Upkeep.** After the opening turns, each guild takes back a little reputation every
   turn, more at higher ranks, so a guild you stop feeding slides back down the ladder.
-- **The AI plays it too.** AI factions of your race earn, buy 15 of the 18 services,
-  answer demands, appoint patrons and take guilds off you. The feed tells you when a guild
-  changes hands and you are one of the two parties.
+- **The AI plays it too.** AI factions of your race earn, buy all 18 services (never the
+  same one twice in a row while anything else is affordable), answer demands, appoint
+  patrons and take guilds off you. The feed tells you when a guild changes hands and you
+  are one of the two parties.
 - **The Log tab** records your rank changes, your purchases, AI purchases in your race and
   hostile services used against you, newest first.
 
-The panel opens from a crest button on the campaign HUD. It has six tabs: Guilds,
-Standings, Bounties, Court, Log and Help. The in-game Help tab explains all of the above.
+The panel opens from a crest button at the top of the campaign screen. It has six tabs:
+Guilds, Leaderboard, Bounties, Court, Log and Help. The in-game Help tab explains all of the
+above. The panel grows with your resolution, so it is not a postage stamp at 1440p or 4K.
 
 ### Which races take part
 
-The guilds belong to **the player's race**. In a Chaos Dwarf campaign, every Chaos Dwarf
-faction runs the guilds and nobody else does. This works for any culture, including ones
-added by other mods, without this mod naming them.
+The guilds belong to **the player's race**, and eight races have them:
+
+| Race | The six guilds |
+|---|---|
+| Chaos Dwarfs | The Brass Tablets, The Immortals, The Daemonsmiths, The Khanate, The Overseers, The Slavers |
+| Empire | The Merchant Guilds, The Greatswords, The Engineers' School, The Thieves' Guild, The Masons' Guild, The Free Companies |
+| Dwarfs | The Merchant Clans, The Hammerers, The Engineers' Guild, The Rangers, The Miners' Guild, The Grudge-Settlers |
+| Bretonnia | The Wine Merchants, The Knights Errant, The Grail Damsels, The Forest Outlaws, The Castle-Wrights, The Crusaders |
+| Grand Cathay | The Caravan Masters, The Dragon Guard, The Imperial Academy, The Crow Society, The Bastion Builders, The Punitive Host |
+| Kislev | The Erengrad Merchants, The Tzar Guard, The Ice Court, The Oblast Smugglers, The Stanitsa Builders, The Ungol Raiders |
+| Dark Elves | The Karond Kar Traders, The Black Guard, The Convent of Ghrond, The Khainite Assassins, The Naggarond Builders, The Black Ark Corsairs |
+| High Elves | The Lothern Merchants, The Swordmasters, The Loremasters, The Shadow Warriors, The Ulthuan Masons, The Ellyrian Reavers |
+
+In a campaign played as one of these, every faction of that race runs the guilds and nobody
+else does. Any other race gets nothing: no button, no messages and no AI spending.
+
+**Multiplayer:** every panel action goes through the multiplayer transport, so it should
+stay in sync, but no two-machine campaign has tested it yet.
 
 ## Installing
 
@@ -81,8 +103,8 @@ It can be added to a campaign already in progress: rank bonuses are re-applied o
 first turn after loading.
 
 **Mod Configuration Tool (optional).** If MCT is installed, the mod adds a settings page:
-a difficulty preset (Easy, Default, Hard, Cutthroat, or Custom with every earn rate and cap
-exposed), four switches (AI spending, hostile services, guild notices on the feed, and the
+a difficulty preset (Easy, Default, Hard, Cutthroat, or Custom with every earn rate and
+limit exposed), four switches (AI spending, hostile services, guild notices on the feed, and the
 leader's monopoly on each guild's top service), and a debug log option. The values are
 read once, at the first turn of a campaign, and are fixed for the life of that save.
 Without MCT the defaults apply.
@@ -94,7 +116,7 @@ mirrors the in-pack paths, so the tools run from the repo root unchanged.
 
 | Path | What it is |
 |---|---|
-| `Modding Files/pack/script/campaign/mod/zzz_derpy_guilds.lua` | the model: standing, earning, ranks, services, bounties, Court, leadership, save state |
+| `Modding Files/pack/script/campaign/mod/zzz_derpy_guilds.lua` | the model: reputation, earning, ranks, services, bounties, Court, leadership, save state |
 | `Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_ai.lua` | the AI's spending |
 | `Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_ui.lua` | the panel and the HUD opener |
 | `Modding Files/pack/script/mct/settings/derpy_great_guilds.lua` | the MCT settings page |

@@ -320,6 +320,23 @@ def component(c):
         out += _state(c, "standard", c.sid, layers, None)
     out += "\t\t\t</states>\n"
 
+    # A ZERO-LENGTH FONT-SCALE ANIMATION, for a runtime that rewrites its frame and plays
+    # it: the only route to a label's drawn size (see gen_guilds_ui.SCALE_ANIM). Shape
+    # copied from CA's ui/common ui/scripted_topic_leader.twui.xml - tag and id alike,
+    # after <states> and before <LayoutEngine>, width and height written as CA writes
+    # them. interpolationpropertymask 512 animates font_scale and nothing else.
+    anim = kw.get("font_anim")
+    if anim:
+        out += ('\t\t\t<animations>\n\t\t\t\t<%s\n\t\t\t\t\tid="%s">\n'
+                '\t\t\t\t\t<frames>\n\t\t\t\t\t\t<frame\n'
+                '\t\t\t\t\t\t\tinterpolationtime="0"\n'
+                '\t\t\t\t\t\t\tinterpolationpropertymask="512"\n'
+                '\t\t\t\t\t\t\ttargetmetrics_m_height="%d"\n'
+                '\t\t\t\t\t\t\ttargetmetrics_m_width="%d"\n'
+                '\t\t\t\t\t\t\ttargetmetrics_m_font_scale="1"/>\n'
+                '\t\t\t\t\t</frames>\n\t\t\t\t</%s>\n\t\t\t</animations>\n'
+                % (anim, anim, c.h, c.w, anim))
+
     # WHAT STACKS THE ROWS. Runtime-created children of a list_box are placed by this
     # engine and not by MoveTo - the one place in this whole mod where MoveTo is the wrong
     # tool, because a layout group owns its children's positions and beats it.

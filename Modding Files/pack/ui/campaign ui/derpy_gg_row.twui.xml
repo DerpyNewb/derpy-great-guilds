@@ -92,6 +92,19 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="190"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
 		</row_guild>
 		<row_leader
 			this="GG21000A-D000-4000-B00000000000000A"
@@ -119,6 +132,19 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="324"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
 		</row_leader>
 		<row_rank
 			this="GG21000D-D000-4000-B00000000000000D"
@@ -146,6 +172,19 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="196"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
 		</row_rank>
 	</components>
 </layout>

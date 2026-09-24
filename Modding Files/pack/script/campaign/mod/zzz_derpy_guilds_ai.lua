@@ -8,12 +8,8 @@
 
 GGAI = GGAI or {}
 
--- Fifteen of the eighteen. The three excluded are not "unimplemented", they are
--- deliberately cut - see the design spec section 6.1:
---   hobgoblin_eyes   revealing shroud is meaningless for an AI
---   bound_blueprint  needs the AI's current research subject, call unverified
---   raise_ziggurat   needs a per-turn scan for in-progress construction
-GGAI.EXCLUDED = {hobgoblin_eyes = true, bound_blueprint = true, raise_ziggurat = true}
+-- ALL EIGHTEEN. Three were cut until 2026-09-24 because each needed a target the AI had
+-- no way to pick; GGAI.pick_target has one for every kind now.
 
 -- One purchase per faction per turn. A hard cap, not a tuning value.
 GGAI.bought_this_turn = GGAI.bought_this_turn or {}
@@ -22,28 +18,57 @@ GGAI.bought_this_turn = GGAI.bought_this_turn or {}
 -- interfaces are read instead.
 GGAI.TEST_FORCES = nil
 GGAI.TEST_WARS = nil
+GGAI.TEST_REGIONS = nil          -- the buyer's own region keys
+GGAI.TEST_ENEMY_REGIONS = nil    -- [enemy faction] = {region key, ...}
 
 function GGAI.reset_turn()
     GGAI.bought_this_turn = {}
 end
 
-function GGAI.allowed(key)
-    return not GGAI.EXCLUDED[key]
+-- THE LAST SERVICE THIS FACTION BOUGHT, kept in the save rather than the session: every
+-- machine in a multiplayer game runs this sweep, and a value one of them lost on a reload
+-- is a different purchase on each.
+function GGAI.last_bought(faction)
+    local k = cm:get_saved_value("derpy_gg_ai_last_" .. faction)
+    if type(k) == "string" and k ~= "" then return k end
+    return nil
 end
 
+-- RETURNS THE KEY AND ITS TARGET. A service that needs a target is a candidate only once
+-- it has one: choosing it blind spent the faction's one purchase of the turn on a sale
+-- GG.buy then refused.
 function GGAI.choose(faction)
-    local affordable = {}
+    local cands = {}
     for i = 1, #GG.SERVICES do
         local s = GG.SERVICES[i]
-        if GGAI.allowed(s.key) and GG.can_buy(faction, s.key) then
-            -- Weight by cost, so a faction that can afford a tier-3 service
-            -- usually takes it rather than dribbling on tier-1s.
-            local weight = math.floor(s.cost / 50)
-            for _ = 1, weight do affordable[#affordable + 1] = s.key end
+        if GG.can_buy(faction, s.key) then
+            local target = nil
+            if GG.needs_target(s) then target = GGAI.pick_target(faction, s) end
+            if target ~= nil or not GG.needs_target(s) then
+                cands[#cands + 1] = {s = s, target = target}
+            end
         end
     end
-    if #affordable == 0 then return nil end
-    return affordable[GGAI.roll(#affordable)]
+    -- NEVER THE SAME SERVICE TWICE IN A ROW while anything else is affordable. A faction
+    -- whose only open guild sells one service bought it every time its cooldown ran out
+    -- and nothing else - the Daemonsmiths below rank 4 sell only the Forge-Rite.
+    local last = GGAI.last_bought(faction)
+    if last and #cands > 1 then
+        local rest = {}
+        for i = 1, #cands do
+            if cands[i].s.key ~= last then rest[#rest + 1] = cands[i] end
+        end
+        if #rest > 0 then cands = rest end
+    end
+    local pool = {}
+    for i = 1, #cands do
+        -- Weight by cost, so a faction that can afford a tier-3 service
+        -- usually takes it rather than dribbling on tier-1s.
+        for _ = 1, math.floor(cands[i].s.cost / 50) do pool[#pool + 1] = cands[i] end
+    end
+    if #pool == 0 then return nil end
+    local c = pool[GGAI.roll(#pool)]
+    return c.s.key, c.target
 end
 
 -- cm:random_number is the multiplayer-safe roll. A plain math.random would
@@ -59,22 +84,21 @@ end
 -- line. Nothing else reads the return.
 function GGAI.step(faction)
     if GGAI.bought_this_turn[faction] then return false end
-    local key = GGAI.choose(faction)
+    local key, target = GGAI.choose(faction)
     if not key then return false end
     local s = GG.service(key)
     if not s then return false end
-    local target = GGAI.pick_target(faction, s)
+    if target == nil then target = GGAI.pick_target(faction, s) end
     -- A targeted service with no target is skipped, never fired blind.
     --
     -- GG.needs_target, NOT a copy of the rule. This line used to read
     -- `(s.kind == "unit") or s.hostile`, which was the same incomplete list that let
     -- four services take the player's favour and deliver nothing - a third copy of a
-    -- rule that had already been wrong in two places. GGAI.EXCLUDED keeps the AI away
-    -- from the other three today, so this changes no behaviour; it means the AI cannot
-    -- drift out of step with the till the day one of them is un-excluded.
+    -- rule that had already been wrong in two places.
     if GG.needs_target(s) and not target then return false end
     if GG.buy(faction, key, target) then
         GGAI.bought_this_turn[faction] = true
+        cm:set_saved_value("derpy_gg_ai_last_" .. faction, key)
         GG.save(faction)
         GGAI.report(faction, s, target)
         GGAI.log_purchase(faction, s, target)
@@ -131,10 +155,59 @@ function GGAI.pick_enemy(faction)
     return wars[GGAI.roll(#wars)]
 end
 
+-- A REGION OF A FACTION AT WAR WITH THE BUYER, for Hobgoblin Eyes: the one thing an AI
+-- wants to see through the shroud is where its enemy is.
+function GGAI.pick_enemy_region(faction)
+    local enemy = GGAI.pick_enemy(faction)
+    if not enemy then return nil end
+    local keys = GGAI.TEST_ENEMY_REGIONS and GGAI.TEST_ENEMY_REGIONS[enemy]
+    if not keys then
+        keys = {}
+        pcall(function()
+            local f = cm:get_faction(enemy)
+            if not f or f:is_null_interface() then return end
+            local rl = f:region_list()
+            for i = 0, rl:num_items() - 1 do keys[#keys + 1] = rl:item_at(i):name() end
+        end)
+    end
+    if #keys == 0 then return nil end
+    return keys[GGAI.roll(#keys)]
+end
+
+-- WHAT THE AI IS RESEARCHING, for Bound Blueprint - read back from the save, because
+-- GG.researching starts empty on a load and only the player's turn start refills it.
+function GGAI.pick_research(faction)
+    GG.load_research(faction)
+    return GG.research_target(faction)
+end
+
+-- THE FIRST UPGRADE IN ANY OF THE AI'S OWN REGIONS, for Raise the Ziggurat, through the
+-- same GG.upgrade_target the panel uses.
+function GGAI.pick_building(faction)
+    local keys = GGAI.TEST_REGIONS
+    if not keys then
+        keys = {}
+        pcall(function()
+            local f = cm:get_faction(faction)
+            if not f or f:is_null_interface() then return end
+            local rl = f:region_list()
+            for i = 0, rl:num_items() - 1 do keys[#keys + 1] = rl:item_at(i):name() end
+        end)
+    end
+    for i = 1, #keys do
+        local t = GG.upgrade_target(faction, keys[i])
+        if t then return t end
+    end
+    return nil
+end
+
 function GGAI.pick_target(faction, s)
     if not s then return nil end
     if s.kind == "unit" then return GGAI.pick_army(faction) end
     if s.hostile then return GGAI.pick_enemy(faction) end
+    if s.kind == "shroud" then return GGAI.pick_enemy_region(faction) end
+    if s.kind == "research" then return GGAI.pick_research(faction) end
+    if s.kind == "building" then return GGAI.pick_building(faction) end
     return nil
 end
 
@@ -225,12 +298,12 @@ function GGAI.report(faction, s, target)
     if not ok or not humans then return end
     for i = 1, #humans do
         if humans[i] == target then
+            -- IN THE RECEIVER'S WORDS: the target is who reads it.
+            local k = "message_event_text_text_derpy_gg_hit" .. GG.tag(target)
             pcall(function()
-                cm:show_message_event(target,
-                    "message_event_text_text_derpy_gg_hit_title",
-                    "message_event_text_text_derpy_gg_hit_primary",
-                    "message_event_text_text_derpy_gg_hit_secondary",
-                    true, GG.FEED_INDEX)
+                cm:show_message_event(target, k .. "_title", k .. "_primary",
+                                      k .. "_secondary", true,
+                                      GG.feed(target, GG.FEED_INDEX))
             end)
             return
         end

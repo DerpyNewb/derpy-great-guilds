@@ -13,39 +13,40 @@
 				<gg_close this="GG210013-D000-4000-B000000000000013"/>
 				<gg_crest this="GG210016-D000-4000-B000000000000016"/>
 				<gg_divider this="GG210019-D000-4000-B000000000000019"/>
-				<gg_footer this="GG21001C-D000-4000-B00000000000001C"/>
-				<gg_help_01 this="GG21001F-D000-4000-B00000000000001F"/>
-				<gg_help_02 this="GG210022-D000-4000-B000000000000022"/>
-				<gg_help_03 this="GG210025-D000-4000-B000000000000025"/>
-				<gg_help_04 this="GG210028-D000-4000-B000000000000028"/>
-				<gg_help_05 this="GG21002B-D000-4000-B00000000000002B"/>
-				<gg_help_06 this="GG21002E-D000-4000-B00000000000002E"/>
-				<gg_help_07 this="GG210031-D000-4000-B000000000000031"/>
-				<gg_help_08 this="GG210034-D000-4000-B000000000000034"/>
-				<gg_help_09 this="GG210037-D000-4000-B000000000000037"/>
-				<gg_help_10 this="GG21003A-D000-4000-B00000000000003A"/>
-				<gg_help_11 this="GG21003D-D000-4000-B00000000000003D"/>
-				<gg_help_12 this="GG210040-D000-4000-B000000000000040"/>
-				<gg_help_13 this="GG210043-D000-4000-B000000000000043"/>
-				<gg_help_14 this="GG210046-D000-4000-B000000000000046"/>
-				<gg_help_15 this="GG210049-D000-4000-B000000000000049"/>
-				<gg_help_16 this="GG21004C-D000-4000-B00000000000004C"/>
-				<gg_help_17 this="GG21004F-D000-4000-B00000000000004F"/>
-				<gg_help_18 this="GG210052-D000-4000-B000000000000052"/>
-				<gg_help_19 this="GG210055-D000-4000-B000000000000055"/>
-				<gg_help_20 this="GG210058-D000-4000-B000000000000058"/>
-				<gg_help_21 this="GG21005B-D000-4000-B00000000000005B"/>
-				<gg_next this="GG21005E-D000-4000-B00000000000005E"/>
-				<gg_prev this="GG210061-D000-4000-B000000000000061"/>
-				<gg_rank_line this="GG210064-D000-4000-B000000000000064"/>
-				<gg_rep_bar this="GG210067-D000-4000-B000000000000067"/>
-				<gg_tab_bounty this="GG21006A-D000-4000-B00000000000006A"/>
-				<gg_tab_court this="GG21006D-D000-4000-B00000000000006D"/>
-				<gg_tab_guilds this="GG210070-D000-4000-B000000000000070"/>
-				<gg_tab_help this="GG210073-D000-4000-B000000000000073"/>
-				<gg_tab_log this="GG210076-D000-4000-B000000000000076"/>
-				<gg_tab_stand this="GG210079-D000-4000-B000000000000079"/>
-				<gg_title this="GG21007C-D000-4000-B00000000000007C"/>
+				<gg_earned this="GG21001C-D000-4000-B00000000000001C"/>
+				<gg_footer this="GG21001F-D000-4000-B00000000000001F"/>
+				<gg_help_01 this="GG210022-D000-4000-B000000000000022"/>
+				<gg_help_02 this="GG210025-D000-4000-B000000000000025"/>
+				<gg_help_03 this="GG210028-D000-4000-B000000000000028"/>
+				<gg_help_04 this="GG21002B-D000-4000-B00000000000002B"/>
+				<gg_help_05 this="GG21002E-D000-4000-B00000000000002E"/>
+				<gg_help_06 this="GG210031-D000-4000-B000000000000031"/>
+				<gg_help_07 this="GG210034-D000-4000-B000000000000034"/>
+				<gg_help_08 this="GG210037-D000-4000-B000000000000037"/>
+				<gg_help_09 this="GG21003A-D000-4000-B00000000000003A"/>
+				<gg_help_10 this="GG21003D-D000-4000-B00000000000003D"/>
+				<gg_help_11 this="GG210040-D000-4000-B000000000000040"/>
+				<gg_help_12 this="GG210043-D000-4000-B000000000000043"/>
+				<gg_help_13 this="GG210046-D000-4000-B000000000000046"/>
+				<gg_help_14 this="GG210049-D000-4000-B000000000000049"/>
+				<gg_help_15 this="GG21004C-D000-4000-B00000000000004C"/>
+				<gg_help_16 this="GG21004F-D000-4000-B00000000000004F"/>
+				<gg_help_17 this="GG210052-D000-4000-B000000000000052"/>
+				<gg_help_18 this="GG210055-D000-4000-B000000000000055"/>
+				<gg_help_19 this="GG210058-D000-4000-B000000000000058"/>
+				<gg_help_20 this="GG21005B-D000-4000-B00000000000005B"/>
+				<gg_help_21 this="GG21005E-D000-4000-B00000000000005E"/>
+				<gg_next this="GG210061-D000-4000-B000000000000061"/>
+				<gg_prev this="GG210064-D000-4000-B000000000000064"/>
+				<gg_rank_line this="GG210067-D000-4000-B000000000000067"/>
+				<gg_rep_bar this="GG21006A-D000-4000-B00000000000006A"/>
+				<gg_tab_bounty this="GG21006D-D000-4000-B00000000000006D"/>
+				<gg_tab_court this="GG210070-D000-4000-B000000000000070"/>
+				<gg_tab_guilds this="GG210073-D000-4000-B000000000000073"/>
+				<gg_tab_help this="GG210076-D000-4000-B000000000000076"/>
+				<gg_tab_log this="GG210079-D000-4000-B000000000000079"/>
+				<gg_tab_stand this="GG21007C-D000-4000-B00000000000007C"/>
+				<gg_title this="GG21007F-D000-4000-B00000000000007F"/>
 			</derpy_gg_panel>
 		</root>
 	</hierarchy>
@@ -200,6 +201,19 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="120"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
 		</gg_card_1>
 		<gg_card_2
 			this="GG21000D-D000-4000-B00000000000000D"
@@ -227,6 +241,19 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="120"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
 		</gg_card_2>
 		<gg_card_3
 			this="GG210010-D000-4000-B000000000000010"
@@ -254,6 +281,19 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="120"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
 		</gg_card_3>
 		<gg_close
 			this="GG210013-D000-4000-B000000000000013"
@@ -414,9 +454,9 @@
 				</standard>
 			</states>
 		</gg_divider>
-		<gg_footer
+		<gg_earned
 			this="GG21001C-D000-4000-B00000000000001C"
-			id="gg_footer"
+			id="gg_earned"
 			tooltipslocalised="true"
 			uniqueguid="GG21001C-D000-4000-B00000000000001C"
 			currentstate="GG21001D-D000-4000-B00000000000001D"
@@ -426,7 +466,7 @@
 					this="GG21001D-D000-4000-B00000000000001D"
 					name="standard"
 					width="750"
-					height="30"
+					height="24"
 					uniqueguid="GG21001D-D000-4000-B00000000000001D">
 					<component_text
 						texthalign="Left"
@@ -440,10 +480,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_footer>
-		<gg_help_01
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_earned>
+		<gg_footer
 			this="GG21001F-D000-4000-B00000000000001F"
-			id="gg_help_01"
+			id="gg_footer"
 			tooltipslocalised="true"
 			uniqueguid="GG21001F-D000-4000-B00000000000001F"
 			currentstate="GG210020-D000-4000-B000000000000020"
@@ -453,24 +506,37 @@
 					this="GG210020-D000-4000-B000000000000020"
 					name="standard"
 					width="750"
-					height="18"
+					height="30"
 					uniqueguid="GG210020-D000-4000-B000000000000020">
 					<component_text
 						texthalign="Left"
 						textvalign="Center"
 						textxoffset="6.00,0.00"
-						textyoffset="0.00,0.00"
+						textyoffset="4.00,0.00"
 						texthbehaviour="Never split"
 						font_m_size="12"
-						font_m_colour="#C9BFA8FF"
+						font_m_colour="#FFF8D7FF"
 						font_m_leading="3"
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_01>
-		<gg_help_02
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="30"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_footer>
+		<gg_help_01
 			this="GG210022-D000-4000-B000000000000022"
-			id="gg_help_02"
+			id="gg_help_01"
 			tooltipslocalised="true"
 			uniqueguid="GG210022-D000-4000-B000000000000022"
 			currentstate="GG210023-D000-4000-B000000000000023"
@@ -494,10 +560,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_02>
-		<gg_help_03
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_01>
+		<gg_help_02
 			this="GG210025-D000-4000-B000000000000025"
-			id="gg_help_03"
+			id="gg_help_02"
 			tooltipslocalised="true"
 			uniqueguid="GG210025-D000-4000-B000000000000025"
 			currentstate="GG210026-D000-4000-B000000000000026"
@@ -521,10 +600,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_03>
-		<gg_help_04
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_02>
+		<gg_help_03
 			this="GG210028-D000-4000-B000000000000028"
-			id="gg_help_04"
+			id="gg_help_03"
 			tooltipslocalised="true"
 			uniqueguid="GG210028-D000-4000-B000000000000028"
 			currentstate="GG210029-D000-4000-B000000000000029"
@@ -548,10 +640,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_04>
-		<gg_help_05
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_03>
+		<gg_help_04
 			this="GG21002B-D000-4000-B00000000000002B"
-			id="gg_help_05"
+			id="gg_help_04"
 			tooltipslocalised="true"
 			uniqueguid="GG21002B-D000-4000-B00000000000002B"
 			currentstate="GG21002C-D000-4000-B00000000000002C"
@@ -575,10 +680,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_05>
-		<gg_help_06
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_04>
+		<gg_help_05
 			this="GG21002E-D000-4000-B00000000000002E"
-			id="gg_help_06"
+			id="gg_help_05"
 			tooltipslocalised="true"
 			uniqueguid="GG21002E-D000-4000-B00000000000002E"
 			currentstate="GG21002F-D000-4000-B00000000000002F"
@@ -602,10 +720,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_06>
-		<gg_help_07
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_05>
+		<gg_help_06
 			this="GG210031-D000-4000-B000000000000031"
-			id="gg_help_07"
+			id="gg_help_06"
 			tooltipslocalised="true"
 			uniqueguid="GG210031-D000-4000-B000000000000031"
 			currentstate="GG210032-D000-4000-B000000000000032"
@@ -629,10 +760,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_07>
-		<gg_help_08
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_06>
+		<gg_help_07
 			this="GG210034-D000-4000-B000000000000034"
-			id="gg_help_08"
+			id="gg_help_07"
 			tooltipslocalised="true"
 			uniqueguid="GG210034-D000-4000-B000000000000034"
 			currentstate="GG210035-D000-4000-B000000000000035"
@@ -656,10 +800,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_08>
-		<gg_help_09
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_07>
+		<gg_help_08
 			this="GG210037-D000-4000-B000000000000037"
-			id="gg_help_09"
+			id="gg_help_08"
 			tooltipslocalised="true"
 			uniqueguid="GG210037-D000-4000-B000000000000037"
 			currentstate="GG210038-D000-4000-B000000000000038"
@@ -683,10 +840,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_09>
-		<gg_help_10
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_08>
+		<gg_help_09
 			this="GG21003A-D000-4000-B00000000000003A"
-			id="gg_help_10"
+			id="gg_help_09"
 			tooltipslocalised="true"
 			uniqueguid="GG21003A-D000-4000-B00000000000003A"
 			currentstate="GG21003B-D000-4000-B00000000000003B"
@@ -710,10 +880,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_10>
-		<gg_help_11
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_09>
+		<gg_help_10
 			this="GG21003D-D000-4000-B00000000000003D"
-			id="gg_help_11"
+			id="gg_help_10"
 			tooltipslocalised="true"
 			uniqueguid="GG21003D-D000-4000-B00000000000003D"
 			currentstate="GG21003E-D000-4000-B00000000000003E"
@@ -737,10 +920,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_11>
-		<gg_help_12
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_10>
+		<gg_help_11
 			this="GG210040-D000-4000-B000000000000040"
-			id="gg_help_12"
+			id="gg_help_11"
 			tooltipslocalised="true"
 			uniqueguid="GG210040-D000-4000-B000000000000040"
 			currentstate="GG210041-D000-4000-B000000000000041"
@@ -764,10 +960,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_12>
-		<gg_help_13
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_11>
+		<gg_help_12
 			this="GG210043-D000-4000-B000000000000043"
-			id="gg_help_13"
+			id="gg_help_12"
 			tooltipslocalised="true"
 			uniqueguid="GG210043-D000-4000-B000000000000043"
 			currentstate="GG210044-D000-4000-B000000000000044"
@@ -791,10 +1000,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_13>
-		<gg_help_14
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_12>
+		<gg_help_13
 			this="GG210046-D000-4000-B000000000000046"
-			id="gg_help_14"
+			id="gg_help_13"
 			tooltipslocalised="true"
 			uniqueguid="GG210046-D000-4000-B000000000000046"
 			currentstate="GG210047-D000-4000-B000000000000047"
@@ -818,10 +1040,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_14>
-		<gg_help_15
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_13>
+		<gg_help_14
 			this="GG210049-D000-4000-B000000000000049"
-			id="gg_help_15"
+			id="gg_help_14"
 			tooltipslocalised="true"
 			uniqueguid="GG210049-D000-4000-B000000000000049"
 			currentstate="GG21004A-D000-4000-B00000000000004A"
@@ -845,10 +1080,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_15>
-		<gg_help_16
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_14>
+		<gg_help_15
 			this="GG21004C-D000-4000-B00000000000004C"
-			id="gg_help_16"
+			id="gg_help_15"
 			tooltipslocalised="true"
 			uniqueguid="GG21004C-D000-4000-B00000000000004C"
 			currentstate="GG21004D-D000-4000-B00000000000004D"
@@ -872,10 +1120,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_16>
-		<gg_help_17
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_15>
+		<gg_help_16
 			this="GG21004F-D000-4000-B00000000000004F"
-			id="gg_help_17"
+			id="gg_help_16"
 			tooltipslocalised="true"
 			uniqueguid="GG21004F-D000-4000-B00000000000004F"
 			currentstate="GG210050-D000-4000-B000000000000050"
@@ -899,10 +1160,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_17>
-		<gg_help_18
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_16>
+		<gg_help_17
 			this="GG210052-D000-4000-B000000000000052"
-			id="gg_help_18"
+			id="gg_help_17"
 			tooltipslocalised="true"
 			uniqueguid="GG210052-D000-4000-B000000000000052"
 			currentstate="GG210053-D000-4000-B000000000000053"
@@ -926,10 +1200,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_18>
-		<gg_help_19
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_17>
+		<gg_help_18
 			this="GG210055-D000-4000-B000000000000055"
-			id="gg_help_19"
+			id="gg_help_18"
 			tooltipslocalised="true"
 			uniqueguid="GG210055-D000-4000-B000000000000055"
 			currentstate="GG210056-D000-4000-B000000000000056"
@@ -953,10 +1240,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_19>
-		<gg_help_20
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_18>
+		<gg_help_19
 			this="GG210058-D000-4000-B000000000000058"
-			id="gg_help_20"
+			id="gg_help_19"
 			tooltipslocalised="true"
 			uniqueguid="GG210058-D000-4000-B000000000000058"
 			currentstate="GG210059-D000-4000-B000000000000059"
@@ -980,10 +1280,23 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_20>
-		<gg_help_21
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_19>
+		<gg_help_20
 			this="GG21005B-D000-4000-B00000000000005B"
-			id="gg_help_21"
+			id="gg_help_20"
 			tooltipslocalised="true"
 			uniqueguid="GG21005B-D000-4000-B00000000000005B"
 			currentstate="GG21005C-D000-4000-B00000000000005C"
@@ -1007,96 +1320,63 @@
 						fontcat_name="body_12"/>
 				</standard>
 			</states>
-		</gg_help_21>
-		<gg_next
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_20>
+		<gg_help_21
 			this="GG21005E-D000-4000-B00000000000005E"
-			id="gg_next"
+			id="gg_help_21"
 			tooltipslocalised="true"
-			soundcategory="UI_GBL_TMP_Round_Small_Button"
 			uniqueguid="GG21005E-D000-4000-B00000000000005E"
 			currentstate="GG21005F-D000-4000-B00000000000005F"
 			defaultstate="GG21005F-D000-4000-B00000000000005F">
-			<componentimages>
-				<component_image
-					this="GG21005E-D001-4000-B00000000000005E"
-					uniqueguid="GG21005E-D001-4000-B00000000000005E"
-					imagepath="ui/skins/default/button_round_small_active.png"/>
-				<component_image
-					this="GG21005E-D003-4000-B00000000000005E"
-					uniqueguid="GG21005E-D003-4000-B00000000000005E"
-					imagepath="ui/skins/default/button_round_small_hover.png"/>
-			</componentimages>
 			<states>
 				<standard
 					this="GG21005F-D000-4000-B00000000000005F"
 					name="standard"
-					width="38"
-					height="38"
-					interactive="true"
+					width="750"
+					height="18"
 					uniqueguid="GG21005F-D000-4000-B00000000000005F">
-					<imagemetrics>
-						<image
-							this="GG21005E-D002-4000-B00000000000005E"
-							uniqueguid="GG21005E-D002-4000-B00000000000005E"
-							componentimage="GG21005E-D001-4000-B00000000000005E"
-							offset="0.00,0.00"
-							width="38"
-							height="38"
-							margin="0.00,0.00,0.00,0.00"/>
-					</imagemetrics>
-					<transitionmap>
-						<transition
-							transition_m_target_state="GG210060-D000-4000-B000000000000060"/>
-					</transitionmap>
 					<component_text
-						texthalign="Center"
+						texthalign="Left"
 						textvalign="Center"
-						textxoffset="0.00,0.00"
+						textxoffset="6.00,0.00"
 						textyoffset="0.00,0.00"
 						texthbehaviour="Never split"
 						font_m_size="12"
-						font_m_colour="#FFF8D7FF"
-						font_m_leading="0"
-						fontcat_name="header_14"/>
+						font_m_colour="#C9BFA8FF"
+						font_m_leading="3"
+						fontcat_name="body_12"/>
 				</standard>
-				<hover
-					this="GG210060-D000-4000-B000000000000060"
-					name="hover"
-					width="38"
-					height="38"
-					interactive="true"
-					uniqueguid="GG210060-D000-4000-B000000000000060">
-					<imagemetrics>
-						<image
-							this="GG21005E-D004-4000-B00000000000005E"
-							uniqueguid="GG21005E-D004-4000-B00000000000005E"
-							componentimage="GG21005E-D003-4000-B00000000000005E"
-							offset="0.00,0.00"
-							width="38"
-							height="38"
-							margin="0.00,0.00,0.00,0.00"/>
-					</imagemetrics>
-					<transitionmap>
-						<transition
-							index="1"
-							transition_m_target_state="GG21005F-D000-4000-B00000000000005F"/>
-					</transitionmap>
-					<component_text
-						texthalign="Center"
-						textvalign="Center"
-						textxoffset="0.00,0.00"
-						textyoffset="0.00,0.00"
-						texthbehaviour="Never split"
-						font_m_size="12"
-						font_m_colour="#FFF8D7FF"
-						font_m_leading="0"
-						fontcat_name="header_14"/>
-				</hover>
 			</states>
-		</gg_next>
-		<gg_prev
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="18"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_help_21>
+		<gg_next
 			this="GG210061-D000-4000-B000000000000061"
-			id="gg_prev"
+			id="gg_next"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Round_Small_Button"
 			uniqueguid="GG210061-D000-4000-B000000000000061"
@@ -1179,107 +1459,59 @@
 						fontcat_name="header_14"/>
 				</hover>
 			</states>
-		</gg_prev>
-		<gg_rank_line
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="38"
+							targetmetrics_m_width="38"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_next>
+		<gg_prev
 			this="GG210064-D000-4000-B000000000000064"
-			id="gg_rank_line"
+			id="gg_prev"
 			tooltipslocalised="true"
+			soundcategory="UI_GBL_TMP_Round_Small_Button"
 			uniqueguid="GG210064-D000-4000-B000000000000064"
 			currentstate="GG210065-D000-4000-B000000000000065"
 			defaultstate="GG210065-D000-4000-B000000000000065">
+			<componentimages>
+				<component_image
+					this="GG210064-D001-4000-B000000000000064"
+					uniqueguid="GG210064-D001-4000-B000000000000064"
+					imagepath="ui/skins/default/button_round_small_active.png"/>
+				<component_image
+					this="GG210064-D003-4000-B000000000000064"
+					uniqueguid="GG210064-D003-4000-B000000000000064"
+					imagepath="ui/skins/default/button_round_small_hover.png"/>
+			</componentimages>
 			<states>
 				<standard
 					this="GG210065-D000-4000-B000000000000065"
 					name="standard"
-					width="750"
-					height="26"
-					uniqueguid="GG210065-D000-4000-B000000000000065">
-					<component_text
-						texthalign="Left"
-						textvalign="Center"
-						textxoffset="6.00,0.00"
-						textyoffset="4.00,0.00"
-						texthbehaviour="Never split"
-						font_m_size="12"
-						font_m_colour="#FFF8D7FF"
-						font_m_leading="3"
-						fontcat_name="body_12"/>
-				</standard>
-			</states>
-		</gg_rank_line>
-		<gg_rep_bar
-			this="GG210067-D000-4000-B000000000000067"
-			id="gg_rep_bar"
-			tooltipslocalised="true"
-			uniqueguid="GG210067-D000-4000-B000000000000067"
-			currentstate="GG210068-D000-4000-B000000000000068"
-			defaultstate="GG210068-D000-4000-B000000000000068">
-			<componentimages>
-				<component_image
-					this="GG210067-D001-4000-B000000000000067"
-					uniqueguid="GG210067-D001-4000-B000000000000067"
-					imagepath="ui/skins/default/1x1_blank_white.png"/>
-			</componentimages>
-			<states>
-				<standard
-					this="GG210068-D000-4000-B000000000000068"
-					name="standard"
-					width="750"
-					height="12"
-					uniqueguid="GG210068-D000-4000-B000000000000068">
-					<imagemetrics>
-						<image
-							this="GG210067-D002-4000-B000000000000067"
-							uniqueguid="GG210067-D002-4000-B000000000000067"
-							componentimage="GG210067-D001-4000-B000000000000067"
-							offset="0.00,0.00"
-							width="750"
-							height="12"
-							colour="#C8A05AFF"
-							margin="0.00,0.00,0.00,0.00"/>
-					</imagemetrics>
-				</standard>
-			</states>
-		</gg_rep_bar>
-		<gg_tab_bounty
-			this="GG21006A-D000-4000-B00000000000006A"
-			id="gg_tab_bounty"
-			tooltipslocalised="true"
-			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
-			uniqueguid="GG21006A-D000-4000-B00000000000006A"
-			currentstate="GG21006B-D000-4000-B00000000000006B"
-			defaultstate="GG21006B-D000-4000-B00000000000006B">
-			<componentimages>
-				<component_image
-					this="GG21006A-D001-4000-B00000000000006A"
-					uniqueguid="GG21006A-D001-4000-B00000000000006A"
-					imagepath="ui/skins/default/button_square_medium_text_active.png"/>
-				<component_image
-					this="GG21006A-D003-4000-B00000000000006A"
-					uniqueguid="GG21006A-D003-4000-B00000000000006A"
-					imagepath="ui/skins/default/button_square_medium_text_hover.png"/>
-			</componentimages>
-			<states>
-				<standard
-					this="GG21006B-D000-4000-B00000000000006B"
-					name="standard"
-					width="125"
-					height="34"
+					width="38"
+					height="38"
 					interactive="true"
-					uniqueguid="GG21006B-D000-4000-B00000000000006B">
+					uniqueguid="GG210065-D000-4000-B000000000000065">
 					<imagemetrics>
 						<image
-							this="GG21006A-D002-4000-B00000000000006A"
-							uniqueguid="GG21006A-D002-4000-B00000000000006A"
-							componentimage="GG21006A-D001-4000-B00000000000006A"
-							offset="0.00,-3.00"
-							width="125"
-							height="52"
-							margin="8.00,8.00,8.00,8.00"/>
+							this="GG210064-D002-4000-B000000000000064"
+							uniqueguid="GG210064-D002-4000-B000000000000064"
+							componentimage="GG210064-D001-4000-B000000000000064"
+							offset="0.00,0.00"
+							width="38"
+							height="38"
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
-							transition_m_target_state="GG21006C-D000-4000-B00000000000006C"/>
+							transition_m_target_state="GG210066-D000-4000-B000000000000066"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -1293,26 +1525,26 @@
 						fontcat_name="header_14"/>
 				</standard>
 				<hover
-					this="GG21006C-D000-4000-B00000000000006C"
+					this="GG210066-D000-4000-B000000000000066"
 					name="hover"
-					width="125"
-					height="34"
+					width="38"
+					height="38"
 					interactive="true"
-					uniqueguid="GG21006C-D000-4000-B00000000000006C">
+					uniqueguid="GG210066-D000-4000-B000000000000066">
 					<imagemetrics>
 						<image
-							this="GG21006A-D004-4000-B00000000000006A"
-							uniqueguid="GG21006A-D004-4000-B00000000000006A"
-							componentimage="GG21006A-D003-4000-B00000000000006A"
-							offset="0.00,-3.00"
-							width="125"
-							height="52"
-							margin="8.00,8.00,8.00,8.00"/>
+							this="GG210064-D004-4000-B000000000000064"
+							uniqueguid="GG210064-D004-4000-B000000000000064"
+							componentimage="GG210064-D003-4000-B000000000000064"
+							offset="0.00,0.00"
+							width="38"
+							height="38"
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
 							index="1"
-							transition_m_target_state="GG21006B-D000-4000-B00000000000006B"/>
+							transition_m_target_state="GG210065-D000-4000-B000000000000065"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -1326,10 +1558,97 @@
 						fontcat_name="header_14"/>
 				</hover>
 			</states>
-		</gg_tab_bounty>
-		<gg_tab_court
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="38"
+							targetmetrics_m_width="38"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_prev>
+		<gg_rank_line
+			this="GG210067-D000-4000-B000000000000067"
+			id="gg_rank_line"
+			tooltipslocalised="true"
+			uniqueguid="GG210067-D000-4000-B000000000000067"
+			currentstate="GG210068-D000-4000-B000000000000068"
+			defaultstate="GG210068-D000-4000-B000000000000068">
+			<states>
+				<standard
+					this="GG210068-D000-4000-B000000000000068"
+					name="standard"
+					width="750"
+					height="26"
+					uniqueguid="GG210068-D000-4000-B000000000000068">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="6.00,0.00"
+						textyoffset="4.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="12"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="body_12"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="26"
+							targetmetrics_m_width="750"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_rank_line>
+		<gg_rep_bar
+			this="GG21006A-D000-4000-B00000000000006A"
+			id="gg_rep_bar"
+			tooltipslocalised="true"
+			uniqueguid="GG21006A-D000-4000-B00000000000006A"
+			currentstate="GG21006B-D000-4000-B00000000000006B"
+			defaultstate="GG21006B-D000-4000-B00000000000006B">
+			<componentimages>
+				<component_image
+					this="GG21006A-D001-4000-B00000000000006A"
+					uniqueguid="GG21006A-D001-4000-B00000000000006A"
+					imagepath="ui/skins/default/1x1_blank_white.png"/>
+			</componentimages>
+			<states>
+				<standard
+					this="GG21006B-D000-4000-B00000000000006B"
+					name="standard"
+					width="750"
+					height="12"
+					uniqueguid="GG21006B-D000-4000-B00000000000006B">
+					<imagemetrics>
+						<image
+							this="GG21006A-D002-4000-B00000000000006A"
+							uniqueguid="GG21006A-D002-4000-B00000000000006A"
+							componentimage="GG21006A-D001-4000-B00000000000006A"
+							offset="0.00,0.00"
+							width="750"
+							height="12"
+							colour="#C8A05AFF"
+							margin="0.00,0.00,0.00,0.00"/>
+					</imagemetrics>
+				</standard>
+			</states>
+		</gg_rep_bar>
+		<gg_tab_bounty
 			this="GG21006D-D000-4000-B00000000000006D"
-			id="gg_tab_court"
+			id="gg_tab_bounty"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
 			uniqueguid="GG21006D-D000-4000-B00000000000006D"
@@ -1412,10 +1731,23 @@
 						fontcat_name="header_14"/>
 				</hover>
 			</states>
-		</gg_tab_court>
-		<gg_tab_guilds
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="34"
+							targetmetrics_m_width="125"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_tab_bounty>
+		<gg_tab_court
 			this="GG210070-D000-4000-B000000000000070"
-			id="gg_tab_guilds"
+			id="gg_tab_court"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
 			uniqueguid="GG210070-D000-4000-B000000000000070"
@@ -1498,10 +1830,23 @@
 						fontcat_name="header_14"/>
 				</hover>
 			</states>
-		</gg_tab_guilds>
-		<gg_tab_help
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="34"
+							targetmetrics_m_width="125"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_tab_court>
+		<gg_tab_guilds
 			this="GG210073-D000-4000-B000000000000073"
-			id="gg_tab_help"
+			id="gg_tab_guilds"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
 			uniqueguid="GG210073-D000-4000-B000000000000073"
@@ -1584,10 +1929,23 @@
 						fontcat_name="header_14"/>
 				</hover>
 			</states>
-		</gg_tab_help>
-		<gg_tab_log
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="34"
+							targetmetrics_m_width="125"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_tab_guilds>
+		<gg_tab_help
 			this="GG210076-D000-4000-B000000000000076"
-			id="gg_tab_log"
+			id="gg_tab_help"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
 			uniqueguid="GG210076-D000-4000-B000000000000076"
@@ -1670,10 +2028,23 @@
 						fontcat_name="header_14"/>
 				</hover>
 			</states>
-		</gg_tab_log>
-		<gg_tab_stand
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="34"
+							targetmetrics_m_width="125"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_tab_help>
+		<gg_tab_log
 			this="GG210079-D000-4000-B000000000000079"
-			id="gg_tab_stand"
+			id="gg_tab_log"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
 			uniqueguid="GG210079-D000-4000-B000000000000079"
@@ -1756,21 +2127,133 @@
 						fontcat_name="header_14"/>
 				</hover>
 			</states>
-		</gg_tab_stand>
-		<gg_title
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="34"
+							targetmetrics_m_width="125"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_tab_log>
+		<gg_tab_stand
 			this="GG21007C-D000-4000-B00000000000007C"
-			id="gg_title"
+			id="gg_tab_stand"
 			tooltipslocalised="true"
+			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
 			uniqueguid="GG21007C-D000-4000-B00000000000007C"
 			currentstate="GG21007D-D000-4000-B00000000000007D"
 			defaultstate="GG21007D-D000-4000-B00000000000007D">
+			<componentimages>
+				<component_image
+					this="GG21007C-D001-4000-B00000000000007C"
+					uniqueguid="GG21007C-D001-4000-B00000000000007C"
+					imagepath="ui/skins/default/button_square_medium_text_active.png"/>
+				<component_image
+					this="GG21007C-D003-4000-B00000000000007C"
+					uniqueguid="GG21007C-D003-4000-B00000000000007C"
+					imagepath="ui/skins/default/button_square_medium_text_hover.png"/>
+			</componentimages>
 			<states>
 				<standard
 					this="GG21007D-D000-4000-B00000000000007D"
 					name="standard"
+					width="125"
+					height="34"
+					interactive="true"
+					uniqueguid="GG21007D-D000-4000-B00000000000007D">
+					<imagemetrics>
+						<image
+							this="GG21007C-D002-4000-B00000000000007C"
+							uniqueguid="GG21007C-D002-4000-B00000000000007C"
+							componentimage="GG21007C-D001-4000-B00000000000007C"
+							offset="0.00,-3.00"
+							width="125"
+							height="52"
+							margin="8.00,8.00,8.00,8.00"/>
+					</imagemetrics>
+					<transitionmap>
+						<transition
+							transition_m_target_state="GG21007E-D000-4000-B00000000000007E"/>
+					</transitionmap>
+					<component_text
+						texthalign="Center"
+						textvalign="Center"
+						textxoffset="0.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="12"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="0"
+						fontcat_name="header_14"/>
+				</standard>
+				<hover
+					this="GG21007E-D000-4000-B00000000000007E"
+					name="hover"
+					width="125"
+					height="34"
+					interactive="true"
+					uniqueguid="GG21007E-D000-4000-B00000000000007E">
+					<imagemetrics>
+						<image
+							this="GG21007C-D004-4000-B00000000000007C"
+							uniqueguid="GG21007C-D004-4000-B00000000000007C"
+							componentimage="GG21007C-D003-4000-B00000000000007C"
+							offset="0.00,-3.00"
+							width="125"
+							height="52"
+							margin="8.00,8.00,8.00,8.00"/>
+					</imagemetrics>
+					<transitionmap>
+						<transition
+							index="1"
+							transition_m_target_state="GG21007D-D000-4000-B00000000000007D"/>
+					</transitionmap>
+					<component_text
+						texthalign="Center"
+						textvalign="Center"
+						textxoffset="0.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="12"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="0"
+						fontcat_name="header_14"/>
+				</hover>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="34"
+							targetmetrics_m_width="125"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_tab_stand>
+		<gg_title
+			this="GG21007F-D000-4000-B00000000000007F"
+			id="gg_title"
+			tooltipslocalised="true"
+			uniqueguid="GG21007F-D000-4000-B00000000000007F"
+			currentstate="GG210080-D000-4000-B000000000000080"
+			defaultstate="GG210080-D000-4000-B000000000000080">
+			<states>
+				<standard
+					this="GG210080-D000-4000-B000000000000080"
+					name="standard"
 					width="366"
 					height="28"
-					uniqueguid="GG21007D-D000-4000-B00000000000007D">
+					uniqueguid="GG210080-D000-4000-B000000000000080">
 					<component_text
 						texthalign="Left"
 						textvalign="Center"
@@ -1783,6 +2266,19 @@
 						fontcat_name="header_18_bold"/>
 				</standard>
 			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="28"
+							targetmetrics_m_width="366"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
 		</gg_title>
 	</components>
 </layout>

@@ -228,13 +228,51 @@ Clean load, no guild error, the usual unrelated VCO error only. Read off the two
 Packed to `Modpacks/`, MD5 `99A25F5C5D60CEC9533FBC5B91323597`. **Not in data/ - the game was
 running.** `data/` still holds `340DBF52...` (6b), which is correct apart from the key bloat.
 
+### 6e. Second live round (`script_log_230926_1342`, turns 32-33) - and the rank flip
+
+Clean load on 99A25F5C, no script error (the 30 "error" hits are CA's Great Game VFX lines).
+
+- **AI Daemonsmiths from technologies - CONFIRMED.** Turn 32 -> 33 saves: Baal 20 -> 21
+  techs and 60 -> 119 rep, Astragoth 23 -> 24 and 0 -> 60, Khorakk, Snakebeards, Uzkulak
+  and Azgorh the same. The tech-key count stayed 273 across both saves (the 259 non-CHD
+  keys are the inert leftovers from 6d; none new).
+- Lead lost (Overseers, to the Conclave 108 v 95) and won (Slavers) both announced. The Log
+  holds 25 entries; it was opened once, at about 12, so paging past 21 is still unseen.
+- The Chaos Dwarf invasion faction `wh3_dlc25_chd_chaos_dwarfs_invasion` earns and buys
+  (Forge-Rite). Chaos Dwarf culture, so covered by design.
+- **FOUND: the player's Slavers rank flipped and re-announced.** Log: `31,rank,slavers,1,2`
+  / `32,rank,slavers,2,1` / `32,rank,slavers,1,2`, and "Name You Indebted" popped in both
+  sessions. `GG.rival_cost` floored at EXACTLY the held threshold, so Overseers income
+  pinned the slavers at 100, the next turn start's upkeep charged 2 (rank 2), the save read
+  98 - demoted - and the next sack promoted again. Rivalry cost a rank one turn late,
+  contradicting the Help's "never a rank you hold".
+
+**Fixed (author's choice, "both"):**
+1. `GG.rival_cost` floors at `threshold + GG.decay_amount(rank)` - one turn's upkeep above
+   the threshold. Upkeep still demotes an unfed guild; it now takes one turn longer after a
+   rivalry pin. Two harness tests changed on purpose (they pinned the old exact-threshold
+   floor) - the new one reproduces the live 100 -> 98 sequence and was watched to fail.
+2. `GG.announce_rank` pops a promotion only when the rank beats the best that human has
+   reached with that guild: `derpy_gg_best_<guild>_<faction>`, humans only. The bundle swap
+   and the Log still record every crossing. A save from before this build has no record, so
+   each guild can re-announce its current rank once more. New harness block, watched to fail.
+
+Gates: harness ok, luac x3, check_lua_api 0, check_lua_undeclared 0, gen --check and
+--selftest, check_guilds_anchor, import --check, packed and content-verified, all three
+scripts byte-identical in the saved pack. **Packed to Modpacks, MD5
+`1FC5D7257C516BF6279CF67B2B0D25C6`, DEPLOYED 15:11 (6c item 6).** Rollback:
+`Modpacks/derpy_great_guilds.pack.bak_20260923_pre_rankflip` (= the deployed 99A25F5C).
+
 ### 6c. Live checks still owed
 
 1. ~~A building completing pays its themed guild~~ - confirmed, 6d.
-2. After the SECOND round, an AI faction's Daemonsmiths reputation is above 0 from
-   technologies (not only from forges) - the first count is a baseline.
+2. ~~After the SECOND round, an AI faction's Daemonsmiths reputation is above 0 from
+   technologies~~ - confirmed, 6e.
 3. ~~The Log tab opens and records~~ - confirmed, 6d. Paging past 21 lines not yet seen.
 4. The six tab labels fit their 125px plates in game fonts (the preview uses PIL's font).
 5. ~~Deploy `99A25F5C...` with the game closed~~ - DEPLOYED 2026-09-23 13:18, game confirmed
    closed, MD5 matched on both sides, `used_mods.txt` line 119 still enables it. The 340DBF52
    build it replaced is `Modpacks/derpy_great_guilds.pack.bak_20260923_deployed_340dbf52`.
+6. ~~Deploy `1FC5D725...`~~ - DEPLOYED 2026-09-23 15:11, game confirmed closed, MD5 matched,
+   `used_mods.txt` line 119 still enables it. Still owed live: a guild pinned by rivalry keeps its rank
+   through the next turn start, and re-crossing a rank you already reached raises no popup.

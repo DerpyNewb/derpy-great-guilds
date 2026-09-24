@@ -1,5 +1,6 @@
 """The Great Guilds - generator. See docs/superpowers/specs/2026-09-10-great-guilds-design.md"""
 import io
+import os
 import re
 import sys
 
@@ -118,7 +119,7 @@ EFFECT_BLURB = {
     "brass":        ("%+d%% income from all buildings", "every region you own"),
     "immortals":    ("%+d%% replenishment rate", "every army"),
     "daemonsmiths": ("%+d%% research rate", "your faction"),
-    "khanate":      ("%+d%% agent recruitment cost", "every province you own"),
+    "khanate":      ("%+d%% hero recruitment cost", "every province you own"),
     "overseers":    ("%+d%% building construction cost", "every region you own"),
     "slavers":      ("%+d%% income from sacking and razing", "every army"),
 }
@@ -442,23 +443,28 @@ SERVICE_BLURB = {
 # What each guild is, how you earn its reputation, and what its ladder pays.
 GUILD_DESC = {
     "brass":        "Tally-keepers and caravan masters. They record every debt in the "
-                    "Dark Lands and forgive none of them.||Reputation accrues from your "
-                    "trade and treasury income.",
+                    "Dark Lands and forgive none of them.||You earn reputation from your "
+                    "income every turn, and from their own buildings.",
     "immortals":    "The oath-sworn companies who fight for whoever holds their bond, "
-                    "and never break it.||Reputation accrues from battles you win, and "
-                    "doubles when you win outnumbered.",
+                    "and never break it.||You earn reputation from battles you win - double "
+                    "when you win outnumbered - and from their own buildings.",
     "daemonsmiths": "Those who bind daemons into iron. They sell knowledge, never "
-                    "cheaply.||Reputation accrues from technologies you complete.",
+                    "cheaply.||You earn reputation from technologies you complete, and "
+                    "from their own buildings.",
     "khanate":      "Hobgoblin knives and hobgoblin eyes, for hire to anyone, "
-                    "including against you.||Reputation accrues from agent actions you "
-                    "carry out.",
+                    "including against you.||You earn reputation when your heroes succeed "
+                    "at an action, and from their own buildings.",
     "overseers":    "The gang-masters who drive the building of Zharr Naggrund and "
-                    "everything like it.||Reputation accrues from buildings you "
-                    "complete, and more from higher levels.",
+                    "everything like it.||You earn reputation when a settlement grows a "
+                    "level, and from any building no other guild claims.",
     "slavers":      "The coffle-drivers. Their ledger is measured in bodies, and it is "
-                    "always growing.||Reputation accrues from settlements you sack, and "
-                    "more from those you raze.",
+                    "always growing.||You earn reputation from settlements you sack - more "
+                    "from those you raze - and from their own buildings.",
 }
+# THE TWO HALVES. The flavour sentence is written per race in FLAVOURS below; the earn
+# sentence is mechanical and every race shares it.
+GUILD_FLAVOUR = dict((g, d.split("||", 1)[0]) for g, d in GUILD_DESC.items())
+GUILD_EARN = dict((g, d.split("||", 1)[1]) for g, d in GUILD_DESC.items())
 
 # ------------------------------------------------------------------ bounties ---
 # A CLONE OF CA'S OWN OGRE CONTRACTS, which its script calls `ogre_bounties`
@@ -510,7 +516,7 @@ CA_CONTRACT_OBJECTIVES = ("KILL_CHARACTER_BY_ANY_MEANS", "CAPTURE_REGIONS",
 BOUNTIES = {
     "brass":        ("region_take", "Seize the Market",
                      "The Tablets want the tolls of that place counted in our "
-                     "column. Take it standing."),
+                     "column. Take it intact."),
     "immortals":    ("lord_kill", "Break Their Champion",
                      "A general is being spoken of with respect. Correct that."),
     "daemonsmiths": ("region_sack", "Strip the Works",
@@ -535,14 +541,724 @@ BOUNTIES = {
 RIVAL_PAIRS = [("brass", "khanate"), ("immortals", "daemonsmiths"),
                ("overseers", "slavers")]
 
+# ------------------------------------------------------------- the flavours ---
+# ONE TAG PER CULTURE, APPENDED TO EVERY KEY THE PLAYER READS. The Chaos Dwarf entry is
+# the empty tag and is read off the tables above rather than restated, so the pass that
+# ships today's keys cannot drift from them. Names, ranks, services and prose are the
+# spec's sections 3 and 4, approved as written. `culture` and `feed` are mirrored in
+# GG.FLAVOURED in the model Lua, and check_flavour_mirror() compares the two. `pics` is
+# the eventpics folder; every picture used under it is one vanilla's own rows use.
+FLAVOURS = {
+    "": {
+        "culture": "wh3_dlc23_chd_chaos_dwarfs", "pics": "chd", "feed": 0,
+        "guilds": GUILD_NAMES,
+        "ranks": RANK_NAMES,
+        "services": dict((s["key"], s["name"]) for s in SERVICES),
+        "blurbs": dict((k, v) for k, v in SERVICE_BLURB.items() if v is not None),
+        "desc": GUILD_FLAVOUR,
+        "bounties": dict((g, (b[1], b[2])) for g, b in BOUNTIES.items()),
+    },
+    "_emp": {
+        "culture": "wh_main_emp_empire", "pics": "emp", "feed": 10,
+        "guilds": {
+            "brass": "The Merchant Guilds",
+            "immortals": "The Greatswords",
+            "daemonsmiths": "The Engineers' School",
+            "khanate": "The Thieves' Guild",
+            "overseers": "The Masons' Guild",
+            "slavers": "The Free Companies",
+        },
+        "ranks": ["Outsider", "Apprentice", "Journeyman", "Master", "Grand Master"],
+        "services": {
+            "caravan_levy": "Call in the Debts",
+            "writ_monopoly": "Imperial Charter",
+            "long_ledger": "The Altdorf Exchange",
+            "oathbound_draft": "Muster Roll",
+            "hire_immortals": "Hire the Greatswords",
+            "astragoths_levy": "The Emperor's Levy",
+            "forge_rite": "Proving Grounds",
+            "bound_blueprint": "The School's Treatise",
+            "bound_ordnance": "Guns of Nuln",
+            "hobgoblin_eyes": "Eyes in Every Tavern",
+            "knife_in_dark": "Knife in the Alley",
+            "khans_price": "Protection Money",
+            "lash_the_gangs": "Overtime Wages",
+            "raise_ziggurat": "Master's Commission",
+            "works_of_zharr": "The Emperor's Works",
+            "coffle_drive": "Plunder Rights",
+            "slave_tithe": "The Company's Cut",
+            "great_coffle": "The Grand Pillage",
+        },
+        # The unit name matches vanilla's land_units_onscreen_name for
+        # wh_main_emp_inf_greatswords, read with read_vanilla_loc on 2026-09-23.
+        "blurbs": {
+            "caravan_levy": "The Merchant Guilds call in what they are owed. Adds 2,500 "
+                            "gold to your treasury at once.",
+            "hire_immortals": "A company already sworn and already armed. Adds one unit "
+                              "of Greatswords to an army of your choosing.",
+            "bound_blueprint": "The Engineers' School hands over work already done. "
+                               "Completes the technology you are currently researching, "
+                               "at once.",
+            "hobgoblin_eyes": "The Thieves' Guild sells what its ears have heard. Reveals "
+                              "one region through the shroud, permanently.",
+            "raise_ziggurat": "The Masons' Guild works through the night. Upgrades one of "
+                              "your buildings to its next level at once, and free.",
+            "slave_tithe": "The Free Companies send you your share of the take. Adds "
+                           "3,000 gold to your treasury.",
+        },
+        "desc": {
+            "brass": "The counting-houses of Altdorf and Nuln. Every road toll, river "
+                     "tariff and letter of credit in the Empire passes through their "
+                     "books.",
+            "immortals": "Veterans who swore their lives to an Elector Count's banner. "
+                         "They sell that oath now, to whoever can carry it.",
+            "daemonsmiths": "Altdorf's engineers, who build what should not work and make "
+                            "it fire. They sell what they know, in instalments.",
+            "khanate": "Every tavern has a back room, and every back room has an ear. "
+                       "Their knives are for hire to anyone, including against you.",
+            "overseers": "The builders of every wall and temple from the Reikland to "
+                         "Ostland, and the only ones who know where the foundations are "
+                         "weak.",
+            "slavers": "Sell-swords and road-wardens paid in plunder. Their ledger is "
+                       "measured in what they carry home.",
+        },
+        "bounties": {
+            "brass": ("Open the Market",
+                      "The Merchant Guilds want that town's tolls paid in Altdorf. Take "
+                      "it intact."),
+            "immortals": ("A Duel for the Banner",
+                          "A general is being spoken of with respect. The Greatswords "
+                          "would like that corrected."),
+            "daemonsmiths": ("Salvage the Works",
+                             "Whatever that place has built, the School wants on its own "
+                             "benches. Bring it back in pieces."),
+            "khanate": ("A Name Crossed Out",
+                        "The Guild does not care how it is done, only that the name "
+                        "stops being used."),
+            "overseers": ("Stone Still Standing",
+                          "Take it whole. The Masons want the walls left up, so they can "
+                          "be paid to mend them."),
+            "slavers": ("Pay Day",
+                        "Empty it. The companies are owed, and that place can pay them."),
+        },
+    },
+    "_dwf": {
+        "culture": "wh_main_dwf_dwarfs", "pics": "dwf", "feed": 20,
+        "guilds": {
+            "brass": "The Merchant Clans",
+            "immortals": "The Hammerers",
+            "daemonsmiths": "The Engineers' Guild",
+            "khanate": "The Rangers",
+            "overseers": "The Miners' Guild",
+            "slavers": "The Grudge-Settlers",
+        },
+        "ranks": ["Stranger", "Beardling", "Oathsworn", "Longbeard", "Elder"],
+        "services": {
+            "caravan_levy": "Road-Toll",
+            "writ_monopoly": "Hold Charter",
+            "long_ledger": "The Clan Ledger",
+            "oathbound_draft": "Call to the Hold",
+            "hire_immortals": "Hire the Hammerers",
+            "astragoths_levy": "The High King's Levy",
+            "forge_rite": "Guild Workshop",
+            "bound_blueprint": "Guild Secrets",
+            "bound_ordnance": "Guild Artillery",
+            "hobgoblin_eyes": "Ranger's Report",
+            "knife_in_dark": "Ambush in the Passes",
+            "khans_price": "Cut Their Roads",
+            "lash_the_gangs": "Double Shift",
+            "raise_ziggurat": "Delve Deeper",
+            "works_of_zharr": "Works of Grungni",
+            "coffle_drive": "Settle the Account",
+            "slave_tithe": "Weregild",
+            "great_coffle": "The Great Reckoning",
+        },
+        # The unit name matches vanilla's land_units_onscreen_name for
+        # wh_main_dwf_inf_hammerers, read with read_vanilla_loc on 2026-09-23.
+        "blurbs": {
+            "caravan_levy": "The Merchant Clans collect on every road between the holds. "
+                            "Adds 2,500 gold to your treasury at once.",
+            "hire_immortals": "A company already sworn and already armed. Adds one unit "
+                              "of Hammerers to an army of your choosing.",
+            "bound_blueprint": "The Engineers' Guild parts with a secret, once. Completes "
+                               "the technology you are currently researching, at once.",
+            "hobgoblin_eyes": "The Rangers report what they have seen from the high "
+                              "passes. Reveals one region through the shroud, "
+                              "permanently.",
+            "raise_ziggurat": "The Miners' Guild works a double shift. Upgrades one of "
+                              "your buildings to its next level at once, and free.",
+            "slave_tithe": "Oathgold paid to settle a grudge, and passed on to you. "
+                           "Adds 250 Oathgold.",
+        },
+        "desc": {
+            "brass": "The traders of the Karaks, who remember every debt for as long as "
+                     "there is stone to write it on.",
+            "immortals": "The king's own guard, sworn to the throne of their hold. Their "
+                         "oath can be lent, never broken.",
+            "daemonsmiths": "Keepers of secrets guarded since the first hold was dug. They "
+                            "share them slowly, and never twice.",
+            "khanate": "Dwarfs who left the holds to watch the passes. They see "
+                       "everything that moves above ground, and sell it dearly.",
+            "overseers": "The delvers and stone-cutters who carved every hold. Nothing is "
+                         "built in the mountains without them.",
+            "slavers": "The clans who take the Book of Grudges at its word. Every line "
+                       "struck out is paid for in plunder.",
+        },
+        "bounties": {
+            "brass": ("Reopen the Road",
+                      "The Merchant Clans want that place back in their ledgers. Take it "
+                      "intact."),
+            "immortals": ("A Grudge on a Name",
+                          "A general has been boasting. The Hammerers would like that "
+                          "settled."),
+            "daemonsmiths": ("Recover the Craft",
+                             "Whatever was forged in that place was likely stolen from us "
+                             "first. Bring it back in pieces."),
+            "khanate": ("Silence in the Passes",
+                        "The Rangers want the name stopped. How is their affair."),
+            "overseers": ("Reclaim the Hold",
+                          "Take it whole. The Miners' Guild wants tunnels, not rubble."),
+            "slavers": ("Strike a Line",
+                        "Sack it. One more grudge struck from the Book, and paid for."),
+        },
+    },
+    # BRETONNIA, CATHAY AND KISLEV. Approved 2026-09-24 as written in
+    # docs/superpowers/specs/2026-09-24-great-guilds-brt-cth-ksl-design.md; every lore word
+    # in them is one CA's own loc uses. All four feed pictures exist under each race's
+    # folder. Kislev has no mission picture of its own anywhere in vanilla - CA gives its
+    # Kislev missions emp/generic (97 rows), so the bounties do the same.
+    "_brt": {
+        "culture": "wh_main_brt_bretonnia", "pics": "brt", "feed": 40,
+        "guilds": {
+            "brass": "The Wine Merchants",
+            "immortals": "The Knights Errant",
+            "daemonsmiths": "The Grail Damsels",
+            "khanate": "The Forest Outlaws",
+            "overseers": "The Castle-Wrights",
+            "slavers": "The Crusaders",
+        },
+        "ranks": ["Peasant", "Yeoman", "Squire", "Knight", "Paladin"],
+        "services": {
+            "caravan_levy": "Wine Duties",
+            "writ_monopoly": "Ducal Charter",
+            "long_ledger": "The Vintners' Accord",
+            "oathbound_draft": "Call the Banners",
+            "hire_immortals": "Hire the Knights",
+            "astragoths_levy": "The King's Summons",
+            "forge_rite": "Lessons of the Lady",
+            "bound_blueprint": "The Lady's Revelation",
+            "bound_ordnance": "Vision of the Grail",
+            "hobgoblin_eyes": "Word from the Woods",
+            "knife_in_dark": "Arrows from Cover",
+            "khans_price": "The Outlaws' Toll",
+            "lash_the_gangs": "Feudal Labour",
+            "raise_ziggurat": "Raise the Keep",
+            "works_of_zharr": "The Duke's Works",
+            "coffle_drive": "Spoils of Crusade",
+            "slave_tithe": "The Crusaders' Share",
+            "great_coffle": "The Errantry War",
+        },
+        "blurbs": {
+            "caravan_levy": "The Wine Merchants collect the duties owed on every cask. "
+                            "Adds 2,500 gold to your treasury at once.",
+            "hire_immortals": "A lance of knights, already sworn and already horsed. "
+                              "Adds one unit of Knights of the Realm to an army of your "
+                              "choosing.",
+            "bound_blueprint": "The Grail Damsels share what the Lady has shown them. "
+                               "Completes the technology you are currently researching, "
+                               "at once.",
+            "hobgoblin_eyes": "The Forest Outlaws sell what they have seen from the "
+                              "trees. Reveals one region through the shroud, "
+                              "permanently.",
+            "raise_ziggurat": "The Castle-Wrights work through the night. Upgrades one "
+                              "of your buildings to its next level at once, and free.",
+            "slave_tithe": "The Crusaders send home your share of the spoils. Adds 3,000 "
+                           "gold to your treasury.",
+        },
+        "desc": {
+            "brass": "The vintners and shipping houses of Bordeleaux, whose casks reach "
+                     "every court in the Old World. Every duke owes them something.",
+            "immortals": "Young knights sworn to prove themselves in battle. Whoever "
+                         "gives them the field earns their lances.",
+            "daemonsmiths": "Handmaidens of the Lady who keep the old lore of Bretonnia. "
+                            "They share it only with those they judge worthy.",
+            "khanate": "Poachers and cutpurses who live beyond the law in the deep "
+                       "forests. They will rob anyone, including you.",
+            "overseers": "The master masons who raise every keep and curtain wall in the "
+                         "dukedoms, and who know where each one is weak.",
+            "slavers": "Knights and men-at-arms back from the Errantry Wars, paid in "
+                       "what they carry home.",
+        },
+        "bounties": {
+            "brass": ("Open the Cellars",
+                      "The Wine Merchants want that town's trade flowing to Bordeleaux. "
+                      "Take it intact."),
+            "immortals": ("A Challenge of Honour",
+                          "A general is being spoken of with respect. The Knights Errant "
+                          "would like to test that."),
+            "daemonsmiths": ("Out of Unworthy Hands",
+                             "Whatever that place keeps, the Damsels want it taken from "
+                             "those who should not have it. Bring it back in pieces."),
+            "khanate": ("A Name in the Forest",
+                        "The Outlaws do not care how it is done, only that the name "
+                        "stops being used."),
+            "overseers": ("A Keep Worth Keeping",
+                          "Take it whole. The Castle-Wrights want a keep to improve, not "
+                          "rubble."),
+            "slavers": ("A Crusade's Worth",
+                        "Sack it. The Crusaders are owed, and that place can pay."),
+        },
+    },
+    "_cth": {
+        "culture": "wh3_main_cth_cathay", "pics": "cth", "feed": 50,
+        "guilds": {
+            "brass": "The Caravan Masters",
+            "immortals": "The Dragon Guard",
+            "daemonsmiths": "The Imperial Academy",
+            "khanate": "The Crow Society",
+            "overseers": "The Bastion Builders",
+            "slavers": "The Punitive Host",
+        },
+        "ranks": ["Commoner", "Scholar", "Official", "Magistrate", "Minister"],
+        "services": {
+            "caravan_levy": "Caravan Tolls",
+            "writ_monopoly": "Seal of Trade",
+            "long_ledger": "The Ivory Road",
+            "oathbound_draft": "Fresh Levies",
+            "hire_immortals": "Hire the Dragon Guard",
+            "astragoths_levy": "The Emperor's Mandate",
+            "forge_rite": "Hall of Scholars",
+            "bound_blueprint": "Archive Scrolls",
+            "bound_ordnance": "The Celestial Charts",
+            "hobgoblin_eyes": "Eyes of the Crows",
+            "knife_in_dark": "A Quiet Poison",
+            "khans_price": "Sow Disharmony",
+            "lash_the_gangs": "Conscript Labour",
+            "raise_ziggurat": "Raise the Pagoda",
+            "works_of_zharr": "Works of the Bastion",
+            "coffle_drive": "Punitive Raids",
+            "slave_tithe": "The Host's Share",
+            "great_coffle": "The Great Expedition",
+        },
+        "blurbs": {
+            "caravan_levy": "The Caravan Masters collect on every road they travel. Adds "
+                            "2,500 gold to your treasury at once.",
+            "hire_immortals": "A company already sworn and already armed. Adds one unit "
+                              "of Celestial Dragon Guard to an army of your choosing.",
+            "bound_blueprint": "The Imperial Academy hands over work already done. "
+                               "Completes the technology you are currently researching, "
+                               "at once.",
+            "hobgoblin_eyes": "The Crow Society sells what its crows have seen. Reveals "
+                              "one region through the shroud, permanently.",
+            "raise_ziggurat": "The Bastion Builders work through the night. Upgrades one "
+                              "of your buildings to its next level at once, and free.",
+            "slave_tithe": "The Punitive Host sends back your share of the spoils. Adds "
+                           "3,000 gold to your treasury.",
+        },
+        "desc": {
+            "brass": "The masters of the Ivory Road, whose caravans cross half the world "
+                     "and come back heavier. Every province pays their tolls.",
+            "immortals": "The Emperor's own warriors, sworn to the Celestial Court. "
+                         "Their oath is lent to whoever the Court favours.",
+            "daemonsmiths": "The scholars and astromancers who keep the Empire's "
+                            "learning. They teach it slowly, and never for free.",
+            "khanate": "Informers, poisoners and watchers who sell what they learn at "
+                       "court. They work for anyone, including against you.",
+            "overseers": "The engineers who keep the Great Bastion standing, and who "
+                         "know where every wall is weak.",
+            "slavers": "Soldiers sent beyond the Bastion to punish the Emperor's "
+                       "enemies. Their pay is what they bring back.",
+        },
+        "bounties": {
+            "brass": ("Open the Road",
+                      "The Caravan Masters want that town's markets on the Ivory Road. "
+                      "Take it intact."),
+            "immortals": ("A Lesson in Respect",
+                          "A general is being spoken of with respect. The Dragon Guard "
+                          "would like that corrected."),
+            "daemonsmiths": ("Collect the Texts",
+                             "Whatever that place has written down, the Academy wants in "
+                             "its archive. Bring it back in pieces."),
+            "khanate": ("A Name Forgotten",
+                        "The Society does not care how it is done, only that the name "
+                        "stops being used."),
+            "overseers": ("Walls for the Empire",
+                          "Take it whole. The Bastion Builders want walls to strengthen, "
+                          "not rubble."),
+            "slavers": ("Punish Them",
+                        "Sack it. The Host is owed, and that place can pay."),
+        },
+    },
+    "_ksl": {
+        "culture": "wh3_main_ksl_kislev", "pics": "ksl", "feed": 60,
+        "mission_pic": "emp/generic",
+        "guilds": {
+            "brass": "The Erengrad Merchants",
+            "immortals": "The Tzar Guard",
+            "daemonsmiths": "The Ice Court",
+            "khanate": "The Oblast Smugglers",
+            "overseers": "The Stanitsa Builders",
+            "slavers": "The Ungol Raiders",
+        },
+        "ranks": ["Serf", "Kossar", "Druzhina", "Boyar", "Ataman"],
+        "services": {
+            "caravan_levy": "Erengrad Tolls",
+            "writ_monopoly": "Tzarina's Charter",
+            "long_ledger": "The Erengrad Exchange",
+            "oathbound_draft": "Call the Druzhina",
+            "hire_immortals": "Hire the Tzar Guard",
+            "astragoths_levy": "The Tzarina's Levy",
+            "forge_rite": "Winter Lessons",
+            "bound_blueprint": "Secrets of the Ice",
+            "bound_ordnance": "The Ice Queen's Favour",
+            "hobgoblin_eyes": "Smugglers' Trails",
+            "knife_in_dark": "A Knife in the Snow",
+            "khans_price": "Sabotage the Sledges",
+            "lash_the_gangs": "Before the Thaw",
+            "raise_ziggurat": "Raise the Palisade",
+            "works_of_zharr": "Walls Against Chaos",
+            "coffle_drive": "Steppe Plunder",
+            "slave_tithe": "The Riders' Share",
+            "great_coffle": "The Long Raid",
+        },
+        "blurbs": {
+            "caravan_levy": "The Erengrad Merchants collect on every ship and sledge. "
+                            "Adds 2,500 gold to your treasury at once.",
+            "hire_immortals": "A company already sworn and already armed. Adds one unit "
+                              "of Tzar Guard (Great Weapons) to an army of your "
+                              "choosing.",
+            "bound_blueprint": "The Ice Court parts with a secret, once. Completes the "
+                               "technology you are currently researching, at once.",
+            "hobgoblin_eyes": "The Oblast Smugglers sell what they have seen on the "
+                              "trails. Reveals one region through the shroud, "
+                              "permanently.",
+            "raise_ziggurat": "The Stanitsa Builders work before the thaw. Upgrades one "
+                              "of your buildings to its next level at once, and free.",
+            "slave_tithe": "The Ungol Raiders send back your share of the take. Adds "
+                           "3,000 gold to your treasury.",
+        },
+        "desc": {
+            "brass": "The traders of Erengrad, whose ships and sledges carry furs south "
+                     "and gold north. Every boyar owes them something.",
+            "immortals": "The Tzar's own guard, the finest warriors in Kislev. Their "
+                         "oath can be lent, never broken.",
+            "daemonsmiths": "The witches of the Ice Court, who keep what the winter "
+                            "teaches. They part with it slowly, and never for free.",
+            "khanate": "Smugglers who know every trail across the oblast and every ear "
+                       "in every stanitsa. They work for anyone, including against you.",
+            "overseers": "The builders of every palisade and stanitsa that holds the "
+                         "north, and the only ones who know where each is weak.",
+            "slavers": "Horse-raiders of the steppe who ride for pay and plunder. Their "
+                       "ledger is measured in what they carry home.",
+        },
+        "bounties": {
+            "brass": ("Open the Market",
+                      "The Erengrad Merchants want that town's trade in their ledgers. "
+                      "Take it intact."),
+            "immortals": ("A Duel in the Snow",
+                          "A general is being spoken of with respect. The Tzar Guard "
+                          "would like that corrected."),
+            "daemonsmiths": ("Claim the Lore",
+                             "Whatever that place knows, the Ice Court wants. Bring it "
+                             "back in pieces."),
+            "khanate": ("Lost in the Snow",
+                        "The Smugglers do not care how it is done, only that the name "
+                        "stops being used."),
+            "overseers": ("Hold the Line",
+                          "Take it whole. The Stanitsa Builders want walls that hold, "
+                          "not rubble."),
+            "slavers": ("Ride and Take",
+                        "Sack it. The Raiders are owed, and that place can pay."),
+        },
+    },
+    # DARK ELVES AND HIGH ELVES. Approved 2026-09-24 as written in
+    # docs/superpowers/specs/2026-09-24-great-guilds-def-hef-design.md; every lore word
+    # in them is one CA's own loc uses. Both races have all four feed pictures and a
+    # generic mission picture of their own. "slave" is refused, so the Dark Elves say
+    # captives, thralls and Corsairs.
+    "_def": {
+        "culture": "wh2_main_def_dark_elves", "pics": "def", "feed": 70,
+        "guilds": {
+            "brass": "The Karond Kar Traders",
+            "immortals": "The Black Guard",
+            "daemonsmiths": "The Convent of Ghrond",
+            "khanate": "The Khainite Assassins",
+            "overseers": "The Naggarond Builders",
+            "slavers": "The Black Ark Corsairs",
+        },
+        "ranks": ["Thrall", "Corsair", "Highborn", "Dreadlord", "Tyrant"],
+        "services": {
+            "caravan_levy": "Market Tithes",
+            "writ_monopoly": "The Witch King's Seal",
+            "long_ledger": "The Karond Kar Ledger",
+            "oathbound_draft": "Call the Dreadspears",
+            "hire_immortals": "Hire the Black Guard",
+            "astragoths_levy": "Malekith's Summons",
+            "forge_rite": "Rites of the Convent",
+            "bound_blueprint": "Secrets of Ghrond",
+            "bound_ordnance": "Morathi's Favour",
+            "hobgoblin_eyes": "Eyes in the Shadows",
+            "knife_in_dark": "A Knife for Khaine",
+            "khans_price": "The Assassins' Price",
+            "lash_the_gangs": "Drive the Thralls",
+            "raise_ziggurat": "Raise the Tower",
+            "works_of_zharr": "Works of Naggarond",
+            "coffle_drive": "Corsair Raids",
+            "slave_tithe": "The Corsairs' Share",
+            "great_coffle": "The Black Ark Raid",
+        },
+        "blurbs": {
+            "caravan_levy": "The Karond Kar Traders take their cut of every sale. Adds "
+                            "2,500 gold to your treasury at once.",
+            "hire_immortals": "A company already sworn and already armed. Adds one unit "
+                              "of Black Guard of Naggarond to an army of your choosing.",
+            "bound_blueprint": "The Convent of Ghrond parts with a secret, once. "
+                               "Completes the technology you are currently researching, "
+                               "at once.",
+            "hobgoblin_eyes": "The Khainite Assassins sell what they have seen from the "
+                              "shadows. Reveals one region through the shroud, "
+                              "permanently.",
+            "raise_ziggurat": "The Naggarond Builders drive the thralls through the "
+                              "night. Upgrades one of your buildings to its next level "
+                              "at once, and free.",
+            "slave_tithe": "The Black Ark Corsairs send home your share of the plunder. "
+                           "Adds 3,000 gold to your treasury.",
+        },
+        "desc": {
+            "brass": "The counting-towers of Karond Kar, where every captive the Black "
+                     "Arks bring home is bought and sold. Every Highborn owes them "
+                     "something.",
+            "immortals": "The Witch King's own guard, sworn to Naggarond and nothing "
+                         "else. Their oath is lent only to those Malekith favours.",
+            "daemonsmiths": "The sorceresses of Ghrond, who keep the dark arts and "
+                            "answer to Morathi alone. They part with what they know "
+                            "slowly, and never for free.",
+            "khanate": "Assassins of the Temple of Khaine, who kill for the Lord of "
+                       "Murder and for pay. They work for anyone, including against you.",
+            "overseers": "The builders of every tower and wall in Naggaroth, raised by "
+                         "thralls in the cold. They know where each one is weak.",
+            "slavers": "The crews of the Black Arks, who raid every shore they can "
+                       "reach. Their pay is what they carry home.",
+        },
+        "bounties": {
+            "brass": ("Fresh Markets",
+                      "The Karond Kar Traders want that town's trade in their ledgers. "
+                      "Take it intact."),
+            "immortals": ("A Test of Blades",
+                          "A general is being spoken of with respect. The Black Guard "
+                          "would like that corrected."),
+            "daemonsmiths": ("Plunder the Lore",
+                             "Whatever that place knows, the Convent wants. Bring it "
+                             "back in pieces."),
+            "khanate": ("A Name for Khaine",
+                        "The Assassins do not care how it is done, only that the name "
+                        "stops being used."),
+            "overseers": ("A Tower Worth Taking",
+                          "Take it whole. The Naggarond Builders want walls to raise "
+                          "higher, not rubble."),
+            "slavers": ("A Harvest of Captives",
+                        "Sack it. The Corsairs are owed, and that place can pay."),
+        },
+    },
+    "_hef": {
+        "culture": "wh2_main_hef_high_elves", "pics": "hef", "feed": 80,
+        "guilds": {
+            "brass": "The Lothern Merchants",
+            "immortals": "The Swordmasters",
+            "daemonsmiths": "The Loremasters",
+            "khanate": "The Shadow Warriors",
+            "overseers": "The Ulthuan Masons",
+            "slavers": "The Ellyrian Reavers",
+        },
+        "ranks": ["Citizen", "Warden", "Noble", "Prince", "Regent"],
+        "services": {
+            "caravan_levy": "Lothern Tolls",
+            "writ_monopoly": "The Phoenix Charter",
+            "long_ledger": "The Sea Lanes",
+            "oathbound_draft": "Call the Citizen Levy",
+            "hire_immortals": "Hire the Swordmasters",
+            "astragoths_levy": "Summons of the Throne",
+            "forge_rite": "Lessons of Hoeth",
+            "bound_blueprint": "From the White Tower",
+            "bound_ordnance": "The Loremasters' Gift",
+            "hobgoblin_eyes": "Eyes of Nagarythe",
+            "knife_in_dark": "An Arrow from Shadow",
+            "khans_price": "Whispers at Court",
+            "lash_the_gangs": "Citizen Labour",
+            "raise_ziggurat": "Raise the Spire",
+            "works_of_zharr": "Works of Ulthuan",
+            "coffle_drive": "Reaver Raids",
+            "slave_tithe": "The Reavers' Share",
+            "great_coffle": "Ulthuan's Vengeance",
+        },
+        "blurbs": {
+            "caravan_levy": "The Lothern Merchants collect on every ship that docks. "
+                            "Adds 2,500 gold to your treasury at once.",
+            "hire_immortals": "A company already sworn and already armed. Adds one unit "
+                              "of Swordmasters of Hoeth to an army of your choosing.",
+            "bound_blueprint": "The Loremasters hand over work already done. Completes "
+                               "the technology you are currently researching, at once.",
+            "hobgoblin_eyes": "The Shadow Warriors share what they have seen. Reveals "
+                              "one region through the shroud, permanently.",
+            "raise_ziggurat": "The Ulthuan Masons work through the night. Upgrades one "
+                              "of your buildings to its next level at once, and free.",
+            "slave_tithe": "The Ellyrian Reavers send back your share of the take. Adds "
+                           "3,000 gold to your treasury.",
+        },
+        "desc": {
+            "brass": "The merchant houses of Lothern, whose ships carry the trade of "
+                     "Ulthuan to every coast. Every Sea Lord owes them something.",
+            "immortals": "The warriors of the White Tower of Hoeth, sworn to the blade "
+                         "for centuries. Their oath is lent to whoever the Tower "
+                         "favours.",
+            "daemonsmiths": "The Loremasters of Hoeth, who keep the greatest library in "
+                            "the world. They teach it slowly, and never for free.",
+            "khanate": "The scouts of Nagarythe, who fight a secret war nobody else "
+                       "sees. They work for anyone, including against you.",
+            "overseers": "The masons who raise every tower and sea wall in Ulthuan, and "
+                         "who know where each one is weak.",
+            "slavers": "The riders of Ellyrion, who range far past the borders and bring "
+                       "back what they find. Their pay is what they carry home.",
+        },
+        "bounties": {
+            "brass": ("Open the Harbour",
+                      "The Lothern Merchants want that town's trade on their ships. Take "
+                      "it intact."),
+            "immortals": ("A Lesson in Blades",
+                          "A general is being spoken of with respect. The Swordmasters "
+                          "would like that corrected."),
+            "daemonsmiths": ("Recover the Lore",
+                             "Whatever that place knows, the Loremasters want kept safe. "
+                             "Bring it back in pieces."),
+            "khanate": ("A Shadow Falls",
+                        "The Shadow Warriors do not care how it is done, only that the "
+                        "name stops being used."),
+            "overseers": ("Walls for Ulthuan",
+                          "Take it whole. The Masons want walls to strengthen, not "
+                          "rubble."),
+            "slavers": ("Reave It",
+                        "Sack it. The Reavers are owed, and that place can pay."),
+        },
+    },
+    # EVERY OTHER RACE. One race-neutral flavour for each culture this mod ships none for.
+    # Since 2026-09-24 those races get no guilds and no button, so it is read only by an
+    # unsupported human that a hostile service hits in multiplayer. The names say what
+    # each guild does rather than whose it is. `culture` is None because it
+    # is the fallback, not an entry: the Lua's GG.GENERIC mirrors it, and
+    # check_flavour_mirror() compares the two.
+    #
+    # THE PICTURES CANNOT BE A FOLDER SWAP. all/ lacks civilisation_up and three of the
+    # other four names the Chaos Dwarf rows draw, so `pictures` names each one outright.
+    # Every value is one vanilla's own rows use, which check_feed_images() asserts.
+    "_gen": {
+        "culture": None, "pics": "all", "feed": 30,
+        "pictures": {
+            "civilisation_down": "all/wh2_rogue_army_encountered",
+            "messenger": "all/wh2_treasure_hunt_3",
+            "diplomacy": "all/nemesis_crown",
+            "civilisation_up": "all/wh2_sea_encounters_1",
+        },
+        "mission_pic": "all/queen_and_crone",
+        "guilds": {
+            "brass": "The Merchant Houses",
+            "immortals": "The Veterans' Company",
+            "daemonsmiths": "The Artisans' Guild",
+            "khanate": "The Shadow Guild",
+            "overseers": "The Builders' Guild",
+            "slavers": "The Raiders' Guild",
+        },
+        "ranks": ["Stranger", "Known", "Trusted", "Honoured", "Exalted"],
+        "services": {
+            "caravan_levy": "Collect the Tolls",
+            "writ_monopoly": "Trade Charter",
+            "long_ledger": "The Long Ledger",
+            "oathbound_draft": "Call to Arms",
+            "hire_immortals": "Hire the Veterans",
+            "astragoths_levy": "Raise the Levy",
+            "forge_rite": "The Proving Forge",
+            "bound_blueprint": "The Artisans' Plans",
+            "bound_ordnance": "Siege Engines",
+            "hobgoblin_eyes": "Spies' Report",
+            "knife_in_dark": "Knife in the Dark",
+            "khans_price": "The Shadow Tax",
+            "lash_the_gangs": "Work Through the Night",
+            "raise_ziggurat": "Master Builder's Work",
+            "works_of_zharr": "The Great Works",
+            "coffle_drive": "Raiding Rights",
+            "slave_tithe": "The Raiders' Cut",
+            "great_coffle": "The Great Raid",
+        },
+        # NO RACE HERE HAS A HIRE UNIT, so GG.can_buy refuses hire_immortals for all of
+        # them and the refusal line says why. The blurb still has to say what the service
+        # is, and must not promise a unit by name.
+        "blurbs": {
+            "caravan_levy": "The Merchant Houses collect on every road they keep a ledger "
+                            "for. Adds 2,500 gold to your treasury at once.",
+            "hire_immortals": "A company already sworn and already armed. Adds one unit "
+                              "of your people's elite infantry to an army of your "
+                              "choosing, where the Company keeps one.",
+            "bound_blueprint": "The Artisans' Guild hands over work already done. "
+                               "Completes the technology you are currently researching, "
+                               "at once.",
+            "hobgoblin_eyes": "The Shadow Guild sells what its spies have seen. Reveals "
+                              "one region through the shroud, permanently.",
+            "raise_ziggurat": "The Builders' Guild works through the night. Upgrades one "
+                              "of your buildings to its next level at once, and free.",
+            "slave_tithe": "The Raiders' Guild sends you your share of the take. Adds "
+                           "3,000 gold to your treasury.",
+        },
+        "desc": {
+            "brass": "Traders and money-lenders who keep a ledger on every road. They "
+                     "forget no debt and forgive fewer.",
+            "immortals": "Old soldiers who sell their oath to whoever can pay for it, and "
+                         "keep it once it is sold.",
+            "daemonsmiths": "Craftsmen and inventors who build what others only draw. They "
+                            "sell what they know, a piece at a time.",
+            "khanate": "Spies, smugglers and knives for hire. They work for anyone, "
+                       "including against you.",
+            "overseers": "The builders of every wall and tower worth the name, and the "
+                         "only ones who know where each one is weak.",
+            "slavers": "Raiders paid in plunder. Their ledger is measured in what they "
+                       "carry home.",
+        },
+        "bounties": {
+            "brass": ("Take the Market",
+                      "The Merchant Houses want that town's tolls paid to them. Take it "
+                      "intact."),
+            "immortals": ("A Challenge Answered",
+                          "A general is being spoken of with respect. The Company would "
+                          "like that corrected."),
+            "daemonsmiths": ("Strip the Workshops",
+                             "Whatever that place has built, the Artisans want on their "
+                             "own benches. Bring it back in pieces."),
+            "khanate": ("A Quiet Removal",
+                        "The Guild does not care how it is done, only that the name "
+                        "stops being used."),
+            "overseers": ("Leave the Walls Standing",
+                          "Take it whole. The Builders want walls to work on, not "
+                          "rubble."),
+            "slavers": ("A Raid Worth Taking",
+                        "Sack it. The Guild is owed, and that place can pay."),
+        },
+    },
+}
+
+# What check_flavours() refuses in a non-Chaos Dwarf flavour's text, and how long a name
+# may run. 22 is the spec's limit for guild names. 12 is the longest approved rank name
+# ("Grand Master"); whether it reads well on the Standings row is the preview's question.
+CHD_ONLY_WORDS = ("Hashut", "Zharr", "Dark Lands", "slave", "Hobgoblin", "Infernal",
+                  "Daemon")
+GUILD_NAME_MAX = 22
+RANK_NAME_MAX = 12
+
 # The one-line version of each guild's earn route. GUILD_DESC carries the full sentence
 # and it is one hover away on the Guilds tab; this is the four-word form a list needs.
 EARN_SHORT = {
-    "brass": "trade and treasury income",
+    "brass": "your income, every turn",
     "immortals": "battles won, doubled when outnumbered",
     "daemonsmiths": "technologies completed",
-    "khanate": "agent actions carried out",
-    "overseers": "settlements grown, and buildings no other guild claims",
+    "khanate": "successful hero actions",
+    "overseers": "settlements growing a level, and buildings no other guild claims",
     "slavers": "settlements sacked, more when razed",
 }
 
@@ -556,37 +1272,43 @@ EARN_SHORT = {
 # that were scattered across pages 1, 2 and 4 - the rival, the demand, the failed bounty
 # and the upkeep are one subject, and a player who has just watched a rank go backwards is
 # looking for one page, not three.
-HELP_PAGE_TITLES = ["The Guilds", "Earning", "Bounties", "The Court", "Losing standing"]
+HELP_PAGE_TITLES = ["The Guilds", "Earning", "Bounties", "The Court", "Losing reputation"]
 
 
-def short_name(guild):
+def short_name(guild, tag=""):
     """The guild's name without its leading article, for a compact list."""
-    name = GUILD_NAMES[guild]
+    name = FLAVOURS[tag]["guilds"][guild]
     if name.startswith("The "):
         return name[4:]
     return name
 
 
-def help_pages():
-    """[[line, ...], ...] - one list per page, in the order the pager turns them."""
+def help_pages(tag=""):
+    """[[line, ...], ...] - one list per page, in the order the pager turns them.
+
+    The two names below SHADOW the module tables on purpose: assigned here, they are
+    local for the whole function, so every line reads this flavour's words unedited.
+    """
+    GUILD_NAMES = FLAVOURS[tag]["guilds"]
+    RANK_NAMES = FLAVOURS[tag]["ranks"]
     ranks = " / ".join("%s %d" % (RANK_NAMES[i], RANK_THRESHOLDS[i]) for i in range(5))
 
     page1 = [
         "#Two numbers, per guild",
         "-REPUTATION is earned by playing and is never spent. It alone sets your rank.",
-        "-But it is not a ratchet. It falls to a rival you have been feeding, to a "
+        "-It can also fall: to a rival you have been feeding, to a "
         "demand you let expire, to a bounty you took and did not finish, and to the "
         "upkeep every guild charges to keep you on its books.",
-        "-FAVOUR accrues beside it and is the currency services are bought with. "
+        "-FAVOUR is earned alongside it and is the currency services are bought with. "
         "Spending it never costs you rank, so there is no reason to hoard it.",
         "#The five ranks",
         "-" + ranks,
-        "-Each rank grants a permanent bonus that lasts exactly as long as the rank "
+        "-Each rank gives a bonus that lasts exactly as long as the rank "
         "does. The Guilds tab names the one you hold.",
         "#Services",
-        "-Each guild sells three, gated by rank and paid for in favour. Each has a "
-        "cooldown.",
-        "-The price moves with your standing: a guild that knows you charges less, one "
+        "-Each guild sells three, each opened by a rank and paid for in favour. Each "
+        "has a cooldown.",
+        "-The price moves with your reputation: a guild that knows you charges less, one "
         "whose rival you have been courting charges more.",
     ]
 
@@ -594,26 +1316,30 @@ def help_pages():
     for gk in GUILDS:
         page2.append("-%s: %s" % (GUILD_NAMES[gk], EARN_SHORT[gk]))
     page2 += [
-        "-And a completed BUILDING pays whichever guild it belongs to - a forge the "
-        "Daemonsmiths, a dock the Brass Tablets, a barracks the Immortals - more at "
-        "higher levels.",
+        # Derived per flavour, so an Empire page names the Engineers' School and not the
+        # Daemonsmiths. Same three guilds, same order as the Chaos Dwarf sentence.
+        "-A finished BUILDING pays its own guild - a forge the %s, a dock the %s, a "
+        "barracks the %s. Higher levels pay more, and its card names the guild."
+        % (short_name("daemonsmiths", tag), short_name("brass", tag),
+           short_name("immortals", tag)),
         "#Every guild at once",
-        "-Completing any MISSION raises your standing with all six. It is the only "
-        "thing that does, and it is how a guild whose trade you never touch comes to "
-        "know your name.",
+        # ONE LINE, NOT TWO (2026-09-23). The Empire's rivalry bullet below wraps where
+        # ours does not and put this page at 22 of the panel's 21 slots; shortening this
+        # bullet is the fix the flavours spec names, and it applies to every race.
+        "-Every completed MISSION raises your reputation with all six guilds.",
         "#Rivalry",
         # Names shortened for this one line only. At full length the three pairs run to
         # 105 characters and wrap to "The Overseers and The / Slavers", which is worse
         # than the four characters saved. Derived from GUILD_NAMES either way, so it
         # cannot drift from what the rest of the panel calls them.
-        "-" + " / ".join("%s and %s" % (short_name(a), short_name(b))
+        "-" + " / ".join("%s and %s" % (short_name(a, tag), short_name(b, tag))
                          for a, b in RIVAL_PAIRS),
         # Mirrors GG.rival_cost: floored at the rank held, and nothing at all below
         # Indebted (2026-09-23). Folded into this bullet because page 2 has no spare line.
-        "-Earning with one takes reputation from its rival - never a rank you hold, and "
-        "nothing before %s." % RANK_NAMES[1],
-        "#Per-turn caps",
-        "-Most guilds pay only so much in a turn, so no empire can max one passively.",
+        "-Earning with one takes reputation from its rival once you reach %s there - "
+        "never a rank." % RANK_NAMES[1],
+        "#A limit each turn",
+        "-Most guilds pay only so much each turn. The Guilds tab shows what each paid.",
     ]
 
     page3 = [
@@ -641,12 +1367,12 @@ def help_pages():
         "or a rival.",
         "-The leader carries an extra bonus, and the guild's dearest service is sold to "
         "nobody else.",
-        "-It can be taken from you. The Standings tab is the league table.",
+        "-It can be taken from you. The Leaderboard tab shows who leads each guild.",
         "#Demands",
         "-Every so often a guild that already knows you asks for something, with a "
         "deadline on it.",
         "-It wants either gold, or the favour you hold with its own rival.",
-        "-Pay it and your standing jumps. Let the deadline pass and it falls, far "
+        "-Pay it and your reputation jumps. Let the deadline pass and it falls, far "
         "enough to cost you a rank.",
         "#A patron",
         "-One of your lords, bound to one guild. Select them on the campaign map, then "
@@ -657,7 +1383,7 @@ def help_pages():
     ]
 
     page5 = [
-        "#Reputation is not a ratchet",
+        "#Reputation can fall",
         "-It is earned by playing and never spent - but four things take it back, and "
         "all four can cost you a rank and the bonus that came with it.",
         "#Upkeep, every turn",
@@ -688,8 +1414,20 @@ def bounty_key(guild):
     return "derpy_gg_bounty_%s" % guild
 
 
-def build():
-    """Every DB row and loc line this plan ships, keyed by table name."""
+def _build_one(tag):
+    """One flavour's rows, under the Chaos Dwarf keys. build() tags them.
+
+    THE FOUR TABLES BELOW SHADOW THE MODULE ONES ON PURPOSE. Assigned here, they are
+    local for the whole body, so every line of it reads this flavour's words without
+    being edited - while the module tables, which other tools import, keep the Chaos
+    Dwarf values.
+    """
+    F = FLAVOURS[tag]
+    GUILD_NAMES = F["guilds"]
+    RANK_NAMES = F["ranks"]
+    SERVICE_NAMES = F["services"]
+    SERVICE_BLURB = dict((s["key"], F["blurbs"].get(s["key"])) for s in SERVICES)
+    GUILD_DESC = dict((g, F["desc"][g] + "||" + GUILD_EARN[g]) for g in GUILDS)
     bundles, junctions, loc = [], [], []
     for i, name in enumerate(RANK_NAMES):
         loc.append({"key": "derpy_gg_rank_name_%d" % (i + 1),
@@ -699,15 +1437,15 @@ def build():
         loc.append({"key": "derpy_gg_guild_name_%s" % g,
                     "text": GUILD_NAMES[g], "tooltip": "false"})
         blurb, reach = EFFECT_BLURB[g]
-        ladder = " / ".join("%s at %d rep"
+        ladder = " / ".join("%s at %d reputation"
                             % (blurb % (RANK_VALUES[r] * EFFECT_GOOD_SIGN[g]),
                                RANK_THRESHOLDS[r - 1])
                             for r in range(2, 6))
-        desc = "%s||Ranks pay, for %s: %s." % (GUILD_DESC[g], reach, ladder)
+        desc = "%s||Each rank gives, for %s: %s." % (GUILD_DESC[g], reach, ladder)
         extra = RANK_EFFECTS_EXTRA.get(g)
         if extra:
             xblurb, xreach = EFFECT_BLURB_EXTRA[g]
-            rungs = " / ".join("%s at %d rep" % (xblurb % extra[2][r],
+            rungs = " / ".join("%s at %d reputation" % (xblurb % extra[2][r],
                                                  RANK_THRESHOLDS[r - 1])
                                for r in range(2, 6) if extra[2][r] is not None)
             desc += " And, for %s: %s." % (xreach, rungs)
@@ -751,7 +1489,7 @@ def build():
             signed = RANK_VALUES[rank] * EFFECT_GOOD_SIGN[g]
             loc.append({
                 "key": "effect_bundles_localised_description_%s" % key,
-                "text": "Rank %d of 5 with %s, held at %d reputation. %s, for %s.%s "
+                "text": "Rank %d of 5 with %s, reached at %d reputation. %s, for %s.%s "
                         "This lasts as long as the rank does."
                         % (rank, GUILD_NAMES[g], RANK_THRESHOLDS[rank - 1],
                            blurb % signed, reach, extra_sentence(g, rank)),
@@ -827,7 +1565,7 @@ def build():
 
     for s in SERVICES:
         loc.append({"key": "derpy_gg_service_name_%s" % s["key"],
-                    "text": s["name"], "tooltip": "false"})
+                    "text": SERVICE_NAMES[s["key"]], "tooltip": "false"})
         blurb, reach = EFFECT_BLURB[s["guild"]]
         signed = service_value(s) * service_sign(s)
         body = SERVICE_BLURB[s["key"]]
@@ -856,7 +1594,7 @@ def build():
         bundles.append({
             "key": key,
             "localised_description": "",
-            "localised_title": s["name"],
+            "localised_title": SERVICE_NAMES[s["key"]],
             "bundle_target": "faction",
             "priority": "1",
             "ui_icon": "",
@@ -874,7 +1612,7 @@ def build():
             "advancement_stage": STAGE,
         })
         loc.append({"key": "effect_bundles_localised_title_%s" % key,
-                    "text": s["name"], "tooltip": "false"})
+                    "text": SERVICE_NAMES[s["key"]], "tooltip": "false"})
         loc.append({
             "key": "effect_bundles_localised_description_%s" % key,
             "text": ("Inflicted by %s, bought with favour. %s, across %s. "
@@ -894,6 +1632,25 @@ def build():
     loc.append({"key": "derpy_gg_favour", "text": "Favour", "tooltip": "false"})
     loc.append({"key": "derpy_gg_reputation", "text": "Reputation", "tooltip": "false"})
     loc.append({"key": "derpy_gg_you", "text": "You", "tooltip": "false"})
+    # THE GUILDS TAB'S "REPUTATION THIS TURN" LINE and its hover (GGUI.earned_line).
+    # One src_ row per GG.LEDGER_SOURCES entry - the Lua builds those keys at runtime, so
+    # check_ledger_sources() is what proves every one of them ships.
+    for key, text in (("earned_now", "Reputation this turn:"),
+                      ("earned_last", "Last turn:"),
+                      ("earned_none", "none"),
+                      ("earned_more", "and more"),
+                      ("earned_held", "over this turn's limit, not paid"),
+                      ("earned_limit", "The most this guild pays you in one turn:"),
+                      ("earned_no_limit", "This guild has no limit per turn."),
+                      ("earned_help", "Bounties and paid demands always pay in full."),
+                      ("src_income", "income"), ("src_battles", "battles"),
+                      ("src_research", "research"), ("src_agents", "hero actions"),
+                      ("src_buildings", "buildings"),
+                      ("src_settlements", "settlements taken"),
+                      ("src_missions", "missions"), ("src_bounties", "bounties"),
+                      ("src_demands", "demands paid"), ("src_other", "other"),
+                      ("src_withheld", "Over the limit, not paid:")):
+        loc.append({"key": "derpy_gg_" + key, "text": text, "tooltip": "false"})
 
     # The two-currency split is the one thing about this mod a player cannot infer
     # from the panel, so it is stated outright in the title tooltip.
@@ -906,8 +1663,8 @@ def build():
     # there are two numbers and that spending one does not cost the other.
     loc.append({
         "key": "derpy_gg_standing_help",
-        "text": "REPUTATION only rises and sets your rank. FAVOUR accrues beside it "
-                "and is what you spend - spending never costs you rank."
+        "text": "REPUTATION sets your rank, and it can fall. FAVOUR is earned "
+                "alongside it and is what you spend - spending it never costs you rank."
                 "||%s"
                 "||Help tab: the full rules."
                 % " / ".join("%s %d" % (RANK_NAMES[i], RANK_THRESHOLDS[i])
@@ -917,7 +1674,7 @@ def build():
                 "tooltip": "false"})
     # The tab row, the pager and the Buy button. Each of these is a button the Lua
     # writes text onto at draw time; without these keys they draw their own key.
-    for key, text in (("tab_guilds", "Guilds"), ("tab_stand", "Standings"),
+    for key, text in (("tab_guilds", "Guilds"), ("tab_stand", "Leaderboard"),
                       # The Bounties tab. It replaced "Log", which was a tab the panel
                       # switched to and then drew nothing into.
                       ("tab_bounty", "Bounties"), ("tab_help", "Help"),
@@ -1011,15 +1768,15 @@ def build():
                       ("per_turn", "/turn"),
                       ("upkeep_on", "Upkeep, taken every turn:"),
                       ("upkeep_soon", "An upkeep begins on turn"),
-                      ("upkeep_help", "Standing has to be held, not just won. Every "
+                      ("upkeep_help", "Reputation has to be held, not just won. Every "
                                       "guild you have reputation with charges a little "
                                       "back each turn, and the higher your rank the "
                                       "more it costs to sit on - so a guild you stop "
                                       "feeding slides back down the ladder, and its "
                                       "bonus goes with it."),
-                      ("table_head", "Standing with this guild:"),
+                      ("table_head", "Reputation with this guild:"),
                       ("more", "more"),
-                      ("unranked", "no standing yet"),
+                      ("unranked", "no reputation yet"),
                       ("buy", "Buy"), ("prev", "<"), ("next", ">"),
                       # THE COURT. The fifth tab, holding the two things that are done
                       # TO you and the one thing you do with a lord.
@@ -1063,7 +1820,7 @@ def build():
     # The Help tab. One key per page, lines joined by the same "||" every other
     # multi-paragraph string in this mod uses - so a blank line is an empty segment and
     # survives the split.
-    pages = help_pages()
+    pages = help_pages(tag)
     for _i, _lines in enumerate(pages):
         loc.append({"key": "derpy_gg_help_t%d" % (_i + 1),
                     "text": HELP_PAGE_TITLES[_i], "tooltip": "false"})
@@ -1075,12 +1832,12 @@ def build():
                 "text": "The Court holds the three things a guild does that you do not "
                         "choose."
                         "||LEADING a guild is held by whichever faction in the world "
-                        "has the most reputation with it - you or an AI. The leader "
+                        "has the most reputation with it - you or a rival. The leader "
                         "carries an extra bonus for as long as they lead, and the "
                         "guild's dearest service is sold to nobody else. It can be "
                         "taken from you."
                         "||A DEMAND arrives every so often from a guild that already "
-                        "knows you. Pay it and your standing with them jumps; let the "
+                        "knows you. Pay it and your reputation with them jumps; let the "
                         "deadline pass and it falls, far enough to cost you a rank. A "
                         "guild asks either for gold or for you to renounce the favour "
                         "you hold with its rival."
@@ -1101,7 +1858,7 @@ def build():
     loc.append({"key": "message_event_text_text_derpy_gg_demand_fail_title",
                 "text": "A Guild Is Answered With Silence", "tooltip": "false"})
     loc.append({"key": "message_event_text_text_derpy_gg_demand_fail_primary",
-                "text": "The deadline has passed and nothing was paid. Your standing "
+                "text": "The deadline has passed and nothing was paid. Your reputation "
                         "with that guild has fallen.", "tooltip": "false"})
     loc.append({"key": "message_event_text_text_derpy_gg_demand_fail_secondary",
                 "text": "The ledger is kept whether you read it or not.",
@@ -1125,7 +1882,7 @@ def build():
         "a normal mission. Leave an offer alone, or hand it back through the "
         "objectives panel, and nothing is lost but the offer."
         "||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not "
-        "finish before its deadline costs that guild's reputation - by default "
+        "finish before its deadline costs that guild's reputation - "
         "exactly what finishing it would have paid. Declining work is free; "
         "promising it and not delivering is not."
         "||The pay is read off the target, not fixed: a defended provincial capital "
@@ -1145,7 +1902,7 @@ def build():
                 "text": "A rival has bought the favour of a guild, and it has been "
                         "spent on you.", "tooltip": "false"})
     loc.append({"key": "message_event_text_text_derpy_gg_hit_secondary",
-                "text": "Their standing buys more than goods.", "tooltip": "false"})
+                "text": "Their favour buys more than goods.", "tooltip": "false"})
 
     # ------------------------------------------------------------------------
     # THE AI, MADE VISIBLE. Everything below exists because the rivals were playing
@@ -1175,7 +1932,7 @@ def build():
                     "text": "%s Answer To You" % _full, "tooltip": "false"})
         loc.append({"key": "message_event_text_text_derpy_gg_lead_won_%s_primary" % _g,
                     "text": "You now hold more reputation with %s than any other power "
-                            "in the world. Their leader's grant is yours, and their "
+                            "in the world. Their leader's bonus is yours, and their "
                             "finest service is sold to nobody else." % _full,
                     "tooltip": "false"})
         loc.append({"key": "message_event_text_text_derpy_gg_lead_won_%s_secondary" % _g,
@@ -1184,13 +1941,13 @@ def build():
         loc.append({"key": "message_event_text_text_derpy_gg_lead_lost_%s_title" % _g,
                     "text": "%s Have Turned Away" % _full, "tooltip": "false"})
         loc.append({"key": "message_event_text_text_derpy_gg_lead_lost_%s_primary" % _g,
-                    "text": "A rival has out-earned you with %s. Their leader's grant "
-                            "and the monopoly on their finest service went with them."
+                    "text": "A rival has out-earned you with %s. Their leader's bonus, "
+                            "and the sole right to their finest service, went with them."
                             % _full,
                     "tooltip": "false"})
         loc.append({"key":
                     "message_event_text_text_derpy_gg_lead_lost_%s_secondary" % _g,
-                    "text": "The Standings tab names who holds it now.",
+                    "text": "The Leaderboard tab names who holds it now.",
                     "tooltip": "false"})
 
     # THE PROMOTION TEXT. One key set per guild per rank, 72 rows, for the same reason the
@@ -1213,7 +1970,7 @@ def build():
                         "text": "%s Name You %s" % (_full, _rank),
                         "tooltip": "false"})
             loc.append({"key": _stem + "_primary",
-                        "text": "Your standing with %s has risen to %s. Their grant to "
+                        "text": "Your rank with %s has risen to %s. Their bonus to "
                                 "you has grown, and a service that was closed to you is "
                                 "open." % (_full, _rank),
                         "tooltip": "false"})
@@ -1228,12 +1985,12 @@ def build():
     _NOTICE = {
         "first": ("%s Have Noticed You",
                   "Word of your doings has reached %s. They keep a ledger of every power "
-                  "in the world, and your name is now in it. Standing with them is earned "
+                  "in the world, and your name is now in it. Reputation with them is earned "
                   "by playing as you already play; what it buys is on the Guilds panel.",
-                  "The crest on your HUD opens it."),
+                  "The guild crest at the top of your screen opens it."),
         "half": ("%s Are Watching Closely",
-                 "You are halfway to a standing %s will act on. At Indebted they open "
-                 "their first service to you.",
+                 "You are halfway to your first rank with %s. At " + RANK_NAMES[1]
+                 + " they open their first service to you.",
                  "The Guilds panel shows how far every guild has come."),
     }
     for _tag in ("first", "half"):
@@ -1259,18 +2016,18 @@ def build():
                 "tooltip": "false"})
     loc.append({"key": "derpy_gg_rivals_demands", "text": "demands paid",
                 "tooltip": "false"})
-    loc.append({"key": "derpy_gg_rivals_patrons", "text": "patrons afield",
+    loc.append({"key": "derpy_gg_rivals_patrons", "text": "patrons appointed",
                 "tooltip": "false"})
     loc.append({"key": "derpy_gg_rivals_idle",
                 "text": "Rivals have not moved yet - end a turn.", "tooltip": "false"})
     loc.append({"key": "derpy_gg_rivals_help",
-                "text": "What the other powers of the world did with their guilds on "
-                        "the round just past: services they bought with favour, "
-                        "demands they answered, and lords they have standing as guild "
+                "text": "What the other powers of the world did with their guilds "
+                        "last turn: services they bought with favour, "
+                        "demands they answered, and lords serving as guild "
                         "patrons.||Every one of these is a tool you have too. The "
                         "rivals are playing for the same six guilds you are."
                         "||Each row below names who leads that guild, how much "
-                        "reputation the leader gained on that round, and marks the "
+                        "reputation the leader gained last turn, and marks the "
                         "name in yellow when the guild changed hands.",
                 "tooltip": "false"})
     loc.append({"key": "derpy_gg_took", "text": "changed hands this turn",
@@ -1289,7 +2046,8 @@ def build():
     # so they are written below as well, and written the same.
     missions = []
     for g in GUILDS:
-        kind, title, desc = BOUNTIES[g]
+        kind = BOUNTIES[g][0]
+        title, desc = F["bounties"][g]
         done = "The guild has been paid in full, and so have you."
         missions.append({
             "key": bounty_key(g), "mission_type": BOUNTY_KINDS[kind]["mtype"],
@@ -1332,6 +2090,161 @@ def build():
             "event_feed_message_events": [dict(FEED_ROW), dict(FEED_ROW_DEMAND),
                                           dict(FEED_ROW_LEAD), dict(FEED_ROW_RANK)],
             "loc": loc}
+
+
+def tag_loc_key(key, tag):
+    """Where a flavour's tag goes in a loc key - the same place the Lua puts it.
+
+    Before the engine's own suffix on a message-event key, because the Lua passes a stem
+    and appends _title / _primary / _secondary itself. At the end of everything else.
+    """
+    m = re.match(r"(message_event_text_text_.+?)(_title|_primary|_secondary)$", key)
+    if m:
+        return m.group(1) + tag + m.group(2)
+    return key + tag
+
+
+def picture(F, image):
+    """A Chaos Dwarf event picture ("chd/messenger") in flavour F's own folder, or the
+    picture F names for it outright."""
+    name = image.split("/", 1)[1]
+    return F.get("pictures", {}).get(name, F["pics"] + "/" + name)
+
+
+def retag(tables, tag):
+    """One flavour's rows under its own keys. The Chaos Dwarf pass comes back as it is.
+
+    The patron's bundle, junctions and loc are dropped from a tagged pass: "Guild Patron"
+    names no guild, so it stays one shared row.
+    """
+    if not tag:
+        return tables
+    F = FLAVOURS[tag]
+    patron_loc = ("effect_bundles_localised_title_" + PATRON_BUNDLE,
+                  "effect_bundles_localised_description_" + PATRON_BUNDLE)
+    out = {
+        "loc": [dict(r, key=tag_loc_key(r["key"], tag))
+                for r in tables["loc"] if r["key"] not in patron_loc],
+        "effect_bundles": [dict(r, key=r["key"] + tag)
+                           for r in tables["effect_bundles"]
+                           if r["key"] != PATRON_BUNDLE],
+        "effect_bundles_to_effects_junctions": [
+            dict(r, effect_bundle_key=r["effect_bundle_key"] + tag)
+            for r in tables["effect_bundles_to_effects_junctions"]
+            if r["effect_bundle_key"] != PATRON_BUNDLE],
+        "missions": [dict(r, key=r["key"] + tag,
+                          ui_image=F.get("mission_pic", F["pics"] + "/generic"))
+                     for r in tables["missions"]],
+        "campaign_groups": [dict(r, id=r["id"] + tag)
+                            for r in tables["campaign_groups"]],
+        "campaign_group_members": [dict(r, group=r["group"] + tag, id=r["id"] + tag)
+                                   for r in tables["campaign_group_members"]],
+        "campaign_group_member_criteria_values": [
+            dict(r, member=r["member"] + tag, value=str(int(r["value"]) + F["feed"]))
+            for r in tables["campaign_group_member_criteria_values"]],
+        "event_feed_message_events": [
+            dict(r, group=r["group"] + tag, image=picture(F, r["image"]))
+            for r in tables["event_feed_message_events"]],
+    }
+    # A TABLE WITH NO RULE HERE WOULD SHIP UNTAGGED, or not at all, for two races.
+    missing = sorted(set(tables) - set(out))
+    assert not missing, "retag has no rule for %s" % ", ".join(missing)
+    return out
+
+
+def build():
+    """Every DB row and loc line this plan ships, keyed by table name.
+
+    One pass per flavour, the Chaos Dwarf pass first and unchanged.
+    """
+    out = {}
+    for tag in FLAVOURS:
+        for table, rows in retag(_build_one(tag), tag).items():
+            out.setdefault(table, []).extend(rows)
+    # Keyed per race already, so it is added once rather than retagged.
+    for table, rows in built_tables().items():
+        out.setdefault(table, []).extend(rows)
+    return out
+
+
+def check_flavour_shape():
+    """Every flavour must name everything the Chaos Dwarf one does.
+
+    Run before anything that calls build(): _build_one indexes these tables and would
+    raise on a gap, which is a crash where a finding was wanted.
+    """
+    out = []
+    base = FLAVOURS[""]
+    for tag, F in FLAVOURS.items():
+        for k in ("culture", "pics", "feed"):
+            if k not in F:
+                out.append("flavour %r has no %s" % (tag, k))
+        for part in ("guilds", "services", "blurbs", "desc", "bounties"):
+            missing = sorted(set(base[part]) - set(F.get(part, {})))
+            if missing:
+                out.append("flavour %r has no %s for: %s"
+                           % (tag, part, ", ".join(missing)))
+        if len(F.get("ranks", [])) != len(RANK_THRESHOLDS):
+            out.append("flavour %r names %d ranks and the ladder has %d"
+                       % (tag, len(F.get("ranks", [])), len(RANK_THRESHOLDS)))
+    return out
+
+
+def check_flavours():
+    """Every flavour must fit, speak its own race's words, and mirror the Chaos Dwarf keys
+    and effects exactly.
+
+    Each fault here is silent in game: a key the Lua builds and no row ships draws itself,
+    a bundle with different effect rows pays one race a different bonus.
+    """
+    out = []
+    for tag, F in FLAVOURS.items():
+        for g, name in sorted(F["guilds"].items()):
+            if len(name) > GUILD_NAME_MAX or not name.startswith("The "):
+                out.append("flavour %r names %s %r - a guild name must start with "
+                           "\"The \" and fit %d characters" % (tag, g, name, GUILD_NAME_MAX))
+        for r in F["ranks"]:
+            if len(r) > RANK_NAME_MAX:
+                out.append("flavour %r has rank %r, longer than %d characters"
+                           % (tag, r, RANK_NAME_MAX))
+    feeds = [F["feed"] for F in FLAVOURS.values()]
+    if len(set(feeds)) != len(feeds):
+        out.append("two flavours share a feed offset, so one race's messages resolve to "
+                   "the other's records: %r" % feeds)
+    one = _build_one("")
+    patron_loc = ("effect_bundles_localised_title_" + PATRON_BUNDLE,
+                  "effect_bundles_localised_description_" + PATRON_BUNDLE)
+    base_keys = set(r["key"] for r in one["loc"] if r["key"] not in patron_loc)
+    base_fx = {}
+    for r in one["effect_bundles_to_effects_junctions"]:
+        base_fx.setdefault(r["effect_bundle_key"], []).append(
+            (r["effect_key"], r["effect_scope"], r["value"]))
+    for tag in FLAVOURS:
+        if not tag:
+            continue
+        t = retag(_build_one(tag), tag)
+        got = set(r["key"] for r in t["loc"])
+        want = set(tag_loc_key(k, tag) for k in base_keys)
+        for k in sorted(want - got)[:5]:
+            out.append("flavour %r ships no %s, so it draws its own key" % (tag, k))
+        for k in sorted(got - want)[:5]:
+            out.append("flavour %r ships %s, which has no Chaos Dwarf twin" % (tag, k))
+        fx = {}
+        for r in t["effect_bundles_to_effects_junctions"]:
+            fx.setdefault(r["effect_bundle_key"], []).append(
+                (r["effect_key"], r["effect_scope"], r["value"]))
+        for bk, rows in sorted(base_fx.items()):
+            if bk == PATRON_BUNDLE:
+                continue
+            if sorted(fx.get(bk + tag, [])) != sorted(rows):
+                out.append("%s%s does not carry exactly the effects of %s - that race's "
+                           "bonus differs" % (bk, tag, bk))
+        for r in t["loc"]:
+            for w in CHD_ONLY_WORDS:
+                if w.lower() in r["text"].lower():
+                    out.append("%s says %r - a Chaos Dwarf word in the %s flavour"
+                               % (r["key"], w, tag))
+    return out
 
 
 def check_table_versions():
@@ -1380,9 +2293,9 @@ def check_bounties():
     rows = tables["missions"]
     lockeys = set(r["key"] for r in tables["loc"])
 
-    if len(rows) != len(GUILDS):
-        out.append("one bounty per guild: %d rows for %d guilds"
-                   % (len(rows), len(GUILDS)))
+    if len(rows) != len(GUILDS) * len(FLAVOURS):
+        out.append("one bounty per guild per flavour: %d rows for %d guilds and %d "
+                   "flavours" % (len(rows), len(GUILDS), len(FLAVOURS)))
     for g in GUILDS:
         if g not in BOUNTIES:
             out.append("no bounty defined for guild: " + g)
@@ -1463,9 +2376,17 @@ def check_rival_mirror():
 
 
 def check_help_pages():
+    """Every flavour's pages must fit - the Empire's longer names wrap where ours do not."""
+    out = []
+    for tag in FLAVOURS:
+        out += ["[%s] %s" % (tag or "chd", p) for p in _check_help_pages_for(tag)]
+    return out
+
+
+def _check_help_pages_for(tag):
     """Every page must be renderable, and the panel must know how many there are."""
     out = []
-    pages = help_pages()
+    pages = help_pages(tag)
     if len(pages) != len(HELP_PAGE_TITLES):
         out.append("%d help pages and %d titles" % (len(pages), len(HELP_PAGE_TITLES)))
     for gk in GUILDS:
@@ -1563,34 +2484,140 @@ def check_feed_mirror():
             out.append("%s is %s in the Lua and %d here - one of them resolves to no "
                        "record and draws nothing" % (lua_name, m.group(1), mine))
 
-    # The leadership message keys are built by concatenation in GG.announce_lead, so no
-    # literal-key scan can reach them. Check the set this file must ship instead.
+    # The leadership, promotion and notice keys are built by concatenation in the Lua, so
+    # no literal-key scan can reach them. Check the set this file must ship instead - for
+    # every flavour, with the tag where the Lua puts it: before the engine's suffix.
     shipped = set(r["key"] for r in build()["loc"])
-    for g in GUILDS:
-        for stem in ("won", "lost"):
-            for part in ("title", "primary", "secondary"):
-                k = "message_event_text_text_derpy_gg_lead_%s_%s_%s" % (stem, g, part)
-                if k not in shipped:
-                    out.append("GG.announce_lead builds %s and no loc row ships it, so "
-                               "that announcement draws nothing" % k)
-
-    # The promotion keys are built by concatenation in GG.announce_rank, so no literal-key
-    # scan reaches them either.
-    for g in GUILDS:
-        for r in range(2, len(RANK_NAMES) + 1):
-            for part in ("title", "primary", "secondary"):
-                k = "message_event_text_text_derpy_gg_rank_%s_%d_%s" % (g, r, part)
-                if k not in shipped:
-                    out.append("GG.announce_rank builds %s and no loc row ships it, so "
-                               "that promotion draws nothing" % k)
-
-    for tag in ("first", "half"):
+    for tag in FLAVOURS:
         for g in GUILDS:
             for part in ("title", "primary", "secondary"):
-                k = "message_event_text_text_derpy_gg_notice_%s_%s_%s" % (tag, g, part)
-                if k not in shipped:
-                    out.append("GG.notice_once builds %s and no loc row ships it, so that "
-                               "notice draws nothing" % k)
+                for stem in ("won", "lost"):
+                    k = ("message_event_text_text_derpy_gg_lead_%s_%s%s_%s"
+                         % (stem, g, tag, part))
+                    if k not in shipped:
+                        out.append("GG.announce_lead builds %s and no loc row ships it, "
+                                   "so that announcement draws nothing" % k)
+                for r in range(2, len(RANK_NAMES) + 1):
+                    k = ("message_event_text_text_derpy_gg_rank_%s_%d%s_%s"
+                         % (g, r, tag, part))
+                    if k not in shipped:
+                        out.append("GG.announce_rank builds %s and no loc row ships it, "
+                                   "so that promotion draws nothing" % k)
+                for notice in ("first", "half"):
+                    k = ("message_event_text_text_derpy_gg_notice_%s_%s%s_%s"
+                         % (notice, g, tag, part))
+                    if k not in shipped:
+                        out.append("GG.notice_once builds %s and no loc row ships it, so "
+                                   "that notice draws nothing" % k)
+    return out
+
+
+def lua_flavoured(lua):
+    """{culture: (tag, feed)} read out of GG.FLAVOURED in the model Lua's text, or None."""
+    block = re.search(r"^GG\.FLAVOURED = \{(.*?)\n\}", lua, re.S | re.M)
+    chd = re.search(r'^GG\.CHD_CULTURE = "([a-z0-9_]+)"', lua, re.M)
+    if not block or not chd:
+        return None
+    got = {}
+    for key, tag, feed in re.findall(
+            r'\[(GG\.CHD_CULTURE|"[a-z0-9_]+")\]\s*=\s*\{\s*tag\s*=\s*"([_a-z]*)"\s*,'
+            r'\s*feed\s*=\s*(\d+)\s*\}', block.group(1)):
+        culture = chd.group(1) if key == "GG.CHD_CULTURE" else key.strip('"')
+        got[culture] = (tag, int(feed))
+    # The fallback every other culture reads, under the None the generator gives it.
+    gen = re.search(r'^GG\.GENERIC = \{\s*tag\s*=\s*"([_a-z]*)"\s*,\s*feed\s*=\s*(\d+)'
+                    r'\s*\}', lua, re.M)
+    if gen:
+        got[None] = (gen.group(1), int(gen.group(2)))
+    return got
+
+
+UI_LUA = "Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_ui.lua"
+MCT_LUA = "Modding Files/pack/script/mct/settings/derpy_great_guilds.lua"
+MCT_BEGIN = "-- BEGIN GENERATED: GGUI.MCT_NAMES"
+MCT_END = "-- END GENERATED: GGUI.MCT_NAMES"
+
+
+def mct_names_block():
+    """GGUI.MCT_NAMES as Lua: every flavour's six guild names, keyed by tag."""
+    lines = ["GGUI.MCT_NAMES = {"]
+    for tag, F in FLAVOURS.items():
+        lines.append('    ["%s"] = {' % tag)
+        for g in GUILDS:
+            lines.append('        %s = "%s",' % (g, F["guilds"][g].replace('"', '\\"')))
+        lines.append("    },")
+    lines.append("}")
+    return "\n".join(lines)
+
+
+def with_mct_names(src):
+    """The panel Lua with the generated block rewritten, or None if the markers are gone.
+    Line endings are the file's own - the panel is CRLF."""
+    nl = "\r\n" if "\r\n" in src else "\n"
+    a, b = src.find(MCT_BEGIN), src.find(MCT_END)
+    if a < 0 or b < a:
+        return None
+    body = mct_names_block().replace("\n", nl)
+    return src[:a + len(MCT_BEGIN)] + nl + body + nl + src[b:]
+
+
+def write_mct_names():
+    src = io.open(UI_LUA, encoding="utf-8", newline="").read()
+    new = with_mct_names(src)
+    assert new is not None, "the GGUI.MCT_NAMES markers are missing from " + UI_LUA
+    if new != src:
+        io.open(UI_LUA, "w", encoding="utf-8", newline="").write(new)
+    return UI_LUA
+
+
+def check_mct_names():
+    """The campaign renames and the frontend labels must be this generator's names.
+
+    GGUI.MCT_NAMES is what an Empire or Dwarf player reads on the MCT page; stale, it
+    names guilds the panel no longer calls by that name. The settings file carries the
+    generic flavour's role names, because the frontend has no race - and those twelve
+    labels are typed there by hand, so they are compared here.
+    """
+    out = []
+    src = io.open(UI_LUA, encoding="utf-8", newline="").read()
+    new = with_mct_names(src)
+    if new is None:
+        out.append("the GGUI.MCT_NAMES markers are missing from " + UI_LUA)
+    elif new != src:
+        out.append("GGUI.MCT_NAMES in %s is stale - run gen_great_guilds.py --write"
+                   % UI_LUA)
+    mct = io.open(MCT_LUA, encoding="utf-8").read()
+    for g in GUILDS:
+        want = FLAVOURS["_gen"]["guilds"][g]
+        for key in ("rate_" + g, "cap_" + g):
+            m = re.search(r'\{"%s",\s*"([^"]*)"' % key, mct)
+            if not m or m.group(1) != want:
+                out.append("%s labels %s %r in the frontend, not the role name %r"
+                           % (MCT_LUA, key, m and m.group(1), want))
+    return out
+
+
+def check_flavour_mirror():
+    """GG.FLAVOURED must hand each culture the tag and feed offset minted here.
+
+    A tag the Lua builds and no row ships is a raw key on screen; a feed offset that
+    disagrees is a message that logs and draws nothing. Both are silent.
+    """
+    path = "Modding Files/pack/script/campaign/mod/zzz_derpy_guilds.lua"
+    try:
+        lua = io.open(path, encoding="utf-8").read()
+    except IOError:
+        return ["cannot read %s to check GG.FLAVOURED" % path]
+    got = lua_flavoured(lua)
+    if got is None:
+        return ["GG.FLAVOURED or GG.CHD_CULTURE is not declared in " + path]
+    want = dict((F["culture"], (tag, F["feed"])) for tag, F in FLAVOURS.items())
+    out = []
+    for c in sorted(set(want) | set(got), key=str):
+        if got.get(c) != want.get(c):
+            out.append("GG.FLAVOURED gives %s %r and the generator mints %r - that race "
+                       "reads raw keys or messages that draw nothing"
+                       % (c, got.get(c), want.get(c)))
     return out
 
 
@@ -1793,6 +2820,190 @@ def check_building_theme():
     return out
 
 
+# ------------------------------------------------ the line on every building card ----
+# A finished building pays its guild in SCRIPT (GG.on_building), not through an effect, so
+# its card said nothing and a player could not see that the forge they built paid the
+# smiths (reported from play, 2026-09-24). Every level of every chain a covered race can
+# build now carries one display-only effect naming the guild it pays. That is CA's own
+# way to put a line of text on a building: wh2_main_effect_building_major_settlement_
+# only_dummy has no bonus-value junction, value 1, and building_to_building_own, whose
+# scope suffix is empty.
+#
+# NO NUMBER. The amount is an MCT rate times a building level CA does not document the
+# base of, cut by a per-turn limit. The Guilds tab's "Reputation this turn" line shows
+# the real figure.
+#
+# LEFT OFF: ruin levels, which nobody builds; and chains more than one covered race can
+# build - 48 landmark variants, which would print one line per race, each naming a
+# different guild. Those still pay, and so do a mod's chains; they just do not say so.
+BUILT_EFFECT = "derpy_gg_built_%s%s"      # guild, flavour tag
+BUILT_SCOPE = "building_to_building_own"
+MODEL_LUA = "Modding Files/pack/script/campaign/mod/zzz_derpy_guilds.lua"
+LUA_EXE = r"C:\Program Files (x86)\Lua\5.1\lua.exe"
+
+
+def building_theme():
+    """[(guild, [token, ...]), ...] exactly as GG.BUILDING_THEME declares it, in order."""
+    lua = io.open(MODEL_LUA, encoding="utf-8").read()
+    block = re.search(r"^GG\.BUILDING_THEME = \{(.*?)\n\}", lua, re.S | re.M)
+    if not block:
+        return []
+    return [(g, re.findall(r'"([^"]*)"', toks))
+            for g, toks in re.findall(r'\{"([a-z_]+)",\s*\{(.*?)\}\}', block.group(1), re.S)]
+
+
+def guild_of_chain(chain, theme):
+    """GG.guild_of_chain: the longest token wins, the first-listed guild on a tie, None
+    when nothing matches. check_built_effects runs the Lua itself to prove they agree."""
+    chain = chain.lower()
+    best, best_len = None, 0
+    for guild, words in theme:
+        for w in words:
+            if w and w in chain and len(w) > best_len:
+                best, best_len = guild, len(w)
+    return best
+
+
+def covered_chains():
+    """{chain: flavour tag} for every chain exactly one covered race can build.
+
+    Read off CA's availability sets, the same route tools/gen_ghorth_settlement_tiers.py
+    uses to scope "every chain a Chaos Dwarf region can hold" - it picks up the landmarks,
+    ports and gates that carry no race word in their key.
+    """
+    sys.path.insert(0, "tools")
+    import read_vanilla_cache as R
+    tag_of = {F["culture"]: t for t, F in FLAVOURS.items() if F.get("culture")}
+    sub_culture = {r["subculture"]: r["culture"] for r in R.load("cultures_subcultures")[0]}
+    fac_culture = {r["key"]: sub_culture.get(r["subculture"], "")
+                   for r in R.load("factions")[0]}
+    set_tags = {}
+    for r in R.load("building_chain_availabilities")[0]:
+        if r["campaign"]:
+            continue                                  # the prologue's own sets
+        tag = tag_of.get(r["culture"] or fac_culture.get(r["faction"], ""))
+        if tag is not None:
+            set_tags.setdefault(r["set_id"], set()).add(tag)
+    chain_tags = {}
+    for r in R.load("building_chain_availability_sets")[0]:
+        chain_tags.setdefault(r["building_chain"], set()).update(set_tags.get(r["id"], ()))
+    return {c: next(iter(t)) for c, t in chain_tags.items() if len(t) == 1}
+
+
+def built_tables():
+    """The effects rows, their building junction rows and their loc."""
+    sys.path.insert(0, "tools")
+    import read_vanilla_cache as R
+    theme = building_theme()
+    icon_of = {r["effect"]: r["icon"] for r in R.load("effects")[0]}
+    effects, junction, loc = [], [], []
+    for tag, F in FLAVOURS.items():
+        if not F.get("culture"):
+            continue                                  # the generic flavour has no buildings
+        for g in GUILDS:
+            key = BUILT_EFFECT % (g, tag)
+            # The icon of the vanilla effect this guild's rank rewards already use.
+            icon = icon_of[RANK_EFFECTS[g][0]]
+            effects.append({"effect": key, "icon": icon, "priority": "1",
+                            "icon_negative": icon, "category": "campaign",
+                            "is_positive_value_good": "true"})
+            loc.append({"key": "effects_description_" + key,
+                        "text": "[[col:yellow]]Completing this earns reputation with the "
+                                "%s[[/col]]" % short_name(g, tag),
+                        "tooltip": "false"})
+    owner = covered_chains()
+    for r in sorted(R.load("building_levels")[0], key=lambda r: r["level_name"]):
+        tag = owner.get(r["chain"])
+        if tag is None or r["level_name"].endswith("_ruin") or not r["visible_in_ui"]:
+            continue
+        # What GG.on_building pays when no word matches.
+        g = guild_of_chain(r["chain"], theme) or "overseers"
+        junction.append({"building": r["level_name"], "effect": BUILT_EFFECT % (g, tag),
+                         "effect_scope": BUILT_SCOPE, "value": "1.0000",
+                         "value_damaged": "1.0000", "value_ruined": "0.0000",
+                         "context_requirement": ""})
+    return {"effects": effects, "building_effects_junction": junction, "loc": loc}
+
+
+def _lua_guilds_of(chains):
+    """{chain: guild or None} from the SHIPPED GG.guild_of_chain, run under lua.exe."""
+    import subprocess
+    import tempfile
+    lua = io.open(MODEL_LUA, encoding="utf-8").read()
+    theme = re.search(r"^GG\.BUILDING_THEME = \{.*?\n\}", lua, re.S | re.M)
+    fn = re.search(r"^function GG\.guild_of_chain\(chain\)\n.*?\nend\n", lua, re.S | re.M)
+    if not theme or not fn:
+        raise RuntimeError("GG.BUILDING_THEME or GG.guild_of_chain not found in " + MODEL_LUA)
+    prog = ("GG = {}\n" + theme.group(0) + "\n" + fn.group(0)
+            + "for c in io.lines() do io.write((GG.guild_of_chain(c) or '-') .. '\\n') end\n")
+    fd, path = tempfile.mkstemp(suffix=".lua")
+    try:
+        with os.fdopen(fd, "w") as fh:
+            fh.write(prog)
+        res = subprocess.run([LUA_EXE, path], input="\n".join(chains) + "\n",
+                             capture_output=True, text=True, check=True)
+    finally:
+        os.remove(path)
+    got = res.stdout.split()
+    if len(got) != len(chains):
+        raise RuntimeError("lua.exe answered %d of %d chains" % (len(got), len(chains)))
+    return {c: (None if g == "-" else g) for c, g in zip(chains, got)}
+
+
+def check_built_effects():
+    """The building-card line must promise the guild the building actually pays.
+
+    A card that names the smiths on a building the script pays to the Overseers is worse
+    than no line at all, and nothing in the game would ever report it.
+    """
+    out = []
+    try:
+        t = built_tables()
+    except Exception as exc:                                   # noqa: BLE001
+        return ["cannot build the building-card rows: %r" % (exc,)]
+    sys.path.insert(0, "tools")
+    from read_vanilla_cache import load
+    chain_of = {r["level_name"]: r["chain"] for r in load("building_levels")[0]}
+    chains = sorted({chain_of[r["building"]] for r in t["building_effects_junction"]})
+    try:
+        lua = _lua_guilds_of(chains)
+    except Exception as exc:                                   # noqa: BLE001
+        return ["cannot run the shipped GG.guild_of_chain: %r" % (exc,)]
+    theme = building_theme()
+    for c in chains:
+        if guild_of_chain(c, theme) != lua[c]:
+            out.append("chain %s: the card would name %s and the script pays %s"
+                       % (c, guild_of_chain(c, theme), lua[c]))
+    for r in t["building_effects_junction"]:
+        g = lua[chain_of[r["building"]]] or "overseers"
+        if not r["effect"].startswith(BUILT_EFFECT % (g, "")):
+            out.append("%s carries %s but pays %s" % (r["building"], r["effect"], g))
+    keys = set(r["effect"] for r in t["effects"])
+    described = set(r["key"][len("effects_description_"):] for r in t["loc"])
+    for r in t["building_effects_junction"]:
+        if r["effect"] not in keys:
+            out.append("%s names an effect no row defines: %s" % (r["building"], r["effect"]))
+    for k in sorted(keys - described):
+        out.append("effect %s has no effects_description_ loc, so the card draws an "
+                   "empty line" % k)
+    pairs = [(r["building"], r["effect"]) for r in t["building_effects_junction"]]
+    if len(pairs) != len(set(pairs)):
+        out.append("duplicate building_effects_junction rows - the game drops the table")
+    # EVERY RACE GETS ITS BUILDINGS. A culture key that stopped matching CA's sets would
+    # otherwise leave that race with no line on any card and every check still green.
+    tag_of_key = {BUILT_EFFECT % (g, tag): tag for tag in FLAVOURS for g in GUILDS}
+    per_tag = {}
+    for r in t["building_effects_junction"]:
+        tag = tag_of_key.get(r["effect"])
+        per_tag[tag] = per_tag.get(tag, 0) + 1
+    for tag, F in FLAVOURS.items():
+        if F.get("culture") and per_tag.get(tag, 0) < 100:
+            out.append("flavour %r puts the line on only %d building levels - its culture "
+                       "%s no longer matches CA's availability sets"
+                       % (tag, per_tag.get(tag, 0), F["culture"]))
+    return out
+
+
 def check_player_scope():
     """Coverage must be read off the player, and it must not be a list.
 
@@ -1882,25 +3093,49 @@ def check_titles():
     title written by hand with a bare guild name fails here too.
     """
     out = []
-    for row in build()["loc"]:
-        key, text = row["key"], row["text"]
-        if not key.startswith("message_event_text_text_derpy_gg_"):
-            continue
-        if not key.endswith("_title"):
-            continue
-        for g in GUILDS:
-            full, short = GUILD_NAMES[g], short_name(g)
-            if full == short:
-                continue                      # no article to lose
-            at = text.find(short)
-            while at != -1:
-                if not text[:at].rstrip().endswith(full[:-len(short)].strip()):
-                    out.append("%s reads %r - %r drops the article that %r carries, "
-                               "which reads as a headline for a plural guild and as a "
-                               "mistake for a singular one" % (key, text, short, full))
-                    break
-                at = text.find(short, at + 1)
+    for tag, F in FLAVOURS.items():
+        for row in _build_one(tag)["loc"]:
+            key, text = row["key"], row["text"]
+            if not key.startswith("message_event_text_text_derpy_gg_"):
+                continue
+            if not key.endswith("_title"):
+                continue
+            for g in GUILDS:
+                full, short = F["guilds"][g], short_name(g, tag)
+                if full == short:
+                    continue                  # no article to lose
+                at = text.find(short)
+                while at != -1:
+                    if not text[:at].rstrip().endswith(full[:-len(short)].strip()):
+                        out.append("%s%s reads %r - %r drops the article that %r "
+                                   "carries, which reads as a headline for a plural "
+                                   "guild and as a mistake for a singular one"
+                                   % (key, tag, text, short, full))
+                        break
+                    at = text.find(short, at + 1)
     return out
+
+
+def check_ledger_sources():
+    """Every source the ledger can record must have its src_ loc row, for every flavour.
+
+    GGUI.earned_line reads GGUI.loc("src_" .. source), a key built at runtime, so
+    check_ui_loc_keys cannot see it - and a missing one prints "src_buildings" on the
+    panel, on the one line that exists to explain what a building paid.
+    """
+    path = "Modding Files/pack/script/campaign/mod/zzz_derpy_guilds.lua"
+    lua = io.open(path, encoding="utf-8").read()
+    m = re.search(r"^GG\.LEDGER_SOURCES = \{(.*?)\}", lua, re.S | re.M)
+    if not m:
+        return ["GG.LEDGER_SOURCES is not declared in " + path]
+    sources = re.findall(r'"([a-z]+)"', m.group(1))
+    if not sources:
+        return ["GG.LEDGER_SOURCES lists no sources"]
+    have = set(r["key"] for r in build()["loc"])
+    return ["the ledger source %r has no derpy_gg_src_%s%s loc row, so the panel prints "
+            "the bare key" % (src, src, tag)
+            for src in sources for tag in FLAVOURS
+            if "derpy_gg_src_" + src + tag not in have]
 
 
 def check_ui_loc_keys():
@@ -1924,19 +3159,23 @@ def check_ui_loc_keys():
         # belongs INSIDE the lookahead: with `\s*` before it the star matches zero
         # characters, the lookahead then reads the space rather than the dots, and every
         # prefix form is reported as missing.
+        # GGUI.loc appends the local player's flavour tag, so every literal must ship
+        # under every tag.
         for m in re.finditer(r'GGUI\.loc\(\s*"([a-z0-9_]+)"(?!\s*\.\.)', src):
-            if "derpy_gg_" + m.group(1) not in have:
-                bad.append("%s reads GGUI.loc(\"%s\") and no loc row defines it"
-                           % (stem, m.group(1)))
+            for tag in FLAVOURS:
+                if "derpy_gg_" + m.group(1) + tag not in have:
+                    bad.append("%s reads GGUI.loc(\"%s\") and no loc row defines it for "
+                               "flavour %r" % (stem, m.group(1), tag))
         # GGUI.target_hint returns a BARE KEY NAME that GGUI.loc is then called on, so
         # the literal never appears inside a GGUI.loc(...) call. Checked by name.
         if stem == "zzz_derpy_guilds_ui":
             fn = re.search(r"function GGUI\.target_hint\(s\)(.*?)\nend", src, re.S)
             if fn:
                 for k in re.findall(r'return\s+"([a-z0-9_]+)"', fn.group(1)):
-                    if "derpy_gg_" + k not in have:
-                        bad.append("GGUI.target_hint returns \"%s\" and no loc row "
-                                   "defines it" % k)
+                    for tag in FLAVOURS:
+                        if "derpy_gg_" + k + tag not in have:
+                            bad.append("GGUI.target_hint returns \"%s\" and no loc row "
+                                       "defines it for flavour %r" % (k, tag))
     return bad
 
 
@@ -1964,15 +3203,28 @@ def check_feed_images():
     for r in rows:
         if r.get("image"):
             known.add(r["image"])
-    for name, row in (("hit", FEED_ROW), ("demand", FEED_ROW_DEMAND),
-                      ("lead", FEED_ROW_LEAD), ("rank", FEED_ROW_RANK)):
+    # EVERY FLAVOUR'S RECORDS, read off build() - the emp/ and dwf/ copies are made by
+    # retag() swapping the folder, and nothing else checks that the swap lands on a
+    # picture that exists.
+    tables = build()
+    for row in tables["event_feed_message_events"]:
         img = row.get("image")
         if img not in known:
-            near = sorted(k for k in known if k.startswith("chd/"))
+            folder = img.split("/", 1)[0] + "/"
+            near = sorted(k for k in known if k.startswith(folder))
             out.append("the %s feed record draws %r, which no vanilla row uses - a "
                        "missing event picture is a black rectangle on the panel, not an "
-                       "error. Chaos Dwarf pictures vanilla uses: %s"
-                       % (name, img, ", ".join(near)))
+                       "error. Pictures vanilla uses there: %s"
+                       % (row["group"], img, ", ".join(near)))
+    try:
+        mrows, _ = load("missions")
+        mknown = set(r.get("ui_image") for r in mrows if r.get("ui_image"))
+        for row in tables["missions"]:
+            if row["ui_image"] not in mknown:
+                out.append("bounty %s draws %r, which no vanilla mission uses"
+                           % (row["key"], row["ui_image"]))
+    except Exception as exc:                                   # noqa: BLE001
+        out.append("cannot read vanilla missions to check bounty pictures: %s" % exc)
     return out
 
 
@@ -2129,17 +3381,25 @@ def check():
     out += check_extra_effects()
     if out:
         return out          # build() would raise on these
+    out += check_flavour_shape()
+    if out:
+        return out          # build() would raise on an incomplete flavour
+    out += check_flavours()
     out += check_favour_floor()
     out += check_monopoly_mirror()
     out += check_rival_mirror()
     out += check_help_pages()
     out += check_feed_mirror()
     out += check_ui_loc_keys()
+    out += check_ledger_sources()
     out += check_feed_images()
     out += check_titles()
     out += check_hire_units()
+    out += check_flavour_mirror()
+    out += check_mct_names()
     out += check_player_scope()
     out += check_building_theme()
+    out += check_built_effects()
     out += check_presets()
     out += check_bounties()
     out += check_table_versions()
@@ -2194,8 +3454,10 @@ def check():
                            "is a penalty drawn as a reward" % (k, v))
 
         # And the emitted rows must actually carry that sign.
-        hostile_keys = set(service_bundle_key(x["key"])
-                           for x in SERVICES if x.get("hostile"))
+        # EVERY FLAVOUR'S COPY of the hostile bundle, or the tagged ones read as a malus
+        # on the buyer's own sign and are reported as inverted.
+        hostile_keys = set(service_bundle_key(x["key"]) + t
+                           for x in SERVICES if x.get("hostile") for t in FLAVOURS)
         for r in build()["effect_bundles_to_effects_junctions"]:
             # EVERY VALUE MUST SIT INSIDE VANILLA'S OWN RANGE for this exact
             # (effect, scope) pair. Nothing else catches an effect used at the wrong
@@ -2342,6 +3604,9 @@ TSV_META = {
     # before any script runs. check() now pins every version below to what CA's own file
     # declares, read offline via read_vanilla_cache.version().
     "missions": ("missions_tables", 0),
+    # The building-card line. Both 0, what CA's own files declare.
+    "effects": ("effects_tables", 0),
+    "building_effects_junction": ("building_effects_junction_tables", 0),
     "loc": ("Loc", 1),
 }
 PACK_NAME = "derpy_great_guilds"
@@ -2408,7 +3673,9 @@ def selftest():
     assert len(keys) == 24, "24 rank bundles"
     assert len(set(keys)) == 24, "bundle keys unique"
     assert all(k == k.lower() for k in keys), "bundle keys lowercase"
-    tables = build()
+    # THE CHAOS DWARF PASS. Every count below is one flavour's; the block at the end of
+    # this function holds build(), which ships all of them, to the same shape.
+    tables = _build_one("")
     # The bounties: one per guild, each naming a kind that exists, and the objective
     # template must carry exactly one %s or the target is never substituted in.
     assert len(tables["missions"]) == len(GUILDS), "one bounty mission row per guild"
@@ -2497,6 +3764,73 @@ def selftest():
             assert s.get("turns", 0) > 0, "a timed bundle needs turns: " + s["key"]
     hostile = [s for s in SERVICES if s.get("hostile")]
     assert len(hostile) == 1, "exactly one outward-facing service, got %d" % len(hostile)
+    # ------------------------------------------------------------ the flavours ---
+    assert list(FLAVOURS) == ["", "_emp", "_dwf", "_brt", "_cth", "_ksl", "_def", "_hef",
+                             "_gen"], list(FLAVOURS)
+    full = build()
+    n = len(FLAVOURS)
+    assert len(full["missions"]) == len(GUILDS) * n, len(full["missions"])
+    # Every bundle once per flavour, except the patron, which is one shared row.
+    assert len(full["effect_bundles"]) == (want_eb - 1) * n + 1, len(full["effect_bundles"])
+    assert len(full["event_feed_message_events"]) == 4 * n
+    text = dict((r["key"], r["text"]) for r in full["loc"])
+    assert len(text) == len(full["loc"]), "a loc key is emitted twice"
+    assert text["derpy_gg_guild_name_brass"] == "The Brass Tablets"
+    assert text["derpy_gg_guild_name_brass_emp"] == "The Merchant Guilds"
+    assert text["derpy_gg_rank_name_5_dwf"] == "Elder"
+    assert text["derpy_gg_service_name_slave_tithe_dwf"] == "Weregild"
+    assert text["missions_localised_title_derpy_gg_bounty_slavers_dwf"] == "Strike a Line"
+    assert (text["effect_bundles_localised_title_derpy_gg_rank_brass_3_emp"]
+            == "The Merchant Guilds - Journeyman")
+    assert (text["message_event_text_text_derpy_gg_rank_brass_3_emp_title"]
+            == "The Merchant Guilds Name You Journeyman")
+    assert "At Apprentice they open" in \
+        text["message_event_text_text_derpy_gg_notice_half_brass_emp_primary"]
+    assert "At Indebted they open" in \
+        text["message_event_text_text_derpy_gg_notice_half_brass_primary"]
+    assert "a forge the Engineers' School" in text["derpy_gg_help_p2_emp"]
+    assert "a forge the Daemonsmiths, a dock the Brass Tablets" in text["derpy_gg_help_p2"]
+    assert "effect_bundles_localised_title_%s_emp" % PATRON_BUNDLE not in text, \
+        "the patron is one shared row"
+    crit = dict((r["member"], r["value"])
+                for r in full["campaign_group_member_criteria_values"])
+    assert crit["derpy_gg_event_feed_hit"] == "5001", crit
+    assert crit["derpy_gg_event_feed_rank_emp"] == "5014", crit
+    assert crit["derpy_gg_event_feed_hit_dwf"] == "5021", crit
+    img = dict((r["group"], r["image"]) for r in full["event_feed_message_events"])
+    assert img["derpy_gg_event_feed_rank_dwf"] == "dwf/civilisation_up", img
+    ui = dict((r["key"], r["ui_image"]) for r in full["missions"])
+    assert ui["derpy_gg_bounty_brass"] == "chd/generic", ui
+    assert ui["derpy_gg_bounty_brass_emp"] == "emp/generic", ui
+    assert (tag_loc_key("message_event_text_text_derpy_gg_demand_fail_title", "_emp")
+            == "message_event_text_text_derpy_gg_demand_fail_emp_title")
+    assert tag_loc_key("derpy_gg_guild_name_brass", "_dwf") == "derpy_gg_guild_name_brass_dwf"
+    # THE FLAVOUR CHECKS MUST BE ABLE TO FAIL, or a clean run proves nothing.
+    keep = FLAVOURS["_emp"]["guilds"]["brass"]
+    try:
+        FLAVOURS["_emp"]["guilds"]["brass"] = "The Hashut Guild"
+        assert any("Hashut" in p for p in check_flavours()), "a Chaos Dwarf word slipped by"
+        FLAVOURS["_emp"]["guilds"]["brass"] = "The Very Long Merchant Guilds"
+        assert any("22" in p for p in check_flavours()), "an overlong name slipped by"
+    finally:
+        FLAVOURS["_emp"]["guilds"]["brass"] = keep
+    keep = FLAVOURS["_dwf"]["services"].pop("great_coffle")
+    try:
+        assert any("great_coffle" in p for p in check_flavour_shape()), \
+            "a missing service name slipped by"
+    finally:
+        FLAVOURS["_dwf"]["services"]["great_coffle"] = keep
+    assert not check_flavour_shape(), check_flavour_shape()
+    assert not check_flavours(), check_flavours()
+    sample = ('GG.CHD_CULTURE = "wh3_dlc23_chd_chaos_dwarfs"\n'
+              'GG.FLAVOURED = {\n'
+              '    [GG.CHD_CULTURE]       = {tag = "",     feed = 0},\n'
+              '    ["wh_main_emp_empire"] = {tag = "_emp", feed = 10},\n'
+              '}\n')
+    assert lua_flavoured(sample) == {"wh3_dlc23_chd_chaos_dwarfs": ("", 0),
+                                     "wh_main_emp_empire": ("_emp", 10)}, \
+        lua_flavoured(sample)
+    assert lua_flavoured("GG.FLAVOURED = nil") is None
     print("selftest ok: %d guilds, %d services, %d bundles, %d loc"
           % (len(GUILDS), len(SERVICES), len(eb), len(loc)))
 
@@ -2507,6 +3841,7 @@ if __name__ == "__main__":
     if "--write" in sys.argv:
         for _p in write_tsvs("Modding Files/source/great_guilds"):
             print("wrote " + _p)
+        print("wrote " + write_mct_names())
     if "--check" in sys.argv:
         problems = check()
         for p in problems:

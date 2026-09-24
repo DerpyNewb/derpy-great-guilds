@@ -76,6 +76,10 @@ function GGUI.wrap(c, text, max_lines)
     if not c or not text or text == "" then return {} end
     local ok_w, w = pcall(function() return c:Dimensions() end)
     if not ok_w or not w or w <= 0 then return {text} end
+    -- The box is GGUI.S times its design width and so is the text drawn in it, so the
+    -- lines break where they break at 1x. The budget is put in whatever units the
+    -- measurement below comes back in; see GGUI.text_ratio.
+    w = w * GGUI.text_ratio() / GGUI.S
     local lines, cur = {}, nil
     for word in string.gmatch(text, "%S+") do
         local try = cur and (cur .. " " .. word) or word
@@ -118,9 +122,35 @@ end
 -- Every call below reads localisation and therefore may ONLY be reached from a
 -- draw path. Nothing in zzz_derpy_guilds.lua calls into this file.
 
+-- WHOSE FLAVOUR THE PANEL SPEAKS: the local player's. Forced read, because an unforced
+-- get_local_faction_name throws in multiplayer; nil when it cannot be read.
+function GGUI.me()
+    local ok, me = pcall(function() return cm:get_local_faction_name(true) end)
+    if ok and me then return me end
+    return nil
+end
+
+function GGUI.tag() return GG.tag(GGUI.me()) end
+
+-- OUR ART IN THE READER'S FLAVOUR: the tag goes before ".png", so brass.png is
+-- brass_emp.png for an Empire player. gen_guilds_ui.check() asserts every tagged path is
+-- staged - a missing one draws a blank square and logs nothing.
+function GGUI.art(path)
+    if not path then return nil end
+    local tag = GGUI.tag()
+    if tag == "" then return path end
+    return (string.gsub(path, "%.png$", tag .. ".png"))
+end
+
+function GGUI.icon(guild) return GGUI.art(GGUI.GUILD_ICON[guild]) end
+
+-- The crest beside the title and on the HUD opener. Both .twui.xml files draw this path;
+-- a flavoured player's is repainted over it by GGUI.paint_crest and GGUI.paint_opener.
+GGUI.CREST = "ui/campaign ui/derpy_gg_icons/crest.png"
+
 function GGUI.loc(key)
     local ok, s = pcall(function()
-        return common.get_localised_string("derpy_gg_" .. key)
+        return common.get_localised_string("derpy_gg_" .. key .. GGUI.tag())
     end)
     if ok and s and s ~= "" then return s end
     return key
@@ -153,7 +183,7 @@ end
 -- - it hard-crashes the game, as GetTooltipText does. Refresh runs on clicks and events,
 -- not on a timer, so this is a handful of calls per panel visit.
 function GGUI.paint_ground(guild)
-    local path = GGUI.PANEL_BG[guild]
+    local path = GGUI.art(GGUI.PANEL_BG[guild])
     -- NO FALLBACK TO "". An unknown guild leaves the ground alone; SetImagePath with an
     -- empty path draws nothing at all, so guessing here would trade a wrong picture for
     -- no picture.
@@ -161,6 +191,27 @@ function GGUI.paint_ground(guild)
     local panel = comp(GGUI.PANEL)
     if not panel then return end
     pcall(function() panel:SetImagePath(path, GGUI.BG_INDEX) end)
+end
+
+-- THE CREST BESIDE THE TITLE, in the reader's flavour. Image 0 is its only image. A
+-- Chaos Dwarf player keeps what the .twui.xml draws, so nothing is called for them.
+function GGUI.paint_crest()
+    local path = GGUI.art(GGUI.CREST)
+    if path == GGUI.CREST then return end
+    local c = comp("gg_crest")
+    if c then pcall(function() c:SetImagePath(path, 0) end) end
+end
+
+-- AND ON THE HUD OPENER. Images 2 and 5 are the glyph in the standard and hover states -
+-- derpy_gg_opener.twui.xml lists the standard layers and then the hover ones, three each,
+-- and gen_guilds_ui.check_opener_crest pins both numbers against that order.
+function GGUI.paint_opener(b)
+    local path = GGUI.art(GGUI.CREST)
+    if path == GGUI.CREST then return end
+    pcall(function()
+        b:SetImagePath(path, 2)
+        b:SetImagePath(path, 5)
+    end)
 end
 
 function GGUI.services_of(guild)
@@ -213,6 +264,7 @@ GGUI.PANEL_XY = {
     gg_card_3     = {20, 430},
     gg_prev       = {20, 596},
     gg_next       = {732, 596},
+    gg_earned     = {20, 562},
     gg_footer     = {20, 640},
     gg_help_01   = {20, 168},
     gg_help_02   = {20, 188},
@@ -350,26 +402,129 @@ GGUI.STAND_GUILD = 1
 -- that resolves to nothing draws nothing and says nothing about it.
 GGUI.FLAG_FALLBACK = "ui/flags/wh3_dlc23_chd_chaos_dwarfs/mon_24.png"
 
+-- ------------------------------------------------------------------ scale ---
+-- THE PANEL GROWS WITH THE SCREEN. A 4K player at UI Scale 100% got a 790x700 panel in a
+-- quarter of the area it covers at 1080p, with text to match.
+--
+-- The screen this script is told about is ALREADY divided by the player's UI Scale.
+-- CA's own scale slider tests RootComponent.Dimensions.y * DevUiScale >= 1440, and a
+-- 1280x720 window reported a 1600x900 screen here. So the game's own setting already
+-- scales this panel along with the rest of its UI, and the factor below only makes up the
+-- gap between that screen and the 1920x1080 the panel was laid out for. A 4K player at
+-- 200% reports 1920x1080 and gets 1: scaling again would make it four times.
+--
+-- Never below 1, since at 1600x900 the design still fits. Led by height, and capped by
+-- width, so an ultrawide gets the panel a 16:9 screen of the same height would.
+GGUI.DESIGN_W = 1920
+GGUI.DESIGN_H = 1080
+GGUI.S = 1
+
+function GGUI.scale_for(sw, sh)
+    if type(sw) ~= "number" or type(sh) ~= "number" or sw <= 0 or sh <= 0 then
+        return 1
+    end
+    local s = math.min(sw / GGUI.DESIGN_W, sh / GGUI.DESIGN_H)
+    if s <= 1 then return 1 end
+    -- Hundredths: 2560x1440 is 1.333... and the tail buys nothing but float noise.
+    return math.floor(s * 100 + 0.5) / 100
+end
+
+function GGUI.px(v)
+    return math.floor(v * GGUI.S + 0.5)
+end
+
+-- THE ZERO-LENGTH ANIMATION EVERY TEXT CELL CARRIES. It exists so its font_scale frame
+-- can be rewritten: nothing else in the uicomponent API changes the size a label draws
+-- at, and CA's own lib_topic_leader.lua shrinks its text the same way. Swapping the font
+-- category would stop near 1.33x, because the body family ends at body_16.
+-- gen_guilds_ui.py writes the animation and its check() pins this name against it.
+GGUI.SCALE_ANIM = "derpy_gg_scale"
+
+-- EVERY PART, RECURSIVELY, PARENT FIRST. Each part is resized from what it measures
+-- now, so this runs once per component, straight after it is created: a second pass
+-- would scale a part that is already scaled. Parent first because list_clip follows its
+-- parent's resize by itself (isrelativeresize), and the size set after that is the one
+-- that stands.
+--
+-- SetCanResize* before Resize, or the call is ignored (the rep bar's idiom). The
+-- pictures follow their box: across CA's panels an image's canresizewidth is only ever
+-- written "false", 7,585 times and never "true", so stretching is the default.
+function GGUI.scale_tree(c)
+    if GGUI.S == 1 or not c then return end
+    local w, h
+    pcall(function()
+        w, h = c:Dimensions()
+        w, h = GGUI.px(w), GGUI.px(h)
+        c:SetCanResizeWidth(true)
+        c:SetCanResizeHeight(true)
+        c:Resize(w, h)
+    end)
+    pcall(function()
+        if c:AnimationExists(GGUI.SCALE_ANIM) then
+            -- The frame carries a width and height, as CA writes every frame. The mask
+            -- says font_scale only; the grown size goes in as well, so a frame that
+            -- applied them anyway could not shrink the part back to its design size.
+            if w and h then
+                c:SetAnimationFrameProperty(GGUI.SCALE_ANIM, 0, "scale", w, h)
+            end
+            c:SetAnimationFrameProperty(GGUI.SCALE_ANIM, 0, "font_scale", GGUI.S)
+            c:TriggerAnimation(GGUI.SCALE_ANIM)
+        end
+    end)
+    local ok, n = pcall(function() return c:ChildCount() end)
+    if not ok or type(n) ~= "number" then return end
+    for i = 0, n - 1 do
+        local ok_k, kid = pcall(function() return UIComponent(c:Find(i)) end)
+        if ok_k and kid then GGUI.scale_tree(kid) end
+    end
+end
+
+-- WHETHER TextDimensionsForText MEASURES THE SCALED FONT is not in CA's reference, so it
+-- is measured instead: one probe string on gg_help_01, before the scale in open() and
+-- again here. 1 means the engine measures at the design size, GGUI.S at the drawn one.
+-- GGUI.wrap needs to know which, or the Help tab breaks its lines in the wrong places.
+-- Logged when it changes, which is the in-game answer to the question.
+GGUI.PROBE = "The Great Guilds of Zharr-Naggrund"
+GGUI.PROBE_W0 = nil
+GGUI.RATIO_SEEN = nil
+
+function GGUI.text_ratio()
+    if type(GGUI.PROBE_W0) ~= "number" or GGUI.PROBE_W0 <= 0 then return 1 end
+    local c = comp("gg_help_01")
+    if not c then return 1 end
+    local ok, w = pcall(function() return c:TextDimensionsForText(GGUI.PROBE) end)
+    if not ok or type(w) ~= "number" or w <= 0 then return 1 end
+    local r = w / GGUI.PROBE_W0
+    if r ~= GGUI.RATIO_SEEN then
+        GGUI.RATIO_SEEN = r
+        GGUI.info(string.format("text measures x%.2f at panel scale %.2f", r, GGUI.S))
+    end
+    return r
+end
+
 -- Re-run on every open and every refresh. Cheap, and it heals a panel laid out
 -- before the screen settled instead of leaving a bad position permanent.
+-- Every offset goes through GGUI.px: the parts are GGUI.S times their design size, so
+-- their places have to be too, or a grown panel stacks them in its top-left corner.
 function GGUI.layout()
     local panel = comp(GGUI.PANEL)
     if not panel then return end
+    local P = GGUI.px
     local px, py = panel:Position()
     for name, xy in pairs(GGUI.PANEL_XY) do
         local c = comp(name, panel)
-        if c then c:MoveTo(px + xy[1], py + xy[2]) end
+        if c then c:MoveTo(px + P(xy[1]), py + P(xy[2])) end
     end
     for i = 1, #GGUI.CARD_XY do
         local card = comp(GGUI.CARD .. "_" .. i, panel)
         if card then
-            card:MoveTo(px + GGUI.CARD_XY[i][1], py + GGUI.CARD_XY[i][2])
+            card:MoveTo(px + P(GGUI.CARD_XY[i][1]), py + P(GGUI.CARD_XY[i][2]))
             -- Read the card's position back rather than reusing the asked-for
             -- numbers: the children must follow where the card ACTUALLY went.
             local cx, cy = card:Position()
             for name, xy in pairs(GGUI.CARD_CHILD_XY) do
                 local c = comp(name, card)
-                if c then c:MoveTo(cx + xy[1], cy + xy[2]) end
+                if c then c:MoveTo(cx + P(xy[1]), cy + P(xy[2])) end
             end
         end
     end
@@ -378,21 +533,21 @@ function GGUI.layout()
     -- engine's list layout, which is the whole point of using one.
     local list = comp(GGUI.LIST, panel)
     if list then
-        list:MoveTo(px + GGUI.LIST_XY[1], py + GGUI.LIST_XY[2])
+        list:MoveTo(px + P(GGUI.LIST_XY[1]), py + P(GGUI.LIST_XY[2]))
         local lx, ly = list:Position()
         for name, xy in pairs(GGUI.LIST_CHILD_XY) do
             local c = comp(name, list)
-            if c then c:MoveTo(lx + xy[1], ly + xy[2]) end
+            if c then c:MoveTo(lx + P(xy[1]), ly + P(xy[2])) end
         end
     end
     for i = 1, #GG.GUILDS do
         local row = comp(GGUI.ROW .. "_" .. i, panel)
         if row then
-            row:MoveTo(px + 20, py + 170 + (i - 1) * 44)
+            row:MoveTo(px + P(20), py + P(170 + (i - 1) * 44))
             local rx, ry = row:Position()
             for name, xy in pairs(GGUI.ROW_CHILD_XY) do
                 local c = comp(name, row)
-                if c then c:MoveTo(rx + xy[1], ry + xy[2]) end
+                if c then c:MoveTo(rx + P(xy[1]), ry + P(xy[2])) end
             end
         end
     end
@@ -405,11 +560,10 @@ function GGUI.open()
         r:CreateComponent(GGUI.PANEL, GGUI.PATH_PANEL)
         local panel = comp(GGUI.PANEL)
         if not panel then return end
-        -- MoveTo, not dockpoint. Bounds() includes children; the screen size is
-        -- Dimensions(), so centring reads the root's Dimensions.
+        -- Dimensions(), not Bounds(): Bounds() includes children. Read on every open,
+        -- so a player who changes UI Scale gets the new size the next time they look.
         local sw, sh = r:Dimensions()
-        local pw, ph = panel:Dimensions()
-        panel:MoveTo(math.floor((sw - pw) / 2), math.floor((sh - ph) / 2))
+        GGUI.S = GGUI.scale_for(sw, sh)
         panel:PropagatePriority(60)
 
         -- AND IT EATS THE MOUSE WHILE IT IS UP. Without this the panel is scenery:
@@ -447,8 +601,36 @@ function GGUI.open()
         -- The faction list frame. Its rows are not created here: they depend on who is
         -- alive and which guild is selected, so GGUI.draw_faction_list builds them.
         panel:CreateComponent(GGUI.LIST, GGUI.PATH_LIST)
-        -- Creation only above. GGUI.layout() places every component, including the
-        -- panel's own children, which the .twui.xml offsets do not.
+
+        -- GROW EVERYTHING, THEN PLACE IT. The probe is measured first because it has to
+        -- be the design-size reading. The panel is centred after the scale, on the size
+        -- it has now, with MoveTo, since dockpoint is ignored on a runtime component.
+        GGUI.PROBE_W0, GGUI.RATIO_SEEN = nil, nil
+        local help = comp("gg_help_01", panel)
+        if help then
+            pcall(function() GGUI.PROBE_W0 = help:TextDimensionsForText(GGUI.PROBE) end)
+        end
+        GGUI.scale_tree(panel)
+        -- THE SLIDER'S TRAVEL IS A NUMBER, not a size, so Resize never reaches it. Left
+        -- alone, a list twice as tall scrolls through half of its track.
+        if GGUI.S ~= 1 then
+            for name, prop in pairs({vslider = "maxValue", handle = "max_height"}) do
+                local c = comp(name, panel)
+                if c then
+                    pcall(function()
+                        local v = tonumber(c:GetProperty(prop))
+                        if v then c:SetProperty(prop, GGUI.px(v)) end
+                    end)
+                end
+            end
+        end
+        local pw, ph = panel:Dimensions()
+        panel:MoveTo(math.floor((sw - pw) / 2), math.floor((sh - ph) / 2))
+        GGUI.info(string.format("panel scale %.2f on a %dx%d screen, panel %dx%d",
+                               GGUI.S, sw, sh, pw, ph))
+
+        -- Creation and scale above. GGUI.layout() places every component, including
+        -- the panel's own children, which the .twui.xml offsets do not.
         GGUI.layout()
     end)
     if ok then GGUI.refresh() end
@@ -531,7 +713,7 @@ function GGUI.draw_card(faction, i, s)
     if ic then
         pcall(function()
             ic:SetVisible(true)
-            ic:SetImagePath(GGUI.GUILD_ICON[GGUI.current_guild()] or "", 0)
+            ic:SetImagePath(GGUI.icon(GGUI.current_guild()) or "", 0)
         end)
     end
 
@@ -604,7 +786,8 @@ function GGUI.loc_raw(key)
 end
 
 function GGUI.bounty_title(o)
-    local t = GGUI.loc_raw("missions_localised_title_" .. GG.bounty_mission_key(o.guild))
+    local t = GGUI.loc_raw("missions_localised_title_"
+                           .. GG.bounty_mission_key(o.guild, GGUI.me()))
     if t ~= "" then return t end
     return GGUI.loc_guild(o.guild)
 end
@@ -662,39 +845,23 @@ function GGUI.bounty_band(o)
     return ""
 end
 
+-- THE DRAW WRITES NOTHING. It used to post and purge the board, and a draw runs on one
+-- machine - in multiplayer that is a board the others do not have. GG.first_boards posts
+-- an empty board at the first tick, turn start withdraws what went stale, and the draw
+-- only hides an offer that stopped being true mid-turn (GG.bounty_view).
+--
+-- GGUI.BOUNTY_AT[card] is the board index that card shows, which is what a click sends.
+GGUI.BOUNTY_AT = {}
+
 function GGUI.draw_bounties(faction)
-    -- A reload mid-turn leaves GG.bounties empty until the next turn start, so the
-    -- board reads the save the first time it is drawn. This is a saved-value read,
-    -- not a loc call, so it is safe from anywhere.
-    if not GG.bounties[faction] then
-        pcall(function() GG.load_bounties(faction) end)
-    end
-    -- POSTED ON DEMAND, ONCE PER TURN. post_bounties otherwise runs only at
-    -- FactionTurnStart, so the board is empty for a whole turn after the mod is
-    -- installed mid-campaign, and empty again on any save loaded after its turn had
-    -- already started. Both read as "the feature does not work".
-    --
-    -- The turn stamp is what keeps this cheap: with no war to draw targets from the
-    -- walk finds nothing, and without the stamp it would run again on every redraw.
     local turn = GG.turn_now()
-    GGUI.posted = GGUI.posted or {}
-    if #(GG.bounties[faction] or {}) == 0 and GGUI.posted[faction] ~= turn then
-        GGUI.posted[faction] = turn
-        pcall(function()
-            GG.post_bounties(faction)
-            GG.save_bounties(faction)
-        end)
-    end
-    -- Purged on every draw, not only at turn start: an offer can stop being true in the
-    -- middle of your own turn - you take the settlement it names - and the panel is
-    -- where that would otherwise be visible for a full turn.
-    pcall(function()
-        if GG.purge_bounties(faction) > 0 then GG.save_bounties(faction) end
-    end)
     local list = GG.bounties[faction] or {}
+    local view = {}
+    pcall(function() view = GG.bounty_view(faction) end)
+    GGUI.BOUNTY_AT = view
     for i = 1, #GGUI.CARD_XY do
         local card = GGUI.card(i)
-        local o = list[i]
+        local o = view[i] and list[view[i]]
         if card and not o then
             -- An empty slot says so, rather than leaving the previous tab's service
             -- text sitting on a card that no longer means it.
@@ -731,13 +898,13 @@ function GGUI.draw_bounties(faction)
             if ic then
                 pcall(function()
                     ic:SetVisible(true)
-                    ic:SetImagePath(GGUI.GUILD_ICON[o.guild] or "", 0)
+                    ic:SetImagePath(GGUI.icon(o.guild) or "", 0)
                 end)
             end
 
             set_tooltip(card, GGUI.loc_guild(o.guild) .. "  -  "
                         .. GGUI.loc_raw("missions_localised_description_"
-                                        .. GG.bounty_mission_key(o.guild))
+                                        .. GG.bounty_mission_key(o.guild, GGUI.me()))
                         .. "||" .. GGUI.loc("bounty_help"))
 
             local btn = comp("card_buy", card)
@@ -853,7 +1020,7 @@ function GGUI.draw_court(faction)
                     .. GGUI.loc("demand_desc_" .. d.kind)
         if not ok then tip = tip .. "||" .. GGUI.loc("demand_short") end
         tip = tip .. "||" .. GGUI.loc("court_help")
-        GGUI.write_card(1, GGUI.GUILD_ICON[d.guild],
+        GGUI.write_card(1, GGUI.icon(d.guild),
                         GGUI.loc_guild(d.guild) .. "   "
                         .. GGUI.loc("demand_name_" .. d.kind),
                         l1, l2, tostring(d.amount or 0),
@@ -867,7 +1034,7 @@ function GGUI.draw_court(faction)
     local p = GG.patrons[faction]
     local holds_this = p ~= nil and p.guild == guild
     if holds_this then
-        GGUI.write_card(2, GGUI.GUILD_ICON[guild],
+        GGUI.write_card(2, GGUI.icon(guild),
                         GGUI.loc("patron_of") .. ": " .. GGUI.loc_guild(guild),
                         GGUI.patron_name(p.cqi),
                         "+" .. (GG.setting("rate_patron") or 0) .. "% "
@@ -897,7 +1064,7 @@ function GGUI.draw_court(faction)
         line = GGUI.loc("nobody")
     end
     local mine = select(1, GG.get(faction, guild))
-    GGUI.write_card(3, GGUI.GUILD_ICON[guild],
+    GGUI.write_card(3, GGUI.icon(guild),
                     GGUI.loc_guild(guild) .. "   " .. GGUI.loc("lead_title"),
                     line,
                     GGUI.loc("you") .. ": " .. mine .. "   "
@@ -925,6 +1092,7 @@ function GGUI.refresh()
     -- The ground follows whichever guild the panel is showing, so paging the Guilds tab
     -- or picking a row on Standings changes the hall behind the text.
     GGUI.paint_ground(GGUI.ground_guild())
+    GGUI.paint_crest()
     set_named_text("gg_title", GGUI.loc("panel_title"))
 
     -- THE TAB ROW, THE PAGER AND THE BUY BUTTONS ARE BUTTONS WITH NO TEXT OF THEIR
@@ -1012,6 +1180,10 @@ function GGUI.refresh()
             tip = tip .. " " .. GGUI.loc("upkeep_help")
         end
         set_tooltip(comp("gg_rank_line"), tip)
+        -- WHAT THIS GUILD PAID, AND FOR WHAT. See GGUI.earned_line.
+        local now, last = GG.earned(faction)
+        set_named_text("gg_earned", GGUI.earned_line(now, last, guild))
+        set_tooltip(comp("gg_earned"), GGUI.earned_tip(now, last, guild))
     elseif GGUI.TAB == 5 then
         -- The Help tab's header is its table of contents: which chapter, and how many
         -- there are, so the arrows read as pages rather than as something that might
@@ -1070,6 +1242,8 @@ function GGUI.refresh()
     local barred = (GGUI.TAB == 1)
     local track = comp("gg_bar_track")
     if track then pcall(function() track:SetVisible(barred) end) end
+    local earned = comp("gg_earned")
+    if earned then pcall(function() earned:SetVisible(GGUI.TAB == 1) end) end
     local bar = comp("gg_rep_bar")
     if bar then
         local frac = 0
@@ -1083,7 +1257,7 @@ function GGUI.refresh()
             bar:SetVisible(barred and w > 0)
             if w > 0 then
                 bar:SetCanResizeWidth(true)
-                bar:Resize(w, GGUI.REP_BAR_H)
+                bar:Resize(GGUI.px(w), GGUI.px(GGUI.REP_BAR_H))
             end
         end)
         set_tooltip(bar, GGUI.loc_guild(guild) .. "  " .. rep .. " / " .. next_at)
@@ -1323,6 +1497,77 @@ function GGUI.rivals_line()
            .. GGUI.loc("rivals_patrons")
 end
 
+-- WHAT THIS GUILD PAID YOU, AND FOR WHAT: the line under the Guilds tab's three cards,
+-- read off GG.earned. A finished building pays in script, not through an effect, so this
+-- is where a player sees the forge they built pay the smiths.
+--
+-- AT MOST THREE SOURCES ON THE LINE, biggest first: 750px is about a hundred characters
+-- and one guild can be paid from seven places in a turn. The hover carries all of them.
+-- "withheld" is what the per-turn limit kept back - reputation you do NOT have - so it
+-- never goes into the total and is shown apart, in red.
+GGUI.EARNED_SHOWN = 3
+
+local function earned_parts(by)
+    local parts, total = {}, 0
+    for i = 1, #GG.LEDGER_SOURCES do
+        local s = GG.LEDGER_SOURCES[i]
+        local n = by and by[s]
+        if n and n > 0 and s ~= "withheld" then
+            parts[#parts + 1] = {s = s, n = n, i = i}
+            total = total + n
+        end
+    end
+    table.sort(parts, function(a, b)
+        if a.n ~= b.n then return a.n > b.n end
+        return a.i < b.i
+    end)
+    return parts, total, (by and by.withheld) or 0
+end
+
+local function source_text(p) return GGUI.loc("src_" .. p.s) .. " " .. p.n end
+
+function GGUI.earned_line(now, last, guild)
+    local parts, total, held = earned_parts(now[guild])
+    local line = GGUI.loc("earned_now") .. " "
+    if total == 0 then
+        line = line .. GGUI.loc("earned_none")
+    else
+        local shown = {}
+        for i = 1, math.min(#parts, GGUI.EARNED_SHOWN) do
+            shown[i] = source_text(parts[i])
+        end
+        if #parts > GGUI.EARNED_SHOWN then shown[#shown + 1] = GGUI.loc("earned_more") end
+        line = line .. "+" .. total .. " (" .. table.concat(shown, ", ") .. ")"
+    end
+    if held > 0 then
+        line = line .. "   [[col:red]]" .. held .. " " .. GGUI.loc("earned_held") .. "[[/col]]"
+    end
+    local _, ltotal = earned_parts(last[guild])
+    return line .. "   " .. GGUI.loc("earned_last") .. " "
+           .. (ltotal > 0 and ("+" .. ltotal) or GGUI.loc("earned_none"))
+end
+
+function GGUI.earned_tip(now, last, guild)
+    local function block(head, by)
+        local parts, total, held = earned_parts(by)
+        local out = head .. " " .. (total > 0 and ("+" .. total) or GGUI.loc("earned_none"))
+        for i = 1, #parts do out = out .. "||   " .. source_text(parts[i]) end
+        if held > 0 then
+            out = out .. "||   [[col:red]]" .. GGUI.loc("src_withheld") .. " " .. held
+                  .. "[[/col]]"
+        end
+        return out
+    end
+    local cap = GG.setting("cap_" .. guild)
+    if cap == nil then cap = GG.CAP[guild] or 0 end
+    local limit = GGUI.loc("earned_no_limit")
+    if cap > 0 then
+        limit = GGUI.loc("earned_limit") .. " " .. cap .. ". " .. GGUI.loc("earned_help")
+    end
+    return block(GGUI.loc("earned_now"), now[guild]) .. "||"
+           .. block(GGUI.loc("earned_last"), last[guild]) .. "||" .. limit
+end
+
 -- THE LEAGUE TABLE FOR ONE GUILD, as tooltip lines. Five names and no more: a tooltip
 -- that runs past the screen is worse than a short one, and five is enough to see whether
 -- you are in the race or watching it.
@@ -1453,6 +1698,8 @@ function GGUI.draw_faction_list(faction)
         local ok = pcall(function() box:CreateComponent(name, GGUI.PATH_FROW) end)
         local fr = ok and comp(name, box) or nil
         if fr then
+            -- Created after open() scaled the panel, so it is scaled here, once.
+            GGUI.scale_tree(fr)
             set_text(fr, GGUI.frow_text(rows[i], faction))
             set_tooltip(fr, GGUI.loc_guild(guild) .. "  "
                         .. GGUI.faction_name(rows[i].faction))
@@ -1609,6 +1856,16 @@ function GGUI.target_hint(s)
     return "needs_target"
 end
 
+-- THE TARGET AS IT TRAVELS. GG.target_from_wire rebuilds it on every machine: a
+-- building as the selected region, research as nothing, the rest as the key or cqi.
+function GGUI.wire_target(s, faction)
+    if not s or s.kind == "research" then return "" end
+    if s.kind == "building" and not s.hostile then return GGUI.selected_region() or "" end
+    local t = GGUI.pick_target(s, faction)
+    if t == nil then return "" end
+    return tostring(t)
+end
+
 function GGUI.pick_target(s, faction)
     if not s then return nil end
     if s.hostile then return GGUI.selected_enemy_faction() end
@@ -1626,59 +1883,10 @@ function GGUI.pick_target(s, faction)
     return nil
 end
 
--- THE FIRST LEGAL UPGRADE IN THE SELECTED REGION, as the {slot, building} pair the
--- payload wants. cm:region_slot_instantly_upgrade_building needs a slot interface AND a
--- building key that is a legal upgrade for the chain standing in that slot, and the
--- legality lives in building_upgrades_junction, which no script interface exposes - so
--- this looked like it needed a copy of that table baked into the pack.
---
--- IT DOES NOT. cm:get_building_level_upgrades(key) returns "a lua table containing a
--- list of building keys that are upgrades from a supplied building key", empty when
--- there are none. CA's own prologue achievement script walks settlements with exactly
--- this call, which is where the idiom below comes from -
--- region:settlement():primary_slot():building():name().
---
--- THE PRIMARY SLOT IS TRIED FIRST, because the settlement chain is what raising a
--- ziggurat means and it is the tier gate every other slot in the region is capped by.
--- The rest of the settlement's slots are the fallback, so a region already at its
--- maximum tier still has something to sell.
+-- THE FIRST LEGAL UPGRADE IN THE SELECTED REGION. GG.upgrade_target does the work, and
+-- the AI and the multiplayer handler build the same target through it.
 function GGUI.selected_building_upgrade(faction)
-    local key = GGUI.selected_region()
-    if not key or not faction then return nil end
-    local ok, out = pcall(function()
-        -- cm:get_region returns FALSE, not nil, for a region key it does not know.
-        local r = cm:get_region(key)
-        if not r or r:is_null_interface() then return nil end
-        -- YOUR OWN REGION ONLY. Upgrading a building for the faction that owns it is a
-        -- gift to whoever holds the settlement, and the map's selection happily lands
-        -- on someone else's city.
-        if r:owning_faction():name() ~= faction then return nil end
-        local st = r:settlement()
-        if not st or st:is_null_interface() then return nil end
-        local ordered = {st:primary_slot()}
-        local slots = st:slot_list()
-        for i = 0, slots:num_items() - 1 do
-            ordered[#ordered + 1] = slots:item_at(i)
-        end
-        for i = 1, #ordered do
-            local sl = ordered[i]
-            if sl and not sl:is_null_interface() and sl:has_building() then
-                local b = sl:building()
-                if b and not b:is_null_interface() then
-                    local ups = cm:get_building_level_upgrades(b:name())
-                    -- AN EMPTY TABLE IS THE DOCUMENTED "no upgrades" ANSWER, and a key
-                    -- that names no building returns nothing at all - so the type is
-                    -- checked before the index.
-                    if type(ups) == "table" and type(ups[1]) == "string" then
-                        return {slot = sl, building = ups[1]}
-                    end
-                end
-            end
-        end
-        return nil
-    end)
-    if ok then return out end
-    return nil
+    return GG.upgrade_target(faction, GGUI.selected_region())
 end
 
 function GGUI.selected_region()
@@ -1810,10 +2018,13 @@ function GGUI.on_buy_click(context)
         slot = tonumber(string.match(parent_name, "_(%d+)$"))
     end
     if not slot then return end
+    -- EVERY CHANGE BELOW GOES THROUGH GG.mp_send - applied at once in single player,
+    -- broadcast in multiplayer and applied on every machine when it comes back. In
+    -- multiplayer the refresh here shows the state before the change; GG.after_mp
+    -- redraws when it lands.
     if is_bounty then
-        if GG.take_bounty(faction, slot) then
-            GG.save_bounties(faction)
-        end
+        local n = GGUI.BOUNTY_AT[slot]
+        if n then GG.mp_send(faction, "bounty", n) end
         GGUI.refresh()
         return
     end
@@ -1821,19 +2032,10 @@ function GGUI.on_buy_click(context)
         -- Slot 1 pays the demand, slot 2 appoints or dismisses the patron, slot 3 is
         -- the leadership card and has no button at all.
         if slot == 1 then
-            if GG.pay_demand(faction) then
-                GG.save_demand(faction)
-                GG.save(faction)
-            end
+            GG.mp_send(faction, "demand")
         elseif slot == 2 then
-            local guild = GGUI.current_guild()
-            local p = GG.patrons[faction]
-            if p and p.guild == guild then
-                GG.clear_patron(faction)
-            else
-                GG.set_patron(faction, guild, GGUI.selected_force_cqi())
-            end
-            GG.save_patron(faction)
+            GG.mp_send(faction, "patron", GGUI.current_guild() .. "|"
+                                          .. tostring(GGUI.selected_force_cqi() or ""))
         end
         GGUI.refresh()
         return
@@ -1841,9 +2043,13 @@ function GGUI.on_buy_click(context)
     local mine = GGUI.services_of(GGUI.current_guild())
     local s = mine[slot]
     if not s then return end
-    GG.buy(faction, s.key, GGUI.pick_target(s, faction))
-    GG.save(faction)
+    GG.mp_send(faction, "buy", s.key .. "|" .. GGUI.wire_target(s, faction))
     GGUI.refresh()
+end
+
+-- A CHANGE THAT CAME BACK OVER THE NETWORK: redraw if it was ours and the panel is up.
+GG.after_mp = function(faction)
+    if faction == GGUI.me() and comp(GGUI.PANEL) then GGUI.refresh() end
 end
 
 -- ---------------------------------------------------------------- opener ---
@@ -1872,6 +2078,13 @@ GGUI.TAG = "GREAT GUILDS: "
 
 function GGUI.say(msg)
     pcall(function() out(GGUI.TAG .. msg) end)
+end
+
+-- INFORMATION, NOT WARNINGS: printed only with MCT's "Log every accrual" on. GGUI.say is
+-- kept for the lines that explain a fault - GAVE UP, OVERRIDDEN - which must be in any
+-- log a player sends unasked.
+function GGUI.info(msg)
+    if GG.logging and GG.logging() then GGUI.say(msg) end
 end
 
 GGUI.BTN      = "gg_opener"
@@ -2025,6 +2238,12 @@ function GGUI.place_opener(attempt)
         return true
     end
 
+    -- NO GUILDS, NO BUTTON. A race this mod writes no guilds for gets no way in; GG.covered
+    -- keeps it out of the race as well. An unreadable player is loading, not a verdict.
+    local fl = GG.flavour_of(GGUI.me())
+    if not fl then retry() return end
+    if fl == GG.GENERIC then return end
+
     -- CREATION retries too. The HUD is not built when the first callback runs, so a
     -- one-shot create silently does nothing forever.
     local b = comp(GGUI.BTN)
@@ -2071,7 +2290,7 @@ function GGUI.place_opener(attempt)
     -- HUD - hud_campaign draws over it. Being on-screen is not the same as being
     -- visible, and that difference is what the first attempt lost a round trip to.
     pcall(function() b:RegisterTopMost() end)
-    set_tooltip(b, GGUI.loc("panel_title") .. "||" .. GGUI.loc("standing_help"))
+    GGUI.paint_opener(b)
 
     -- READ IT BACK. This is the check that catches a layout engine on day one
     -- instead of costing a screenshot and a wrong fix: if the position we asked for
@@ -2086,7 +2305,7 @@ function GGUI.place_opener(attempt)
         -- correction at turn start is visible instead of silent.
         local now = x .. "," .. y
         if GGUI.btn_at ~= now then
-            GGUI.say("opener button at " .. now .. " on a " .. sw .. "x" .. sh
+            GGUI.info("opener button at " .. now .. " on a " .. sw .. "x" .. sh
                      .. " screen, " .. tostring(how))
         end
         GGUI.btn_at = now
@@ -2096,6 +2315,118 @@ function GGUI.place_opener(attempt)
                  .. ax .. "," .. ay .. ", the parent is laying this component out")
     end
 end
+
+-- THE MCT PAGE IN THE PLAYER'S OWN WORDS. The settings file names the guilds by what
+-- they do, because the frontend has no race to name them for. In a campaign the twelve
+-- guild sliders take the local player's flavour at the first tick. MCT reads an option's
+-- text when it builds the page, so this lands before anyone opens it.
+--
+-- LITERAL NAMES, NOT LOC. This runs from the first tick, and a loc call there is the
+-- no-loc-in-turn-handlers trap. tools/gen_great_guilds.py --write rewrites the table
+-- between the two markers from its FLAVOURS, and --check refuses a stale one.
+-- BEGIN GENERATED: GGUI.MCT_NAMES
+GGUI.MCT_NAMES = {
+    [""] = {
+        brass = "The Brass Tablets",
+        immortals = "The Immortals",
+        daemonsmiths = "The Daemonsmiths",
+        khanate = "The Khanate",
+        overseers = "The Overseers",
+        slavers = "The Slavers",
+    },
+    ["_emp"] = {
+        brass = "The Merchant Guilds",
+        immortals = "The Greatswords",
+        daemonsmiths = "The Engineers' School",
+        khanate = "The Thieves' Guild",
+        overseers = "The Masons' Guild",
+        slavers = "The Free Companies",
+    },
+    ["_dwf"] = {
+        brass = "The Merchant Clans",
+        immortals = "The Hammerers",
+        daemonsmiths = "The Engineers' Guild",
+        khanate = "The Rangers",
+        overseers = "The Miners' Guild",
+        slavers = "The Grudge-Settlers",
+    },
+    ["_brt"] = {
+        brass = "The Wine Merchants",
+        immortals = "The Knights Errant",
+        daemonsmiths = "The Grail Damsels",
+        khanate = "The Forest Outlaws",
+        overseers = "The Castle-Wrights",
+        slavers = "The Crusaders",
+    },
+    ["_cth"] = {
+        brass = "The Caravan Masters",
+        immortals = "The Dragon Guard",
+        daemonsmiths = "The Imperial Academy",
+        khanate = "The Crow Society",
+        overseers = "The Bastion Builders",
+        slavers = "The Punitive Host",
+    },
+    ["_ksl"] = {
+        brass = "The Erengrad Merchants",
+        immortals = "The Tzar Guard",
+        daemonsmiths = "The Ice Court",
+        khanate = "The Oblast Smugglers",
+        overseers = "The Stanitsa Builders",
+        slavers = "The Ungol Raiders",
+    },
+    ["_def"] = {
+        brass = "The Karond Kar Traders",
+        immortals = "The Black Guard",
+        daemonsmiths = "The Convent of Ghrond",
+        khanate = "The Khainite Assassins",
+        overseers = "The Naggarond Builders",
+        slavers = "The Black Ark Corsairs",
+    },
+    ["_hef"] = {
+        brass = "The Lothern Merchants",
+        immortals = "The Swordmasters",
+        daemonsmiths = "The Loremasters",
+        khanate = "The Shadow Warriors",
+        overseers = "The Ulthuan Masons",
+        slavers = "The Ellyrian Reavers",
+    },
+    ["_gen"] = {
+        brass = "The Merchant Houses",
+        immortals = "The Veterans' Company",
+        daemonsmiths = "The Artisans' Guild",
+        khanate = "The Shadow Guild",
+        overseers = "The Builders' Guild",
+        slavers = "The Raiders' Guild",
+    },
+}
+-- END GENERATED: GGUI.MCT_NAMES
+
+function GGUI.name_mct()
+    local names = GGUI.MCT_NAMES and GGUI.MCT_NAMES[GGUI.tag()]
+    if not names then return end
+    pcall(function()
+        local mct = get_mct and get_mct()
+        local mod = mct and mct:get_mod_by_key("derpy_great_guilds")
+        if not mod then return end
+        for g, name in pairs(names) do
+            local r = mod:get_option_by_key("rate_" .. g)
+            if r then r:set_text(name) end
+            local c = mod:get_option_by_key("cap_" .. g)
+            if c then c:set_text(name .. " limit") end
+        end
+    end)
+end
+
+cm:add_first_tick_callback(function() GGUI.name_mct() end)
+
+-- THE OPENER'S TOOLTIP, WRITTEN ON HOVER. place_opener runs from FactionTurnStart, and a
+-- loc call from a turn handler can crash at turn 1 past pcall - so the tooltip is not
+-- written there. A hover is a UI event, and the text is in place before the tooltip's
+-- own delay runs out.
+core:add_listener("gg_opener_tip", "ComponentMouseOn", true, function(context)
+    if context.string ~= GGUI.BTN then return end
+    set_tooltip(comp(GGUI.BTN), GGUI.loc("panel_title") .. "||" .. GGUI.loc("standing_help"))
+end, true)
 
 -- Placement starts at first tick and is re-run at turn start. Both are one-shots
 -- into the same chain; place_opener stops itself once GGUI.btn_at is set.

@@ -31,9 +31,11 @@ function GG.rank_of(rep)
     return r
 end
 
-function GG.bundle_key(guild, rank)
+-- THE HOLDER'S FLAVOUR TAG ON THE END: derpy_gg_rank_brass_3 for a Chaos Dwarf faction,
+-- derpy_gg_rank_brass_3_emp for an Empire one. A nil faction is the untagged key.
+function GG.bundle_key(guild, rank, faction)
     if rank < 2 then return nil end
-    return "derpy_gg_rank_" .. guild .. "_" .. rank
+    return "derpy_gg_rank_" .. guild .. "_" .. rank .. GG.tag(faction)
 end
 
 function GG.get(faction, guild)
@@ -75,11 +77,18 @@ function GG.assert_ranks(faction)
                 -- otherwise carry both.
                 for r = 2, 5 do
                     if r ~= rank then
+                        local k = GG.bundle_key(guild, r, faction)
+                        if k then cm:remove_effect_bundle(k, faction) end
+                    end
+                    -- AND THE UNTAGGED COPY, EVERY RANK, on a flavoured faction: a save
+                    -- from the build that covered all three races at once has Empire and
+                    -- Dwarf AIs wearing it, and it would stack with the tagged one forever.
+                    if GG.tag(faction) ~= "" then
                         local k = GG.bundle_key(guild, r)
                         if k then cm:remove_effect_bundle(k, faction) end
                     end
                 end
-                local key = GG.bundle_key(guild, rank)
+                local key = GG.bundle_key(guild, rank, faction)
                 if key then cm:apply_effect_bundle(key, faction, -1) end
                 seen[guild] = rank
             end
@@ -90,9 +99,9 @@ end
 
 function GG.apply_rank(faction, guild, old_rank, new_rank)
     if new_rank == old_rank then return end
-    local old_key = GG.bundle_key(guild, old_rank)
+    local old_key = GG.bundle_key(guild, old_rank, faction)
     if old_key then cm:remove_effect_bundle(old_key, faction) end
-    local new_key = GG.bundle_key(guild, new_rank)
+    local new_key = GG.bundle_key(guild, new_rank, faction)
     -- -1 is indefinite. CA's episodic_scripting doc, verbatim: "-1 may be
     -- supplied to apply the effect indefinitely." 0 means zero turns, which
     -- applies the bundle and then does nothing, silently, forever.
@@ -163,7 +172,11 @@ function GG.rival_cost(faction, guild, amount)
     -- slavers too. Soaked over 83 turns: khanate 0 -> 69, slavers 13 -> 102, the other
     -- four within 20. Upkeep is untouched and still bites from decay_from.
     if GG.rank_of(t.rep) < 2 then return 0 end
-    local floor_at = GG.RANKS[GG.rank_of(t.rep)] or 0
+    -- ONE TURN'S UPKEEP ABOVE THE THRESHOLD, not on it. A floor ON the threshold left the
+    -- next turn start's upkeep to finish the job: pinned at 100, charged 2, demoted at 98,
+    -- then re-promoted by the next earn with a second popup (Azeros, turns 31-33, 2026-09-23).
+    local rank = GG.rank_of(t.rep)
+    local floor_at = (GG.RANKS[rank] or 0) + GG.decay_amount(rank)
     if t.rep <= floor_at then return 0 end
     if loss > t.rep - floor_at then loss = t.rep - floor_at end
     return GG.penalise(faction, rival, loss)
@@ -253,11 +266,14 @@ function GG.decay(faction, turn)
     return took
 end
 
-function GG.grant(faction, guild, amount)
+-- `source` is which of GG.LEDGER_SOURCES paid it, for the panel's "Reputation this turn"
+-- line. Every caller names one; a caller that forgets shows up there as "other".
+function GG.grant(faction, guild, amount, source)
     if not amount or amount <= 0 then return end
     GG.state[faction] = GG.state[faction] or blank()
     local g = GG.state[faction][guild]
     if not g then return end          -- unknown guild is a no-op, never an error
+    GG.ledger_add(faction, guild, source, amount)
     local before = GG.rank_of(g.rep)
     g.rep = g.rep + amount
     local after = GG.rank_of(g.rep)
@@ -334,7 +350,7 @@ function GG.logging()
     return ok and on == true
 end
 
-function GG.capped_grant(faction, guild, amount)
+function GG.capped_grant(faction, guild, amount, source)
     if not amount or amount <= 0 then return end
     -- THE ONE FUNNEL EVERY PASSIVE EARN ROUTE GOES THROUGH, which is why the culture
     -- gate lives here rather than in six listeners. The bounty payout calls GG.grant
@@ -354,11 +370,19 @@ function GG.capped_grant(faction, guild, amount)
     if cap > 0 then
         GG.turn_gain[faction] = GG.turn_gain[faction] or {}
         local so_far = GG.turn_gain[faction][guild] or 0
-        if so_far >= cap then return end
-        if so_far + amount > cap then amount = cap - so_far end
+        -- WHAT THE CAP KEPT BACK IS WRITTEN DOWN. Without it a market finished on a turn
+        -- the income already filled the Brass cap pays nothing and says nothing.
+        if so_far >= cap then
+            GG.ledger_add(faction, guild, "withheld", amount)
+            return
+        end
+        if so_far + amount > cap then
+            GG.ledger_add(faction, guild, "withheld", so_far + amount - cap)
+            amount = cap - so_far
+        end
         GG.turn_gain[faction][guild] = so_far + amount
     end
-    GG.grant(faction, guild, amount)
+    GG.grant(faction, guild, amount, source)
     -- The line the MCT's debug checkbox promises. Behind GG.logging() because it is one
     -- line per grant per faction per turn, which is noise nobody wants by default.
     if GG.logging() then
@@ -374,16 +398,17 @@ end
 function GG.on_turn_start(faction, net_income)
     if not net_income or net_income <= 0 then return end
     GG.capped_grant(faction, "brass",
-                    math.floor(net_income / (GG.setting("rate_brass") or 250)))
+                    math.floor(net_income / (GG.setting("rate_brass") or 250)), "income")
 end
 
 function GG.on_battle(faction, outnumbered)
     local base = GG.setting("rate_immortals") or 15
-    GG.capped_grant(faction, "immortals", outnumbered and (base * 2) or base)
+    GG.capped_grant(faction, "immortals", outnumbered and (base * 2) or base, "battles")
 end
 
 function GG.on_tech(faction)
-    GG.capped_grant(faction, "daemonsmiths", GG.setting("rate_daemonsmiths") or 60)
+    GG.capped_grant(faction, "daemonsmiths", GG.setting("rate_daemonsmiths") or 60,
+                    "research")
 end
 
 -- THE AI'S DAEMONSMITHS, off faction:num_completed_technologies() at its own turn start.
@@ -410,7 +435,7 @@ end
 
 function GG.on_agent_action(faction, success)
     if not success then return end
-    GG.capped_grant(faction, "khanate", GG.setting("rate_khanate") or 8)
+    GG.capped_grant(faction, "khanate", GG.setting("rate_khanate") or 8, "agents")
 end
 
 -- WHICH GUILD A BUILDING BELONGS TO.
@@ -532,7 +557,8 @@ function GG.on_building(faction, level, chain)
     -- The Overseers are the default and not merely a fallback: they are the guild of
     -- building things, so a chain whose name says nothing still belongs to them.
     local guild = GG.guild_of_chain(chain) or "overseers"
-    GG.capped_grant(faction, guild, (GG.setting("rate_overseers") or 10) * tier)
+    GG.capped_grant(faction, guild, (GG.setting("rate_overseers") or 10) * tier,
+                    "buildings")
 end
 
 function GG.on_settlement(faction, razed)
@@ -544,7 +570,8 @@ function GG.on_settlement(faction, razed)
     -- divide, never as " * 1.6": WH3 Lua is float32, 1.6 is not exact in binary,
     -- and floor(25 * 1.6) can land on 39 instead of 40. 25*8=200 and 200/5=40 are
     -- both exactly representable.
-    GG.capped_grant(faction, "slavers", razed and math.floor(sack * 8 / 5) or sack)
+    GG.capped_grant(faction, "slavers", razed and math.floor(sack * 8 / 5) or sack,
+                    "settlements")
 end
 
 function GG.on_mission(faction)
@@ -553,7 +580,7 @@ function GG.on_mission(faction)
     local rate = GG.setting("rate_missions") or 0
     if rate <= 0 then return end
     for i = 1, #GG.GUILDS do
-        GG.capped_grant(faction, GG.GUILDS[i], rate)
+        GG.capped_grant(faction, GG.GUILDS[i], rate, "missions")
     end
 end
 
@@ -613,8 +640,10 @@ function GG.trace(msg)
     pcall(function() out("derpy_gg: " .. tostring(msg)) end)
 end
 
-function GG.bounty_mission_key(guild)
-    return "derpy_gg_bounty_" .. guild
+-- Per holder: an Empire faction's bounty is derpy_gg_bounty_brass_emp, which is the row
+-- whose title and picture are the Empire's. A nil faction is the untagged key.
+function GG.bounty_mission_key(guild, faction)
+    return "derpy_gg_bounty_" .. guild .. GG.tag(faction)
 end
 
 -- One live mission per key per faction, so one bounty per guild at a time. The board
@@ -1060,8 +1089,11 @@ end
 -- comparison below goes quiet.
 GG.leaders_now = {}
 
-function GG.lead_key(guild)
-    return "derpy_gg_lead_" .. guild
+-- One bundle per guild PER CULTURE: an Empire foremost holds derpy_gg_lead_brass_emp.
+-- The sweep in reassert_leaders is already scoped to one culture, so it passes it here.
+function GG.lead_key(guild, culture)
+    local f = GG.flavour_of_culture(culture)
+    return "derpy_gg_lead_" .. guild .. (f and f.tag or "")
 end
 
 -- ONE FOREMOST PER GUILD PER CULTURE, so GG.leaders_now is keyed by both. The bundle
@@ -1082,7 +1114,7 @@ function GG.reassert_leaders()
         local who = GG.leader_of(guild, culture) or false
         if GG.leaders_now[slot] ~= who then
             local was = GG.leaders_now[slot]
-            local key = GG.lead_key(guild)
+            local key = GG.lead_key(guild, culture)
             -- SWEPT ACROSS EVERY FACTION OF THIS CULTURE, not just the one we believed
             -- held it. After a load we believe nothing, and the bundle from the previous
             -- session is still sitting on whoever had it then. Scoped to the culture
@@ -1090,9 +1122,15 @@ function GG.reassert_leaders()
             -- multiplayer campaign has two races that can each have a foremost - an
             -- unscoped sweep strips one player's bundle the moment the other is crowned,
             -- and back again next turn, for the rest of the campaign.
+            local stale = GG.lead_key(guild)
             for faction, _ in pairs(GG.state) do
                 if faction ~= who and GG.CULTURE_OF[faction] == culture then
                     cm:remove_effect_bundle(key, faction)
+                end
+                -- The untagged lead a flavoured culture wore under the all-races build
+                -- is wrong on EVERY faction of it, the foremost included.
+                if stale ~= key and GG.CULTURE_OF[faction] == culture then
+                    cm:remove_effect_bundle(stale, faction)
                 end
             end
             if who then cm:apply_effect_bundle(key, who, -1) end
@@ -1343,7 +1381,75 @@ function GG.research_target(faction)
     if not faction then return nil end
     local k = GG.researching[faction]
     if type(k) ~= "string" or k == "" then return nil end
+    -- ALREADY HELD IS NOTHING TO BUY. ResearchCompleted never reaches an AI faction, so
+    -- an AI's record outlives the research it names; the faction itself says whether it
+    -- is done. An unreadable answer keeps the record, which is the player's case: their
+    -- record is cleared by ResearchCompleted and never needs this.
+    local ok, has = pcall(function()
+        local f = cm:get_faction(faction)
+        if not f or f:is_null_interface() then return false end
+        return f:has_technology(k)
+    end)
+    if ok and has == true then return nil end
     return k
+end
+
+-- THE FIRST LEGAL UPGRADE IN ONE OF THE FACTION'S OWN REGIONS, as the {slot, building}
+-- pair the payload wants, from nothing but a region key. The panel passes the selected
+-- settlement, the AI walks its own regions, and a multiplayer purchase sends the key and
+-- rebuilds this on every machine - a slot interface cannot travel in an event string.
+--
+-- cm:region_slot_instantly_upgrade_building needs a slot interface AND a building key
+-- that is a legal upgrade for the chain standing in that slot, and the legality lives in
+-- building_upgrades_junction, which no script interface exposes. It does not need a copy
+-- of that table: cm:get_building_level_upgrades(key) returns "a lua table containing a
+-- list of building keys that are upgrades from a supplied building key", empty when
+-- there are none. CA's own prologue achievement script walks settlements with exactly
+-- this call - region:settlement():primary_slot():building():name().
+--
+-- THE PRIMARY SLOT IS TRIED FIRST, because the settlement chain is what raising a
+-- ziggurat means and it is the tier gate every other slot in the region is capped by.
+-- The rest of the settlement's slots are the fallback, so a region already at its
+-- maximum tier still has something to sell.
+--
+-- ponytail: no construction-in-progress test. No slot or region member in CA's docs
+-- says a building is being built, so a slot mid-construction can still be picked.
+function GG.upgrade_target(faction, key)
+    if not faction or type(key) ~= "string" or key == "" then return nil end
+    local ok, out = pcall(function()
+        -- cm:get_region returns FALSE, not nil, for a region key it does not know.
+        local r = cm:get_region(key)
+        if not r or r:is_null_interface() then return nil end
+        -- YOUR OWN REGION ONLY. Upgrading a building for the faction that owns it is a
+        -- gift to whoever holds the settlement, and the map's selection happily lands
+        -- on someone else's city.
+        if r:owning_faction():name() ~= faction then return nil end
+        local st = r:settlement()
+        if not st or st:is_null_interface() then return nil end
+        local ordered = {st:primary_slot()}
+        local slots = st:slot_list()
+        for i = 0, slots:num_items() - 1 do
+            ordered[#ordered + 1] = slots:item_at(i)
+        end
+        for i = 1, #ordered do
+            local sl = ordered[i]
+            if sl and not sl:is_null_interface() and sl:has_building() then
+                local b = sl:building()
+                if b and not b:is_null_interface() then
+                    local ups = cm:get_building_level_upgrades(b:name())
+                    -- AN EMPTY TABLE IS THE DOCUMENTED "no upgrades" ANSWER, and a key
+                    -- that names no building returns nothing at all - so the type is
+                    -- checked before the index.
+                    if type(ups) == "table" and type(ups[1]) == "string" then
+                        return {slot = sl, building = ups[1]}
+                    end
+                end
+            end
+        end
+        return nil
+    end)
+    if ok then return out end
+    return nil
 end
 
 function GG.save_patron(faction)
@@ -1476,7 +1582,7 @@ function GG.pay_demand(faction)
     end
     -- Through GG.grant, so the reward climbs ranks and drains the rival exactly as any
     -- other earning does. A paid demand is a large, chosen, one-off earn.
-    GG.grant(faction, d.guild, GG.setting("demand_reward") or 0)
+    GG.grant(faction, d.guild, GG.setting("demand_reward") or 0, "demands")
     GG.demands[faction] = nil
     return true, nil
 end
@@ -1658,6 +1764,24 @@ function GG.bounty_still_valid(faction, o)
     end)
     if not ok then return true end
     return valid == true
+end
+
+-- WHAT THE BOARD SHOWS: the index of every offer still worth showing, and the list left
+-- exactly as it was. The panel is drawn on one machine, so purging from the draw changed
+-- one machine's board - a desync. Withdrawing is turn start's job; the draw hides an
+-- offer that stopped being true mid-turn, and the index it shows is the one a click
+-- sends, which is why nothing may move under it.
+function GG.bounty_view(faction)
+    local list, out = GG.bounties[faction] or {}, {}
+    local turn = GG.turn_now()
+    for i = 1, #list do
+        local o = list[i]
+        if o.taken or (turn - (o.posted or 0) < GG.BOUNTY_OFFER_LIFE
+                       and GG.bounty_still_valid(faction, o)) then
+            out[#out + 1] = i
+        end
+    end
+    return out
 end
 
 -- Everything that takes an offer off the board: it ran out of time, it names what
@@ -1880,7 +2004,7 @@ function GG.bounty_string(faction, o)
     -- own Chaos Dwarf quests already ship. An unknown issuer fails the string parse,
     -- which raises MissionStringParseErrorEvent and nothing the player can see.
     return "mission{"
-        .. "key " .. GG.bounty_mission_key(o.guild) .. ";"
+        .. "key " .. GG.bounty_mission_key(o.guild, faction) .. ";"
         .. "issuer CLAN_ELDERS;"
         .. "turn_limit " .. GG.BOUNTY_TURN_LIMIT .. ";"
         .. "primary_objectives_and_payload{"
@@ -1938,7 +2062,7 @@ function GG.bounty_done(faction, mission_key)
     if not list then return false end
     for i = #list, 1, -1 do
         local o = list[i]
-        if o.taken and GG.bounty_mission_key(o.guild) == mission_key then
+        if o.taken and GG.bounty_mission_key(o.guild, faction) == mission_key then
             -- OFF THE BOARD AND SAVED BEFORE THE PAYOUT, for the reason spelled out in
             -- GG.take_bounty. GG.grant can rank the player up, which shows a message
             -- event; anything that re-enters script from there reloads the board and
@@ -1948,7 +2072,7 @@ function GG.bounty_done(faction, mission_key)
             local guild, rep = o.guild, o.rep or 0
             table.remove(list, i)
             GG.save_bounties(faction)
-            GG.grant(faction, guild, rep)
+            GG.grant(faction, guild, rep, "bounties")
             return true
         end
     end
@@ -1976,7 +2100,7 @@ function GG.take_bounty_slot(faction, mission_key)
     if not list then return nil end
     for i = #list, 1, -1 do
         local o = list[i]
-        if o.taken and GG.bounty_mission_key(o.guild) == mission_key then
+        if o.taken and GG.bounty_mission_key(o.guild, faction) == mission_key then
             table.remove(list, i)
             return o
         end
@@ -2100,8 +2224,9 @@ GG.SERVICES = {
 -- shroud and building calls. So "not race-locked", the mod's headline objective, was one
 -- table away the whole time.
 --
--- Every key below is verified present in vanilla main_units, and all three are the same
--- shape as the original: tier 3 melee infantry, 100-120 men, 850-1200 recruitment cost.
+-- Every key below is verified present in vanilla main_units. Each is its race's elite
+-- melee regiment at 850-1200 recruitment cost - tier 3 infantry for five of them, and
+-- Bretonnia's tier 2 knights, below.
 -- A unit key is an unvalidated string - a typo grants nothing, forever, in silence - so
 -- check_hire_units() reads this table back out of the Lua and asserts each key against
 -- the cached vanilla table.
@@ -2109,6 +2234,15 @@ GG.HIRE_UNIT_BY_CULTURE = {
     ["wh3_dlc23_chd_chaos_dwarfs"] = "wh3_dlc23_chd_inf_infernal_guard_great_weapons",
     ["wh_main_dwf_dwarfs"]         = "wh_main_dwf_inf_hammerers",
     ["wh_main_emp_empire"]         = "wh_main_emp_inf_greatswords",
+    -- BRETONNIA HAS NO ELITE INFANTRY, so its guild sells its signature knights instead:
+    -- tier 2, 950 gold, the Greatswords' price. Chosen by the user on 2026-09-24 over Foot
+    -- Squires (tier 2, 750), which would have been the weakest hire in the mod.
+    ["wh_main_brt_bretonnia"]      = "wh_main_brt_cav_knights_of_the_realm",
+    ["wh3_main_cth_cathay"]        = "wh3_main_cth_inf_dragon_guard_0",
+    ["wh3_main_ksl_kislev"]        = "wh3_main_ksl_inf_tzar_guard_1",
+    ["wh2_main_def_dark_elves"]    = "wh2_main_def_inf_black_guard_0",
+    -- Swordmasters over Phoenix Guard (1,400), chosen by the user on 2026-09-24.
+    ["wh2_main_hef_high_elves"]    = "wh2_main_hef_inf_swordmasters_of_hoeth_0",
 }
 
 -- Kept because three other files still read it by name. It is the Chaos Dwarf entry of
@@ -2168,11 +2302,22 @@ GG.TITHE_FACTOR = "missions"
 GG.CULTURES = GG.CULTURES or {}
 
 -- The cultures this mod ships flavour for. Not a gate - purely which ones have their own
--- guild names, rank names and hire unit rather than the generic fallback.
+-- guild names, rank names, art and hire unit rather than the Chaos Dwarf fallback.
+--
+-- `tag` goes on the end of every key the player reads (before the engine's own _title /
+-- _primary / _secondary on a message), and `feed` is added to the four feed indexes.
+-- tools/gen_great_guilds.py mints the rows behind both and check_flavour_mirror() there
+-- compares this table against its own; a mismatch is a raw key or a message that draws
+-- nothing, with no error either way.
 GG.FLAVOURED = {
-    [GG.CHD_CULTURE] = true,
-    ["wh_main_dwf_dwarfs"] = true,
-    ["wh_main_emp_empire"] = true,
+    [GG.CHD_CULTURE]       = {tag = "",     feed = 0},
+    ["wh_main_emp_empire"] = {tag = "_emp", feed = 10},
+    ["wh_main_dwf_dwarfs"] = {tag = "_dwf", feed = 20},
+    ["wh_main_brt_bretonnia"] = {tag = "_brt", feed = 40},
+    ["wh3_main_cth_cathay"] = {tag = "_cth", feed = 50},
+    ["wh3_main_ksl_kislev"] = {tag = "_ksl", feed = 60},
+    ["wh2_main_def_dark_elves"] = {tag = "_def", feed = 70},
+    ["wh2_main_hef_high_elves"] = {tag = "_hef", feed = 80},
 }
 
 -- Cached in GG.CULTURE_OF, which until now was declared and never written to: a
@@ -2196,18 +2341,57 @@ function GG.covered(faction)
         if ok and type(got) == "string" and got ~= "" then c = got end
         GG.CULTURE_OF[faction] = c
     end
-    -- THE PLAYER'S CULTURE, and only that. Not a list in this file - GG.player_cultures
-    -- reads it off the human faction, so a modded culture is covered the moment somebody
-    -- plays it and this file never names one.
+    -- THE PLAYER'S CULTURE, and only a race GG.FLAVOURED writes guilds for. The first is
+    -- read off the human faction by GG.player_cultures; the second is the list above,
+    -- since 2026-09-24 - before that any culture a human played was covered.
     --
     -- AN UNREADABLE CULTURE IS NOT COVERED, which was never the bug and must not be lost.
     if c == false or type(c) ~= "string" or c == "" then return false end
+    -- ONLY THE RACES THIS MOD WRITES GUILDS FOR. Any other culture gets nothing - no
+    -- opener, no standing, no rank-up or demand messages for a panel it cannot open -
+    -- even when a human plays it. Checked before the fallback below, so standing an
+    -- older build handed every race cannot let one back in.
+    if not GG.FLAVOURED[c] then return false end
     local mine = GG.player_cultures()
     -- AN UNREADABLE PLAYER IS NOT A REASON TO COVER NOBODY. get_human_factions is not
     -- answerable during loading, and returning false for everyone there is a turn where
     -- nothing accrues, silently. A faction already holding standing keeps earning.
     if not next(mine) then return GG.state[faction] ~= nil end
     return mine[c] == true
+end
+
+-- EVERY OTHER RACE: one race-neutral flavour for every culture this mod ships none for.
+-- Since 2026-09-24 such a race gets no guilds at all (GG.covered, GGUI.place_opener), so
+-- what still reads this is a message to an unsupported human that a hostile service hit
+-- in multiplayer. Mirrored by the FLAVOURS entry whose culture is None in
+-- tools/gen_great_guilds.py, which check_flavour_mirror() compares against this.
+GG.GENERIC = {tag = "_gen", feed = 30}
+
+-- A culture's flavour: its own entry, the generic one for any other readable culture, and
+-- nil for one that cannot be read - an unknown culture is not a reason to guess.
+function GG.flavour_of_culture(culture)
+    if type(culture) ~= "string" or culture == "" then return nil end
+    return GG.FLAVOURED[culture] or GG.GENERIC
+end
+
+-- WHICH FLAVOUR A FACTION READS. Fills GG.CULTURE_OF through GG.covered the first time.
+function GG.flavour_of(faction)
+    if not faction then return nil end
+    if GG.CULTURE_OF[faction] == nil then GG.covered(faction) end
+    return GG.flavour_of_culture(GG.CULTURE_OF[faction])
+end
+
+-- "" for Chaos Dwarfs and for an unreadable culture or nil - so every Chaos Dwarf key,
+-- and every key built without a faction, is exactly what it was.
+function GG.tag(faction)
+    local f = GG.flavour_of(faction)
+    return f and f.tag or ""
+end
+
+-- A feed index for the faction that RECEIVES the message: the base plus its offset.
+function GG.feed(faction, base)
+    local f = GG.flavour_of(faction)
+    return base + (f and f.feed or 0)
 end
 
 local function is_chd(faction)
@@ -2223,9 +2407,12 @@ function GG.payload(faction, s, target)
         -- before it gets here, and this is the second line of defence.
         if s.hostile then
             if not target then return end
-            cm:apply_effect_bundle("derpy_gg_svc_" .. s.key, target, s.turns)
+            -- The BUYER's tag, on the target too: the victim reads who did it to them.
+            cm:apply_effect_bundle("derpy_gg_svc_" .. s.key .. GG.tag(faction), target,
+                                   s.turns)
         else
-            cm:apply_effect_bundle("derpy_gg_svc_" .. s.key, faction, s.turns)
+            cm:apply_effect_bundle("derpy_gg_svc_" .. s.key .. GG.tag(faction), faction,
+                                   s.turns)
         end
 
     elseif s.kind == "gold" then
@@ -2268,6 +2455,12 @@ function GG.payload(faction, s, target)
                                            GG.TITHE_FACTOR, 400)
             cm:faction_add_pooled_resource(faction, "wh3_dlc23_chd_raw_materials",
                                            GG.TITHE_FACTOR, 800)
+        elseif GG.CULTURE_OF[faction] == "wh_main_dwf_dwarfs" then
+            -- OATHGOLD, the Dwarfs' own scarce currency. dwf_oathgold is a FACTION pool
+            -- every Dwarf faction has, and "missions" is the factor its
+            -- dwf_oathgold_quest_rewards junction binds - the one of its nine that takes
+            -- either sign. 250 is half what CA's Underdeep pays for one building.
+            cm:faction_add_pooled_resource(faction, "dwf_oathgold", GG.TITHE_FACTOR, 250)
         else
             cm:treasury_mod(faction, 3000)
         end
@@ -2769,6 +2962,16 @@ function GG.register()
     -- Every condition below is the literal `true`. A listener condition that
     -- errors drops with no log line at all, so the work happens in the handler.
 
+    -- THE MULTIPLAYER TRANSPORT'S RECEIVING END - see GG.mp_send. Registered and silent
+    -- in single player, where nothing is ever broadcast.
+    core:add_listener("gg_mp", "UITrigger", true, function(context)
+        local ok, err = pcall(function()
+            local f = GG.mp_receive(context:trigger(), context:faction_cqi())
+            if f and GG.after_mp then GG.after_mp(f) end
+        end)
+        if not ok then GG.trace("UITrigger failed: " .. tostring(err)) end
+    end, true)
+
     core:add_listener("gg_turn", "FactionTurnStart", true, function(context)
         local name = faction_name_of(context)
         if not name then return end
@@ -2865,16 +3068,19 @@ function GG.register()
     core:add_listener("gg_research_started", "ResearchStarted", true, function(context)
         local ok, name = pcall(function() return context:faction():name() end)
         if not ok or not name then return end
-        -- HUMAN FACTIONS ONLY. This event fires for every faction in the campaign -
-        -- about 190 in Immortal Empires - and a saved value per faction per technology
-        -- would be 190 keys in the save. This was gated on GG.covered, which is the
-        -- player's culture and so lets in every AI faction of the player's own race -
-        -- about fifteen of them in Immortal Empires, none of which spends the record.
-        --
-        -- Nothing is lost: GGAI.EXCLUDED keeps the AI off Bound Blueprint entirely, so
-        -- the only faction that ever spends this record is the one at the keyboard. If
-        -- the AI is ever let onto that service, this gate is what has to widen with it.
-        if not GG.is_human(name) then return end
+        -- THE PLAYER'S CULTURE ONLY: the humans, and the AI factions of their race -
+        -- about fifteen in Immortal Empires - which buy Bound Blueprint off this record.
+        -- The event fires for every faction in the campaign, about 190, and a saved value
+        -- for each would be keys in the save for factions that can never buy anything.
+        if not GG.covered(name) then return end
+        -- WHETHER THE EVENT REACHES THE AI AT ALL is unmeasured - ResearchCompleted does
+        -- not - so the first time it does is said once a session. No line in a log that
+        -- has an AI turn in it means the AI never gets a record and never buys this.
+        if not GG.research_seen_ai and not GG.is_human(name) then
+            GG.research_seen_ai = true
+            GG.trace("ResearchStarted reached AI faction " .. tostring(name)
+                     .. " - the AI can buy Bound Blueprint")
+        end
         local okt, tech = pcall(function() return context:technology() end)
         if not okt then return end
         if GG.set_research(name, tech) then GG.save_research(name) end
@@ -3082,12 +3288,14 @@ GG.FEED_INDEX_DEMAND = 5002
 function GG.announce_demand(faction, what, _demand)
     local stem = "message_event_text_text_derpy_gg_demand"
     if what == "expired" then stem = stem .. "_fail" end
+    stem = stem .. GG.tag(faction)
     pcall(function()
         cm:show_message_event(faction, stem .. "_title", stem .. "_primary",
                               -- true, not false: the record is a
                               -- scripted_persistent_event and the flag has to agree
                               -- with it or nothing draws.
-                              stem .. "_secondary", true, GG.FEED_INDEX_DEMAND)
+                              stem .. "_secondary", true,
+                              GG.feed(faction, GG.FEED_INDEX_DEMAND))
     end)
 end
 
@@ -3109,13 +3317,14 @@ function GG.announce_bounty_fail(faction, _guild, _took)
     if not ok or not humans then return end
     for i = 1, #humans do
         if humans[i] == faction then
-            local stem = "message_event_text_text_derpy_gg_bounty_fail"
+            local stem = "message_event_text_text_derpy_gg_bounty_fail" .. GG.tag(faction)
             pcall(function()
                 cm:show_message_event(faction, stem .. "_title", stem .. "_primary",
                                       -- true, not false: the record is a
                                       -- scripted_persistent_event and the flag has to
                                       -- agree with it or nothing draws.
-                                      stem .. "_secondary", true, GG.FEED_INDEX_DEMAND)
+                                      stem .. "_secondary", true,
+                                      GG.feed(faction, GG.FEED_INDEX_DEMAND))
             end)
             return
         end
@@ -3130,6 +3339,84 @@ GG.FEED_INDEX_LEAD = 5003
 -- which is on some faction's turn start - so loc KEYS only, never a resolved name.
 -- That is why there are twelve pairs of keys rather than one pair and a guild name
 -- substituted in: cm:show_message_event takes keys and there is nowhere to put a name.
+-- --------------------------------------------------------------- the ledger --
+-- WHAT EACH GUILD EARNED, AND FROM WHAT: the Guilds tab's "Reputation this turn" line.
+-- A finished building pays in script, not through an effect, so this line is the only
+-- place a player sees that the forge they built paid the smiths.
+--
+-- TWO TURNS, this one and the last. A battle fought on an enemy's turn lands after your
+-- own turn has ended, so "this turn" alone would never show it.
+--
+-- KEYED BY TURN NUMBER, not cleared at FactionTurnStart. The order between that event
+-- and BuildingCompleted is undocumented, and a clear that ran second would wipe out the
+-- building it was meant to show.
+--
+-- IN THE SAVE AND NOWHERE ELSE, like the log below, so a reload of the turn-start
+-- autosave still shows what the turn paid. HUMANS ONLY: the AI opens no panel.
+-- Packed as `turn;guild.source=n,...;turn;guild.source=n,...` - this turn, then the one
+-- before. "withheld" is what the per-turn cap kept back; every other source was paid.
+GG.LEDGER_SOURCES = {"income", "battles", "research", "agents", "buildings",
+                     "settlements", "missions", "bounties", "demands", "other",
+                     "withheld"}
+GG.LEDGER_KNOWN = {}
+for i = 1, #GG.LEDGER_SOURCES do GG.LEDGER_KNOWN[GG.LEDGER_SOURCES[i]] = true end
+
+function GG.ledger_read(faction)
+    local L = {t1 = -1, now = {}, t0 = -1, last = {}}
+    local raw = cm:get_saved_value("derpy_gg_earned_" .. tostring(faction))
+    if type(raw) ~= "string" then return L end
+    local t1, a, t0, b = string.match(raw, "^(%-?%d+);([^;]*);(%-?%d+);([^;]*)$")
+    if not t1 then return L end
+    local function parse(s, into)
+        for g, src, n in string.gmatch(s, "(%a+)%.(%a+)=(%d+)") do
+            into[g] = into[g] or {}
+            into[g][src] = tonumber(n)
+        end
+    end
+    L.t1, L.t0 = tonumber(t1), tonumber(t0)
+    parse(a, L.now)
+    parse(b, L.last)
+    return L
+end
+
+local function ledger_pack(t)
+    local out = {}
+    for i = 1, #GG.GUILDS do
+        local by = t[GG.GUILDS[i]]
+        if by then
+            for j = 1, #GG.LEDGER_SOURCES do
+                local s = GG.LEDGER_SOURCES[j]
+                if by[s] then out[#out + 1] = GG.GUILDS[i] .. "." .. s .. "=" .. by[s] end
+            end
+        end
+    end
+    return table.concat(out, ",")
+end
+
+function GG.ledger_add(faction, guild, source, amount)
+    if not faction or not guild or type(amount) ~= "number" or amount < 1 then return end
+    if not GG.is_human(faction) then return end
+    local L = GG.ledger_read(faction)
+    local now = GG.turn_now()
+    if L.t1 ~= now then
+        L.t0, L.last, L.t1, L.now = L.t1, L.now, now, {}
+    end
+    local src = GG.LEDGER_KNOWN[source] and source or "other"
+    L.now[guild] = L.now[guild] or {}
+    L.now[guild][src] = (L.now[guild][src] or 0) + math.floor(amount)
+    cm:set_saved_value("derpy_gg_earned_" .. faction, L.t1 .. ";" .. ledger_pack(L.now)
+                       .. ";" .. L.t0 .. ";" .. ledger_pack(L.last))
+end
+
+-- {guild = {source = n}} for this turn and for the one before; empty tables when nothing.
+function GG.earned(faction)
+    local L = GG.ledger_read(faction)
+    local t = GG.turn_now()
+    local now = (L.t1 == t) and L.now or {}
+    local last = (L.t1 == t - 1 and L.now) or (L.t0 == t - 1 and L.last) or {}
+    return now, last
+end
+
 -- ------------------------------------------------------------------ the log --
 -- WHAT THE LOG TAB READS. The panel had a Log tab once and it was replaced by Bounties,
 -- because nothing ever wrote a record for it to draw. This is the record.
@@ -3198,9 +3485,11 @@ function GG.announce_lead(guild, who, was)
             GG.log_add(me, "lead_" .. stem, guild,
                        stem == "won" and (was or "") or (who or ""))
             local k = "message_event_text_text_derpy_gg_lead_" .. stem .. "_" .. guild
+                      .. GG.tag(me)
             pcall(function()
                 cm:show_message_event(me, k .. "_title", k .. "_primary",
-                                      k .. "_secondary", true, GG.FEED_INDEX_LEAD)
+                                      k .. "_secondary", true,
+                                      GG.feed(me, GG.FEED_INDEX_LEAD))
             end)
         end
     end
@@ -3235,6 +3524,139 @@ function GG.is_human(faction)
     return false
 end
 
+-- ---------------------------------------------------------------------------
+-- MULTIPLAYER. A model change made on one machine and not the others is a desync, so
+-- nothing the panel does may change the model straight off a click. The click goes
+-- through GG.mp_send, which broadcasts with CampaignUI.TriggerCampaignScriptEvent; CA
+-- delivers the resulting UITrigger to every machine in one order, and GG.mp_receive
+-- applies the same op on all of them. The Zharr Exchange's transport, same shape.
+--
+-- SINGLE PLAYER RUNS THE SAME OPS, called directly instead of broadcast, so every op is
+-- exercised by ordinary play and only the round trip is multiplayer-only.
+--
+-- EACH OP READS ITS STATE BACK FROM THE SAVE FIRST. The machine that drew the panel has
+-- the board, the demand and the patron in memory; after a reload mid-turn the others do
+-- not. The save is the one copy every machine agrees on.
+--
+-- NOT VERIFIED IN A MULTIPLAYER CAMPAIGN - no two-machine run has happened.
+GG.MP_TAG = "gg1"
+GG.MP_OPS = {}
+
+-- CQI -> HUMAN FACTION. Only a human can send one of these.
+function GG.faction_by_cqi(cqi)
+    if not cqi then return nil end
+    local found = nil
+    pcall(function()
+        local humans = cm:get_human_factions()
+        for i = 1, #humans do
+            local f = cm:get_faction(humans[i])
+            if f and not f:is_null_interface() and f:command_queue_index() == cqi then
+                found = humans[i]
+                return
+            end
+        end
+    end)
+    return found
+end
+
+function GG.mp_send(faction, op, arg)
+    if not faction or not GG.MP_OPS[op] then return end
+    if not GG.is_mp() then
+        GG.MP_OPS[op](faction, arg)
+        return
+    end
+    local cqi = nil
+    pcall(function()
+        local f = cm:get_faction(faction)
+        if f and not f:is_null_interface() then cqi = f:command_queue_index() end
+    end)
+    -- REFUSE RATHER THAN FALL BACK. A local apply here would change one machine only,
+    -- which is the fault this whole section exists to prevent.
+    if not cqi then
+        GG.trace("no command_queue_index for " .. tostring(faction) .. " - " .. op
+                 .. " not sent")
+        return
+    end
+    pcall(function()
+        CampaignUI.TriggerCampaignScriptEvent(cqi, GG.MP_TAG .. "|" .. op .. "|"
+                                              .. tostring(arg or ""))
+    end)
+end
+
+-- THE RECEIVING END. Returns the faction it acted for, nil for anything not ours -
+-- every other mod's UITrigger comes through the same listener.
+function GG.mp_receive(id, cqi)
+    if type(id) ~= "string" then return nil end
+    if string.sub(id, 1, #GG.MP_TAG + 1) ~= GG.MP_TAG .. "|" then return nil end
+    local op, arg = string.match(id, "^" .. GG.MP_TAG .. "|([^|]*)|(.*)$")
+    local fn = op and GG.MP_OPS[op]
+    if not fn then return nil end
+    local faction = GG.faction_by_cqi(cqi)
+    if not faction then
+        GG.trace("UITrigger " .. tostring(op) .. " from unknown cqi " .. tostring(cqi))
+        return nil
+    end
+    fn(faction, arg)
+    return faction
+end
+
+-- A TARGET OFF THE WIRE. A slot interface cannot travel in an event string, so a building
+-- target travels as its region key and is rebuilt here; research travels as nothing,
+-- because every machine holds the same ResearchStarted record.
+function GG.target_from_wire(faction, s, t)
+    if not s then return nil end
+    if s.kind == "research" then return GG.research_target(faction) end
+    if type(t) ~= "string" or t == "" then return nil end
+    if s.hostile then return t end
+    if s.kind == "building" then return GG.upgrade_target(faction, t) end
+    if s.kind == "unit" then return tonumber(t) end
+    return t
+end
+
+-- "service_key|target"
+GG.MP_OPS.buy = function(faction, arg)
+    local key, t = string.match(arg or "", "^([^|]*)|?(.*)$")
+    local s = GG.service(key)
+    if not s then return end
+    GG.load(faction)
+    GG.load_research(faction)
+    GG.buy(faction, key, GG.target_from_wire(faction, s, t))
+    GG.save(faction)
+end
+
+-- The board index the card showed, which GG.bounty_view keeps equal to the list's.
+GG.MP_OPS.bounty = function(faction, arg)
+    local n = tonumber(arg)
+    if not n then return end
+    GG.load_bounties(faction)
+    if GG.take_bounty(faction, n) then GG.save_bounties(faction) end
+end
+
+GG.MP_OPS.demand = function(faction)
+    GG.load(faction)
+    GG.load_demand(faction)
+    if GG.pay_demand(faction) then
+        GG.save_demand(faction)
+        GG.save(faction)
+    end
+end
+
+-- "guild|character cqi". The sitting guild's button dismisses, any other appoints -
+-- decided here, on every machine, from the saved post.
+GG.MP_OPS.patron = function(faction, arg)
+    local guild, cqi = string.match(arg or "", "^([^|]*)|?(.*)$")
+    if not GG.is_guild(guild) then return end
+    GG.load(faction)
+    GG.load_patron(faction)
+    local p = GG.patrons[faction]
+    if p and p.guild == guild then
+        GG.clear_patron(faction)
+    else
+        GG.set_patron(faction, guild, tonumber(cqi))
+    end
+    GG.save_patron(faction)
+end
+
 -- A PROMOTION. Called from GG.grant, which runs from six different turn handlers for
 -- every faction in the world - so loc KEYS only, never a resolved name, and the cheap
 -- tests come first.
@@ -3264,14 +3686,23 @@ function GG.announce_rank(faction, guild, old_rank, new_rank)
     if not ok or not humans then return end
     for i = 1, #humans do
         if humans[i] == faction then
+            -- ONLY THE FIRST TIME THIS RANK IS REACHED. Upkeep demotes a guild the player
+            -- stops feeding, so a faction hovering at a threshold crosses it again and
+            -- again; each crossing popped the same promotion (Azeros, turns 31 and 33,
+            -- 2026-09-23). The bundle swap and the Log still record every crossing. Humans
+            -- only, so the AI writes no key.
+            local best_key = "derpy_gg_best_" .. guild .. "_" .. faction
+            if new_rank <= (tonumber(cm:get_saved_value(best_key)) or 0) then return end
+            cm:set_saved_value(best_key, new_rank)
             local k = "message_event_text_text_derpy_gg_rank_"
-                      .. guild .. "_" .. new_rank
+                      .. guild .. "_" .. new_rank .. GG.tag(faction)
             pcall(function()
                 cm:show_message_event(faction, k .. "_title", k .. "_primary",
                                       -- true, not false: the record is a
                                       -- scripted_persistent_event and the flag has to
                                       -- agree with it or nothing draws.
-                                      k .. "_secondary", true, GG.FEED_INDEX_RANK)
+                                      k .. "_secondary", true,
+                                      GG.feed(faction, GG.FEED_INDEX_RANK))
             end)
             return
         end
@@ -3299,10 +3730,13 @@ function GG.notice_once(faction, tag, guild)
     if cm:get_saved_value(flag) == "1" then return false end
     if not GG.is_human(faction) then return false end
     cm:set_saved_value(flag, "1")
+    -- `tag` is this notice's own "first"/"half"; GG.tag is the reader's flavour.
     local k = "message_event_text_text_derpy_gg_notice_" .. tag .. "_" .. guild
+              .. GG.tag(faction)
     pcall(function()
         cm:show_message_event(faction, k .. "_title", k .. "_primary",
-                              k .. "_secondary", true, GG.FEED_INDEX_RANK)
+                              k .. "_secondary", true,
+                              GG.feed(faction, GG.FEED_INDEX_RANK))
     end)
     return true
 end
@@ -3350,7 +3784,24 @@ function GG.battle_award(winner, outnumbered)
     GG.save(winner)
 end
 
-cm:add_first_tick_callback(function() GG.load_all(); GG.register() end)
+-- EVERY HUMAN'S BOARD, AT THE FIRST TICK. It is posted at the human's turn start, so a
+-- campaign that adds the mod mid-turn has none until the next one. It used to be posted
+-- when the panel was drawn, which runs on one machine - a desync in multiplayer. The
+-- first tick runs on every machine, in the same order.
+function GG.first_boards()
+    local ok, humans = pcall(function() return cm:get_human_factions() end)
+    if not ok or not humans then return end
+    for i = 1, #humans do
+        local h = humans[i]
+        GG.load_bounties(h)
+        if #(GG.bounties[h] or {}) == 0 then
+            GG.post_bounties(h)
+            GG.save_bounties(h)
+        end
+    end
+end
+
+cm:add_first_tick_callback(function() GG.load_all(); GG.register(); GG.first_boards() end)
 
 function GG.load(faction)
     local packed = cm:get_saved_value("derpy_gg_" .. faction)

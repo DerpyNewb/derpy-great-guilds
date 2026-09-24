@@ -48,7 +48,111 @@ ICONS = {
     "chd_outpost_overseer_hut": "overseers",
     "chd_outpost_raiding_camp": "slavers",
     "chd_tower_tribute_halls": "crest",
+    # EMPIRE and DWARFS. CA's own building icons for the same six trades, each measured a
+    # flat silhouette (commonest colour 100% of visible pixels, 74x74, 2026-09-23).
+    # dwarf_hall_of_oaths (51%) and dwf_underdeep_grudges (69%) were the first picks and
+    # are textured - build() refuses them, which is why the crest and the Grudge-Settlers
+    # are the Karaz-a-Karak and slayer-cult icons instead.
+    "empire_port": "brass_emp",
+    "empire_barracks": "immortals_emp",
+    "empire_gunnery_school": "daemonsmiths_emp",
+    "empire_tavern": "khanate_emp",
+    "empire_walls": "overseers_emp",
+    "empire_shooting_range": "slavers_emp",
+    "empire_imperial_cult": "crest_emp",
+    "dwarf_trade_depot": "brass_dwf",
+    "dwarf_barracks": "immortals_dwf",
+    "dwarf_engineering": "daemonsmiths_dwf",
+    "dwarf_rangers": "khanate_dwf",
+    "dwarf_industry": "overseers_dwf",
+    "dwarf_slayer_cult": "slavers_dwf",
+    "dwarf_city_karaz_a_karak": "crest_dwf",
+    # EVERY OTHER RACE. Icons that belong to no one race's building line, or whose
+    # picture reads as the trade and not the builder: a handshake shield, crossed swords
+    # on a banner, an anvil, crossed daggers, a quarried block, a loot pile, and a plain
+    # heraldic shield for the crest. Each measured a flat silhouette, 2026-09-24.
+    "war_coordination_outpost": "brass_gen",
+    "wh_main_emp_academy": "immortals_gen",
+    "special_vauls_anvil": "daemonsmiths_gen",
+    "minor_cult_assassins_hideout": "khanate_gen",
+    "wh2_dlc15_special_massif_orcal_quarry": "overseers_gen",
+    "ogre_camp_loot_pile": "slavers_gen",
+    "minor_cult_tilean_traders": "crest_gen",
+    # BRETONNIA, CATHAY AND KISLEV, each from its own race's building line. Picked from a
+    # rendered sheet of every candidate, 2026-09-24; all 21 measure 97-100% one colour.
+    "bretonnia_bordeleaux_wine_market": "brass_brt",
+    "bretonnia_tournament_grounds": "immortals_brt",
+    "bretonnia_tower_of_the_enchantress": "daemonsmiths_brt",
+    "bretonnia_tavern": "khanate_brt",
+    "bretonnia_carpenter": "overseers_brt",
+    "bretonnia_barracks": "slavers_brt",
+    "bretonnia_worship": "crest_brt",
+    "cathay_gold_yin": "brass_cth",
+    "cathay_celestial_barracks": "immortals_cth",
+    "cathay_growth_yin": "daemonsmiths_cth",
+    "cathay_shang_yang_house_of_secrets": "khanate_cth",
+    "cathay_walls_yang": "overseers_cth",
+    "cathay_jade_barracks": "slavers_cth",
+    "cathay_special_celestial_palace": "crest_cth",
+    "kislev_erengrad_trading_port": "brass_ksl",
+    "kislev_royal_guards_prologue": "immortals_ksl",
+    "kislev_frosthome": "daemonsmiths_ksl",
+    "kislev_trade_order": "khanate_ksl",
+    "kislev_timber_prologue": "overseers_ksl",
+    "kislev_ungol_quarters": "slavers_ksl",
+    "kislev_bears": "crest_ksl",
+    # DARK ELVES AND HIGH ELVES, from their own building lines, 2026-09-24. All fourteen
+    # measure 98-100% one colour. dark_elves_sorcery would suit the Convent better but is
+    # 70% - textured - so the Convent is dark_elves_cold_ones, a spired tower. The High
+    # Elves' White Tower (high_elves_mages) and Phoenix Crown chamber are flat but drawn
+    # inside a haze and a filled square, which read as boxes at 74px; the Loremasters get
+    # the scroll and quill instead, and the crest the lone phoenix.
+    "dark_elves_port": "brass_def",
+    "dark_elves_barracks": "immortals_def",
+    "dark_elves_cold_ones": "daemonsmiths_def",
+    "dark_elves_hired_killers": "khanate_def",
+    "dark_elves_defence_major": "overseers_def",
+    "dark_elves_slaves": "slavers_def",
+    "dark_elves_worship": "crest_def",
+    "hef_foreign_trade_market": "brass_hef",
+    "high_elves_barracks": "immortals_hef",
+    "high_elves_embassy": "daemonsmiths_hef",
+    "high_elves_aesanar": "khanate_hef",
+    "high_elves_defence_major": "overseers_hef",
+    "high_elves_stables": "slavers_hef",
+    "hef_sea_patrol_outpost_beasts": "crest_hef",
 }
+
+UI_PACK = os.path.join(r"F:\SteamLibrary\steamapps\common\Total War WARHAMMER III",
+                       "data", "ui.pack")
+CA_ICON = "ui/buildings/icons/%s.png"
+
+
+def fetch(stem):
+    """Copy CA's original of one source icon into SRC, read offline out of ui.pack.
+
+    CA's ui art is COMPRESSED in the pack - a u32 length and then a zstd frame - so a
+    byte-grep finds the path and not a usable PNG; read_vanilla_loc._decompress strips
+    that wrapper. Returns None on success, or why it could not.
+    """
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import read_pack_index as rpi
+    import read_vanilla_loc as rvl
+    want = CA_ICON % stem
+    try:
+        hits = [h for h in rpi.read(UI_PACK, want) if h[0].lower() == want]
+    except (IOError, OSError, ValueError) as e:
+        return "cannot read %s: %s" % (UI_PACK, e)
+    if not hits:
+        return "%s is not in %s" % (want, UI_PACK)
+    _path, comp, data = hits[0]
+    if comp:
+        data = rvl._decompress(data)
+    if not os.path.isdir(SRC):
+        os.makedirs(SRC)
+    with open(os.path.join(SRC, stem + ".png"), "wb") as fh:
+        fh.write(data)
+    return None
 
 
 def brighten(im, ink=INK):
@@ -73,6 +177,11 @@ def build(write=True):
         os.makedirs(DST)
     for stem, name in sorted(ICONS.items()):
         src = os.path.join(SRC, stem + ".png")
+        if not os.path.isfile(src) and write:
+            why = fetch(stem)
+            if why:
+                out.append("%s: %s" % (stem, why))
+                continue
         if not os.path.isfile(src):
             out.append("missing source icon: %s" % src)
             continue
@@ -127,6 +236,13 @@ def selftest():
         assert bad and "not a silhouette" in bad[0], bad
     finally:
         ICONS = keep
+    # EVERY FLAVOUR has all six guild icons and a crest, each from its own source.
+    names = set(ICONS.values())
+    assert len(names) == len(ICONS), "two sources ship under one name"
+    for tag in ("", "_emp", "_dwf", "_brt", "_cth", "_ksl", "_def", "_hef", "_gen"):
+        for g in ("brass", "immortals", "daemonsmiths", "khanate", "overseers",
+                  "slavers", "crest"):
+            assert g + tag in names, "no icon ships as " + g + tag
     print("selftest ok: alpha preserved, peak opaque, detailed source refused")
 
 
