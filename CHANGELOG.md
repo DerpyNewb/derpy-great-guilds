@@ -3,6 +3,17 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-09-25 - build DA1C0218
+
+MD5 `DA1C0218EA4134C3CF72A5755455D836`, 32,151,169 bytes.
+
+- **A guild no longer changes hands and back in one round.** Each faction is paid its Brass
+  Tablets income at the start of its own turn, so two factions whose reputations were
+  close swapped the guild at every turn start. The message was "Turned Away", followed
+  soon after by "Answer To You". A rival now has to be ahead by more than one turn's
+  income to take the guild. The Khanate, which pays for that same income through rivalry,
+  gets the same rule.
+
 ## 2026-09-25 - build A3918816
 
 Deployed 2026-09-25. MD5 `A3918816471FF4C246A60A0D2BC86507`, 32,148,457 bytes.

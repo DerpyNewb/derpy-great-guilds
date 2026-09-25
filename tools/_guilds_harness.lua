@@ -142,10 +142,13 @@ cm.get_faction = function(_, k)
             end,
             -- A demand for gold asks the faction what it has. Without this the tribute
             -- branch of GG.demand_payable is never actually exercised.
-            treasury = function() return TREASURY[k] or 0 end}
+            treasury = function() return TREASURY[k] or 0 end,
+            -- What the Brass Tablets will pay this faction at its next turn start.
+            net_income = function() return INCOME[k] or 0 end}
 end
 
 TREASURY = {}
+INCOME = {}
 
 local function NULL() return {is_null_interface = function() return true end} end
 
@@ -2596,6 +2599,136 @@ assert(#feed == fmark,
        "a round in which nobody earned and nobody was overtaken must announce nothing - "
        .. "got " .. (#feed - fmark) .. " popup(s), which is the half-charged world "
        .. "handing the guild back and forth")
+GG.TUNE = TUNE_BEFORE_LEAD
+
+-- ------------------------- turn-start income must not move the crown twice --
+-- MEASURED IN A LIVE CAMPAIGN, 2026-09-25, turns 1-2: "The Brass Tablets Have Turned
+-- Away" during the rivals' turns, then "The Brass Tablets Answer To You" at the player's
+-- next turn start. The player had 8 Brass Tablets reputation, all of it turn-start income.
+-- Income is paid the same way upkeep is charged, at each faction's OWN turn start, so the
+-- half-charged world above is also a half-PAID one - and one upkeep tick (1 point at
+-- Unmarked) is no margin against a turn's income.
+--
+-- The player earns 8 a turn and the rival 12, played in the single-player round order,
+-- player first. The rival really is out-earning the player, so the guild must change
+-- hands - ONCE, to the rival, and stay there.
+TUNE_BEFORE_LEAD = GG.TUNE
+GG.TUNE = GG.unpack_tune(GG.pack_tune({rate_brass = 250, cap_brass = 40}))
+GG.state[HUMAN]["brass"].rep, GG.state[RIVAL]["brass"].rep = 0, 0
+INCOME[HUMAN], INCOME[RIVAL] = 2000, 3000
+GG.patrons[HUMAN], GG.patrons[RIVAL] = nil, nil
+GG.leaders_now = {}
+fmark = #feed
+TURN_ORDER = {HUMAN, RIVAL}
+LEAD_MOVES = {}
+for round = 1, 8 do
+    for ti = 1, #TURN_ORDER do
+        GG.reset_turn(TURN_ORDER[ti])
+        GG.on_turn_start(TURN_ORDER[ti], INCOME[TURN_ORDER[ti]])
+        LEAD_WAS = GG.leaders_now[WBS]
+        GG.reassert_leaders()
+        if LEAD_WAS ~= nil and GG.leaders_now[WBS] ~= LEAD_WAS then
+            LEAD_MOVES[#LEAD_MOVES + 1] = tostring(GG.leaders_now[WBS])
+        end
+    end
+end
+-- THE INCOME WAS PAID, or the round below measures two factions sitting still.
+assert(GG.state[HUMAN]["brass"].rep == 64 and GG.state[RIVAL]["brass"].rep == 96,
+       "eight rounds of turn-start income must pay 64 and 96, got "
+       .. GG.state[HUMAN]["brass"].rep .. " and " .. GG.state[RIVAL]["brass"].rep)
+assert(#LEAD_MOVES == 1 and LEAD_MOVES[1] == RIVAL,
+       "the rival out-earns the player and must take brass once and keep it - got "
+       .. #LEAD_MOVES .. " move(s): " .. table.concat(LEAD_MOVES, ", "))
+LEAD_POPUPS = 0
+for i = fmark + 1, #feed do
+    if string.find(tostring(feed[i][2]), "derpy_gg_lead_", 1, true) then
+        LEAD_POPUPS = LEAD_POPUPS + 1
+    end
+end
+assert(LEAD_POPUPS == 1,
+       "one change of hands is one popup, got " .. LEAD_POPUPS)
+-- THE HOLDER'S INCOME, NOT THE CHALLENGER'S. The rival holds brass and earns 12 a turn;
+-- the player earns 4 and sits 3 ahead, which the hold rule has kept from counting. The
+-- player's turn start pays 4 and puts them 7 ahead of a rival that has not been paid yet
+-- this round - and the rival's own turn start then puts it back in front. The player
+-- never out-earns the rival, so brass must not move at all.
+GG.state[HUMAN]["brass"].rep, GG.state[RIVAL]["brass"].rep = 103, 100
+INCOME[HUMAN], INCOME[RIVAL] = 1000, 3000
+GG.leaders_now = {}
+GG.leaders_now[WBS] = RIVAL
+LEAD_MOVES = {}
+for round = 1, 4 do
+    for ti = 1, #TURN_ORDER do
+        GG.reset_turn(TURN_ORDER[ti])
+        GG.on_turn_start(TURN_ORDER[ti], INCOME[TURN_ORDER[ti]])
+        LEAD_WAS = GG.leaders_now[WBS]
+        GG.reassert_leaders()
+        if GG.leaders_now[WBS] ~= LEAD_WAS then
+            LEAD_MOVES[#LEAD_MOVES + 1] = tostring(GG.leaders_now[WBS])
+        end
+    end
+end
+assert(#LEAD_MOVES == 0,
+       "a player who never out-earns the holder must never take brass - got "
+       .. #LEAD_MOVES .. " move(s): " .. table.concat(LEAD_MOVES, ", "))
+
+-- AND THE KHANATE, WHICH THE SAME PAYMENT CHARGES. Brass income costs the khanate its
+-- rivalry share at the same turn start, so the faction not yet charged this round sits
+-- HIGH on the khanate. The player holds it on 130, charged 4 a turn (10 brass); the
+-- rival sits 2 higher, which the hold rule keeps from counting, and is charged 10 a turn
+-- (25 brass). After the player's charge the rival looks 6 ahead - but that is the
+-- rival's own charge still to come, and after it the player is ahead by 4. Nobody earns
+-- any khanate, and the player is genuinely ahead once both are charged, so it must not move.
+GG.TUNE = GG.unpack_tune(GG.pack_tune({rate_brass = 100, cap_brass = 40, rate_rivalry = 40,
+                                       rate_decay = 100, decay_from = 25}))
+WKS = GG.lead_slot("khanate", GG.CHD_CULTURE)
+GG.state[HUMAN]["khanate"].rep, GG.state[RIVAL]["khanate"].rep = 130, 132
+INCOME[HUMAN], INCOME[RIVAL] = 1000, 2500
+GG.leaders_now = {}
+GG.leaders_now[WKS] = HUMAN
+LEAD_MOVES = {}
+for round = 1, 2 do
+    for ti = 1, #TURN_ORDER do
+        GG.reset_turn(TURN_ORDER[ti])
+        GG.on_turn_start(TURN_ORDER[ti], INCOME[TURN_ORDER[ti]])
+        LEAD_WAS = GG.leaders_now[WKS]
+        GG.reassert_leaders()
+        if GG.leaders_now[WKS] ~= LEAD_WAS then
+            LEAD_MOVES[#LEAD_MOVES + 1] = tostring(GG.leaders_now[WKS])
+        end
+    end
+end
+-- THE CHARGE WAS TAKEN, or the round measured nothing.
+assert(GG.state[HUMAN]["khanate"].rep == 122 and GG.state[RIVAL]["khanate"].rep == 112,
+       "two rounds of 4- and 10-point rivalry charges must leave 122 and 112, got "
+       .. GG.state[HUMAN]["khanate"].rep .. " and " .. GG.state[RIVAL]["khanate"].rep)
+assert(#LEAD_MOVES == 0,
+       "a rivalry charge taken in turn order must not move the khanate - got "
+       .. #LEAD_MOVES .. " move(s): " .. table.concat(LEAD_MOVES, ", "))
+
+-- THE MARGIN IS WHAT THE TURN START WILL REALLY PAY: at the campaign's own rate, capped,
+-- with the patron's share, and nothing for a guild that does not pay at turn start.
+-- Over-counting makes a rich holder unbeatable; under-counting brings the alternation
+-- back. A rate of 100, not the default 250, so a hard-coded rate cannot pass.
+GG.TUNE = GG.unpack_tune(GG.pack_tune({rate_brass = 100, cap_brass = 40, rate_patron = 50,
+                                       rate_rivalry = 40}))
+INCOME[RIVAL] = 20000
+assert(GG.turn_start_pay(RIVAL, "brass") == 40,
+       "200 a turn must be held to the cap of 40, got " .. GG.turn_start_pay(RIVAL, "brass"))
+assert(GG.turn_start_pay(RIVAL, "khanate") == 0,
+       "the khanate pays nothing at turn start, got " .. GG.turn_start_pay(RIVAL, "khanate"))
+-- AND ONLY THE KHANATE IS CHARGED BY IT: 40% of the 40 paid.
+assert(GG.turn_start_charge(RIVAL, "khanate") == 16,
+       "40% of 40 brass is a 16-point khanate charge, got "
+       .. GG.turn_start_charge(RIVAL, "khanate"))
+assert(GG.turn_start_charge(RIVAL, "brass") == 0 and GG.turn_start_charge(RIVAL, "slavers") == 0,
+       "brass income charges the khanate and nothing else")
+INCOME[RIVAL] = 1000
+GG.patrons[RIVAL] = {guild = "brass"}
+assert(GG.turn_start_pay(RIVAL, "brass") == 15,
+       "10 a turn with a 50% patron on brass is 15, got " .. GG.turn_start_pay(RIVAL, "brass"))
+GG.patrons[RIVAL] = nil
+INCOME[HUMAN], INCOME[RIVAL] = nil, nil
 GG.TUNE = TUNE_BEFORE_LEAD
 
 -- ------------------------------ rivalry cannot take a rank off you --

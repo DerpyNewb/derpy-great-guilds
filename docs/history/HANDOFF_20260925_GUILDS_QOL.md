@@ -1,14 +1,20 @@
 # The Great Guilds - eleven quality-of-life changes to the panel, and the tooltips it never showed
 
-2026-09-25. Built, packed and deployed to `data/`:
+2026-09-25. Built and packed:
 
-- `derpy_great_guilds.pack`, MD5 `a3918816471ff4c246a60a0d2bc86507`, 32,148,457 bytes. The MD5
-  matched on both sides. This is the build after the preview (section 5).
+- `derpy_great_guilds.pack`, MD5 `da1c0218ea4134c3cf72a5755455d836`, 32,151,169 bytes. This
+  build adds the leadership fix (section 6). It was built while the game was running and
+  copied into `data/` once the game closed, after a check that `data/` still held
+  `a3918816`. The MD5 matched on both sides.
+- `a3918816471ff4c246a60a0d2bc86507` (32,148,457 bytes), the build after the preview
+  (section 5), was deployed and MD5-matched. It is backed up as
+  `Modpacks/derpy_great_guilds.pack.bak_20260925_pre_lead_margin_a3918816`.
 - The first QoL build, `74afe8eae3475ff3c20e2b63cc28e1df` (32,144,734 bytes), is backed up as
   `Modpacks/derpy_great_guilds.pack.bak_20260925_pre_preview_fixes_74afe8ea`.
 - The build before QoL (`40fe934a`, see `HANDOFF_20260925_GUILDS_MP_MCT.md`) is backed up as
   `Modpacks/derpy_great_guilds.pack.bak_20260925_pre_qol_40fe934a`.
-- Not pushed to GitHub. Not uploaded to Steam.
+- Pushed to GitHub on 2026-09-25 as commit `6998466`, which covers builds 7DBE88C6 through
+  A3918816. The repo copy of this handoff predates this line. Not uploaded to Steam.
 
 The request was "find qol features that can be added on the UI". Eleven were proposed; the
 answer was "do all". A twelfth, the tooltip fix, turned up while building them.
@@ -204,3 +210,55 @@ staging.
 
 **What the preview cannot tell you.** Text is drawn in PIL's font, so a width is an estimate.
 Whether a caption fits on its plate is still an in-game question (section 4, items 6 and 7).
+
+## 6. The Brass Tablets changed hands twice in one round (build `da1c0218`)
+
+**The report:** a screenshot of the event feed at the start of turn 2 showed "The Brass
+Tablets Have Turned Away" and "The Brass Tablets Answer To You" together.
+`script_log_250926_2144.txt` gives the order:
+
+- 486.2s: the end-of-turn-1 autosave. You held brass on 8, all of it turn-1 income, and no
+  AI faction had been paid anything yet.
+- 492.9s: `lead_lost_brass`, during the AI turns. A rival's turn start paid it its income
+  and put it ahead.
+- 540.9s: `lead_won_brass`, at your turn-2 start, when your income put you back in front.
+
+**Cause.** `GG.hold_lead` keeps a guild with its holder unless the challenger is more than
+a margin ahead, and that margin was one upkeep tick. Upkeep does not start until turn 25,
+so the margin was 1 point. But Brass Tablets income is paid at each faction's own turn
+start, which is the same half-charged world the upkeep rule was written for. Two factions
+closer than one turn's income swap the guild at every turn start: a bundle moved each time,
+the monopoly moved with it, and a popup fired. The same payment also charges the Khanate
+through rivalry, so the Khanate could swap the same way.
+
+**Fix.** The margin is now the largest of:
+
+- the upkeep, as before;
+- `GG.turn_start_pay(held, guild)`: the holder's next turn-start pay, read live from its
+  net income with the patron share and the cap applied. It is Brass Tablets only, and it
+  covers a holder sitting low because it has not been paid yet;
+- `GG.turn_start_charge(top, guild)`: the challenger's rivalry charge from that same
+  payment. It is Khanate only, and it covers a challenger sitting high because it has not
+  been charged yet.
+
+The two terms point in opposite directions: an unpaid faction sits too low and an
+uncharged one sits too high. `GG.with_patron`, `GG.guild_cap`, `GG.brass_from_income` and
+`GG.rival_loss` were split out of the functions that pay, so that the margin and the
+payment work from the same numbers.
+
+**Tests.** Three scenarios in the harness, each played in the single-player turn order:
+
+- you earn 8 and a rival earns 12: brass changes hands once, to the rival, and stays;
+- a rich holder and a poorer challenger who sits just ahead: nothing moves;
+- the Khanate charged 4 and 10 a turn: nothing moves.
+
+Plus direct checks on the cap, the patron share, the campaign's own brass rate, and a
+charge of zero on every guild but the Khanate. The first and third scenarios failed against
+the old code with exactly the live pattern: moves "rival, you, rival" and "rival, you,
+rival, you". Twelve mutants were all killed. Every check in section 3 was rerun green.
+
+**What it costs.** A genuine overtake now takes a turn or two longer to register, because
+the challenger has to get clear of one turn's pay.
+
+**Owed in game:** watch the feed across the first five turns of a new campaign for any
+guild announced lost and won in the same round.

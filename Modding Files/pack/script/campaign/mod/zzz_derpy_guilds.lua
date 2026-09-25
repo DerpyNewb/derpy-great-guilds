@@ -128,6 +128,15 @@ GG.RIVALS = {
 -- A rank can fall through this. GG.apply_rank is symmetric - it removes the old bundle
 -- and applies the new whichever direction the move is - so a demotion takes the ladder
 -- buff away exactly as a promotion granted it.
+-- Floor of 1, so a small gain still costs something rather than rounding to free.
+function GG.rival_loss(amount)
+    local share = GG.setting("rate_rivalry")
+    if not share or share <= 0 or not amount or amount <= 0 then return 0 end
+    local loss = math.floor(amount * share / 100)
+    if loss < 1 then loss = 1 end
+    return loss
+end
+
 function GG.rival_cost(faction, guild, amount)
     local rival = GG.RIVALS[guild]
     if not rival or not amount or amount <= 0 then return 0 end
@@ -138,9 +147,7 @@ function GG.rival_cost(faction, guild, amount)
     local t = tracks and tracks[rival]
     if not t or t.rep <= 0 then return 0 end
 
-    -- Floor of 1, so a small gain still costs something rather than rounding to free.
-    local loss = math.floor(amount * share / 100)
-    if loss < 1 then loss = 1 end
+    local loss = GG.rival_loss(amount)
 
     -- NEVER BELOW THE RANK ALREADY REACHED.
     --
@@ -350,23 +357,33 @@ function GG.logging()
     return ok and on == true
 end
 
+-- THE PATRON'S SHARE, applied BEFORE the cap. A patron earns you more of what a
+-- guild pays; it does not let you outrun that guild's per-turn ceiling, which is
+-- the one thing keeping a large empire from maxing a guild passively.
+function GG.with_patron(faction, guild, amount)
+    local p = GG.patrons[faction]
+    if p and p.guild == guild then
+        local share = GG.setting("rate_patron") or 0
+        if share > 0 then amount = amount + math.floor(amount * share / 100) end
+    end
+    return amount
+end
+
+-- The MCT-tunable cap, falling back to GG.CAP when no snapshot exists yet. 0 is no cap.
+function GG.guild_cap(guild)
+    local cap = GG.setting("cap_" .. guild)
+    if cap == nil then cap = GG.CAP[guild] or 0 end
+    return cap
+end
+
 function GG.capped_grant(faction, guild, amount, source)
     if not amount or amount <= 0 then return end
     -- THE ONE FUNNEL EVERY PASSIVE EARN ROUTE GOES THROUGH, which is why the culture
     -- gate lives here rather than in six listeners. The bounty payout calls GG.grant
     -- directly and is human-only, so it needs no gate of its own.
     if not GG.covered(faction) then return end
-    -- THE PATRON'S SHARE, applied BEFORE the cap. A patron earns you more of what a
-    -- guild pays; it does not let you outrun that guild's per-turn ceiling, which is
-    -- the one thing keeping a large empire from maxing a guild passively.
-    local p = GG.patrons[faction]
-    if p and p.guild == guild then
-        local share = GG.setting("rate_patron") or 0
-        if share > 0 then amount = amount + math.floor(amount * share / 100) end
-    end
-    -- The MCT-tunable cap, falling back to GG.CAP when no snapshot exists yet.
-    local cap = GG.setting("cap_" .. guild)
-    if cap == nil then cap = GG.CAP[guild] or 0 end
+    amount = GG.with_patron(faction, guild, amount)
+    local cap = GG.guild_cap(guild)
     if cap > 0 then
         GG.turn_gain[faction] = GG.turn_gain[faction] or {}
         local so_far = GG.turn_gain[faction][guild] or 0
@@ -395,10 +412,38 @@ end
 -- on 2026-09-10. math.floor everywhere: WH3 Lua is float32, so 1.05 evaluates
 -- as 1.0499999523163 and a .5 boundary falls the wrong way.
 
+function GG.brass_from_income(net_income)
+    if not net_income or net_income <= 0 then return 0 end
+    return math.floor(net_income / (GG.setting("rate_brass") or 250))
+end
+
 function GG.on_turn_start(faction, net_income)
-    if not net_income or net_income <= 0 then return end
-    GG.capped_grant(faction, "brass",
-                    math.floor(net_income / (GG.setting("rate_brass") or 250)), "income")
+    GG.capped_grant(faction, "brass", GG.brass_from_income(net_income), "income")
+end
+
+-- WHAT A FACTION'S NEXT TURN START WILL PAY IT with this guild: the income, after the
+-- patron's share and the cap, exactly as GG.capped_grant will pay it. Only the Brass
+-- Tablets pay at turn start; every other guild is paid by events inside a turn.
+function GG.turn_start_pay(faction, guild)
+    if guild ~= "brass" then return 0 end
+    local ok, income = pcall(function()
+        local f = cm:get_faction(faction)
+        if not f or f:is_null_interface() then return 0 end
+        return f:net_income()
+    end)
+    if not ok then return 0 end
+    local n = GG.with_patron(faction, guild, GG.brass_from_income(income))
+    local cap = GG.guild_cap(guild)
+    if cap > 0 and n > cap then n = cap end
+    return n
+end
+
+-- WHAT THE SAME TURN START TAKES through rivalry: the khanate's share of the brass paid.
+-- An upper bound - GG.rival_cost may take less at a rank floor - which only makes the
+-- hold a little stickier.
+function GG.turn_start_charge(faction, guild)
+    if GG.RIVALS[guild] ~= "brass" then return 0 end
+    return GG.rival_loss(GG.turn_start_pay(faction, "brass"))
 end
 
 function GG.on_battle(faction, outnumbered)
@@ -838,6 +883,20 @@ end
 --
 -- Ties are already resolved by GG.standings' faction-key order, so a challenger that
 -- merely draws level never takes it either.
+--
+-- AND ONE TURN'S INCOME, which is paid the same way. Upkeep does not start until turn 25,
+-- so on its own this margin was 1 point, while the Brass Tablets pay every faction its
+-- income at its own turn start. Measured live on 2026-09-25, turns 1-2: the player
+-- earned 8 a turn and a rival more, and the guild went "Turned Away", then "Answer To
+-- You", and would have gone on alternating until the gap outgrew a single turn's pay.
+-- THE HOLDER'S INCOME ONLY. Upkeep leaves the faction not yet charged too HIGH, so it
+-- can be either party's; income leaves the faction not yet paid too LOW, and only a
+-- holder sitting low makes a challenger look ahead. GG.turn_start_pay reads the income
+-- live, so the margin tracks what the holder will actually be paid next.
+--
+-- AND THE CHALLENGER'S KHANATE CHARGE. The same payment costs the khanate its rivalry
+-- share, which leaves the faction not yet charged too HIGH - and only a challenger
+-- sitting high looks ahead of the holder.
 function GG.hold_lead(guild, culture, rows, top, top_rep)
     local held = GG.leaders_now[GG.lead_slot(guild, culture)]
     -- Nobody held it, or the holder IS the top row: nothing to hold against. `false`
@@ -851,7 +910,9 @@ function GG.hold_lead(guild, culture, rows, top, top_rep)
             -- reaches here and the top row takes it, which is correct.
             if GG.faction_dead(held) then return top, top_rep end
             local margin = math.max(GG.decay_amount(GG.rank_of(top_rep)),
-                                    GG.decay_amount(GG.rank_of(rows[i].rep)))
+                                    GG.decay_amount(GG.rank_of(rows[i].rep)),
+                                    GG.turn_start_pay(held, guild),
+                                    GG.turn_start_charge(top, guild))
             if top_rep - rows[i].rep <= margin then return held, rows[i].rep end
             return top, top_rep
         end
