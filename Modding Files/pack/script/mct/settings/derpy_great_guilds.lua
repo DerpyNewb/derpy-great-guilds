@@ -3,8 +3,9 @@
 -- MCT loads every .lua under script/mct/settings/, so this file only runs when
 -- MCT is installed. It runs in MCT's OWN environment and CANNOT see GG - a mod
 -- script's globals are not _G - so nothing here calls into the mod directly. The
--- campaign script reads these values once, at the first FactionTurnStart, and
--- freezes them into the save.
+-- campaign script reads these values once, at the first tick of a campaign, and
+-- freezes them into the save. In multiplayer only the host's are read, and the
+-- campaign script sends them to every player (GG.send_tune).
 
 local mct = get_mct and get_mct()
 if not mct then return end
@@ -13,14 +14,15 @@ local m = mct:register_mod("derpy_great_guilds")
 m:set_title("The Great Guilds")
 m:set_author("derpy")
 m:set_description("Six guilds span the world. Earn their favour by playing your "
-    .. "campaign, spend it on services. These values are read once, at the first "
-    .. "turn of a campaign, and are then fixed for the life of that save - change "
-    .. "them from the main menu before starting a new one.")
+    .. "campaign, spend it on services. These values are read once, when a campaign "
+    .. "starts, and are then fixed for the life of that save - change them from the "
+    .. "main menu before starting a new one. In multiplayer the host's settings are "
+    .. "used for every player.")
 
 -- MCT HAS NO CAMPAIGN GATING OF ITS OWN. set_context_specific is an empty
 -- function body and set_local_only is commented out end to end, so both read as
 -- gating and gate nothing. The real defence is the snapshot the campaign script
--- writes at the first FactionTurnStart; the lock below is only the warning.
+-- writes at the first tick; the lock below is only the warning.
 local IN_CAMPAIGN = __game_mode == __lib_type_campaign
 local LOCK_REASON = "Fixed for the life of a campaign. Change it from the main "
     .. "menu before starting a new one."
@@ -237,6 +239,10 @@ o_log:set_tooltip_text("Writes a line to script_log.txt each time any faction "
     .. "it can be turned on in a running campaign.")
 o_log:set_default_value(false)
 o_log:set_assigned_section("debug")
+-- EACH PLAYER'S OWN, in multiplayer too. A global option is left out of MCT's host sync
+-- and left unlocked on a client - the same call MCT makes for its own logging switches.
+-- It only writes to this machine's log, so it cannot desync anything.
+o_log:set_is_global(true)
 
 -- Action buttons fire a custom event rather than calling into the mod: this file
 -- runs in MCT's environment and cannot see GG.

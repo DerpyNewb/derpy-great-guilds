@@ -7,8 +7,9 @@
 		<root this="GG210001-D000-4000-B000000000000001">
 			<derpy_gg_row this="GG210004-D000-4000-B000000000000004">
 				<row_guild this="GG210007-D000-4000-B000000000000007"/>
-				<row_leader this="GG21000A-D000-4000-B00000000000000A"/>
-				<row_rank this="GG21000D-D000-4000-B00000000000000D"/>
+				<row_icon this="GG21000A-D000-4000-B00000000000000A"/>
+				<row_leader this="GG21000D-D000-4000-B00000000000000D"/>
+				<row_rank this="GG210010-D000-4000-B000000000000010"/>
 			</derpy_gg_row>
 		</root>
 	</hierarchy>
@@ -77,7 +78,7 @@
 				<standard
 					this="GG210008-D000-4000-B000000000000008"
 					name="standard"
-					width="190"
+					width="160"
 					height="24"
 					uniqueguid="GG210008-D000-4000-B000000000000008">
 					<component_text
@@ -100,26 +101,61 @@
 							interpolationtime="0"
 							interpolationpropertymask="512"
 							targetmetrics_m_height="24"
-							targetmetrics_m_width="190"
+							targetmetrics_m_width="160"
 							targetmetrics_m_font_scale="1"/>
 					</frames>
 				</derpy_gg_scale>
 			</animations>
 		</row_guild>
-		<row_leader
+		<row_icon
 			this="GG21000A-D000-4000-B00000000000000A"
-			id="row_leader"
+			id="row_icon"
 			tooltipslocalised="true"
+			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
 			uniqueguid="GG21000A-D000-4000-B00000000000000A"
 			currentstate="GG21000B-D000-4000-B00000000000000B"
 			defaultstate="GG21000B-D000-4000-B00000000000000B">
+			<componentimages>
+				<component_image
+					this="GG21000A-D001-4000-B00000000000000A"
+					uniqueguid="GG21000A-D001-4000-B00000000000000A"
+					imagepath="ui/campaign ui/derpy_gg_icons/brass.png"/>
+			</componentimages>
 			<states>
 				<standard
 					this="GG21000B-D000-4000-B00000000000000B"
 					name="standard"
+					width="36"
+					height="36"
+					interactive="true"
+					uniqueguid="GG21000B-D000-4000-B00000000000000B">
+					<imagemetrics>
+						<image
+							this="GG21000A-D002-4000-B00000000000000A"
+							uniqueguid="GG21000A-D002-4000-B00000000000000A"
+							componentimage="GG21000A-D001-4000-B00000000000000A"
+							offset="0.00,0.00"
+							width="36"
+							height="36"
+							margin="0.00,0.00,0.00,0.00"/>
+					</imagemetrics>
+				</standard>
+			</states>
+		</row_icon>
+		<row_leader
+			this="GG21000D-D000-4000-B00000000000000D"
+			id="row_leader"
+			tooltipslocalised="true"
+			uniqueguid="GG21000D-D000-4000-B00000000000000D"
+			currentstate="GG21000E-D000-4000-B00000000000000E"
+			defaultstate="GG21000E-D000-4000-B00000000000000E">
+			<states>
+				<standard
+					this="GG21000E-D000-4000-B00000000000000E"
+					name="standard"
 					width="324"
 					height="24"
-					uniqueguid="GG21000B-D000-4000-B00000000000000B">
+					uniqueguid="GG21000E-D000-4000-B00000000000000E">
 					<component_text
 						texthalign="Left"
 						textvalign="Center"
@@ -147,19 +183,19 @@
 			</animations>
 		</row_leader>
 		<row_rank
-			this="GG21000D-D000-4000-B00000000000000D"
+			this="GG210010-D000-4000-B000000000000010"
 			id="row_rank"
 			tooltipslocalised="true"
-			uniqueguid="GG21000D-D000-4000-B00000000000000D"
-			currentstate="GG21000E-D000-4000-B00000000000000E"
-			defaultstate="GG21000E-D000-4000-B00000000000000E">
+			uniqueguid="GG210010-D000-4000-B000000000000010"
+			currentstate="GG210011-D000-4000-B000000000000011"
+			defaultstate="GG210011-D000-4000-B000000000000011">
 			<states>
 				<standard
-					this="GG21000E-D000-4000-B00000000000000E"
+					this="GG210011-D000-4000-B000000000000011"
 					name="standard"
 					width="196"
 					height="24"
-					uniqueguid="GG21000E-D000-4000-B00000000000000E">
+					uniqueguid="GG210011-D000-4000-B000000000000011">
 					<component_text
 						texthalign="Left"
 						textvalign="Center"

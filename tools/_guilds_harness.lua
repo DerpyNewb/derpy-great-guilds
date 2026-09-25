@@ -3305,19 +3305,8 @@ end
            .. tostring(sp.rate_immortals) .. ")")
     assert(sp.guild_notices == (not GG.TUNE_DEFAULTS.guild_notices),
            "and the switches too, on every preset")
-
-    cm.is_multiplayer = function() return true end
-    local mp = GG.read_mct_or_defaults()
-    for i = 1, #GG.TUNE_ORDER do
-        local k = GG.TUNE_ORDER[i]
-        assert(mp[k] == GG.TUNE_DEFAULTS[k],
-               "in multiplayer every value must be the SHIPPED default, but " .. k
-               .. " came back as " .. tostring(mp[k]) .. " against "
-               .. tostring(GG.TUNE_DEFAULTS[k]))
-    end
-    assert(GG.mp_ignores_mct() == true, "and the guard must say so out loud")
-    cm.is_multiplayer = function() return false end
-    assert(GG.mp_ignores_mct() == false, "single player reads MCT as before")
+    -- Multiplayer no longer blanks MCT here: only the host ever calls this in
+    -- multiplayer, and what it reads is broadcast. See the host-settings block.
 
     -- AND A PRESET STILL OWNS THE NUMBERS WHILE THE SWITCHES STAY THE PLAYER'S. This is
     -- where this mod parts company with the Zharr Exchange, so it is asserted rather than
@@ -3355,7 +3344,7 @@ end
     -- returning nothing used to mean `ok and v == true` was false, which is the safe way
     -- round: a singleplayer campaign must not be locked out of its own settings.
     cm.is_multiplayer = function() error("no such call") end
-    assert(GG.mp_ignores_mct() == false,
+    assert(GG.is_mp() == false,
            "an engine call that errors must read as SINGLE player - locking singleplayer out "
            .. "of MCT because a call failed is a worse failure than the one being guarded")
     cm.is_multiplayer = real_mp
@@ -5123,6 +5112,111 @@ end)()
     local m = GGUI.frow_text(mine, A)
     assert(string.find(m, "^%[%[img:"), "the image opens the line, outside any colour tag")
 
+    -- ---- WHO LEADS, AS A FLAG -------------------------------------------------------
+    -- The user's words: instead of Leader: "You" it should be Leader: and the leader's
+    -- flag. The flag says who it is for a rival too, so a rival keeps its name after it.
+    GG.FLAG_OF[A] = "ui/flags/cr_mine_flag"
+    local lead = GGUI.loc("leader") .. ": "
+    local me_s = GGUI.leader_text({faction_key = A, rank = 3}, A)
+    assert(string.find(me_s, lead .. "[[img:ui/flags/cr_mine_flag/mon_24.png]][[/img]]", 1,
+                       true) == 1, "you lead: Leader: then your own flag, got " .. me_s)
+    assert(not string.find(me_s, GGUI.loc("you"), 1, true),
+           "and the flag REPLACES the word You, got " .. me_s)
+    local b_s = GGUI.leader_text({faction_key = B, rank = 2}, A)
+    assert(string.find(b_s, "cr_test_flag/mon_24.png", 1, true)
+           and string.find(b_s, GGUI.faction_name(B), 1, true),
+           "a rival leads: its flag and its name, got " .. b_s)
+    assert(GGUI.leader_text({}, A) == lead .. GGUI.loc("nobody"),
+           "nobody leads: no flag to draw, the word Nobody")
+    GG.FLAG_OF[C] = nil
+    assert(string.find(GGUI.leader_text({faction_key = C, rank = 1}, A),
+                       "chd_chaos_dwarfs/mon_24.png", 1, true),
+           "a leader with no flag on record falls back rather than drawing a gap")
+    -- THE CHANGED-HANDS MARK AND THE GAIN still ride along, and the colour tag opens
+    -- after the image, never around it - the same rule frow_text keeps.
+    local mv = GGUI.leader_text({faction_key = B, rank = 2}, A, true, 40)
+    local i_img = string.find(mv, "[[/img]]", 1, true)
+    local i_col = string.find(mv, "[[col:yellow]]", 1, true)
+    assert(i_img and i_col and i_img < i_col,
+           "the yellow mark wraps the name, not the flag, got " .. mv)
+    assert(string.find(mv, "[[col:green]]+40", 1, true), "and the gain, got " .. mv)
+    assert(not string.find(GGUI.leader_text({faction_key = B, rank = 2}, A, false, 0),
+                           "+0", 1, true), "a zero gain prints nothing")
+
+    -- ---- AND IT FITS ITS COLUMN -----------------------------------------------------
+    -- Nothing in this engine wraps, and the longest real rival line is well past the
+    -- column's 324px - so the rank goes first, then the name. Never the flag.
+    local function cell(w)
+        local c = {}
+        function c:Dimensions() return w, 24 end
+        function c:TextDimensionsForText(s)
+            assert(not string.find(s, "[[", 1, true), "measure the text, not the markup")
+            return #s * 7, 24
+        end
+        return c
+    end
+    local prev_s, prev_p = GGUI.S, GGUI.PROBE_W0
+    GGUI.S, GGUI.PROBE_W0 = 1, nil
+    local Lb = {faction_key = B, rank = 2}
+    local function need(d)
+        return #GGUI.bare(GGUI.leader_text(Lb, A, true, 40, d)) * 7 + GGUI.FLAG_W
+    end
+    assert(need(2) > need(1) and need(1) > need(0), "each step is shorter than the last")
+    assert(GGUI.leader_fit(cell(need(2)), Lb, A, true, 40)
+           == GGUI.leader_text(Lb, A, true, 40), "room for it all: the whole line")
+    assert(GGUI.leader_fit(cell(need(2) - 1), Lb, A, true, 40)
+           == GGUI.leader_text(Lb, A, true, 40, 1), "one pixel short: the rank goes")
+    assert(GGUI.leader_fit(cell(need(1) - 1), Lb, A, true, 40)
+           == GGUI.leader_text(Lb, A, true, 40, 0), "shorter still: the name goes too")
+    local tiny = GGUI.leader_fit(cell(10), Lb, A, true, 40)
+    assert(string.find(tiny, "cr_test_flag", 1, true), "and the flag always stays: " .. tiny)
+    assert(GGUI.leader_fit(nil, Lb, A) == GGUI.leader_text(Lb, A),
+           "no cell to measure: the whole line, not an error")
+    GGUI.S, GGUI.PROBE_W0 = prev_s, prev_p
+
+    -- ---- AND THE ROW'S GUILD ICON ---------------------------------------------------
+    -- A fake panel that answers every lookup, so the draw runs to the end. Keyed by
+    -- parent AND name: all six rows have a child called row_icon.
+    -- The leader cell is 60px here, so the draw must go through leader_fit and drop
+    -- the rival's name; every other cell measures 0 and is left alone.
+    local imgs, texts, fakes = {}, {}, {}
+    local function fake(id)
+        return setmetatable({id = id}, {__index = function(_t, k)
+            if k == "SetImagePath" then
+                return function(self, p, i) imgs[self.id] = p .. "#" .. tostring(i) end
+            elseif k == "SetText" then
+                return function(self, s) texts[self.id] = s end
+            elseif k == "Dimensions" then
+                return function(self)
+                    return (string.find(self.id, "row_leader$") and 60 or 0), 24
+                end
+            elseif k == "TextDimensionsForText" then
+                return function(_self, s) return #s * 7, 24 end
+            end
+            return function() return 0, 0 end
+        end})
+    end
+    local prev_find, prev_is = find_uicomponent, is_uicomponent
+    is_uicomponent = function(x) return type(x) == "table" end
+    find_uicomponent = function(parent, name)
+        local key = ((type(parent) == "table" and parent.id) or "root") .. "/" .. name
+        fakes[key] = fakes[key] or fake(key)
+        return fakes[key]
+    end
+    local ok_draw, err_draw = pcall(GGUI.draw_standings, A)
+    find_uicomponent, is_uicomponent = prev_find, prev_is
+    assert(ok_draw, "draw_standings on a fake panel: " .. tostring(err_draw))
+    for gi = 1, #GG.GUILDS do
+        local key = "root/derpy_gg_panel/" .. GGUI.ROW .. "_" .. gi .. "/row_icon"
+        assert(imgs[key] == GGUI.icon(GG.GUILDS[gi]) .. "#0",
+               "row " .. gi .. " draws " .. GG.GUILDS[gi] .. "'s icon, got "
+               .. tostring(imgs[key]))
+    end
+    local l1 = texts["root/derpy_gg_panel/" .. GGUI.ROW .. "_1/row_leader"] or ""
+    assert(string.find(l1, "cr_test_flag", 1, true)
+           and not string.find(l1, GGUI.faction_name(B), 1, true),
+           "a 60px leader cell keeps the flag and drops the name, got " .. l1)
+
     -- ---- WHAT THE DRAW WOULD LIST ---------------------------------------------------
     -- Through GGUI.list_rows, which is the draw's own first call - not GG.contenders
     -- directly. The culture argument is the whole request ("only same culture, not 127
@@ -5873,7 +5967,7 @@ end)()
     GGUI.S = 2
     GGUI.layout()
     find_uicomponent, is_uicomponent = prev_find, prev_is
-    assert(moved.gg_title == (100 + 54 * 2) .. "," .. (50 + 14 * 2),
+    assert(moved.gg_title == (100 + 60 * 2) .. "," .. (50 + 8 * 2),
            "gg_title at 2x, got " .. tostring(moved.gg_title))
     assert(moved.derpy_gg_row_2 == (100 + 20 * 2) .. "," .. (50 + (170 + 44) * 2),
            "the second standings row at 2x, got " .. tostring(moved.derpy_gg_row_2))
@@ -6359,6 +6453,737 @@ end)()
     tip = GGUI.earned_tip({}, {}, "daemonsmiths")
     assert(string.find(tip, "earned_no_limit", 1, true),
            "a guild with no limit must say so: " .. tip)
+end)()
+
+-- ------------------------------------------- multiplayer: the host's settings --
+-- The request: MCT in multiplayer. Every machine must end the first tick on ONE set of
+-- numbers - the host's - or the first grant desyncs. Two machines are simulated in turn
+-- with the same broadcast delivered to both, the way CA's UITrigger reaches every
+-- machine in one order: a host whose MCT says Hard and a client whose MCT says Easy.
+;(function()
+    local H, C = "cr_tune_host", "cr_tune_client"
+    local CQI = {[H] = 91, [C] = 92}
+    local prev = {humans = GG.humans, getter = cm.get_human_factions, mp = cm.is_multiplayer,
+                  getf = cm.get_faction, ui = CampaignUI, mct = get_mct,
+                  svr = core.svr_load_bool, loc = cm.get_local_faction_name, tune = GG.TUNE,
+                  saved = saved["derpy_gg_tuned"]}
+    GG.humans = nil
+    cm.get_human_factions = function() return {H, C} end
+    cm.get_faction = function(self, k)
+        local f = prev.getf(self, k)
+        if f then f.command_queue_index = function() return CQI[k] or 0 end end
+        return f
+    end
+    cm.is_multiplayer = function() return true end
+    local sent = {}
+    CampaignUI = {TriggerCampaignScriptEvent = function(cqi, id) sent[#sent + 1] = {cqi, id} end}
+    -- A machine's own MCT: this preset, every switch flipped, every slider at SLIDER.
+    local SLIDER = 77
+    local function mct_on(preset)
+        get_mct = function() return {get_mod_by_key = function(_, key)
+            if key ~= "derpy_great_guilds" then return nil end
+            return {get_option_by_key = function(_, k)
+                return {get_finalized_setting = function()
+                    if k == "preset" then return preset end
+                    if type(GG.TUNE_DEFAULTS[k]) == "boolean" then
+                        return not GG.TUNE_DEFAULTS[k]
+                    end
+                    return SLIDER
+                end}
+            end}
+        end} end
+    end
+    -- One machine, fresh: whose keyboard it is, whether MCT's lobby flag calls it the
+    -- host, and what its MCT holds. Nothing carried over from the machine before.
+    local function machine(me, is_host, preset)
+        cm.get_local_faction_name = function() return me end
+        core.svr_load_bool = function(_, k) return k == "mct_local_is_host" and is_host end
+        mct_on(preset)
+        saved["derpy_gg_tuned"] = nil
+        GG.TUNE = nil
+        GG.tune_parts = {}
+    end
+    local function deliver(list)
+        for i = 1, #list do
+            handlers["gg_mp"]({trigger = function() return list[i][2] end,
+                               faction_cqi = function() return list[i][1] end})
+        end
+    end
+
+    -- ONLY THE HOST SENDS.
+    machine(H, true, "hard")
+    GG.snapshot_settings()
+    GG.send_tune()
+    local from_host = sent
+    sent = {}
+    machine(C, false, "easy")
+    GG.snapshot_settings()
+    GG.send_tune()
+    assert(#sent == 0, "a client sent its own settings - only the host's may count")
+    assert(#from_host >= 1, "the host sent nothing")
+    for i = 1, #from_host do
+        assert(#from_host[i][2] <= 100, "part " .. i .. " is " .. #from_host[i][2]
+               .. " characters, over the 100 an event string can safely carry")
+        assert(from_host[i][1] == CQI[H], "a part went out on someone else's cqi")
+    end
+
+    -- NOTHING FROZEN BEFORE THE HOST'S SETTINGS ARRIVE, and the defaults meanwhile - on
+    -- every machine alike, not each machine's own MCT.
+    assert(saved["derpy_gg_tuned"] == nil, "a client froze settings before the host's came")
+    assert(GG.setting("rate_immortals") == GG.TUNE_DEFAULTS.rate_immortals,
+           "the client played its own Easy before the host's settings came: "
+           .. tostring(GG.setting("rate_immortals")))
+    GG.snapshot_settings()
+    assert(saved["derpy_gg_tuned"] == nil, "a turn start froze the defaults first")
+
+    -- EVERY MACHINE ENDS ON THE HOST'S HARD, byte for byte.
+    local frozen = {}
+    for _, m in ipairs({{H, true, "hard"}, {C, false, "easy"}}) do
+        machine(m[1], m[2], m[3])
+        GG.snapshot_settings()
+        deliver(from_host)
+        frozen[#frozen + 1] = saved["derpy_gg_tuned"]
+        assert(GG.setting("rate_immortals") == GG.PRESETS.hard.rate_immortals,
+               m[1] .. " is not on the host's Hard: " .. tostring(GG.setting("rate_immortals")))
+        assert(GG.setting("guild_notices") == (not GG.TUNE_DEFAULTS.guild_notices),
+               m[1] .. " did not get the host's switches")
+    end
+    assert(frozen[1] and frozen[1] == frozen[2], "the two machines froze different settings")
+
+    -- FROZEN ONCE. A second broadcast - the host changing MCT mid-campaign - changes nothing.
+    machine(H, true, "easy")
+    GG.send_tune()
+    local later = sent
+    sent = {}
+    saved["derpy_gg_tuned"] = frozen[1]
+    GG.TUNE = GG.unpack_tune(frozen[1])
+    deliver(later)
+    assert(saved["derpy_gg_tuned"] == frozen[1], "a campaign's settings changed after freezing")
+    machine(H, true, "hard")
+    saved["derpy_gg_tuned"] = frozen[1]
+    GG.send_tune()
+    assert(#sent == 0, "a campaign that already has settings must not send them again")
+
+    -- A CUSTOM HOST'S SLIDERS TRAVEL TOO, not only a preset's numbers - and four-digit
+    -- sliders are past what one event string carries (a preset is about 77 characters),
+    -- so this is also where the parts are split and put back together.
+    SLIDER = 1000
+    machine(H, true, "custom")
+    GG.send_tune()
+    local custom = sent
+    sent = {}
+    assert(#custom >= 2, "four-digit sliders must travel in parts, got " .. #custom)
+    for i = 1, #custom do
+        assert(#custom[i][2] <= 100, "part " .. i .. " is " .. #custom[i][2]
+               .. " characters, over the 100 an event string can safely carry")
+    end
+    machine(C, false, "easy")
+    local partial = {}
+    for i = 1, #custom - 1 do partial[i] = custom[i] end
+    deliver(partial)
+    assert(saved["derpy_gg_tuned"] == nil, "applied before every part had arrived")
+    deliver({custom[#custom]})
+    assert(GG.setting("rate_immortals") == 1000 and GG.setting("cap_slavers") == 1000,
+           "the host's own slider values did not reach the client whole")
+    SLIDER = 77
+
+    -- NO MCT ON THE HOST: MCT never set the lobby flag, so nobody sends, and every
+    -- machine stays on the defaults without freezing them.
+    machine(H, false, "hard")
+    get_mct = nil
+    GG.snapshot_settings()
+    GG.send_tune()
+    assert(#sent == 0 and saved["derpy_gg_tuned"] == nil,
+           "a host with no MCT must send nothing and freeze nothing")
+
+    -- SINGLE PLAYER FREEZES AT THE FIRST TICK, from its own MCT, and sends nothing - so
+    -- turn 1 plays on the player's settings rather than the defaults.
+    cm.is_multiplayer = function() return false end
+    machine(H, false, "hard")
+    for i = 1, MODEL_TICKS do FIRST_TICKS[i]() end
+    assert(saved["derpy_gg_tuned"] ~= nil, "single player did not freeze at the first tick")
+    assert(GG.setting("rate_immortals") == GG.PRESETS.hard.rate_immortals,
+           "single player's first tick froze something other than its own MCT")
+    assert(#sent == 0, "single player broadcast its settings")
+
+    -- AND MULTIPLAYER SENDS FROM THE FIRST TICK, which is the only place it is called.
+    cm.is_multiplayer = function() return true end
+    machine(H, true, "hard")
+    for i = 1, MODEL_TICKS do FIRST_TICKS[i]() end
+    assert(#sent >= 1 and string.find(sent[1][2], "gg1|tune|", 1, true) == 1,
+           "the host's first tick did not send its settings")
+
+    GG.humans, cm.get_human_factions, cm.is_multiplayer = prev.humans, prev.getter, prev.mp
+    cm.get_faction, CampaignUI, get_mct = prev.getf, prev.ui, prev.mct
+    core.svr_load_bool, cm.get_local_faction_name = prev.svr, prev.loc
+    GG.TUNE, saved["derpy_gg_tuned"] = prev.tune, prev.saved
+    GG.tune_parts = {}
+end)()
+
+-- ------------------------------------------------------------ quality of life ---
+-- ELEVEN SMALL THINGS, asked for as a set on 2026-09-25 ("do all"): each one a click saved
+-- or a question answered without leaving the screen. All of them live in the panel, so
+-- this block builds a fake UI that answers lookups the way the engine does - a component
+-- exists once something created it, a deep find from the root lands inside the panel, a
+-- destroyed panel takes its children with it, and a missing one is FALSE, not nil.
+;(function()
+    local ME, RIVAL = "cr_qol_me", "cr_qol_rival"
+    local keep_g = {find = find_uicomponent, is = is_uicomponent, root = core.get_ui_root,
+                    send = GG.mp_send, log = GG.log_entries}
+    local CMK = {"get_local_faction_name", "steal_escape_key_with_callback",
+                 "release_escape_key_with_callback", "callback", "get_campaign_ui_manager",
+                 "get_camera_position", "scroll_camera_from_current", "get_region",
+                 "get_family_member_by_cqi", "get_faction", "get_character_by_cqi"}
+    local keep_cm = {}
+    for _, k in ipairs(CMK) do keep_cm[k] = cm[k] end
+    local keep_ui = {TAB = GGUI.TAB, PAGE = GGUI.PAGE, STAND = GGUI.STAND_GUILD,
+                     LOG_PAGE = GGUI.LOG_PAGE, HELP_PAGE = GGUI.HELP_PAGE}
+    local function has(s, sub) return s ~= nil and string.find(s, sub, 1, true) ~= nil end
+    local function clear(t) for k in pairs(t) do t[k] = nil end end
+
+    -- ---- the fake UI ----
+    -- refuse[name]: the engine declines to create it, as it does for a bad path.
+    local made, gone, fakes, refuse = {}, {}, {}, {}
+    local texts, tips, inter, vis, dis, imgs, moved = {}, {}, {}, {}, {}, {}, {}
+    local function reset()
+        for _, t in ipairs({texts, tips, inter, vis, dis, imgs, moved}) do clear(t) end
+    end
+    local PANEL_KEY = "root/" .. GGUI.PANEL
+    -- Created on the root and never inside the panel. Everything else a find from the root
+    -- asks for is a panel part, and lands there, the way find_uicomponent searches down.
+    local ROOT_ONLY = {[GGUI.PANEL] = true, [GGUI.BTN] = true,
+                       [GGUI.PICK_CARD or "derpy_gg_pick"] = true}
+    local function norm(pkey, name)
+        if pkey == PANEL_KEY or (pkey == "root" and not ROOT_ONLY[name]) then
+            pkey = "P"
+        end
+        return pkey .. "/" .. name
+    end
+    local function alive(key)
+        if gone[key] then return false end
+        local top = (string.sub(key, 1, 2) == "P/") and GGUI.PANEL
+                    or string.match(key, "^root/([^/]+)")
+        return made[top] == true
+    end
+    local function fake(key, name, up)
+        if fakes[key] then return fakes[key] end
+        local f = setmetatable({}, {__index = function() return function() return nil end end})
+        f.key, f.nm, f.up = key, name, up
+        f.Id = function(self) return self.nm end
+        f.Parent = function(self) return self.up end
+        f.Position = function() return 0, 0 end
+        f.Dimensions = function(self)
+            if self.key == "root" then return 1920, 1080 end
+            return 100, 20
+        end
+        f.MoveTo = function(self, x, y) moved[self.key] = {x, y} end
+        f.SetText = function(self, s) texts[self.key] = s end
+        f.SetTooltipText = function(self, s) tips[self.key] = s end
+        f.SetInteractive = function(self, b) inter[self.key] = b end
+        f.SetVisible = function(self, b) vis[self.key] = b end
+        f.Visible = function(self) return vis[self.key] ~= false end
+        f.SetDisabled = function(self, b) dis[self.key] = b end
+        f.SetImagePath = function(self, p, i) imgs[self.key .. "#" .. tostring(i)] = p end
+        f.TextDimensionsForText = function(_, s) return #s * 7, 18 end
+        f.CreateComponent = function(self, n)
+            if self.key == "root" and not refuse[n] then made[n] = true end
+            gone[norm(self.key, n)] = nil
+        end
+        f.Destroy = function(self)
+            local top = string.match(self.key, "^root/([^/]+)$")
+            if top then made[top] = nil else gone[self.key] = true end
+        end
+        fakes[key] = f
+        return f
+    end
+    local ROOT = fake("root", "root", nil)
+    core.get_ui_root = function() return ROOT end
+    is_uicomponent = function(x) return type(x) == "table" and rawget(x, "key") ~= nil end
+    find_uicomponent = function(parent, name)
+        local pkey = (type(parent) == "table" and rawget(parent, "key")) or "root"
+        local key = norm(pkey, name)
+        if not alive(key) then return false end
+        local up = parent
+        if pkey == "root" and string.sub(key, 1, 2) == "P/" then
+            up = find_uicomponent(ROOT, GGUI.PANEL)
+        end
+        return fake(key, name, up or ROOT)
+    end
+    local function part(...)
+        local c = ROOT
+        for _, n in ipairs({...}) do c = find_uicomponent(c, n) end
+        return c
+    end
+    local function panel_up() return find_uicomponent(ROOT, GGUI.PANEL) ~= false end
+    local function click(id, c) handlers["gg_clicks"]({string = id, component = c}) end
+
+    -- ---- the world around it ----
+    cm.get_local_faction_name = function() return ME end
+    GG.CULTURE_OF[ME], GG.CULTURE_OF[RIVAL] = GG.CHD_CULTURE, GG.CHD_CULTURE
+    local function standing(t)
+        GG.state[ME] = {}
+        for _, g in ipairs(GG.GUILDS) do
+            local v = t[g] or {0, 0}
+            GG.state[ME][g] = {rep = v[1], fav = v[2]}
+        end
+    end
+    GG.cooldowns[ME] = {}
+    GG.bounties[ME], GG.demands[ME], GG.patrons[ME] = nil, nil, nil
+    local SEL = {}
+    cm.get_campaign_ui_manager = function()
+        return {get_char_selected_cqi = function() return SEL.char end,
+                get_selected_settlement_region = function() return SEL.region or "" end}
+    end
+    cm.get_character_by_cqi = function()
+        return {is_null_interface = function() return false end,
+                faction = function()
+                    return {is_null_interface = function() return false end,
+                            name = function() return SEL.owner or ME end}
+                end,
+                military_force = function() return NULL() end}
+    end
+    local stolen, released = {}, {}
+    cm.steal_escape_key_with_callback = function(_, name, fn)
+        stolen[#stolen + 1] = {name = name, fn = fn}
+    end
+    cm.release_escape_key_with_callback = function(_, name) released[#released + 1] = name end
+    cm.callback = function(_, fn) fn() end
+    local pans = {}
+    cm.get_camera_position = function() return 1, 2, 30, 0.5, 20 end
+    cm.scroll_camera_from_current = function(_, fix, t, pos)
+        pans[#pans + 1] = {fix = fix, t = t, pos = pos}
+    end
+    local sent = {}
+    GG.mp_send = function(f, op, arg) sent[#sent + 1] = {f = f, op = op, arg = arg} end
+    local function page_of(guild)
+        for i, g in ipairs(GGUI.GUILD_ORDER) do if g == guild then return i end end
+    end
+    local function slot_of(guild, key)
+        for i, s in ipairs(GGUI.services_of(guild)) do if s.key == key then return i end end
+    end
+    local function buy_at(slot) return part(GGUI.PANEL, GGUI.CARD .. "_" .. slot, "card_buy") end
+    local function buy_key(slot) return "P/" .. GGUI.CARD .. "_" .. slot .. "/card_buy" end
+
+    -- ---- 1. ESCAPE CLOSES THE PANEL ----------------------------------------------------
+    -- Every CA panel closes on Escape; this one did not, so Escape opened the game menu
+    -- over it instead.
+    standing({})
+    GGUI.TAB, GGUI.PAGE = 1, 1
+    GGUI.open()
+    assert(panel_up(), "the fake UI did not open the panel")
+    local held = stolen[#stolen]
+    assert(held and held.name == GGUI.ESC, "opening the panel must take the Escape key")
+    -- CA DROPS A FIRED ENTRY ITSELF. Releasing it again finds nothing, and CA then lets go
+    -- of the key outright if no entry is left - including a steal some other script holds.
+    -- Counted from BEFORE the key fires: the close() it runs is the release to catch.
+    local n_rel = #released
+    held.fn()
+    assert(not panel_up(), "Escape must close the panel")
+    GGUI.close()
+    assert(#released == n_rel, "a fired Escape entry must not be released a second time")
+    GGUI.open()
+    assert(#stolen == 2 and stolen[2].name == GGUI.ESC, "a reopened panel takes Escape again")
+    -- A second steal under one name is a script error in CA's own code.
+    GGUI.open()
+    assert(#stolen == 2, "an open panel must not steal Escape twice")
+    GGUI.close()
+    assert(released[#released] == GGUI.ESC, "closing the panel must give Escape back")
+    -- NO PANEL, NO KEY. open() reports success when the engine declined to create the
+    -- panel, and a key held for nothing swallows the player's next Escape.
+    refuse[GGUI.PANEL] = true
+    local n_st = #stolen
+    GGUI.open()
+    assert(not panel_up() and #stolen == n_st, "a panel that was never made must not take Escape")
+    refuse[GGUI.PANEL] = nil
+
+    -- ---- 0. A TOOLTIP ON A PLAIN CELL IS NEVER SEEN ------------------------------------
+    -- docs/CUSTOM_UI.md: 1,670 of CA's 1,747 component tooltips sit on an interactive
+    -- element, and one on a plain text cell is set, correct and invisible. Every card, the
+    -- rank line, the cost and the footer carried one; none was interactive.
+    GGUI.open()
+    reset()
+    GGUI.refresh()
+    for _, k in ipairs({"P/gg_rank_line", "P/gg_footer", "P/" .. GGUI.CARD .. "_1",
+                        "P/" .. GGUI.CARD .. "_1/card_cost"}) do
+        assert(tips[k] and tips[k] ~= "" and inter[k] == true,
+               k .. " carries a tooltip and is not interactive, so nobody can hover it")
+    end
+
+    -- ---- 2. THE OPENER SAYS WHAT IS WAITING --------------------------------------------
+    -- The badge was a number. What the number counted was a click away.
+    standing({brass = {150, 150}})
+    TREASURY[ME] = 99999
+    GG.bounties[ME] = {
+        {guild = "khanate", kind = "region_take", target = "wh3_qol_r", posted = 1,
+         gold = 100, rep = 10},
+        {guild = "brass", kind = "region_take", target = "wh3_qol_r2", posted = 1,
+         taken = true, gold = 100, rep = 10}}
+    GG.demands[ME] = {guild = "slavers", kind = "tribute", amount = 100, due = 99}
+    local kinds = {}
+    for _, it in ipairs(GGUI.actionable_items(ME)) do
+        kinds[it.kind] = (kinds[it.kind] or 0) + 1
+    end
+    assert(kinds.bounty == 1, "a TAKEN offer has no button, so it is not waiting on the "
+           .. "player - got " .. tostring(kinds.bounty))
+    assert(kinds.demand == 1 and (kinds.service or 0) >= 1, "services and the demand count")
+    assert(GGUI.actionable(ME) == #GGUI.actionable_items(ME),
+           "the badge must count exactly what the tooltip lists")
+    made[GGUI.BTN] = true
+    handlers["gg_opener_tip"]({string = GGUI.BTN})
+    local otip = tips["root/" .. GGUI.BTN]
+    assert(has(otip, GGUI.loc_service("caravan_levy")) and has(otip, "opener_bounties")
+           and has(otip, "opener_demand") and has(otip, GGUI.loc_guild("slavers"))
+           and has(otip, "opener_click") and not has(otip, "opener_none"),
+           "the opener's tooltip must name what is ready, got " .. tostring(otip))
+    GG.bounties[ME], GG.demands[ME] = nil, nil
+    standing({})
+    handlers["gg_opener_tip"]({string = GGUI.BTN})
+    assert(has(tips["root/" .. GGUI.BTN], "opener_none"),
+           "with nothing to do the opener must say so")
+    made[GGUI.BTN] = nil
+
+    -- ---- 3. THE ARROWS SAY WHERE THEY GO -----------------------------------------------
+    standing({brass = {150, 150}})
+    GGUI.TAB, GGUI.PAGE = 1, 2
+    reset()
+    GGUI.refresh()
+    assert(has(tips["P/gg_prev"], GGUI.loc_guild(GGUI.GUILD_ORDER[1]))
+           and has(tips["P/gg_prev"], "1 ready"),
+           "the left arrow names the guild it goes to and what is ready there, got "
+           .. tostring(tips["P/gg_prev"]))
+    assert(has(tips["P/gg_next"], GGUI.loc_guild(GGUI.GUILD_ORDER[3]))
+           and not has(tips["P/gg_next"], "ready"), "nothing ready, nothing said")
+    GGUI.PAGE = 1
+    reset()
+    GGUI.refresh()
+    assert(tips["P/gg_prev"] == "pager_end", "the first page's left arrow goes nowhere")
+    GGUI.TAB, GGUI.HELP_PAGE = 5, 1
+    reset()
+    GGUI.refresh()
+    assert(tips["P/gg_next"] == "pager_page_next" and tips["P/gg_prev"] == "pager_end",
+           "the Help tab's arrows page, got " .. tostring(tips["P/gg_next"]))
+
+    -- ---- 4. A BIG CA PANEL CLOSES THIS ONE ---------------------------------------------
+    GGUI.TAB = 1
+    handlers["gg_close_for"]({string = "settlement_panel"})
+    assert(panel_up(), "a selection panel must leave ours open")
+    handlers["gg_close_for"]({string = "technology_panel"})
+    assert(not panel_up(), "the tech tree must close ours, or it draws over it")
+
+    -- ---- 5. A BIG SPEND ASKS FIRST -----------------------------------------------------
+    standing({brass = {150, 0}})
+    local cost = GG.service_cost(ME, "caravan_levy")
+    standing({brass = {150, cost + 1}})
+    GGUI.TAB, GGUI.PAGE = 1, page_of("brass")
+    GGUI.open()
+    local cs = slot_of("brass", "caravan_levy")
+    clear(sent)
+    click("card_buy", buy_at(cs))
+    assert(#sent == 0 and GGUI.CONFIRM == "caravan_levy",
+           "a purchase that spends most of a guild's favour must ask first")
+    assert(has(texts[buy_key(cs)], "confirm"), "the button must say it is asking")
+    click("card_buy", buy_at(cs))
+    assert(#sent == 1 and sent[1].op == "buy" and has(sent[1].arg, "caravan_levy|"),
+           "the second click buys")
+    assert(GGUI.CONFIRM == nil, "a purchase forgets the question")
+    clear(sent)
+    click("card_buy", buy_at(cs))
+    GGUI.set_tab(3)
+    GGUI.set_tab(1)
+    assert(GGUI.CONFIRM == nil, "changing tab must forget a half-made purchase")
+    click("card_buy", buy_at(cs))
+    assert(#sent == 0, "and ask again")
+    GGUI.CONFIRM = nil
+    standing({brass = {150, cost * 3}})
+    click("card_buy", buy_at(cs))
+    assert(#sent == 1, "a small spend buys on one click")
+    standing({khanate = {9999, 99999}})
+    assert(GGUI.needs_confirm(ME, GG.service("khans_price")) == true,
+           "a hostile service always asks, however rich the buyer")
+    GGUI.close()
+
+    -- ---- 6. A ROW'S ICON OPENS ITS GUILD -----------------------------------------------
+    standing({brass = {150, 150}})
+    GGUI.TAB = 2
+    GGUI.open()
+    reset()
+    GGUI.refresh()
+    assert(has(tips["P/" .. GGUI.ROW .. "_1/row_icon"], "open_guild"),
+           "the row's icon must say what clicking it does")
+    click("row_icon", part(GGUI.PANEL, GGUI.ROW .. "_4", "row_icon"))
+    assert(GGUI.TAB == 1 and GGUI.current_guild() == GG.GUILDS[4],
+           "clicking a row's icon must open that guild's services")
+    GGUI.close()
+
+    -- ---- 7. PICK A TARGET WITH THE PANEL OUT OF THE WAY --------------------------------
+    -- The panel covers the map the target is picked on. The card's button now steps the
+    -- panel aside, waits for the selection, and brings it back.
+    standing({khanate = {150, 1000}})
+    SEL.region, SEL.char = nil, nil
+    local kp, ks = page_of("khanate"), slot_of("khanate", "hobgoblin_eyes")
+    GGUI.TAB, GGUI.PAGE = 1, kp
+    GGUI.open()
+    assert(has(texts[buy_key(ks)], "pick_button") and dis[buy_key(ks)] == false,
+           "a service waiting on a target offers to pick one, got "
+           .. tostring(texts[buy_key(ks)]))
+    clear(sent)
+    local function pick() click("card_buy", buy_at(ks)) end
+    -- A REAL SENTENCE for the one instruction this pick shows, so the wrap has something
+    -- to do: every other key falls back to itself, as it does with no loc at all. The
+    -- fake cells are 100px and a character 7, so it breaks after "town".
+    common = {get_localised_string = function(k)
+        return (k == "derpy_gg_needs_region_any") and "select a town first" or ""
+    end}
+    pick()
+    common = nil
+    assert(GGUI.PICK and GGUI.PICK.key == "hobgoblin_eyes", "the click starts a pick")
+    assert(not panel_up(), "the panel steps aside while the map is used")
+    local pc = "root/" .. GGUI.PICK_CARD
+    assert(find_uicomponent(ROOT, GGUI.PICK_CARD), "a card says what is being picked")
+    -- THE LONGEST INSTRUCTION RUNS ABOUT 110 CHARACTERS and a card line holds about 70,
+    -- so it is wrapped across both lines; the Escape note moves to the hover.
+    assert(texts[pc .. "/card_desc_1"] == "select a town"
+           and texts[pc .. "/card_desc_2"] == "first",
+           "the instruction wraps across the card's two lines, got "
+           .. tostring(texts[pc .. "/card_desc_1"]) .. " / "
+           .. tostring(texts[pc .. "/card_desc_2"]))
+    assert(has(tips[pc], "pick_cancel"), "and Escape is explained on hover")
+    assert(stolen[#stolen].name == GGUI.PICK_ESC, "Escape backs out of a pick")
+    assert(#sent == 0, "picking buys nothing")
+    handlers["gg_pick_char"]({})
+    assert(GGUI.PICK, "a selection that is not a target keeps the pick going")
+    SEL.region = "wh3_qol_region"
+    handlers["gg_pick_settlement"]({})
+    assert(GGUI.PICK == nil and not find_uicomponent(ROOT, GGUI.PICK_CARD) and panel_up(),
+           "a good selection brings the panel back")
+    assert(GGUI.TAB == 1 and GGUI.PAGE == kp, "on the page it left")
+    assert(has(texts[buy_key(ks)], "buy") and not has(texts[buy_key(ks)], "pick_button"),
+           "and the card is buyable now, got " .. tostring(texts[buy_key(ks)]))
+    assert(#sent == 0, "coming back buys nothing on its own")
+    SEL.region = nil
+    pick()
+    stolen[#stolen].fn()
+    assert(GGUI.PICK == nil and panel_up(), "Escape ends the pick and brings the panel back")
+    pick()
+    click("card_buy", part(GGUI.PICK_CARD, "card_buy"))
+    assert(GGUI.PICK == nil and panel_up() and #sent == 0, "Cancel does the same")
+    pick()
+    click("gg_opener", nil)
+    assert(GGUI.PICK == nil and panel_up(), "the opener ends a pick and shows the panel")
+    pick()
+    handlers["gg_close_for"]({string = "technology_panel"})
+    assert(GGUI.PICK == nil and not find_uicomponent(ROOT, GGUI.PICK_CARD)
+           and not panel_up(), "a big panel ends a pick and leaves everything shut")
+    -- RESEARCH IS PICKED IN THE TECH TREE, not on the map, so there is nothing to step
+    -- aside for.
+    standing({daemonsmiths = {400, 1000}})
+    GG.researching[ME] = nil
+    local dp, bs = page_of("daemonsmiths"), slot_of("daemonsmiths", "bound_blueprint")
+    GGUI.TAB, GGUI.PAGE = 1, dp
+    GGUI.open()
+    assert(dis[buy_key(bs)] == true and not has(texts[buy_key(bs)], "pick_button"),
+           "research has no map pick")
+    GGUI.close()
+    -- THE COURT'S APPOINT, which wants one of your lords.
+    GG.patrons[ME] = nil
+    GGUI.TAB, GGUI.PAGE = 4, 1
+    GGUI.open()
+    assert(has(texts[buy_key(2)], "pick_button") and dis[buy_key(2)] == false,
+           "Appoint with nobody selected offers to pick, got " .. tostring(texts[buy_key(2)]))
+    click("card_buy", buy_at(2))
+    assert(GGUI.PICK and GGUI.PICK.key == "patron" and #sent == 0, "a patron pick")
+    SEL.char = 5
+    handlers["gg_pick_char"]({})
+    assert(GGUI.PICK == nil and GGUI.TAB == 4 and panel_up(), "back on the Court")
+    assert(has(texts[buy_key(2)], "patron_appoint"), "and Appoint is live")
+    click("card_buy", buy_at(2))
+    assert(#sent == 1 and sent[1].op == "patron", "which appoints")
+    SEL.char = nil
+    GGUI.close()
+
+    -- ---- 8. A BOUNTY SHOWS ITS TARGET ON THE MAP ---------------------------------------
+    cm.get_region = function(self, key)
+        if key ~= "wh3_qol_r" then return keep_cm.get_region(self, key) end
+        return {is_null_interface = function() return false end,
+                owning_faction = function()
+                    return {is_null_interface = function() return false end,
+                            name = function() return RIVAL end}
+                end,
+                settlement = function()
+                    return {is_null_interface = function() return false end,
+                            display_position_x = function() return 111 end,
+                            display_position_y = function() return 222 end}
+                end}
+    end
+    cm.get_family_member_by_cqi = function(self, cqi)
+        if tostring(cqi) ~= "42" then return keep_cm.get_family_member_by_cqi(self, cqi) end
+        return {is_null_interface = function() return false end,
+                character = function()
+                    return {is_null_interface = function() return false end,
+                            display_position_x = function() return 333 end,
+                            display_position_y = function() return 444 end}
+                end}
+    end
+    GG.bounties[ME] = {{guild = "khanate", kind = "region_take", target = "wh3_qol_r",
+                        posted = 1, taken = true, gold = 100, rep = 10}}
+    GGUI.TAB = 3
+    GGUI.open()
+    reset()
+    GGUI.refresh()
+    local card1 = "P/" .. GGUI.CARD .. "_1"
+    assert(has(tips[card1], "map_tip"), "the offer says it can be shown on the map")
+    click(GGUI.CARD .. "_1", part(GGUI.PANEL, GGUI.CARD .. "_1"))
+    local p1 = pans[1]
+    assert(p1 and p1.fix == true and p1.pos[1] == 111 and p1.pos[2] == 222
+           and p1.pos[3] == 30 and p1.pos[4] == 0.5 and p1.pos[5] == 20,
+           "a region bounty pans to its settlement and keeps the camera's own height")
+    assert(not panel_up(), "and gets the panel out of the way")
+    GG.bounties[ME] = {{guild = "khanate", kind = "lord_kill", target = 42, posted = 1,
+                        taken = true, gold = 100, rep = 10}}
+    GGUI.open()
+    click(GGUI.CARD .. "_1", part(GGUI.PANEL, GGUI.CARD .. "_1"))
+    assert(#pans == 2 and pans[2].pos[1] == 333 and pans[2].pos[2] == 444,
+           "a lord bounty pans to the lord")
+    GGUI.TAB = 1
+    GGUI.open()
+    click(GGUI.CARD .. "_1", part(GGUI.PANEL, GGUI.CARD .. "_1"))
+    assert(#pans == 2 and panel_up(), "a service card is not a map link")
+    GGUI.close()
+    GG.bounties[ME] = nil
+
+    -- ---- 9. THE LEADERBOARD'S FACTIONS SHOW WHERE THEY ARE -----------------------------
+    GG.state[RIVAL] = {brass = {rep = 500, fav = 0}}
+    cm.get_faction = function(self, k)
+        local f = keep_cm.get_faction(self, k)
+        if not f then return f end
+        f.has_home_region = function() return k == RIVAL end
+        f.home_region = function()
+            return {is_null_interface = function() return false end,
+                    settlement = function()
+                        return {display_position_x = function() return 555 end,
+                                display_position_y = function() return 666 end}
+                    end}
+        end
+        return f
+    end
+    GGUI.TAB, GGUI.STAND_GUILD = 2, 1
+    GGUI.open()
+    reset()
+    GGUI.refresh()
+    local ri, mi
+    for i, f in ipairs(GGUI.LIST_FACTIONS or {}) do
+        if f == RIVAL then ri = i elseif not mi then mi = i end
+    end
+    -- mi: any other row. Only the rival has a capital in this world.
+    assert(ri and mi, "the list must record which faction each row is")
+    local function frow(i) return "P/" .. GGUI.LIST .. "/list_box/" .. GGUI.FROW .. "_" .. i end
+    assert(has(tips[frow(ri)], "frow_map"), "a faction with a capital says it can be shown")
+    assert(not has(tips[frow(mi)], "frow_map"), "one with none does not promise it")
+    click(GGUI.FROW .. "_" .. mi, nil)
+    assert(#pans == 2 and panel_up(), "no capital, no pan")
+    click(GGUI.FROW .. "_" .. ri, nil)
+    assert(#pans == 3 and pans[3].pos[1] == 555 and pans[3].pos[2] == 666 and not panel_up(),
+           "a click pans to the faction's capital")
+    GG.state[RIVAL] = nil
+
+    -- ---- 10. ONE CLICK TO ANY GUILD ----------------------------------------------------
+    standing({brass = {150, 150}})
+    GGUI.TAB, GGUI.PAGE = 1, 3
+    GGUI.open()
+    reset()
+    GGUI.refresh()
+    for i, g in ipairs(GGUI.GUILD_ORDER) do
+        local k = "P/gg_gtab_" .. i
+        -- The glyph is inset on a round plate, so it is not image 0; gen_guilds_ui.check()
+        -- pins GGUI.GUILD_BTN_ICON against the button's layer order.
+        assert(imgs[k .. "#" .. tostring(GGUI.GUILD_BTN_ICON)] == GGUI.icon(g) and vis[k] == true,
+               "guild button " .. i .. " draws " .. g .. "'s icon")
+        assert(has(tips[k], GGUI.loc_guild(g)), "and names it")
+    end
+    assert(texts["P/gg_gtab_" .. page_of("brass")] == "1"
+           and texts["P/gg_gtab_" .. page_of("khanate")] == "",
+           "each button counts what is ready in its guild")
+    assert(moved["P/gg_gsel"] and moved["P/gg_gsel"][1] == GGUI.px(GGUI.PANEL_XY.gg_gtab_3[1]),
+           "the marker sits under the page on screen")
+    click("gg_gtab_5", part(GGUI.PANEL, "gg_gtab_5"))
+    assert(GGUI.PAGE == 5 and GGUI.TAB == 1, "a guild button pages straight there")
+    GGUI.TAB = 2
+    reset()
+    GGUI.refresh()
+    assert(vis["P/gg_gtab_1"] == false and vis["P/gg_gsel"] == false,
+           "the Leaderboard shows all six already")
+    GGUI.close()
+
+    -- ---- the pick card's wrap, at scale ----------------------------------------------
+    -- The ratio is measured on a panel line, and during a pick the panel is shut. The last
+    -- reading is still the truth about the font, so it is used rather than 1.
+    GGUI.close()
+    local keep_ratio = {GGUI.S, GGUI.PROBE_W0, GGUI.RATIO_SEEN}
+    GGUI.S, GGUI.PROBE_W0, GGUI.RATIO_SEEN = 2, 100, 2
+    assert(GGUI.text_ratio() == 2, "with the panel shut the last measured ratio stands, got "
+           .. tostring(GGUI.text_ratio()))
+    GGUI.S, GGUI.PROBE_W0, GGUI.RATIO_SEEN = keep_ratio[1], keep_ratio[2], keep_ratio[3]
+
+    -- ---- 11. THE LOG FILTERS -----------------------------------------------------------
+    local LOG = {}
+    for i = 1, 30 do
+        LOG[#LOG + 1] = {turn = i, kind = "buy", guild = "brass", a = "caravan_levy", b = 50}
+        LOG[#LOG + 1] = {turn = i, kind = "ai_buy", guild = "brass", a = "caravan_levy",
+                         b = RIVAL}
+    end
+    LOG[#LOG + 1] = {turn = 2, kind = "rank", guild = "brass", a = 1, b = 2}
+    LOG[#LOG + 1] = {turn = 1, kind = "lead_lost", guild = "brass", a = RIVAL}
+    GG.log_entries = function() return LOG end
+    local function lines(f)
+        GGUI.LOG_FILTER = f
+        return table.concat(GGUI.log_lines(ME, nil), "\n")
+    end
+    local all = lines("all")
+    assert(has(all, "log_bought") and has(all, "log_ai_bought") and has(all, "log_rose")
+           and has(all, "log_lead_lost"), "All shows everything")
+    local mine = lines("mine")
+    assert(has(mine, "log_bought") and has(mine, "log_rose") and not has(mine, "log_ai_bought")
+           and not has(mine, "log_lead_lost"), "Yours is what you did")
+    local riv = lines("rivals")
+    assert(has(riv, "log_ai_bought") and has(riv, "log_lead_lost") and not has(riv, "log_bought")
+           and not has(riv, "log_rose"), "Rivals is what they did")
+    local rk = lines("ranks")
+    assert(has(rk, "log_rose") and has(rk, "log_lead_lost") and not has(rk, "log_bought")
+           and not has(rk, "log_ai_bought"), "Ranks is the ladder and the leads")
+    local only_ai = {{turn = 1, kind = "ai_buy", guild = "brass", a = "caravan_levy", b = RIVAL}}
+    GG.log_entries = function() return only_ai end
+    assert(lines("mine") == "log_empty_filter", "an empty filter says so, got " .. lines("mine"))
+    GG.log_entries = function() return {} end
+    assert(lines("mine") == "log_empty", "an empty log says what will appear in it")
+    GG.log_entries = function() return LOG end
+    GGUI.LOG_FILTER = "all"
+    GGUI.TAB = 6
+    GGUI.open()
+    reset()
+    GGUI.refresh()
+    assert(vis["P/gg_lf_mine"] == true, "the filters show on the Log")
+    assert(has(texts["P/gg_lf_all"], "[[col:yellow]]") and not has(texts["P/gg_lf_mine"], "[[col:"),
+           "the active filter is marked")
+    GGUI.LOG_PAGE = 2
+    click("gg_lf_rivals", part(GGUI.PANEL, "gg_lf_rivals"))
+    assert(GGUI.LOG_FILTER == "rivals" and GGUI.LOG_PAGE == 1,
+           "a filter starts from the newest page, got page " .. tostring(GGUI.LOG_PAGE))
+    assert(has(texts["P/gg_lf_rivals"], "[[col:yellow]]"), "and marks itself")
+    GGUI.TAB = 1
+    reset()
+    GGUI.refresh()
+    assert(vis["P/gg_lf_mine"] == false, "and hide everywhere else")
+    GGUI.close()
+
+    -- ---- restore ----
+    find_uicomponent, is_uicomponent, core.get_ui_root = keep_g.find, keep_g.is, keep_g.root
+    GG.mp_send, GG.log_entries = keep_g.send, keep_g.log
+    for _, k in ipairs(CMK) do cm[k] = keep_cm[k] end
+    GGUI.TAB, GGUI.PAGE, GGUI.STAND_GUILD = keep_ui.TAB, keep_ui.PAGE, keep_ui.STAND
+    GGUI.LOG_PAGE, GGUI.HELP_PAGE = keep_ui.LOG_PAGE, keep_ui.HELP_PAGE
+    GGUI.LOG_FILTER, GGUI.CONFIRM, GGUI.PICK = "all", nil, nil
+    GG.state[ME], GG.cooldowns[ME], GG.patrons[ME] = nil, nil, nil
+    GG.CULTURE_OF[ME], GG.CULTURE_OF[RIVAL] = nil, nil
 end)()
 
 print("harness ok")

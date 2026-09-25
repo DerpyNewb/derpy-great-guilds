@@ -3,6 +3,63 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-09-25 - build A3918816
+
+Deployed 2026-09-25. MD5 `A3918816471FF4C246A60A0D2BC86507`, 32,148,457 bytes.
+
+Three fixes to build 74AFE8EA:
+
+- **The numbers on the six guild buttons are readable.** Each icon now sits on a round plate
+  with the count in the corner, instead of the count being printed over the icon.
+- **Selecting a target:** the instruction on the card wraps onto a second line instead of
+  running off the edge. "Press Escape or Cancel to go back" is in the card's hover text.
+- The target card now uses the same text size as the panel when the panel is closed.
+
+## 2026-09-25 - build 74AFE8EA
+
+Deployed 2026-09-25. MD5 `74AFE8EAE3475FF3C20E2B63CC28E1DF`, 32,144,734 bytes.
+
+- **Hover text now shows.** The panel's tooltips were set on components that could not be
+  hovered, so most of them never appeared.
+- **Escape closes the panel.**
+- **The guild button on the campaign screen lists what is ready** when you hover it:
+  services you can buy, bounties to take, and a demand you can pay. A bounty you have
+  already taken no longer counts.
+- **The arrows say where they go**, including how many services are ready in the next
+  guild.
+- **The tech tree, diplomacy and other full-screen panels close this one.**
+- **A big purchase asks first.** A service aimed at another faction, or one that spends
+  half or more of your favour with that guild, needs a second click on Confirm.
+- **Select a target without closing the panel yourself.** A service that needs a target on
+  the map has a Select button. The panel steps aside, and it comes back as soon as you
+  select something that works. Escape or Cancel returns without choosing.
+- **Map links.** Click a bounty to see its target, or a faction on the Leaderboard to see
+  its capital.
+- **Six guild buttons** between the arrows jump straight to any guild and show how many of
+  its services are ready. Clicking a guild's icon on the Leaderboard opens that guild.
+- **Log filters:** All, Yours, Rivals and Ranks.
+
+## 2026-09-25 - build 40FE934A
+
+Deployed 2026-09-25. MD5 `40FE934AD62DAC1982E6AEAC259815D5`, 32,077,286 bytes.
+
+- **MCT works in multiplayer.** When a multiplayer campaign starts, the host's settings are
+  sent to every player and fixed for the campaign. Until they arrive, every machine plays
+  the defaults. It used to ignore MCT in multiplayer entirely. Not yet tested on two
+  machines.
+- **Turn 1 uses your settings.** They were read at the first turn start, after turn 1 had
+  already been played on the defaults. They are now read when the campaign loads.
+- The "Log every reputation gain" switch is each player's own in multiplayer.
+
+## 2026-09-25 - build 7DBE88C6
+
+Deployed 2026-09-25. MD5 `7DBE88C685D5A21089BA70D19A9153CF`, 32,073,727 bytes.
+
+- **Leaderboard:** each row starts with the guild's icon, and the leader is shown by their
+  flag. A rival's name and rank follow the flag, and are dropped when the line would not
+  fit.
+- **The panel title** is larger and centred.
+
 ## 2026-09-25 - build EDB15834
 
 Deployed 2026-09-25. MD5 `EDB15834C791B393BE645A2E837A8E18`, 32,070,410 bytes.

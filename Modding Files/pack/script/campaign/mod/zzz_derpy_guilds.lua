@@ -2833,17 +2833,17 @@ function GG.apply_preset(t, preset)
     return t
 end
 
--- MULTIPLAYER IGNORES MCT ENTIRELY.
+-- MULTIPLAYER PLAYS ON THE HOST'S SETTINGS.
 --
--- MCT IS A LOCAL REGISTRY. Two players can hold different presets and different sliders
--- and nothing reconciles them, so a snapshot taken from MCT freezes a DIFFERENT economy
--- into each machine's save on the first turn - a desync from the first demand onward that
--- nothing further down can undo. With per-key sliders that was a slow divergence nobody
--- had hit; a preset makes it one click, host on Easy against client on Cutthroat.
---
--- So in multiplayer every value is the shipped default, on every machine. The Zharr
--- Exchange has taken the same position since it shipped; this mod had the same exposure
--- and no guard.
+-- MCT IS A LOCAL REGISTRY, so each machine reading its own would freeze a DIFFERENT
+-- economy into each save - a desync from the first grant. MCT does send the host's values
+-- to the clients, but over two network round trips nothing orders against this mod's
+-- snapshot. So the mod carries them itself: at the first tick of a campaign with no
+-- settings yet, the host alone reads its MCT and sends the packed result (GG.send_tune).
+-- It arrives as a UITrigger, which CA delivers to every machine in one order, and every
+-- machine freezes it there (GG.MP_OPS.tune). Until then every machine plays the shipped
+-- defaults and freezes nothing. A host without MCT sends nothing, and the campaign stays
+-- on the defaults.
 --
 -- AN ENGINE CALL THAT ERRORS READS AS SINGLE PLAYER. `ok and v == true` is the safe way
 -- round: locking a singleplayer campaign out of its own settings because a call failed is
@@ -2853,8 +2853,11 @@ function GG.is_mp()
     return ok and v == true
 end
 
-function GG.mp_ignores_mct()
-    return GG.is_mp()
+-- WHICH MACHINE IS THE HOST: the flag MCT sets in the multiplayer lobby, and the one its
+-- own campaign sync reads to decide who sends (groovy_mct, systems/sync/main.lua).
+function GG.is_mct_host()
+    local ok, v = pcall(function() return core:svr_load_bool("mct_local_is_host") end)
+    return ok and v == true
 end
 
 
@@ -2866,9 +2869,7 @@ end
 function GG.read_mct_or_defaults()
     local t = {}
     for k, v in pairs(GG.TUNE_DEFAULTS) do t[k] = v end
-    -- BEFORE MCT IS EVEN ASKED. See GG.mp_ignores_mct: two machines holding different
-    -- settings would freeze two different economies into two saves on the first turn.
-    if GG.mp_ignores_mct() then return t end
+    -- In multiplayer only the host gets here - see GG.send_tune.
     local ok, mct = pcall(function() return get_mct and get_mct() end)
     if not ok or not mct then return t end
     pcall(function()
@@ -2954,9 +2955,52 @@ function GG.snapshot_settings()
         GG.TUNE = GG.unpack_tune(existing)
         return
     end
+    -- MULTIPLAYER WAITS FOR THE HOST'S SETTINGS, on the defaults and freezing nothing.
+    if GG.is_mp() then
+        GG.TUNE = nil
+        return
+    end
     GG.TUNE = GG.read_mct_or_defaults()
     cm:set_saved_value("derpy_gg_tuned", GG.pack_tune(GG.TUNE))
 end
+
+-- THE LONGEST EVENT STRING SENT: MCT's MultiplayerCommunicator splits above 100, and it
+-- is the only number anyone has committed to. CA documents none.
+GG.TUNE_CHUNK = 100
+
+-- The packed settings cut into parts that fit, each "i/n|v|v|..." so the far side knows
+-- when it holds them all.
+function GG.tune_chunks(packed)
+    local room = GG.TUNE_CHUNK - #(GG.MP_TAG .. "|tune|99/99|")
+    local chunks, cur, len = {}, {}, 0
+    for v in string.gmatch(packed or "", "[^|]+") do
+        local add = #v + (#cur > 0 and 1 or 0)
+        if #cur > 0 and len + add > room then
+            chunks[#chunks + 1] = table.concat(cur, "|")
+            cur, len, add = {}, 0, #v
+        end
+        cur[#cur + 1] = v
+        len = len + add
+    end
+    if #cur > 0 then chunks[#chunks + 1] = table.concat(cur, "|") end
+    for i = 1, #chunks do chunks[i] = i .. "/" .. #chunks .. "|" .. chunks[i] end
+    return chunks
+end
+
+-- THE HOST SENDS ITS SETTINGS, once, at the first tick of a campaign that has none.
+function GG.send_tune()
+    if not GG.is_mp() or not GG.is_mct_host() then return end
+    local existing = cm:get_saved_value("derpy_gg_tuned")
+    if existing and existing ~= "" then return end
+    local ok, me = pcall(function() return cm:get_local_faction_name(true) end)
+    if not ok or not me then return end
+    local chunks = GG.tune_chunks(GG.pack_tune(GG.read_mct_or_defaults()))
+    for i = 1, #chunks do GG.mp_send(me, "tune", chunks[i]) end
+    GG.trace("sent this campaign's settings to every player, in " .. #chunks .. " parts")
+end
+
+-- The parts received so far, by index. Session only: they all arrive in one burst.
+GG.tune_parts = GG.tune_parts or {}
 
 function GG.register()
     -- Every condition below is the literal `true`. A listener condition that
@@ -3624,6 +3668,26 @@ GG.MP_OPS.buy = function(faction, arg)
     GG.save(faction)
 end
 
+-- "i/n|v|v|..." - one part of the host's settings. Every machine freezes them once the
+-- last part is in; a campaign that already has settings keeps them.
+GG.MP_OPS.tune = function(_faction, arg)
+    local existing = cm:get_saved_value("derpy_gg_tuned")
+    if existing and existing ~= "" then return end
+    local i, n, body = string.match(arg or "", "^(%d+)/(%d+)|(.*)$")
+    i, n = tonumber(i), tonumber(n)
+    if not i or not n or i < 1 or i > n then return end
+    GG.tune_parts[i] = body
+    for k = 1, n do
+        if not GG.tune_parts[k] then return end
+    end
+    local parts = {}
+    for k = 1, n do parts[k] = GG.tune_parts[k] end
+    GG.tune_parts = {}
+    GG.TUNE = GG.unpack_tune(table.concat(parts, "|"))
+    cm:set_saved_value("derpy_gg_tuned", GG.pack_tune(GG.TUNE))
+    GG.trace("froze the host's settings for this campaign")
+end
+
 -- The board index the card showed, which GG.bounty_view keeps equal to the list's.
 GG.MP_OPS.bounty = function(faction, arg)
     local n = tonumber(arg)
@@ -3801,7 +3865,15 @@ function GG.first_boards()
     end
 end
 
-cm:add_first_tick_callback(function() GG.load_all(); GG.register(); GG.first_boards() end)
+-- THE SETTINGS FIRST, so turn 1 and the first boards play on them rather than on the
+-- defaults. MCT has loaded the player's values by now (its LoadingGame runs earlier).
+cm:add_first_tick_callback(function()
+    GG.snapshot_settings()
+    GG.load_all()
+    GG.register()
+    GG.send_tune()
+    GG.first_boards()
+end)
 
 function GG.load(faction)
     local packed = cm:get_saved_value("derpy_gg_" .. faction)

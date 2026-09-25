@@ -155,3 +155,39 @@ new market paid nothing and nothing said so.
 - **Deployed.** `edb15834c791b393be645a2e837a8e18` is in `data/`, MD5 matched. The backup is
   `Modpacks/derpy_great_guilds.pack.bak_20260925_pre_90keys_108e223b`.
 - **Not pushed to GitHub yet.** Pushing needs the user's approval.
+
+## 7. Leaderboard icons, the leader's flag, a larger title (2026-09-25)
+
+- **The request:** a guild icon at the start of each Leaderboard row; instead of
+  `Leader: You`, `Leader:` and the leading faction's flag; the title larger and centred.
+- **Row icon.** A new `row_icon` child, 36x36 at (6,2) in the 40-tall row, repainted per
+  guild with `GGUI.icon`. `row_guild` moved to x=46 and narrowed to 160px.
+- **Leader flag.** `GGUI.leader_text` draws the flag as inline `[[img:]]` markup, as the
+  faction list below it already does (`GGUI.flag_img`, shared by both).
+  - You lead: `Leader:` and your flag, with no word after it.
+  - A rival leads: the flag, then its name and rank.
+  - Nobody leads: `Leader: Nobody`, with no flag.
+  - The yellow changed-hands mark wraps the text only, never the flag.
+- **The line now shortens itself.** Rival lines could already overflow the 324px column:
+  about 416px for `The Huntsmarshal's Expedition (Grand Master) +120`, estimated from
+  the loc names of all eight races. The flag adds about 45px. `GGUI.leader_fit` measures
+  with `TextDimensionsForText`, as `GGUI.wrap` does, and drops the rank, then the name.
+  The markup is stripped before measuring and the flag is charged as `GGUI.FLAG_W` = 30,
+  because whether the measure reads `[[img:]]` as a picture is not in CA's reference.
+- **Title.** `gg_title` is (60,8) 670x34, which centres it on the panel, in
+  `header_24_bold` (CA's largest bold header), aligned Center. It was `header_18_bold`,
+  left-aligned, at (54,14).
+- **Tests.** The harness covers `leader_text`, `leader_fit`, and a fake-panel
+  `draw_standings` that must paint every row's icon and fit the leader cell. Seven
+  mutations were run and all were caught. `preview_guilds_panel.py` now reads the title
+  and row positions from the generator instead of hard-coding them.
+- **Built and deployed:** `7dbe88c685d5a21089ba70d19a9153cf`, 32,073,727 bytes, MD5
+  matched in `data/`. The backup is
+  `Modpacks/derpy_great_guilds.pack.bak_20260925_pre_leaderboard_edb15834`.
+- **Owed in game:**
+  - Does the flag draw after `Leader:`?
+  - Is the icon crisp at 36px?
+  - Does a long rival line shorten and not overflow?
+  - Does the title sit centred between the crest and the close cross?
+  - Does the log line `text measures x...` still read correctly at UI Scale 50%?
+- **Not pushed to GitHub.**

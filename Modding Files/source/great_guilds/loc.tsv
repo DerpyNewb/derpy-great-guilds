@@ -237,6 +237,29 @@ derpy_gg_demand_short	You cannot pay this yet	false
 derpy_gg_demand_gold	gold	false
 derpy_gg_demand_favour	favour	false
 derpy_gg_needs	Needs	false
+derpy_gg_opener_ready	Ready to buy:	false
+derpy_gg_opener_none	Nothing needs you right now.	false
+derpy_gg_opener_bounties	Bounties to take:	false
+derpy_gg_opener_demand	A demand you can pay now:	false
+derpy_gg_opener_click	Click to open.	false
+derpy_gg_pager_end	Nothing further this way.	false
+derpy_gg_pager_page_next	Next page	false
+derpy_gg_pager_page_prev	Previous page	false
+derpy_gg_ready	ready to buy	false
+derpy_gg_confirm	Confirm	false
+derpy_gg_confirm_tip	This spends half or more of your favour with this guild, or is aimed at another faction. Press Confirm to go ahead.	false
+derpy_gg_open_guild	Click to see this guild's services.	false
+derpy_gg_pick_button	Select	false
+derpy_gg_pick_help	Press Select to move this panel aside while you choose on the map.	false
+derpy_gg_pick_cancel	Press Escape or Cancel to go back.	false
+derpy_gg_cancel	Cancel	false
+derpy_gg_map_tip	Click the card to see the target on the map.	false
+derpy_gg_frow_map	Click to see their capital on the map.	false
+derpy_gg_lf_all	All	false
+derpy_gg_lf_mine	Yours	false
+derpy_gg_lf_rivals	Rivals	false
+derpy_gg_lf_ranks	Ranks	false
+derpy_gg_log_empty_filter	Nothing of this kind yet. Press All to see every entry.	false
 derpy_gg_demand_name_renounce	Renunciation	false
 derpy_gg_demand_desc_renounce	The guild wants you to burn what you have built with its rival. The favour goes; the reputation stays.	false
 derpy_gg_demand_name_tribute	Tribute	false
@@ -672,6 +695,29 @@ derpy_gg_demand_short_emp	You cannot pay this yet	false
 derpy_gg_demand_gold_emp	gold	false
 derpy_gg_demand_favour_emp	favour	false
 derpy_gg_needs_emp	Needs	false
+derpy_gg_opener_ready_emp	Ready to buy:	false
+derpy_gg_opener_none_emp	Nothing needs you right now.	false
+derpy_gg_opener_bounties_emp	Bounties to take:	false
+derpy_gg_opener_demand_emp	A demand you can pay now:	false
+derpy_gg_opener_click_emp	Click to open.	false
+derpy_gg_pager_end_emp	Nothing further this way.	false
+derpy_gg_pager_page_next_emp	Next page	false
+derpy_gg_pager_page_prev_emp	Previous page	false
+derpy_gg_ready_emp	ready to buy	false
+derpy_gg_confirm_emp	Confirm	false
+derpy_gg_confirm_tip_emp	This spends half or more of your favour with this guild, or is aimed at another faction. Press Confirm to go ahead.	false
+derpy_gg_open_guild_emp	Click to see this guild's services.	false
+derpy_gg_pick_button_emp	Select	false
+derpy_gg_pick_help_emp	Press Select to move this panel aside while you choose on the map.	false
+derpy_gg_pick_cancel_emp	Press Escape or Cancel to go back.	false
+derpy_gg_cancel_emp	Cancel	false
+derpy_gg_map_tip_emp	Click the card to see the target on the map.	false
+derpy_gg_frow_map_emp	Click to see their capital on the map.	false
+derpy_gg_lf_all_emp	All	false
+derpy_gg_lf_mine_emp	Yours	false
+derpy_gg_lf_rivals_emp	Rivals	false
+derpy_gg_lf_ranks_emp	Ranks	false
+derpy_gg_log_empty_filter_emp	Nothing of this kind yet. Press All to see every entry.	false
 derpy_gg_demand_name_renounce_emp	Renunciation	false
 derpy_gg_demand_desc_renounce_emp	The guild wants you to burn what you have built with its rival. The favour goes; the reputation stays.	false
 derpy_gg_demand_name_tribute_emp	Tribute	false
@@ -1107,6 +1153,29 @@ derpy_gg_demand_short_dwf	You cannot pay this yet	false
 derpy_gg_demand_gold_dwf	gold	false
 derpy_gg_demand_favour_dwf	favour	false
 derpy_gg_needs_dwf	Needs	false
+derpy_gg_opener_ready_dwf	Ready to buy:	false
+derpy_gg_opener_none_dwf	Nothing needs you right now.	false
+derpy_gg_opener_bounties_dwf	Bounties to take:	false
+derpy_gg_opener_demand_dwf	A demand you can pay now:	false
+derpy_gg_opener_click_dwf	Click to open.	false
+derpy_gg_pager_end_dwf	Nothing further this way.	false
+derpy_gg_pager_page_next_dwf	Next page	false
+derpy_gg_pager_page_prev_dwf	Previous page	false
+derpy_gg_ready_dwf	ready to buy	false
+derpy_gg_confirm_dwf	Confirm	false
+derpy_gg_confirm_tip_dwf	This spends half or more of your favour with this guild, or is aimed at another faction. Press Confirm to go ahead.	false
+derpy_gg_open_guild_dwf	Click to see this guild's services.	false
+derpy_gg_pick_button_dwf	Select	false
+derpy_gg_pick_help_dwf	Press Select to move this panel aside while you choose on the map.	false
+derpy_gg_pick_cancel_dwf	Press Escape or Cancel to go back.	false
+derpy_gg_cancel_dwf	Cancel	false
+derpy_gg_map_tip_dwf	Click the card to see the target on the map.	false
+derpy_gg_frow_map_dwf	Click to see their capital on the map.	false
+derpy_gg_lf_all_dwf	All	false
+derpy_gg_lf_mine_dwf	Yours	false
+derpy_gg_lf_rivals_dwf	Rivals	false
+derpy_gg_lf_ranks_dwf	Ranks	false
+derpy_gg_log_empty_filter_dwf	Nothing of this kind yet. Press All to see every entry.	false
 derpy_gg_demand_name_renounce_dwf	Renunciation	false
 derpy_gg_demand_desc_renounce_dwf	The guild wants you to burn what you have built with its rival. The favour goes; the reputation stays.	false
 derpy_gg_demand_name_tribute_dwf	Tribute	false
@@ -1542,6 +1611,29 @@ derpy_gg_demand_short_brt	You cannot pay this yet	false
 derpy_gg_demand_gold_brt	gold	false
 derpy_gg_demand_favour_brt	favour	false
 derpy_gg_needs_brt	Needs	false
+derpy_gg_opener_ready_brt	Ready to buy:	false
+derpy_gg_opener_none_brt	Nothing needs you right now.	false
+derpy_gg_opener_bounties_brt	Bounties to take:	false
+derpy_gg_opener_demand_brt	A demand you can pay now:	false
+derpy_gg_opener_click_brt	Click to open.	false
+derpy_gg_pager_end_brt	Nothing further this way.	false
+derpy_gg_pager_page_next_brt	Next page	false
+derpy_gg_pager_page_prev_brt	Previous page	false
+derpy_gg_ready_brt	ready to buy	false
+derpy_gg_confirm_brt	Confirm	false
+derpy_gg_confirm_tip_brt	This spends half or more of your favour with this guild, or is aimed at another faction. Press Confirm to go ahead.	false
+derpy_gg_open_guild_brt	Click to see this guild's services.	false
+derpy_gg_pick_button_brt	Select	false
+derpy_gg_pick_help_brt	Press Select to move this panel aside while you choose on the map.	false
+derpy_gg_pick_cancel_brt	Press Escape or Cancel to go back.	false
+derpy_gg_cancel_brt	Cancel	false
+derpy_gg_map_tip_brt	Click the card to see the target on the map.	false
+derpy_gg_frow_map_brt	Click to see their capital on the map.	false
+derpy_gg_lf_all_brt	All	false
+derpy_gg_lf_mine_brt	Yours	false
+derpy_gg_lf_rivals_brt	Rivals	false
+derpy_gg_lf_ranks_brt	Ranks	false
+derpy_gg_log_empty_filter_brt	Nothing of this kind yet. Press All to see every entry.	false
 derpy_gg_demand_name_renounce_brt	Renunciation	false
 derpy_gg_demand_desc_renounce_brt	The guild wants you to burn what you have built with its rival. The favour goes; the reputation stays.	false
 derpy_gg_demand_name_tribute_brt	Tribute	false
@@ -1977,6 +2069,29 @@ derpy_gg_demand_short_cth	You cannot pay this yet	false
 derpy_gg_demand_gold_cth	gold	false
 derpy_gg_demand_favour_cth	favour	false
 derpy_gg_needs_cth	Needs	false
+derpy_gg_opener_ready_cth	Ready to buy:	false
+derpy_gg_opener_none_cth	Nothing needs you right now.	false
+derpy_gg_opener_bounties_cth	Bounties to take:	false
+derpy_gg_opener_demand_cth	A demand you can pay now:	false
+derpy_gg_opener_click_cth	Click to open.	false
+derpy_gg_pager_end_cth	Nothing further this way.	false
+derpy_gg_pager_page_next_cth	Next page	false
+derpy_gg_pager_page_prev_cth	Previous page	false
+derpy_gg_ready_cth	ready to buy	false
+derpy_gg_confirm_cth	Confirm	false
+derpy_gg_confirm_tip_cth	This spends half or more of your favour with this guild, or is aimed at another faction. Press Confirm to go ahead.	false
+derpy_gg_open_guild_cth	Click to see this guild's services.	false
+derpy_gg_pick_button_cth	Select	false
+derpy_gg_pick_help_cth	Press Select to move this panel aside while you choose on the map.	false
+derpy_gg_pick_cancel_cth	Press Escape or Cancel to go back.	false
+derpy_gg_cancel_cth	Cancel	false
+derpy_gg_map_tip_cth	Click the card to see the target on the map.	false
+derpy_gg_frow_map_cth	Click to see their capital on the map.	false
+derpy_gg_lf_all_cth	All	false
+derpy_gg_lf_mine_cth	Yours	false
+derpy_gg_lf_rivals_cth	Rivals	false
+derpy_gg_lf_ranks_cth	Ranks	false
+derpy_gg_log_empty_filter_cth	Nothing of this kind yet. Press All to see every entry.	false
 derpy_gg_demand_name_renounce_cth	Renunciation	false
 derpy_gg_demand_desc_renounce_cth	The guild wants you to burn what you have built with its rival. The favour goes; the reputation stays.	false
 derpy_gg_demand_name_tribute_cth	Tribute	false
@@ -2412,6 +2527,29 @@ derpy_gg_demand_short_ksl	You cannot pay this yet	false
 derpy_gg_demand_gold_ksl	gold	false
 derpy_gg_demand_favour_ksl	favour	false
 derpy_gg_needs_ksl	Needs	false
+derpy_gg_opener_ready_ksl	Ready to buy:	false
+derpy_gg_opener_none_ksl	Nothing needs you right now.	false
+derpy_gg_opener_bounties_ksl	Bounties to take:	false
+derpy_gg_opener_demand_ksl	A demand you can pay now:	false
+derpy_gg_opener_click_ksl	Click to open.	false
+derpy_gg_pager_end_ksl	Nothing further this way.	false
+derpy_gg_pager_page_next_ksl	Next page	false
+derpy_gg_pager_page_prev_ksl	Previous page	false
+derpy_gg_ready_ksl	ready to buy	false
+derpy_gg_confirm_ksl	Confirm	false
+derpy_gg_confirm_tip_ksl	This spends half or more of your favour with this guild, or is aimed at another faction. Press Confirm to go ahead.	false
+derpy_gg_open_guild_ksl	Click to see this guild's services.	false
+derpy_gg_pick_button_ksl	Select	false
+derpy_gg_pick_help_ksl	Press Select to move this panel aside while you choose on the map.	false
+derpy_gg_pick_cancel_ksl	Press Escape or Cancel to go back.	false
+derpy_gg_cancel_ksl	Cancel	false
+derpy_gg_map_tip_ksl	Click the card to see the target on the map.	false
+derpy_gg_frow_map_ksl	Click to see their capital on the map.	false
+derpy_gg_lf_all_ksl	All	false
+derpy_gg_lf_mine_ksl	Yours	false
+derpy_gg_lf_rivals_ksl	Rivals	false
+derpy_gg_lf_ranks_ksl	Ranks	false
+derpy_gg_log_empty_filter_ksl	Nothing of this kind yet. Press All to see every entry.	false
 derpy_gg_demand_name_renounce_ksl	Renunciation	false
 derpy_gg_demand_desc_renounce_ksl	The guild wants you to burn what you have built with its rival. The favour goes; the reputation stays.	false
 derpy_gg_demand_name_tribute_ksl	Tribute	false
@@ -2847,6 +2985,29 @@ derpy_gg_demand_short_def	You cannot pay this yet	false
 derpy_gg_demand_gold_def	gold	false
 derpy_gg_demand_favour_def	favour	false
 derpy_gg_needs_def	Needs	false
+derpy_gg_opener_ready_def	Ready to buy:	false
+derpy_gg_opener_none_def	Nothing needs you right now.	false
+derpy_gg_opener_bounties_def	Bounties to take:	false
+derpy_gg_opener_demand_def	A demand you can pay now:	false
+derpy_gg_opener_click_def	Click to open.	false
+derpy_gg_pager_end_def	Nothing further this way.	false
+derpy_gg_pager_page_next_def	Next page	false
+derpy_gg_pager_page_prev_def	Previous page	false
+derpy_gg_ready_def	ready to buy	false
+derpy_gg_confirm_def	Confirm	false
+derpy_gg_confirm_tip_def	This spends half or more of your favour with this guild, or is aimed at another faction. Press Confirm to go ahead.	false
+derpy_gg_open_guild_def	Click to see this guild's services.	false
+derpy_gg_pick_button_def	Select	false
+derpy_gg_pick_help_def	Press Select to move this panel aside while you choose on the map.	false
+derpy_gg_pick_cancel_def	Press Escape or Cancel to go back.	false
+derpy_gg_cancel_def	Cancel	false
+derpy_gg_map_tip_def	Click the card to see the target on the map.	false
+derpy_gg_frow_map_def	Click to see their capital on the map.	false
+derpy_gg_lf_all_def	All	false
+derpy_gg_lf_mine_def	Yours	false
+derpy_gg_lf_rivals_def	Rivals	false
+derpy_gg_lf_ranks_def	Ranks	false
+derpy_gg_log_empty_filter_def	Nothing of this kind yet. Press All to see every entry.	false
 derpy_gg_demand_name_renounce_def	Renunciation	false
 derpy_gg_demand_desc_renounce_def	The guild wants you to burn what you have built with its rival. The favour goes; the reputation stays.	false
 derpy_gg_demand_name_tribute_def	Tribute	false
@@ -3282,6 +3443,29 @@ derpy_gg_demand_short_hef	You cannot pay this yet	false
 derpy_gg_demand_gold_hef	gold	false
 derpy_gg_demand_favour_hef	favour	false
 derpy_gg_needs_hef	Needs	false
+derpy_gg_opener_ready_hef	Ready to buy:	false
+derpy_gg_opener_none_hef	Nothing needs you right now.	false
+derpy_gg_opener_bounties_hef	Bounties to take:	false
+derpy_gg_opener_demand_hef	A demand you can pay now:	false
+derpy_gg_opener_click_hef	Click to open.	false
+derpy_gg_pager_end_hef	Nothing further this way.	false
+derpy_gg_pager_page_next_hef	Next page	false
+derpy_gg_pager_page_prev_hef	Previous page	false
+derpy_gg_ready_hef	ready to buy	false
+derpy_gg_confirm_hef	Confirm	false
+derpy_gg_confirm_tip_hef	This spends half or more of your favour with this guild, or is aimed at another faction. Press Confirm to go ahead.	false
+derpy_gg_open_guild_hef	Click to see this guild's services.	false
+derpy_gg_pick_button_hef	Select	false
+derpy_gg_pick_help_hef	Press Select to move this panel aside while you choose on the map.	false
+derpy_gg_pick_cancel_hef	Press Escape or Cancel to go back.	false
+derpy_gg_cancel_hef	Cancel	false
+derpy_gg_map_tip_hef	Click the card to see the target on the map.	false
+derpy_gg_frow_map_hef	Click to see their capital on the map.	false
+derpy_gg_lf_all_hef	All	false
+derpy_gg_lf_mine_hef	Yours	false
+derpy_gg_lf_rivals_hef	Rivals	false
+derpy_gg_lf_ranks_hef	Ranks	false
+derpy_gg_log_empty_filter_hef	Nothing of this kind yet. Press All to see every entry.	false
 derpy_gg_demand_name_renounce_hef	Renunciation	false
 derpy_gg_demand_desc_renounce_hef	The guild wants you to burn what you have built with its rival. The favour goes; the reputation stays.	false
 derpy_gg_demand_name_tribute_hef	Tribute	false
@@ -3717,6 +3901,29 @@ derpy_gg_demand_short_gen	You cannot pay this yet	false
 derpy_gg_demand_gold_gen	gold	false
 derpy_gg_demand_favour_gen	favour	false
 derpy_gg_needs_gen	Needs	false
+derpy_gg_opener_ready_gen	Ready to buy:	false
+derpy_gg_opener_none_gen	Nothing needs you right now.	false
+derpy_gg_opener_bounties_gen	Bounties to take:	false
+derpy_gg_opener_demand_gen	A demand you can pay now:	false
+derpy_gg_opener_click_gen	Click to open.	false
+derpy_gg_pager_end_gen	Nothing further this way.	false
+derpy_gg_pager_page_next_gen	Next page	false
+derpy_gg_pager_page_prev_gen	Previous page	false
+derpy_gg_ready_gen	ready to buy	false
+derpy_gg_confirm_gen	Confirm	false
+derpy_gg_confirm_tip_gen	This spends half or more of your favour with this guild, or is aimed at another faction. Press Confirm to go ahead.	false
+derpy_gg_open_guild_gen	Click to see this guild's services.	false
+derpy_gg_pick_button_gen	Select	false
+derpy_gg_pick_help_gen	Press Select to move this panel aside while you choose on the map.	false
+derpy_gg_pick_cancel_gen	Press Escape or Cancel to go back.	false
+derpy_gg_cancel_gen	Cancel	false
+derpy_gg_map_tip_gen	Click the card to see the target on the map.	false
+derpy_gg_frow_map_gen	Click to see their capital on the map.	false
+derpy_gg_lf_all_gen	All	false
+derpy_gg_lf_mine_gen	Yours	false
+derpy_gg_lf_rivals_gen	Rivals	false
+derpy_gg_lf_ranks_gen	Ranks	false
+derpy_gg_log_empty_filter_gen	Nothing of this kind yet. Press All to see every entry.	false
 derpy_gg_demand_name_renounce_gen	Renunciation	false
 derpy_gg_demand_desc_renounce_gen	The guild wants you to burn what you have built with its rival. The favour goes; the reputation stays.	false
 derpy_gg_demand_name_tribute_gen	Tribute	false

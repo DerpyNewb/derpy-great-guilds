@@ -1809,7 +1809,40 @@ def _build_one(tag):
                       ("demand_favour", "favour"),
                       # Prefixes the rank a locked service wants, so the red text on
                       # the card reads as a requirement and not as a label.
-                      ("needs", "Needs")):
+                      ("needs", "Needs"),
+                      # THE QUALITY-OF-LIFE PASS, 2026-09-25. The HUD opener's hover
+                      # names what its count is counting.
+                      ("opener_ready", "Ready to buy:"),
+                      ("opener_none", "Nothing needs you right now."),
+                      ("opener_bounties", "Bounties to take:"),
+                      ("opener_demand", "A demand you can pay now:"),
+                      ("opener_click", "Click to open."),
+                      # The arrows and the six guild buttons say where they go.
+                      ("pager_end", "Nothing further this way."),
+                      ("pager_page_next", "Next page"),
+                      ("pager_page_prev", "Previous page"),
+                      ("ready", "ready to buy"),
+                      # A big spend asks once before it goes.
+                      ("confirm", "Confirm"),
+                      ("confirm_tip", "This spends half or more of your favour with "
+                                      "this guild, or is aimed at another faction. "
+                                      "Press Confirm to go ahead."),
+                      # A Leaderboard row's icon opens that guild.
+                      ("open_guild", "Click to see this guild's services."),
+                      # Picking a target with the panel out of the way.
+                      ("pick_button", "Select"),
+                      ("pick_help", "Press Select to move this panel aside while you "
+                                    "choose on the map."),
+                      ("pick_cancel", "Press Escape or Cancel to go back."),
+                      ("cancel", "Cancel"),
+                      # Map links on the bounty board and the Leaderboard's list.
+                      ("map_tip", "Click the card to see the target on the map."),
+                      ("frow_map", "Click to see their capital on the map."),
+                      # The Log's filters.
+                      ("lf_all", "All"), ("lf_mine", "Yours"),
+                      ("lf_rivals", "Rivals"), ("lf_ranks", "Ranks"),
+                      ("log_empty_filter", "Nothing of this kind yet. Press All to see "
+                                           "every entry.")):
         loc.append({"key": "derpy_gg_" + key, "text": text, "tooltip": "false"})
     for dk, d in sorted(DEMAND_KINDS.items()):
         loc.append({"key": "derpy_gg_demand_name_" + dk, "text": d["name"],

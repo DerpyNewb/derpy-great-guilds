@@ -91,8 +91,9 @@ The guilds belong to **the player's race**, and eight races have them:
 In a campaign played as one of these, every faction of that race runs the guilds and nobody
 else does. Any other race gets nothing: no button, no messages and no AI spending.
 
-**Multiplayer:** every panel action goes through the multiplayer transport, so it should
-stay in sync, but no two-machine campaign has tested it yet.
+**Multiplayer:** every panel action goes through the multiplayer transport, and the host's
+MCT settings are sent to every player when the campaign starts, so it should stay in sync.
+No two-machine campaign has tested it yet.
 
 ## Installing
 
@@ -106,8 +107,9 @@ first turn after loading.
 a difficulty preset (Easy, Default, Hard, Cutthroat, or Custom with every earn rate and
 limit exposed), four switches (AI spending, hostile services, guild notices on the feed, and the
 leader's monopoly on each guild's top service), and a debug log option. The values are
-read once, at the first turn of a campaign, and are fixed for the life of that save.
-Without MCT the defaults apply.
+read once, when a campaign starts, and are fixed for the life of that save. In multiplayer
+the host's settings are used for every player; the debug log option stays each player's
+own. Without MCT, or with a host who has no MCT, the defaults apply.
 
 ## This repository
 

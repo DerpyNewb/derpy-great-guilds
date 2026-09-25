@@ -39,6 +39,7 @@
 					name="standard"
 					width="710"
 					height="24"
+					interactive="true"
 					uniqueguid="GG210005-D000-4000-B000000000000005">
 					<component_text
 						texthalign="Left"

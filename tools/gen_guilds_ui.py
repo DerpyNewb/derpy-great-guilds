@@ -52,7 +52,9 @@ TABS = ["gg_tab_guilds", "gg_tab_stand", "gg_tab_bounty", "gg_tab_court", "gg_ta
 TAB_W, TAB_H = 125, 34
 PANEL_LAYOUT = {
     "gg_crest":      (16,  9,   34,  34),
-    "gg_title":      (54,  14,  366, 28),
+    # CENTRED ON THE PANEL: 60px in from both sides, so the middle of the box is the
+    # middle of the panel, clear of the crest (ends x=50) and the close cross (x=748).
+    "gg_title":      (60,  8,   670, 34),
     "gg_close":      (748, 12,  30,  30),
     "gg_divider":    (20,  44,  750, 10),
     "gg_rank_line":  (20,  104, 750, 26),
@@ -70,6 +72,19 @@ PANEL_LAYOUT = {
 }
 for _i, _name in enumerate(TABS):
     PANEL_LAYOUT[_name] = (20 + _i * TAB_W, 56, TAB_W, TAB_H)
+# ONE CLICK TO ANY GUILD: six glyph buttons between the arrows, the pager's own size and
+# row, centred on the panel (256..534 around 395). The bar above them marks the page on
+# screen; GGUI.draw_guild_buttons moves it along, so its x here is only where it starts.
+GUILD_BTNS = ["gg_gtab_%d" % (_i + 1) for _i in range(6)]
+GTAB_W, GTAB_STEP = 38, 48
+for _i, _name in enumerate(GUILD_BTNS):
+    PANEL_LAYOUT[_name] = (256 + _i * GTAB_STEP, 596, GTAB_W, GTAB_W)
+PANEL_LAYOUT["gg_gsel"] = (256, 590, GTAB_W, 4)
+# THE LOG'S FILTERS, in the band the reputation bar and its track use on the Guilds tab -
+# both are hidden on the Log, and the first of its 21 lines starts at y=168.
+LOG_FILTERS = ["gg_lf_all", "gg_lf_mine", "gg_lf_rivals", "gg_lf_ranks"]
+for _i, _name in enumerate(LOG_FILTERS):
+    PANEL_LAYOUT[_name] = (20 + _i * 120, 138, 110, 24)
 # 21 SLOTS AT A 20px STEP, not 16 at 24. The Help tab truncates in silence - its
 # builder stops at HELP_SLOTS - and the text had grown to about 21 lines. The last slot
 # sits at y=568 and ends at 586, clear of the pager at y=596.
@@ -101,8 +116,12 @@ ROW_W, ROW_H = 750, 40
 # "Leader: Zharr-Naggrund (Ironmaster)" already filled. The two columns to its left were
 # the ones with room: a guild name is at most 22 characters and "You: Ironmaster (1240)"
 # is 22.
+#
+# THE GUILD'S GLYPH OPENS THE ROW, at 36 in a 40-tall row - the largest square that
+# fits. The name gives up 32px for it: the longest guild name is 22 characters.
 ROW_LAYOUT = {
-    "row_guild":  (14, 8, 190, 24),
+    "row_icon":   (6, 2, 36, 36),
+    "row_guild":  (46, 8, 160, 24),
     "row_rank":   (212, 8, 196, 24),
     "row_leader": (416, 8, 324, 24),
 }
@@ -354,6 +373,19 @@ CARD_ICON_LAYERS = [
      "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "dock": "Center"},
 ]
 
+# The same one-placeholder idea for the Leaderboard row's glyph, repainted per guild.
+ROW_ICON_LAYERS = [
+    {"path": "ui/campaign ui/derpy_gg_icons/brass.png",
+     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "dock": None},
+]
+
+# CA's gold, the colour of the counts on these buttons and on the HUD opener.
+GOLD = "#FFD37AFF"
+GSEL_LAYERS = [
+    {"path": "ui/skins/default/1x1_blank_white.png",
+     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "colour": GOLD, "dock": None},
+]
+
 # A standings row is a BAND, not a button - a flat tint, the same idiom as the
 # reputation track. It was a 750px-wide stretched button plate, which is the exact
 # smear the cards were, six times over.
@@ -398,6 +430,19 @@ CLOSE_HOVER = ROUND_HOVER + [
     {"path": "ui/skins/default/icon_cross_small.png", "offset": (_X, _X),
      "dw": -2 * _X, "dh": -2 * _X, "margin": 0, "dock": "Center"},
 ]
+
+# THE GUILD BUTTONS: the pager's round plate, the guild's glyph inset on it. The plate is
+# for the count, not decoration - drawn straight onto the pale glyph, the gold digit was
+# lost in it (seen in preview_guilds_panel.py's gg_guilds.png); on the plate it has the
+# dark rim the HUD opener's count sits on. The glyph is a placeholder the Lua repaints by
+# index, GGUI.GUILD_BTN_ICON, which check() pins to GTAB_ICON.
+GTAB_INSET = 5
+GTAB_ICON_PATH = "ui/campaign ui/derpy_gg_icons/brass.png"
+GTAB_LAYERS = ROUND_LAYERS + [
+    {"path": GTAB_ICON_PATH, "offset": (GTAB_INSET, GTAB_INSET),
+     "dw": -2 * GTAB_INSET, "dh": -2 * GTAB_INSET, "margin": 0, "dock": "Center"},
+]
+GTAB_ICON = [l["path"] for l in GTAB_LAYERS].index(GTAB_ICON_PATH)
 
 # The tabs and each card's Buy button are BUTTONS: they carry a click
 # handler and nothing else. With no image and no label they were live click targets
@@ -474,8 +519,17 @@ def _panel():
                       layers=PANEL_LAYERS))
     for name in sorted(PANEL_LAYOUT):
         _x, _y, w, h = PANEL_LAYOUT[name]
-        interactive = name in TABS + ["gg_prev", "gg_next", "gg_close"]
-        if name == "gg_close":
+        interactive = name in TABS + LOG_FILTERS + ["gg_prev", "gg_next", "gg_close"]
+        if name in GUILD_BTNS:
+            # The glyph IS the button, and the count sits on its corner the way the
+            # opener's badge does: same font, same gold, same bottom-right.
+            kw = {"layers": GTAB_LAYERS, "interactive": True, "sound": SOUND_ROUND,
+                  "text": True, "size": 12, "align": "Right", "valign": "Bottom",
+                  "fontcat": "header_14", "leading": 0, "colour": GOLD,
+                  "tx": "-2.00,0.00", "ty": "-1.00,0.00"}
+        elif name == "gg_gsel":
+            kw = {"layers": GSEL_LAYERS}
+        elif name == "gg_close":
             # A cross, not a caption: no text block, so there is nothing to write
             # onto it and nothing that can vanish off it.
             kw = {"layers": CLOSE_LAYERS, "hover": CLOSE_HOVER, "interactive": True,
@@ -496,8 +550,9 @@ def _panel():
         elif name == "gg_crest":
             kw = {"layers": CREST_LAYERS}
         elif name == "gg_title":
-            kw = {"text": True, "size": 18, "align": "Left", "valign": "Center",
-                  "fontcat": "header_18_bold", "tx": LABEL_TX, "ty": LABEL_TY}
+            # The largest bold header CA has, centred with no side offset.
+            kw = {"text": True, "size": 24, "align": "Center", "valign": "Center",
+                  "fontcat": "header_24_bold", "tx": "0.00,0.00", "ty": "0.00,0.00"}
         elif name.startswith("gg_help_"):
             kw = {"text": True, "size": 12, "align": "Left", "valign": "Center",
                   "fontcat": "body_12", "colour": "#C9BFA8FF",
@@ -511,7 +566,13 @@ def _panel():
 
 def _card():
     root = EU.C("root", CARD_W, CARD_H)
-    c = root.add(EU.C("derpy_gg_card", CARD_W, CARD_H, layers=CARD_LAYERS))
+    # INTERACTIVE, for two reasons: its tooltip carries everything the card has no room
+    # for, and a tooltip on a component that is not interactive is never shown; and on the
+    # bounty board a click on the card pans the map to the target. NO SOUND, deliberately:
+    # on the Guilds and Court tabs the card body does nothing, and a click sound there
+    # would say something happened. On the board the camera moving is the answer.
+    c = root.add(EU.C("derpy_gg_card", CARD_W, CARD_H, layers=CARD_LAYERS,
+                      interactive=True))
     for name in sorted(CARD_LAYOUT):
         _x, _y, w, h = CARD_LAYOUT[name]
         if name == "card_buy":
@@ -548,6 +609,12 @@ def _row():
                       interactive=True, sound=SOUND_TAB))
     for name in sorted(ROW_LAYOUT):
         _x, _y, w, h = ROW_LAYOUT[name]
+        if name == "row_icon":
+            # A BUTTON INSIDE THE ROW: the row picks the list below, its glyph opens the
+            # guild's services. On top of the row, so it takes its own clicks.
+            r.add(EU.C(name, w, h, layers=ROW_ICON_LAYERS, interactive=True,
+                       sound=SOUND_TAB))
+            continue
         r.add(EU.C(name, w, h, text=True, size=14, align="Left", valign="Center",
                    tx=LABEL_TX, ty=LABEL_TY))
     return root
@@ -622,8 +689,11 @@ def _frow():
     as rows, and the list already has the clip window's edge to sit in.
     """
     root = EU.C("root", FROW_W, FROW_H)
+    # INTERACTIVE for its tooltip, and because a click pans the map to the faction's
+    # capital. No sound, for the card's reason: the camera moving is the answer.
     root.add(EU.C("derpy_gg_frow", FROW_W, FROW_H, text=True, size=12, align="Left",
-                  valign="Center", fontcat="body_12", tx=LABEL_TX, ty=LABEL_TY))
+                  valign="Center", fontcat="body_12", tx=LABEL_TX, ty=LABEL_TY,
+                  interactive=True))
     return root
 
 
@@ -1118,6 +1188,12 @@ def check():
         out += check_loc_keys(lua_src)
         out += check_panel_bg(lua_src)
         out += check_opener_crest(lua_src)
+        # The guild buttons repaint their glyph by index; the plate is image 0.
+        m = re.search(r"GGUI\.GUILD_BTN_ICON\s*=\s*(\d+)", lua_src)
+        if not m or int(m.group(1)) != GTAB_ICON:
+            out.append("GGUI.GUILD_BTN_ICON is %s but the guild buttons' glyph is image %d "
+                       "- the Lua would paint over the plate and leave brass on every "
+                       "button" % (m and m.group(1), GTAB_ICON))
         out += check_scale_anim(files, lua_src)
 
     # THE OPENER STACKS UNDER THE ZHARR EXCHANGE'S BUTTON, and when that mod is not
@@ -1309,7 +1385,7 @@ def check():
     # the Buy buttons shipped once they had art.
     for fname, names in (("derpy_gg_panel.twui.xml",
                           ["gg_title", "gg_rank_line", "gg_earned", "gg_footer"] + TABS
-                          + ["gg_prev", "gg_next"]),
+                          + ["gg_prev", "gg_next"] + GUILD_BTNS + LOG_FILTERS),
                          ("derpy_gg_card.twui.xml",
                           ["card_name", "card_desc_1", "card_desc_2",
                            "card_cost", "card_buy"]),
@@ -1344,10 +1420,10 @@ def check():
     # These carry a click handler in the campaign Lua; without an image they are live
     # but invisible, which is how the tab row, the pager and every Buy button shipped.
     for fname, names in (("derpy_gg_panel.twui.xml",
-                          TABS + ["gg_prev", "gg_next"]),
+                          TABS + ["gg_prev", "gg_next"] + GUILD_BTNS + LOG_FILTERS),
                          ("derpy_gg_panel.twui.xml", ["gg_close"]),
                          ("derpy_gg_card.twui.xml", ["card_buy"]),
-                         ("derpy_gg_row.twui.xml", ["derpy_gg_row"])):
+                         ("derpy_gg_row.twui.xml", ["derpy_gg_row", "row_icon"])):
         text = files.get(fname, "")
         for name in names:
             i = text.find('id="%s"' % name)
@@ -1372,6 +1448,22 @@ def check():
             if 'interactive="true"' not in body:
                 out.append("%s: %s is clicked by the campaign Lua but no state of it is "
                            "interactive, so it raises no click event at all" % (fname, name))
+
+    # HOVERED AND CLICKED, BUT SILENT ON PURPOSE: the card and the faction row. Their
+    # tooltips need them interactive, and so do the bounty board's and the Leaderboard's
+    # map links - a click that is not interactive never reaches the Lua. They carry no
+    # soundcategory; see _card(). Asserted here because set_tooltip also makes them
+    # interactive at runtime, which would hide this file losing the flag until a click on
+    # the board did nothing.
+    for fname, name in (("derpy_gg_card.twui.xml", "derpy_gg_card"),
+                        ("derpy_gg_frow.twui.xml", "derpy_gg_frow")):
+        text = files.get(fname, "")
+        i = text.find('id="%s"' % name)
+        nxt = text.find("\n\t\t<", i)
+        body = text[i:nxt if nxt > 0 else len(text)] if i >= 0 else ""
+        if 'interactive="true"' not in body:
+            out.append("%s: %s is not interactive, so its tooltip is never shown and "
+                       "its map link never fires" % (fname, name))
 
     # AND THE CATEGORY MUST BE ONE CA HAS. An invented name is silent with no error -
     # the missing-attribute failure one layer down, and unreachable by reading our own
@@ -1559,6 +1651,8 @@ def check():
     for lname, layers, (cw, ch) in (("panel", PANEL_LAYERS, (PANEL_W, PANEL_H)),
                                     ("card", CARD_LAYERS, (CARD_W, CARD_H)),
                                     ("card icon", CARD_ICON_LAYERS, (68, 68)),
+                                    ("row icon", ROW_ICON_LAYERS,
+                                     tuple(ROW_LAYOUT["row_icon"][2:])),
                                     ("row", ROW_LAYERS, (ROW_W, ROW_H))):
         for lay in layers:
             ox, oy = lay.get("offset", (0, 0))

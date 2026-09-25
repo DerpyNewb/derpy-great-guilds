@@ -112,10 +112,17 @@ end
 -- text is already resolved by GGUI.loc before it arrives.
 --
 -- Never read a tooltip back. GetTooltipText hard-crashes on a HUD button.
+--
+-- AND A TOOLTIP ONLY SHOWS ON AN INTERACTIVE COMPONENT. 1,670 of CA's 1,747 component
+-- tooltips sit on one (docs/CUSTOM_UI.md), and a tooltip on a plain text cell is set,
+-- correct and never seen. Every card, the rank line, the cost and the footer carried one
+-- and none of them was interactive, so the whole panel's hover text was unreachable.
+-- Interactive is not clickable: nothing here listens for a click on a text cell.
 local function set_tooltip(c, text)
     if not c or not text or text == "" then return end
     pcall(function() c:SetTooltipText("", true) end)
     pcall(function() c:SetTooltipText(text, true) end)
+    pcall(function() c:SetInteractive(true) end)
 end
 
 -- ------------------------------------------------------------------- loc ---
@@ -247,7 +254,7 @@ end
 -- drift here is silent misplacement rather than an error.
 GGUI.PANEL_XY = {
     gg_crest      = {16, 9},
-    gg_title      = {54, 14},
+    gg_title      = {60, 8},
     gg_close      = {748, 12},
     gg_divider    = {20, 44},
     gg_tab_guilds = {20, 56},
@@ -264,6 +271,19 @@ GGUI.PANEL_XY = {
     gg_card_3     = {20, 430},
     gg_prev       = {20, 596},
     gg_next       = {732, 596},
+    -- The six guild buttons between the arrows, and the bar that marks the page.
+    gg_gtab_1     = {256, 596},
+    gg_gtab_2     = {304, 596},
+    gg_gtab_3     = {352, 596},
+    gg_gtab_4     = {400, 596},
+    gg_gtab_5     = {448, 596},
+    gg_gtab_6     = {496, 596},
+    gg_gsel       = {256, 590},
+    -- The Log's filters, in the band the reputation bar uses on the Guilds tab.
+    gg_lf_all     = {20, 138},
+    gg_lf_mine    = {140, 138},
+    gg_lf_rivals  = {260, 138},
+    gg_lf_ranks   = {380, 138},
     gg_earned     = {20, 562},
     gg_footer     = {20, 640},
     gg_help_01   = {20, 168},
@@ -357,7 +377,8 @@ GGUI.REP_BAR_H = 12
 -- column was widened to 324px because it now carries the round's movement as well as
 -- the holder.
 GGUI.ROW_CHILD_XY = {
-    row_guild  = {14, 8},
+    row_icon   = {6, 2},
+    row_guild  = {46, 8},
     row_rank   = {212, 8},
     row_leader = {416, 8},
 }
@@ -491,7 +512,9 @@ GGUI.RATIO_SEEN = nil
 function GGUI.text_ratio()
     if type(GGUI.PROBE_W0) ~= "number" or GGUI.PROBE_W0 <= 0 then return 1 end
     local c = comp("gg_help_01")
-    if not c then return 1 end
+    -- THE PANEL IS SHUT during a pick, and the pick card still wraps. The last reading is
+    -- still the truth about the font.
+    if not c then return GGUI.RATIO_SEEN or 1 end
     local ok, w = pcall(function() return c:TextDimensionsForText(GGUI.PROBE) end)
     if not ok or type(w) ~= "number" or w <= 0 then return 1 end
     local r = w / GGUI.PROBE_W0
@@ -506,6 +529,19 @@ end
 -- before the screen settled instead of leaving a bad position permanent.
 -- Every offset goes through GGUI.px: the parts are GGUI.S times their design size, so
 -- their places have to be too, or a grown panel stacks them in its top-left corner.
+-- A card and its six children. Shared by the panel's three cards and the pick card, which
+-- is the same template created on the root.
+function GGUI.place_card(card, x, y)
+    card:MoveTo(x, y)
+    -- Read the card's position back rather than reusing the asked-for numbers: the
+    -- children must follow where the card ACTUALLY went.
+    local cx, cy = card:Position()
+    for name, xy in pairs(GGUI.CARD_CHILD_XY) do
+        local c = comp(name, card)
+        if c then c:MoveTo(cx + GGUI.px(xy[1]), cy + GGUI.px(xy[2])) end
+    end
+end
+
 function GGUI.layout()
     local panel = comp(GGUI.PANEL)
     if not panel then return end
@@ -518,14 +554,7 @@ function GGUI.layout()
     for i = 1, #GGUI.CARD_XY do
         local card = comp(GGUI.CARD .. "_" .. i, panel)
         if card then
-            card:MoveTo(px + P(GGUI.CARD_XY[i][1]), py + P(GGUI.CARD_XY[i][2]))
-            -- Read the card's position back rather than reusing the asked-for
-            -- numbers: the children must follow where the card ACTUALLY went.
-            local cx, cy = card:Position()
-            for name, xy in pairs(GGUI.CARD_CHILD_XY) do
-                local c = comp(name, card)
-                if c then c:MoveTo(cx + P(xy[1]), cy + P(xy[2])) end
-            end
+            GGUI.place_card(card, px + P(GGUI.CARD_XY[i][1]), py + P(GGUI.CARD_XY[i][2]))
         end
     end
     -- THE LIST FRAME, but not what is inside the box. The clip window and the slider are
@@ -633,12 +662,51 @@ function GGUI.open()
         -- the panel's own children, which the .twui.xml offsets do not.
         GGUI.layout()
     end)
-    if ok then GGUI.refresh() end
+    -- ASKED OF THE PANEL, not of `ok`: the body above returns early without a panel and
+    -- still reports success, and a key held for a panel that is not there swallows the
+    -- player's next Escape for nothing.
+    if ok and comp(GGUI.PANEL) then
+        GGUI.hold_esc(GGUI.ESC, GGUI.close)
+        GGUI.refresh()
+    end
 end
 
 function GGUI.close()
+    GGUI.drop_esc(GGUI.ESC)
+    GGUI.CONFIRM = nil
     local p = comp(GGUI.PANEL)
     if p then pcall(function() p:DestroyChildren(); p:Destroy() end) end
+end
+
+-- ------------------------------------------------------------ escape key ---
+-- ESCAPE CLOSES THE PANEL, the way it closes every CA panel. Without it Escape opened the
+-- game menu over the top of this one.
+--
+-- TRACKED HERE, because CA's two calls are not symmetric (lib_campaign_manager.lua):
+--   * stealing a name that is already held is a script_error;
+--   * releasing a name that is NOT held finds nothing, and if no entry is left CA then
+--     lets go of the key outright - including a plain steal_escape_key some other script
+--     is relying on.
+-- And a FIRED entry is removed by CA itself, so the callback clears its own mark before it
+-- runs; the close() it calls then has nothing to release.
+GGUI.ESC = "derpy_gg_panel_esc"
+GGUI.ESC_HELD = GGUI.ESC_HELD or {}
+
+function GGUI.hold_esc(name, fn)
+    if GGUI.ESC_HELD[name] then return end
+    GGUI.ESC_HELD[name] = true
+    pcall(function()
+        cm:steal_escape_key_with_callback(name, function()
+            GGUI.ESC_HELD[name] = nil
+            fn()
+        end)
+    end)
+end
+
+function GGUI.drop_esc(name)
+    if not GGUI.ESC_HELD[name] then return end
+    GGUI.ESC_HELD[name] = nil
+    pcall(function() cm:release_escape_key_with_callback(name) end)
 end
 
 function GGUI.card(i)
@@ -662,16 +730,9 @@ function GGUI.draw_card(faction, i, s)
         if ic then pcall(function() ic:SetVisible(false) end) end
         return
     end
-    local ok, why = GG.can_buy(faction, s.key)
-    -- A TARGETED service needs something selected on the map. can_buy cannot see the
-    -- selection, so the card checks it here - otherwise the button reads as live and
-    -- refuses when pressed, which is the fault this whole pass keeps finding.
-    --
-    -- GG.needs_target, not s.hostile: four more services read a target and did nothing
-    -- without one, and this card showed all four as buyable.
-    if ok and GG.needs_target(s) and not GGUI.pick_target(s, faction) then
-        ok, why = false, "target"
-    end
+    local ok, why = GGUI.card_state(faction, s)
+    -- NO TARGET, BUT ONE CAN BE PICKED: the button is live and steps the panel aside.
+    local pick = not ok and why == "target" and GGUI.can_pick(s)
     local label = GGUI.loc_service(s.key)
     local rep_now = GG.get(faction, s.guild)
     local need_rep = GG.RANKS[s.rank] or 0
@@ -747,11 +808,14 @@ function GGUI.draw_card(faction, i, s)
         tip = tip .. "||You do not have " .. cost_now .. " favour with this guild yet."
     elseif not ok and why == "target" then
         tip = tip .. "||" .. GGUI.loc(GGUI.target_hint(s))
+        if pick then tip = tip .. "||" .. GGUI.loc("pick_help") end
     elseif not ok and why == "no_unit" then
         -- Every culture in the campaign runs guilds; only the flavoured ones have a
         -- regiment mapped. Said in words rather than left as a dead button.
         tip = tip .. "||" .. GGUI.loc("no_unit")
     end
+    local asking = ok and GGUI.CONFIRM == s.key
+    if asking then tip = tip .. "||" .. GGUI.loc("confirm_tip") end
     set_tooltip(card, tip)
     -- The price AND the reason for it. A number that moves with no explanation is
     -- read as a bug, which is the whole lesson of the bounty board's difficulty band.
@@ -765,15 +829,49 @@ function GGUI.draw_card(faction, i, s)
     local btn = comp("card_buy", card)
     if btn then
         local cap = GGUI.loc("buy")
-        if not ok then cap = "[[col:red]]" .. cap .. "[[/col]]" end
+        if pick then
+            cap = GGUI.loc("pick_button")
+        elseif asking then
+            cap = "[[col:yellow]]" .. GGUI.loc("confirm") .. "[[/col]]"
+        elseif not ok then
+            cap = "[[col:red]]" .. cap .. "[[/col]]"
+        end
         set_text(btn, cap)
         -- SHOWN AGAIN. The bounty board and the Court both hide this button on a slot
         -- with no action, and nothing else would ever bring it back.
         pcall(function()
             btn:SetVisible(true)
-            btn:SetDisabled(not ok)
+            btn:SetDisabled(not (ok or pick))
         end)
     end
+end
+
+-- THE CARD'S VERDICT, shared by the draw and the click so the two cannot disagree.
+-- A TARGETED service needs something selected on the map. can_buy cannot see the
+-- selection, so the card checks it here - otherwise the button reads as live and refuses
+-- when pressed, which is the fault this whole pass keeps finding.
+--
+-- GG.needs_target, not s.hostile: four more services read a target and did nothing
+-- without one, and this card showed all four as buyable.
+function GGUI.card_state(faction, s)
+    local ok, why = GG.can_buy(faction, s.key)
+    if ok and GG.needs_target(s) and not GGUI.pick_target(s, faction) then
+        ok, why = false, "target"
+    end
+    return ok, why
+end
+
+-- A PURCHASE THAT IS HARD TO TAKE BACK ASKS FIRST: one aimed at another faction, and one
+-- that spends half or more of what the player holds with that guild. The first click turns
+-- the button into Confirm; paging or changing tab forgets it.
+GGUI.CONFIRM = nil
+
+function GGUI.needs_confirm(faction, s)
+    if not s then return false end
+    if s.hostile then return true end
+    local cost = GG.service_cost(faction, s.key)
+    local _, fav = GG.get(faction, s.guild)
+    return (cost or 0) * 2 >= (fav or 0)
 end
 
 -- A mission's title and description live under keys the RUNTIME derives from the
@@ -902,10 +1000,14 @@ function GGUI.draw_bounties(faction)
                 end)
             end
 
-            set_tooltip(card, GGUI.loc_guild(o.guild) .. "  -  "
+            -- A CLICK ON THE CARD SHOWS THE TARGET ON THE MAP - said only where there is
+            -- somewhere to show, since a dead lord has no position.
+            local tip = GGUI.loc_guild(o.guild) .. "  -  "
                         .. GGUI.loc_raw("missions_localised_description_"
                                         .. GG.bounty_mission_key(o.guild, GGUI.me()))
-                        .. "||" .. GGUI.loc("bounty_help"))
+                        .. "||" .. GGUI.loc("bounty_help")
+            if GGUI.bounty_pos(o) then tip = tip .. "||" .. GGUI.loc("map_tip") end
+            set_tooltip(card, tip)
 
             local btn = comp("card_buy", card)
             if btn then
@@ -932,7 +1034,11 @@ end
 -- or it reads as a button that does nothing, which is exactly what the bounty board's
 -- taken offers did.
 function GGUI.write_card(i, icon, name, l1, l2, right, button, enabled, tip)
-    local card = GGUI.card(i)
+    GGUI.fill_card(GGUI.card(i), icon, name, l1, l2, right, button, enabled, tip)
+end
+
+-- The same six children on any card, including the pick card on the root.
+function GGUI.fill_card(card, icon, name, l1, l2, right, button, enabled, tip)
     if not card then return end
     set_text(comp("card_name", card), name or "")
     set_text(comp("card_desc_1", card), l1 or "")
@@ -1046,10 +1152,11 @@ function GGUI.draw_court(faction)
         local sel = GGUI.selected_force_cqi()
         local l2 = GGUI.loc("patron_needs_char")
         if p then l2 = GGUI.loc("patron_elsewhere") end
+        -- NOBODY SELECTED: the button picks a lord instead of sitting greyed out.
         GGUI.write_card(2, nil,
                         GGUI.loc("patron_of") .. ": " .. GGUI.loc_guild(guild),
                         GGUI.loc("patron_none"), l2, "",
-                        GGUI.loc("patron_appoint"), sel ~= nil,
+                        GGUI.loc(sel and "patron_appoint" or "pick_button"), true,
                         GGUI.loc("court_help"))
     end
 
@@ -1132,6 +1239,14 @@ function GGUI.refresh()
         local b = comp(n)
         if b then pcall(function() b:SetVisible(paged) end) end
     end
+    -- WHERE EACH ARROW GOES, so paging is not a guess. See GGUI.pager_tips.
+    if paged then
+        local back, fwd = GGUI.pager_tips(faction)
+        set_tooltip(comp("gg_prev"), back)
+        set_tooltip(comp("gg_next"), fwd)
+    end
+    GGUI.draw_guild_buttons(faction)
+    GGUI.draw_log_filters()
 
     if paged and GGUI.TAB == 1 then
         -- The bare "340 / 700" said nothing about WHICH number it was. Naming it is
@@ -1429,11 +1544,40 @@ end
 -- Every line the log would draw, wrapped against `ruler`. THE COLOUR GOES ON AFTER THE
 -- WRAP, one pair of tags per line: GGUI.wrap splits on spaces, so a [[col:]] opened on
 -- one line and closed on the next would be a guess about the renderer.
+-- WHICH ENTRIES THE LOG SHOWS. A long campaign's log is mostly rivals buying things; a
+-- player looking for when they lost a rank had to page through all of it.
+GGUI.LOG_FILTER = "all"
+GGUI.LOG_FILTER_BTN = "gg_lf_"
+GGUI.LOG_FILTER_ORDER = {"all", "mine", "rivals", "ranks"}
+GGUI.LOG_FILTERS = {
+    mine   = {buy = true, rank = true, lead_won = true},
+    rivals = {ai_buy = true, hit = true, lead_lost = true},
+    ranks  = {rank = true, lead_won = true, lead_lost = true},
+}
+
+-- The four buttons above the Log. Literal keys, one per filter, so the generator's loc
+-- check can see every one of them.
+function GGUI.draw_log_filters()
+    local label = {all = GGUI.loc("lf_all"), mine = GGUI.loc("lf_mine"),
+                   rivals = GGUI.loc("lf_rivals"), ranks = GGUI.loc("lf_ranks")}
+    for _, f in ipairs(GGUI.LOG_FILTER_ORDER) do
+        local b = comp(GGUI.LOG_FILTER_BTN .. f)
+        if b then
+            pcall(function() b:SetVisible(GGUI.TAB == 6) end)
+            local t = label[f]
+            if f == GGUI.LOG_FILTER then t = "[[col:yellow]]" .. t .. "[[/col]]" end
+            set_text(b, t)
+        end
+    end
+end
+
 function GGUI.log_lines(me, ruler)
     local out = {}
     local entries = GG.log_entries(me)
+    local keep = GGUI.LOG_FILTERS[GGUI.LOG_FILTER]
     for i = 1, #entries do
-        local text, bad = GGUI.log_text(entries[i])
+        local text, bad
+        if not keep or keep[entries[i].kind] then text, bad = GGUI.log_text(entries[i]) end
         if text then
             local wrapped = GGUI.wrap(ruler, text, 3)
             if #wrapped == 0 then wrapped = {text} end
@@ -1445,8 +1589,11 @@ function GGUI.log_lines(me, ruler)
         end
     end
     -- AN EMPTY LOG SAYS WHAT WILL APPEAR IN IT. The first Log tab drew nothing at all,
-    -- which is why it was removed.
-    if #out == 0 then out[1] = GGUI.loc("log_empty") end
+    -- which is why it was removed. An empty FILTER says that instead, or a player with a
+    -- full log reads "nothing yet" and thinks it was lost.
+    if #out == 0 then
+        out[1] = GGUI.loc((keep and #entries > 0) and "log_empty_filter" or "log_empty")
+    end
     return out
 end
 
@@ -1638,17 +1785,79 @@ end
 -- The colour tags wrap only the text. Nesting them around the [[img:]] pair would be a
 -- guess about how the renderer handles overlapping markup, and an unknown colour name is
 -- consumed silently rather than erroring - so a nesting mistake would be invisible.
-function GGUI.frow_text(r, me)
-    local flag = GG.FLAG_OF[r.faction]
+function GGUI.flag_img(faction)
+    local flag = GG.FLAG_OF[faction]
     local img = (type(flag) == "string" and flag ~= "")
                 and (flag .. "/mon_24.png") or GGUI.FLAG_FALLBACK
+    return "[[img:" .. img .. "]][[/img]]"
+end
+
+function GGUI.frow_text(r, me)
     local who = (r.faction == me) and GGUI.loc("you") or GGUI.faction_name(r.faction)
     local body = r.pos .. ".  " .. who .. "   " .. r.rep .. "   "
                  .. GGUI.loc_rank(GG.rank_of(r.rep))
     if r.faction == me then
         body = "[[col:yellow]]" .. body .. "[[/col]]"
     end
-    return "[[img:" .. img .. "]][[/img]]  " .. body
+    return GGUI.flag_img(r.faction) .. "  " .. body
+end
+
+-- WHO LEADS, in the Leaderboard's third column: "Leader:" and the leader's flag. A
+-- rival's name and rank follow the flag; yours does not, because the flag is yours and
+-- the column to the left already gives your rank. The yellow changed-hands mark and the
+-- round's gain wrap only the text, never the flag, for the reason frow_text gives.
+--
+-- detail 2 is the name and rank, 1 the name alone, 0 the flag alone; see leader_fit.
+function GGUI.leader_text(L, me, moved, gain, detail)
+    detail = detail or 2
+    local body = ""
+    if not L.faction_key then
+        body = GGUI.loc("nobody")
+    elseif L.faction_key ~= me and detail > 0 then
+        body = GGUI.faction_name(L.faction_key)
+        if detail > 1 then body = body .. " (" .. GGUI.loc_rank(L.rank) .. ")" end
+    end
+    if moved and body ~= "" then body = "[[col:yellow]]" .. body .. "[[/col]]" end
+    gain = gain or 0
+    if gain ~= 0 then
+        body = body .. (gain > 0 and "   [[col:green]]+" or "   [[col:red]]")
+               .. gain .. "[[/col]]"
+    end
+    if not L.faction_key then return GGUI.loc("leader") .. ": " .. body end
+    return GGUI.loc("leader") .. ": " .. GGUI.flag_img(L.faction_key) .. "  " .. body
+end
+
+-- A string with its [[img:]] and [[col:]] markup taken out, for measuring.
+function GGUI.bare(s)
+    return (s:gsub("%[%[img:.-%]%]%[%[/img%]%]", ""):gsub("%[%[/?col[^%]]*%]%]", ""))
+end
+
+-- THE FLAG'S WIDTH, charged by hand: whether TextDimensionsForText reads [[img:]] as a
+-- picture or as fifty characters of path is not in CA's reference, so the markup is
+-- stripped before measuring and the flag is paid for here, in design pixels.
+GGUI.FLAG_W = 30
+
+-- THE LONGEST LEADER LINE THAT FITS ITS CELL. Nothing in this engine wraps, and the
+-- longest real rival line - "The Huntsmarshal's Expedition (Grand Master)   +120" with
+-- the flag - is about 460px against a 324px column, so it would run out past the
+-- panel's edge. The rank goes first, then the name: the flag still says who, and the
+-- row's hover names everyone. Measured the way GGUI.wrap measures.
+function GGUI.leader_fit(c, L, me, moved, gain)
+    local ok_w, w = pcall(function() return c:Dimensions() end)
+    if not ok_w or type(w) ~= "number" or w <= 0 then
+        return GGUI.leader_text(L, me, moved, gain)
+    end
+    local r = GGUI.text_ratio()
+    w = w * r / GGUI.S
+    local s
+    for detail = 2, 0, -1 do
+        s = GGUI.leader_text(L, me, moved, gain, detail)
+        local ok, need = pcall(function() return c:TextDimensionsForText(GGUI.bare(s)) end)
+        if not ok or type(need) ~= "number" or need + GGUI.FLAG_W * r <= w then
+            return s
+        end
+    end
+    return s
 end
 
 -- WHICH GUILD THE LIST IS SHOWING. Clamped rather than trusted: GGUI.STAND_GUILD is set
@@ -1683,9 +1892,15 @@ GGUI.LIST_LAST = 0
 -- hidden child still occupies a slot in some layout engines, which would leave gaps
 -- wherever a faction died, and this panel already re-finds every component every time
 -- rather than caching handles.
+-- WHICH FACTION EACH ROW IS, by row number, for the click. A row is one text component
+-- with no data behind it, so the click reads the faction back from here.
+GGUI.LIST_FACTIONS = {}
+
 function GGUI.draw_faction_list(faction)
     local rows, guild = GGUI.list_rows(faction)
     GGUI.LIST_LAST = #rows
+    GGUI.LIST_FACTIONS = {}
+    for i = 1, #rows do GGUI.LIST_FACTIONS[i] = rows[i].faction end
 
     local list = comp(GGUI.LIST, comp(GGUI.PANEL))
     if not list then return end
@@ -1701,8 +1916,12 @@ function GGUI.draw_faction_list(faction)
             -- Created after open() scaled the panel, so it is scaled here, once.
             GGUI.scale_tree(fr)
             set_text(fr, GGUI.frow_text(rows[i], faction))
-            set_tooltip(fr, GGUI.loc_guild(guild) .. "  "
-                        .. GGUI.faction_name(rows[i].faction))
+            -- A click shows their capital, promised only for a faction that has one.
+            local tip = GGUI.loc_guild(guild) .. "  " .. GGUI.faction_name(rows[i].faction)
+            if GGUI.faction_pos(rows[i].faction) then
+                tip = tip .. "||" .. GGUI.loc("frow_map")
+            end
+            set_tooltip(fr, tip)
         end
     end
     -- Force the list layout to run now. Without it the rows created above are stacked at
@@ -1727,32 +1946,24 @@ function GGUI.draw_standings(faction)
                 label = "[[col:yellow]]" .. label .. "[[/col]]"
             end
             set_text(comp("row_guild", row), label)
+            local ic = comp("row_icon", row)
+            if ic then
+                pcall(function() ic:SetImagePath(GGUI.icon(L.guild) or "", 0) end)
+                -- The one part of the row that does something else: it opens the guild.
+                set_tooltip(ic, GGUI.loc("open_guild"))
+            end
             -- LABELLED, because the row had three naked fragments in it: the guild,
             -- a rank with a number after it, and a second rank belonging to somebody
             -- else. Nothing said which of the two ranks was yours.
             set_text(comp("row_rank", row),
                      GGUI.loc("you") .. ": " .. GGUI.loc_rank(GG.rank_of(rep))
                      .. " (" .. rep .. ")" .. GGUI.position_tag(faction, L.guild))
-            local who = L.faction_key
-            if who == faction then
-                -- "Leader: You" and nothing else: the rank is already in the column
-                -- to the left, and printing it twice was half the confusion.
-                who = GGUI.loc("you")
-            elseif who then
-                who = GGUI.faction_name(who) .. " (" .. GGUI.loc_rank(L.rank) .. ")"
-            else
-                -- Nobody has any standing with this guild yet, so nobody leads it.
-                who = GGUI.loc("nobody")
-            end
             -- YELLOW WHEN THE GUILD CHANGED HANDS ON THE ROUND JUST PAST. A name that
             -- is merely different from the last time you opened the panel says nothing
             -- about when it changed; the mark is the difference between a scoreboard
             -- and a scoreboard you can watch. [[col:]] works in SetStateText and
             -- "yellow" is one of CA's 42 real colour names.
             local slot = GG.lead_slot(L.guild, GG.culture_of(faction))
-            if w.moved and w.moved[slot] then
-                who = "[[col:yellow]]" .. who .. "[[/col]]"
-            end
             -- AND WHAT THE LEADER GAINED ON IT. This is the race's speed: a rival
             -- pulling away shows a number every round whether or not the name above it
             -- ever changes. Usually positive, because earning only adds - but a
@@ -1760,11 +1971,8 @@ function GGUI.draw_standings(faction)
             -- sign is read rather than assumed. Zero prints nothing rather than "+0",
             -- which is clutter on six rows.
             local gain = (w.gain or {})[slot] or 0
-            if gain ~= 0 then
-                who = who .. (gain > 0 and "   [[col:green]]+" or "   [[col:red]]")
-                      .. gain .. "[[/col]]"
-            end
-            set_text(comp("row_leader", row), GGUI.loc("leader") .. ": " .. who)
+            local cell = comp("row_leader", row)
+            set_text(cell, GGUI.leader_fit(cell, L, faction, w.moved and w.moved[slot], gain))
             -- The league table is where a player decides which guild to chase, so
             -- each row carries what that guild is and what its ladder pays - and, when
             -- there is movement to explain, what the marks on it mean.
@@ -1825,12 +2033,86 @@ function GGUI.set_page(n)
     else
         GGUI.PAGE = n
     end
+    GGUI.CONFIRM = nil
     GGUI.refresh()
 end
 
 function GGUI.set_tab(n)
     GGUI.TAB = n
+    GGUI.CONFIRM = nil
     GGUI.refresh()
+end
+
+-- HOW MANY OF A GUILD'S SERVICES CAN BE BOUGHT NOW, by the same gate as the badge.
+function GGUI.ready_in(faction, guild)
+    local n, mine = 0, GGUI.services_of(guild)
+    for i = 1, #mine do
+        local ok, can = pcall(function() return GG.can_buy(faction, mine[i].key) end)
+        if ok and can then n = n + 1 end
+    end
+    return n
+end
+
+-- A guild's name and, when there is any, what is ready in it. The arrows and the six guild
+-- buttons both say this, so they say it the same way.
+function GGUI.guild_tip(faction, guild)
+    local t = GGUI.loc_guild(guild)
+    local n = GGUI.ready_in(faction, guild)
+    if n > 0 then t = t .. "  -  " .. n .. " " .. GGUI.loc("ready") end
+    return t
+end
+
+-- WHAT EACH ARROW DOES, as (left, right). The Guilds and Court tabs page guilds, so an
+-- arrow names the guild it goes to; Help and the Log page pages. An arrow at the end of
+-- the run says so, because set_page clamps and a click there does nothing.
+function GGUI.pager_tips(faction)
+    local n, max = GGUI.page_now(), GGUI.page_max()
+    local function tip(to)
+        if to < 1 or to > max then return GGUI.loc("pager_end") end
+        if GGUI.TAB == 5 or GGUI.TAB == 6 then
+            return GGUI.loc(to > n and "pager_page_next" or "pager_page_prev")
+        end
+        return GGUI.guild_tip(faction, GGUI.GUILD_ORDER[to])
+    end
+    return tip(n - 1), tip(n + 1)
+end
+
+-- ONE CLICK TO ANY GUILD. The arrows walk six pages one at a time; these jump. Each button
+-- is the guild's own glyph with the badge's gold count in its corner, and a bar marks the
+-- page on screen. Only where the pager pages guilds - Guilds and Court.
+GGUI.GUILD_BTN = "gg_gtab_"
+GGUI.GUILD_SEL = "gg_gsel"
+-- WHICH OF THE BUTTON'S IMAGES IS THE GLYPH: 0 is the round plate under it, which gives
+-- the gold count a dark rim to sit on. gen_guilds_ui.check() pins this against the layers.
+GGUI.GUILD_BTN_ICON = 1
+
+function GGUI.draw_guild_buttons(faction)
+    local quick = (GGUI.TAB == 1 or GGUI.TAB == 4)
+    for i = 1, #GGUI.GUILD_ORDER do
+        local g = GGUI.GUILD_ORDER[i]
+        local b = comp(GGUI.GUILD_BTN .. i)
+        if b then
+            pcall(function() b:SetVisible(quick) end)
+            if quick then
+                pcall(function() b:SetImagePath(GGUI.icon(g) or "", GGUI.GUILD_BTN_ICON) end)
+                local n = GGUI.ready_in(faction, g)
+                set_text(b, n > 0 and tostring(n) or "")
+                set_tooltip(b, GGUI.guild_tip(faction, g))
+            end
+        end
+    end
+    local bar, panel = comp(GGUI.GUILD_SEL), comp(GGUI.PANEL)
+    if not bar or not panel then return end
+    pcall(function()
+        bar:SetVisible(quick)
+        -- Moved AFTER GGUI.layout put it at the first button: the page, not the file,
+        -- decides where it sits.
+        local at = GGUI.PANEL_XY[GGUI.GUILD_BTN .. GGUI.PAGE]
+        if at then
+            local px, py = panel:Position()
+            bar:MoveTo(px + GGUI.px(at[1]), py + GGUI.px(GGUI.PANEL_XY[GGUI.GUILD_SEL][2]))
+        end
+    end)
 end
 
 -- EVERY TARGETED SERVICE TAKES WHATEVER THE PLAYER HAS SELECTED, and the campaign map
@@ -1991,32 +2273,79 @@ core:add_listener("gg_clicks", "ComponentLClickUp", true, function(context)
             GGUI.STAND_GUILD = n
             GGUI.refresh()
         end
+    elseif id == "row_icon" then
+        -- THE ROW PICKS THE LIST BELOW IT; ITS GLYPH GOES TO THE GUILD'S OWN SERVICES.
+        local n = tonumber(string.match(GGUI.parent_name(context) or "", "_(%d+)$"))
+        local g = n and GG.GUILDS[n]
+        for i = 1, #GGUI.GUILD_ORDER do
+            if g and GGUI.GUILD_ORDER[i] == g then
+                GGUI.PAGE = i
+                GGUI.set_tab(1)
+            end
+        end
+    elseif string.match(id, "^" .. GGUI.GUILD_BTN .. "%d+$") then
+        local n = tonumber(string.match(id, "(%d+)$"))
+        if n and GGUI.GUILD_ORDER[n] then GGUI.set_page(n) end
+    elseif string.match(id, "^" .. GGUI.LOG_FILTER_BTN) then
+        local f = string.sub(id, #GGUI.LOG_FILTER_BTN + 1)
+        if f == "all" or GGUI.LOG_FILTERS[f] then
+            -- The newest page of the new view, the same rule as opening the tab.
+            GGUI.LOG_FILTER, GGUI.LOG_PAGE = f, 1
+            GGUI.refresh()
+        end
+    elseif string.match(id, "^" .. GGUI.CARD .. "_%d+$") then
+        -- A BOUNTY CARD IS A MAP LINK. The same card on the other tabs is a service or a
+        -- court matter, and has its button for that.
+        if GGUI.TAB == 3 then
+            local n = tonumber(string.match(id, "(%d+)$"))
+            local me = GGUI.me()
+            local list = me and GG.bounties[me]
+            GGUI.show_on_map(GGUI.bounty_pos(list and list[GGUI.BOUNTY_AT[n] or 0]))
+        end
+    elseif string.match(id, "^" .. GGUI.FROW .. "_%d+$") then
+        local f = GGUI.LIST_FACTIONS[tonumber(string.match(id, "(%d+)$"))]
+        if f then GGUI.show_on_map(GGUI.faction_pos(f)) end
     elseif id == "card_buy" then
         GGUI.on_buy_click(context)
     elseif id == "gg_opener" then
-        if comp(GGUI.PANEL) then GGUI.close() else GGUI.open() end
+        if GGUI.PICK then
+            GGUI.end_pick(true)
+        elseif comp(GGUI.PANEL) then
+            GGUI.close()
+        else
+            GGUI.open()
+        end
     end
 end, true)
+
+-- The name of the component a clicked child sits in: card_buy's card, row_icon's row.
+function GGUI.parent_name(context)
+    local ok, name = pcall(function()
+        -- UIComponent TWICE, and that is not a typo. :Parent() hands back a component
+        -- ADDRESS, not a uicomponent, so calling :Id() straight off it throws - and
+        -- inside a pcall that throws silently, which left every Buy and Take in the
+        -- panel dead once while the click itself registered fine. The Zharr Exchange
+        -- writes the same two-step walk for the same reason.
+        return UIComponent(UIComponent(context.component):Parent()):Id()
+    end)
+    if ok then return name end
+    return nil
+end
 
 function GGUI.on_buy_click(context)
     local ok, faction = pcall(function() return cm:get_local_faction_name(true) end)
     if not ok or not faction then return end
+    local parent_name = GGUI.parent_name(context)
+    -- THE PICK CARD'S ONE BUTTON IS CANCEL.
+    if parent_name == GGUI.PICK_CARD then
+        GGUI.end_pick(true)
+        return
+    end
     -- One button, two meanings, because one card template serves both tabs.
     local is_bounty = (GGUI.TAB == 3)
     local is_court = (GGUI.TAB == 4)
-    -- Which card was clicked: walk up to the card, read its index off its name.
-    local slot = nil
-    local okp, parent_name = pcall(function()
-        -- UIComponent TWICE, and that is not a typo. :Parent() hands back a component
-        -- ADDRESS, not a uicomponent, so calling :Id() straight off it throws - and
-        -- inside this pcall that threw silently, leaving slot nil and every Buy and
-        -- Take in the panel dead while the click itself registered fine. The Zharr
-        -- Exchange writes the same two-step walk for the same reason.
-        return UIComponent(UIComponent(context.component):Parent()):Id()
-    end)
-    if okp and parent_name then
-        slot = tonumber(string.match(parent_name, "_(%d+)$"))
-    end
+    -- Which card was clicked: read its index off its name.
+    local slot = parent_name and tonumber(string.match(parent_name, "_(%d+)$"))
     if not slot then return end
     -- EVERY CHANGE BELOW GOES THROUGH GG.mp_send - applied at once in single player,
     -- broadcast in multiplayer and applied on every machine when it comes back. In
@@ -2034,6 +2363,13 @@ function GGUI.on_buy_click(context)
         if slot == 1 then
             GG.mp_send(faction, "demand")
         elseif slot == 2 then
+            -- APPOINTING WITH NOBODY SELECTED picks a lord first. Dismissing needs no one.
+            local p = GG.patrons[faction]
+            local holds_this = p ~= nil and p.guild == GGUI.current_guild()
+            if not holds_this and not GGUI.selected_force_cqi() then
+                GGUI.start_pick("patron")
+                return
+            end
             GG.mp_send(faction, "patron", GGUI.current_guild() .. "|"
                                           .. tostring(GGUI.selected_force_cqi() or ""))
         end
@@ -2043,6 +2379,18 @@ function GGUI.on_buy_click(context)
     local mine = GGUI.services_of(GGUI.current_guild())
     local s = mine[slot]
     if not s then return end
+    local can, why = GGUI.card_state(faction, s)
+    if not can then
+        -- The only refusal with a live button: no target yet, and the map can give one.
+        if why == "target" and GGUI.can_pick(s) then GGUI.start_pick(s.key) end
+        return
+    end
+    if GGUI.needs_confirm(faction, s) and GGUI.CONFIRM ~= s.key then
+        GGUI.CONFIRM = s.key
+        GGUI.refresh()
+        return
+    end
+    GGUI.CONFIRM = nil
     GG.mp_send(faction, "buy", s.key .. "|" .. GGUI.wire_target(s, faction))
     GGUI.refresh()
 end
@@ -2051,6 +2399,176 @@ end
 GG.after_mp = function(faction)
     if faction == GGUI.me() and comp(GGUI.PANEL) then GGUI.refresh() end
 end
+
+-- ----------------------------------------------------------------- the map ---
+-- THE PANEL COVERS THE MAP IT TALKS ABOUT: 790x700 over the middle of the screen. Three
+-- things below get it out of the way - a bounty's target, a rival's capital, and picking
+-- a target for a service.
+
+-- Seconds. Long enough to see where the camera went, short enough not to wait on it.
+GGUI.PAN_TIME = 0.6
+
+-- ONLY THE POINT THE CAMERA LOOKS AT MOVES. Its distance, bearing and height are read and
+-- handed back, because a pan that also zooms is two things at once. `true` because CA's
+-- doc says to "set to true if control is being released back to the player".
+function GGUI.pan_to(x, y)
+    pcall(function()
+        local _cx, _cy, d, b, h = cm:get_camera_position()
+        cm:scroll_camera_from_current(true, GGUI.PAN_TIME, {x, y, d, b, h})
+    end)
+end
+
+-- The panel closes only when there is somewhere to go, so a dead link is a click that
+-- does nothing rather than one that shuts the panel and shows nothing.
+function GGUI.show_on_map(x, y)
+    if type(x) ~= "number" or type(y) ~= "number" then return false end
+    GGUI.close()
+    GGUI.pan_to(x, y)
+    return true
+end
+
+-- WHERE A BOUNTY'S TARGET STANDS: the settlement for a region, the lord for a lord. A
+-- family member outlives its character (CA's model_hierarchy), so a dead lord is a null
+-- character here and has no position.
+function GGUI.bounty_pos(o)
+    local k = o and GG.BOUNTY_KINDS[o.kind]
+    if not k then return nil end
+    local ok, x, y = pcall(function()
+        if k.target == "region" then
+            local r = cm:get_region(o.target)
+            if not r or r:is_null_interface() then return nil end
+            local s = r:settlement()
+            return s:display_position_x(), s:display_position_y()
+        end
+        local fm = cm:get_family_member_by_cqi(tonumber(o.target) or 0)
+        if not fm or fm:is_null_interface() then return nil end
+        local c = fm:character()
+        if not c or c:is_null_interface() then return nil end
+        return c:display_position_x(), c:display_position_y()
+    end)
+    if ok then return x, y end
+    return nil
+end
+
+-- A FACTION'S CAPITAL, or nil for one with none - a horde, or a faction that lost it. The
+-- Leaderboard only offers the click where this answers.
+function GGUI.faction_pos(key)
+    local ok, x, y = pcall(function()
+        local f = cm:get_faction(key)
+        if not f or f:is_null_interface() or not f:has_home_region() then return nil end
+        local s = f:home_region():settlement()
+        return s:display_position_x(), s:display_position_y()
+    end)
+    if ok then return x, y end
+    return nil
+end
+
+-- ------------------------------------------------------- picking a target ---
+-- A TARGETED SERVICE READS THE MAP'S SELECTION, and the panel sits over that map. So the
+-- card's button steps the panel aside: a card at the top of the screen says what to
+-- select, the map is free, and the first selection that is a target brings the panel back
+-- where it was. It buys nothing - the player still presses Buy, with the target now on the
+-- card. Escape, the card's Cancel and the HUD opener all end it the same way.
+--
+-- NOT RESEARCH: that target is picked in the tech tree, and its card already says so.
+GGUI.PICK = nil
+GGUI.PICK_CARD = "derpy_gg_pick"
+GGUI.PICK_ESC = "derpy_gg_pick_esc"
+-- Design pixels from the top of the screen: under CA's top bar, and clear of the unit
+-- panel a selected army raises along the bottom.
+GGUI.PICK_Y = 110
+
+function GGUI.can_pick(s)
+    return s ~= nil and GG.needs_target(s) and s.kind ~= "research"
+end
+
+-- `key` is a service key, or "patron" for the Court's Appoint.
+function GGUI.start_pick(key)
+    -- The tab and page are left as they are: nothing can change them while the panel
+    -- is shut, so the panel reopens where it was.
+    GGUI.PICK = {key = key}
+    GGUI.close()
+    local s = GG.service(key)
+    local guild = s and s.guild or GGUI.current_guild()
+    local name, hint
+    if s then
+        name, hint = GGUI.loc_service(key), GGUI.target_hint(s)
+    else
+        name, hint = GGUI.loc("patron_of") .. ": " .. GGUI.loc_guild(guild), "patron_needs_char"
+    end
+    pcall(function()
+        local r = root()
+        r:CreateComponent(GGUI.PICK_CARD, GGUI.PATH_CARD)
+        local card = comp(GGUI.PICK_CARD)
+        if not card then return end
+        card:PropagatePriority(60)
+        -- The panel's scale, read by the last open(). A pick only starts from the panel.
+        GGUI.scale_tree(card)
+        local sw = r:Dimensions()
+        local cw = card:Dimensions()
+        GGUI.place_card(card, math.floor((sw - cw) / 2), GGUI.px(GGUI.PICK_Y))
+        -- WRAPPED ACROSS BOTH LINES. The longest instruction runs about 110 characters
+        -- and a card line holds about 70; nothing here wraps by itself. The Escape note
+        -- goes to the hover, and the Cancel button says the rest.
+        local lines = GGUI.wrap(comp("card_desc_1", card), GGUI.loc(hint), 2)
+        GGUI.fill_card(card, GGUI.icon(guild), name, lines[1] or "", lines[2] or "",
+                       "", GGUI.loc("cancel"), true,
+                       GGUI.loc(hint) .. "||" .. GGUI.loc("pick_cancel"))
+    end)
+    GGUI.hold_esc(GGUI.PICK_ESC, function() GGUI.end_pick(true) end)
+end
+
+function GGUI.end_pick(reopen)
+    local p = GGUI.PICK
+    GGUI.PICK = nil
+    GGUI.drop_esc(GGUI.PICK_ESC)
+    local c = comp(GGUI.PICK_CARD)
+    if c then pcall(function() c:DestroyChildren(); c:Destroy() end) end
+    if p and reopen then GGUI.open() end
+end
+
+-- WHETHER WHAT IS SELECTED NOW IS WHAT THE PICK WANTS, through the same reads the card
+-- makes, so the panel never comes back to a card that still says "pick a target".
+function GGUI.pick_ready()
+    local p = GGUI.PICK
+    if not p then return false end
+    if p.key == "patron" then return GGUI.selected_force_cqi() ~= nil end
+    local s = GG.service(p.key)
+    return s ~= nil and GGUI.pick_target(s, GGUI.me()) ~= nil
+end
+
+function GGUI.pick_check()
+    if GGUI.pick_ready() then GGUI.end_pick(true) end
+end
+
+-- A TENTH OF A SECOND LATE: CA's campaign_ui_manager records the selection in its own
+-- listener for the same event, and nothing orders the two.
+for name, event in pairs({gg_pick_char = "CharacterSelected",
+                          gg_pick_settlement = "SettlementSelected"}) do
+    core:add_listener(name, event, true, function()
+        if GGUI.PICK then cm:callback(GGUI.pick_check, 0.1) end
+    end, true)
+end
+
+-- THE BIG PANELS CLOSE THIS ONE. Two panels at once draw over each other in whichever
+-- order they opened. Only full-screen and decision panels: a click on the map raises the
+-- settlement and unit panels, and closing on those would shut this one on every stray
+-- click. Every name is one CA's own scripts compare PanelOpenedCampaign's context.string
+-- against; a wrong name would match nothing and cost nothing.
+GGUI.CLOSE_FOR = {
+    popup_pre_battle = true, popup_battle_results = true, settlement_captured = true,
+    character_details_panel = true, objectives_screen = true, diplomacy_dropdown = true,
+    building_browser = true, technology_panel = true, offices = true,
+    appoint_new_general = true, finance_screen = true, esc_menu_campaign = true,
+    tower_of_zharr = true, hellforge_panel_main = true, book_of_monster_hunts = true,
+    daemonic_progression = true, beastmen_panel = true,
+}
+
+core:add_listener("gg_close_for", "PanelOpenedCampaign", true, function(context)
+    if not GGUI.CLOSE_FOR[context.string] then return end
+    if GGUI.PICK then GGUI.end_pick(false) end
+    if comp(GGUI.PANEL) then GGUI.close() end
+end, true)
 
 -- ---------------------------------------------------------------- opener ---
 -- WHERE THE BUTTON GOES, and why it is not parented to anything on the HUD.
@@ -2099,22 +2617,68 @@ GGUI.BTN_SIZE = 44          -- must match OPENER_W/H in tools/gen_guilds_ui.py
 -- can_buy is the gate rather than the price, deliberately. A count that included services
 -- the rank does not reach would send the player to a panel of greyed buttons, which is a
 -- worse signal than no badge at all.
-function GGUI.actionable(faction)
-    if not faction or not GG.state or not GG.state[faction] then return 0 end
-    local n = 0
+--
+-- A LIST, NOT A COUNT, so the opener's tooltip can name what the badge is counting - the
+-- two are one call and cannot disagree. Keys and guilds only: still no loc in here.
+-- A TAKEN offer is not on it. It has no button on the board, so it is not waiting on the
+-- player; it was counted until 2026-09-25.
+function GGUI.actionable_items(faction)
+    local out = {}
+    if not faction or not GG.state or not GG.state[faction] then return out end
     for i = 1, #GG.SERVICES do
-        local ok, can = pcall(function()
-            return GG.can_buy(faction, GG.SERVICES[i].key)
-        end)
-        if ok and can then n = n + 1 end
+        local s = GG.SERVICES[i]
+        local ok, can = pcall(function() return GG.can_buy(faction, s.key) end)
+        if ok and can then out[#out + 1] = {kind = "service", key = s.key, guild = s.guild} end
     end
-    local offers = GG.bounties and GG.bounties[faction]
-    if offers then n = n + #offers end
-    if GG.demands and GG.demands[faction] then
+    local offers = (GG.bounties and GG.bounties[faction]) or {}
+    for i = 1, #offers do
+        if not offers[i].taken then
+            out[#out + 1] = {kind = "bounty", guild = offers[i].guild}
+        end
+    end
+    local d = GG.demands and GG.demands[faction]
+    if d then
         local ok, payable = pcall(function() return GG.demand_payable(faction) end)
-        if ok and payable then n = n + 1 end
+        if ok and payable then out[#out + 1] = {kind = "demand", guild = d.guild} end
     end
-    return n
+    return out
+end
+
+function GGUI.actionable(faction)
+    return #GGUI.actionable_items(faction)
+end
+
+-- WHAT THE BADGE IS COUNTING, in words. Draw time only - it is written on hover.
+function GGUI.opener_tip(faction)
+    local parts, bounties, demand = {GGUI.loc("panel_title")}, 0, nil
+    local items = GGUI.actionable_items(faction)
+    local ready = {}
+    for i = 1, #items do
+        local it = items[i]
+        if it.kind == "service" then
+            ready[#ready + 1] = GGUI.HELP_BULLET .. GGUI.loc_service(it.key) .. "  ("
+                                .. GGUI.loc_guild(it.guild) .. ")"
+        elseif it.kind == "bounty" then
+            bounties = bounties + 1
+        elseif it.kind == "demand" then
+            demand = it
+        end
+    end
+    if #items == 0 then
+        parts[#parts + 1] = GGUI.loc("opener_none")
+    end
+    if #ready > 0 then
+        parts[#parts + 1] = GGUI.loc("opener_ready")
+        for i = 1, #ready do parts[#parts + 1] = ready[i] end
+    end
+    if bounties > 0 then
+        parts[#parts + 1] = GGUI.loc("opener_bounties") .. " " .. bounties
+    end
+    if demand then
+        parts[#parts + 1] = GGUI.loc("opener_demand") .. " " .. GGUI.loc_guild(demand.guild)
+    end
+    parts[#parts + 1] = GGUI.loc("opener_click")
+    return table.concat(parts, "||")
 end
 
 -- WRITES IT, AND RETURNS IT. The return is not decoration: the harness has no UI, so the
@@ -2423,9 +2987,11 @@ cm:add_first_tick_callback(function() GGUI.name_mct() end)
 -- loc call from a turn handler can crash at turn 1 past pcall - so the tooltip is not
 -- written there. A hover is a UI event, and the text is in place before the tooltip's
 -- own delay runs out.
+-- WHAT IS READY, not the rules: the rules are a hover away on the panel's own title, and
+-- this is the one place a player can learn whether opening the panel is worth it.
 core:add_listener("gg_opener_tip", "ComponentMouseOn", true, function(context)
     if context.string ~= GGUI.BTN then return end
-    set_tooltip(comp(GGUI.BTN), GGUI.loc("panel_title") .. "||" .. GGUI.loc("standing_help"))
+    set_tooltip(comp(GGUI.BTN), GGUI.opener_tip(GGUI.me()))
 end, true)
 
 -- Placement starts at first tick and is re-run at turn start. Both are one-shots
