@@ -3,6 +3,17 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-09-25 - build EDB15834
+
+Deployed 2026-09-25. MD5 `EDB15834C791B393BE645A2E837A8E18`, 32,070,410 bytes.
+
+- **Fixed for game patch 9.0.** Build 108E223B named a building that 9.0 removed (the Great
+  Temple of Ulric), so the game would reject the whole pack. The building list is now read
+  from the installed game instead of an older copy. 9.0's new buildings are included, and
+  1,726 building cards carry the guild line.
+- A new build check resolves every key the pack names against the installed game, so a
+  removed key fails the build instead of the game load.
+
 ## 2026-09-24 - build 108E223B
 
 Deployed 2026-09-24. MD5 `108E223BC4E178A65930A621DE729DF8`, 32,069,050 bytes.

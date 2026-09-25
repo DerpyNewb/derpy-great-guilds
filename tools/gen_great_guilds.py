@@ -2864,6 +2864,25 @@ def guild_of_chain(chain, theme):
     return best
 
 
+_LIVE = {}
+
+
+def live_rows(table):
+    """CA's rows for `table` out of the INSTALLED db.pack - not .skilltree_cache.
+
+    The building-card rows name CA's buildings, and a row naming a building the game no
+    longer has is a load-time reject that drops the whole pack. The cache is whatever patch
+    it was dumped under: patch 9.0 removed wh_main_special_great_temple_of_ulric, which the
+    8.x cache still listed, and the 2026-09-24 build shipped a row for it. Reading the
+    installed game means a rebuild after a patch follows that patch.
+    """
+    if table not in _LIVE:
+        sys.path.insert(0, "tools")
+        from read_vanilla_db import load, DB_PACK
+        _LIVE[table] = [r for _p, _v, rows in load(DB_PACK, table + "_tables") for r in rows]
+    return _LIVE[table]
+
+
 def covered_chains():
     """{chain: flavour tag} for every chain exactly one covered race can build.
 
@@ -2871,31 +2890,27 @@ def covered_chains():
     uses to scope "every chain a Chaos Dwarf region can hold" - it picks up the landmarks,
     ports and gates that carry no race word in their key.
     """
-    sys.path.insert(0, "tools")
-    import read_vanilla_cache as R
     tag_of = {F["culture"]: t for t, F in FLAVOURS.items() if F.get("culture")}
-    sub_culture = {r["subculture"]: r["culture"] for r in R.load("cultures_subcultures")[0]}
+    sub_culture = {r["subculture"]: r["culture"] for r in live_rows("cultures_subcultures")}
     fac_culture = {r["key"]: sub_culture.get(r["subculture"], "")
-                   for r in R.load("factions")[0]}
+                   for r in live_rows("factions")}
     set_tags = {}
-    for r in R.load("building_chain_availabilities")[0]:
+    for r in live_rows("building_chain_availabilities"):
         if r["campaign"]:
             continue                                  # the prologue's own sets
         tag = tag_of.get(r["culture"] or fac_culture.get(r["faction"], ""))
         if tag is not None:
             set_tags.setdefault(r["set_id"], set()).add(tag)
     chain_tags = {}
-    for r in R.load("building_chain_availability_sets")[0]:
+    for r in live_rows("building_chain_availability_sets"):
         chain_tags.setdefault(r["building_chain"], set()).update(set_tags.get(r["id"], ()))
     return {c: next(iter(t)) for c, t in chain_tags.items() if len(t) == 1}
 
 
 def built_tables():
     """The effects rows, their building junction rows and their loc."""
-    sys.path.insert(0, "tools")
-    import read_vanilla_cache as R
     theme = building_theme()
-    icon_of = {r["effect"]: r["icon"] for r in R.load("effects")[0]}
+    icon_of = {r["effect"]: r["icon"] for r in live_rows("effects")}
     effects, junction, loc = [], [], []
     for tag, F in FLAVOURS.items():
         if not F.get("culture"):
@@ -2912,7 +2927,7 @@ def built_tables():
                                 "%s[[/col]]" % short_name(g, tag),
                         "tooltip": "false"})
     owner = covered_chains()
-    for r in sorted(R.load("building_levels")[0], key=lambda r: r["level_name"]):
+    for r in sorted(live_rows("building_levels"), key=lambda r: r["level_name"]):
         tag = owner.get(r["chain"])
         if tag is None or r["level_name"].endswith("_ruin") or not r["visible_in_ui"]:
             continue
@@ -2961,9 +2976,7 @@ def check_built_effects():
         t = built_tables()
     except Exception as exc:                                   # noqa: BLE001
         return ["cannot build the building-card rows: %r" % (exc,)]
-    sys.path.insert(0, "tools")
-    from read_vanilla_cache import load
-    chain_of = {r["level_name"]: r["chain"] for r in load("building_levels")[0]}
+    chain_of = {r["level_name"]: r["chain"] for r in live_rows("building_levels")}
     chains = sorted({chain_of[r["building"]] for r in t["building_effects_junction"]})
     try:
         lua = _lua_guilds_of(chains)
@@ -3001,6 +3014,63 @@ def check_built_effects():
             out.append("flavour %r puts the line on only %d building levels - its culture "
                        "%s no longer matches CA's availability sets"
                        % (tag, per_tag.get(tag, 0), F["culture"]))
+    return out
+
+
+def check_live_references():
+    """Every reference cell this pack ships must resolve against the INSTALLED game.
+
+    A row naming a key the game does not have is a load-time reject that drops the whole
+    pack. Patch 9.0 removed wh_main_special_great_temple_of_ulric, and the 2026-09-24 build
+    shipped a building-card row for it: every version check was green, because a version
+    says nothing about whether the keys inside a row still exist. This is RPFM's
+    InvalidReference diagnostic done offline - the reference each column makes is read out
+    of RPFM's schema, the values out of CA's db.pack and this pack's own rows.
+
+    A referenced table with no file in db.pack (effect_bundle_targets, mission_types,
+    message_event_layout_types) is Assembly Kit only and is not checked at load, so it is
+    skipped rather than reported.
+    """
+    sys.path.insert(0, "tools")
+    try:
+        from read_vanilla_db import load, DB_PACK, SCHEMA
+        schema = io.open(SCHEMA, encoding="utf-8").read()
+    except Exception as exc:                                   # noqa: BLE001
+        return ["cannot read the schema or db.pack for the reference check: %r" % (exc,)]
+    built = build()
+    own = {TSV_META[t][0][:-len("_tables")]: rows for t, rows in built.items() if t != "loc"}
+    live = {}
+    out = []
+    for t, rows in sorted(built.items()):
+        if t == "loc" or not rows:
+            continue
+        name, ver = TSV_META[t]
+        i = schema.find('"%s": [' % name)
+        blk = schema[i:schema.find('_tables": [', i + len(name) + 5)]
+        m = re.search(r"version: %d,\s*fields: \[(.*?)\n {16}\]," % ver, blk, re.S)
+        if i < 0 or not m:
+            out.append("%s v%d is not in RPFM's schema, so its references cannot be "
+                       "checked" % (name, ver))
+            continue
+        for f in re.split(r"\n {20}\(\n", m.group(1)):
+            col = re.search(r'name: "([^"]+)"', f)
+            ref = re.search(r'is_reference: Some\(\("([^"]+)", "([^"]+)"\)\)', f)
+            if not col or not ref:
+                continue
+            col, (rt, rc) = col.group(1), ref.groups()
+            if (rt, rc) not in live:
+                files = load(DB_PACK, rt + "_tables")
+                live[(rt, rc)] = None if not files else (
+                    {str(r[rc]) for _p, _v, rs in files for r in rs}
+                    | {r.get(rc, "") for r in own.get(rt, [])})
+            ok = live[(rt, rc)]
+            if ok is None:
+                continue                                       # Assembly Kit only
+            miss = sorted({r[col] for r in rows if r.get(col) and r[col] not in ok})
+            if miss:
+                out.append("%s.%s names %d key(s) the installed game has no %s.%s for "
+                           "(%s) - a load-time reject that drops the whole pack"
+                           % (t, col, len(miss), rt, rc, ", ".join(miss[:3])))
     return out
 
 
@@ -3400,6 +3470,7 @@ def check():
     out += check_player_scope()
     out += check_building_theme()
     out += check_built_effects()
+    out += check_live_references()
     out += check_presets()
     out += check_bounties()
     out += check_table_versions()

@@ -615,6 +615,7 @@ wh3_dlc23_chd_factory_refinery_3	derpy_gg_built_daemonsmiths	building_to_buildin
 wh3_dlc23_chd_military_beasts_1	derpy_gg_built_immortals	building_to_building_own	1.0000	1.0000	0.0000	
 wh3_dlc23_chd_military_beasts_2	derpy_gg_built_immortals	building_to_building_own	1.0000	1.0000	0.0000	
 wh3_dlc23_chd_military_beasts_3	derpy_gg_built_immortals	building_to_building_own	1.0000	1.0000	0.0000	
+wh3_dlc23_chd_military_beasts_4	derpy_gg_built_immortals	building_to_building_own	1.0000	1.0000	0.0000	
 wh3_dlc23_chd_military_chaos_dwarf_infantry_1	derpy_gg_built_immortals	building_to_building_own	1.0000	1.0000	0.0000	
 wh3_dlc23_chd_military_chaos_dwarf_infantry_2	derpy_gg_built_immortals	building_to_building_own	1.0000	1.0000	0.0000	
 wh3_dlc23_chd_military_chaos_dwarf_infantry_3	derpy_gg_built_immortals	building_to_building_own	1.0000	1.0000	0.0000	
@@ -968,6 +969,16 @@ wh3_dlc27_hef_special_colony_tower_of_the_sun	derpy_gg_built_overseers_hef	build
 wh3_dlc27_teb_allied_outpost_1	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
 wh3_dlc27_teb_allied_outpost_2	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
 wh3_dlc27_teb_allied_outpost_3	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
+wh3_dlc29_emp_worship_ulric_1	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
+wh3_dlc29_emp_worship_ulric_2	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
+wh3_dlc29_emp_worship_ulric_3	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
+wh3_dlc29_special_middenheim_eckzahnehaus	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
+wh3_dlc29_special_salzenmund_chapter_house_white_wolf	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
+wh3_dlc29_special_settlement_middenheim_1_emp	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
+wh3_dlc29_special_settlement_middenheim_2_emp	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
+wh3_dlc29_special_settlement_middenheim_3_emp	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
+wh3_dlc29_special_settlement_middenheim_4_emp	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
+wh3_dlc29_special_settlement_middenheim_5_emp	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
 wh3_main_DWARFS_underdeep_1	derpy_gg_built_overseers_dwf	building_to_building_own	1.0000	1.0000	0.0000	
 wh3_main_DWARFS_underdeep_2	derpy_gg_built_overseers_dwf	building_to_building_own	1.0000	1.0000	0.0000	
 wh3_main_brt_allied_outpost_1	derpy_gg_built_overseers_brt	building_to_building_own	1.0000	1.0000	0.0000	
@@ -1616,8 +1627,6 @@ wh_main_emp_wizards_1	derpy_gg_built_overseers_emp	building_to_building_own	1.00
 wh_main_emp_wizards_2	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
 wh_main_emp_worship_1	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
 wh_main_emp_worship_2	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
-wh_main_middenheim_worship_1	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
-wh_main_middenheim_worship_2	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
 wh_main_sch_special_moot_cauldron_1	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
 wh_main_sch_special_the_rock_1	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
 wh_main_special_archecclesiatium	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
@@ -1630,7 +1639,10 @@ wh_main_special_conclave_of_magic	derpy_gg_built_daemonsmiths_emp	building_to_bu
 wh_main_special_great_slayer_shrine	derpy_gg_built_overseers_dwf	building_to_building_own	1.0000	1.0000	0.0000	
 wh_main_special_great_slayer_shrine_1	derpy_gg_built_overseers_dwf	building_to_building_own	1.0000	1.0000	0.0000	
 wh_main_special_great_slayer_shrine_2	derpy_gg_built_overseers_dwf	building_to_building_own	1.0000	1.0000	0.0000	
-wh_main_special_great_temple_of_ulric	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
+wh_main_special_great_temple_of_ulric_1	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
+wh_main_special_great_temple_of_ulric_2	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
+wh_main_special_great_temple_of_ulric_3	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
+wh_main_special_great_temple_of_ulric_4	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
 wh_main_special_high_king_throne_hall	derpy_gg_built_overseers_dwf	building_to_building_own	1.0000	1.0000	0.0000	
 wh_main_special_knights_panther_chapterhouse	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	
 wh_main_special_knights_panther_chapterhouse_stables	derpy_gg_built_overseers_emp	building_to_building_own	1.0000	1.0000	0.0000	

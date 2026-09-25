@@ -5,6 +5,8 @@
 - The previous build (`efa60e77`, see `HANDOFF_20260924_GUILDS_DEF_HEF_GATE.md`) is backed
   up as `Modpacks/derpy_great_guilds.pack.bak_20260924_pre_ledger_efa60e77`.
 - **Deployed to `data/` 2026-09-24**, once the game closed. MD5 matches.
+- **Superseded 2026-09-25 by `edb15834`,** the patch 9.0 fix in section 6. `108e223b` would
+  not load on 9.0.
 - **The report:** "why cant i see an effect on the buildings that it actually adds something
   to the Guild".
 - **The user's choices:**
@@ -133,3 +135,23 @@ new market paid nothing and nothing said so.
    - On a rich turn, a new market should show the red "over this turn's limit" figure.
    - Check the line sits clear of the third card and the pager, at 1080p and at 4K.
 4. **The Leaderboard tab label** fits its 125px plate.
+
+## 6. Patch 9.0: a removed building (2026-09-25)
+
+- **The fault.** 9.0 deleted `wh_main_special_great_temple_of_ulric`. The `108e223b` build
+  shipped a building-card junction row for it, read out of `.skilltree_cache`, which is 8.x.
+  A reference to a missing row is a load-time reject that drops the whole pack.
+- **Why nothing caught it.** Every table version was still current. A version says nothing
+  about whether the keys inside a row still exist.
+- **The fix.** The building-line tables are read from the installed `db.pack` through
+  `read_vanilla_db` (`live_rows()` in `gen_great_guilds.py`), never from the cache. 9.0 also
+  added 419 building levels, so the card line now covers 1,726 levels, up from 1,714.
+- **The new check.** `check_live_references()` runs in `--check`. It reads each column's
+  reference out of RPFM's `schema_wh3.ron` and resolves every value this pack ships against
+  the installed `db.pack` plus the pack's own rows. That is RPFM's InvalidReference, offline.
+  - Tables with no file in `db.pack` are Assembly Kit only and are skipped:
+    `effect_bundle_targets`, `mission_types`, `message_event_layout_types`.
+  - Proven: injecting the removed temple key fails it by name.
+- **Deployed.** `edb15834c791b393be645a2e837a8e18` is in `data/`, MD5 matched. The backup is
+  `Modpacks/derpy_great_guilds.pack.bak_20260925_pre_90keys_108e223b`.
+- **Not pushed to GitHub yet.** Pushing needs the user's approval.
