@@ -50,9 +50,14 @@ all six guilds at once.
   Daemonsmiths, Overseers and Slavers. Earning with one takes reputation from its rival
   once you reach Indebted there, but never a rank you have reached.
 - **Bounties.** A board of three offers drawn from every guild. Taking one turns it into
-  a real mission (take a region, kill a lord, sack a settlement) that pays gold and a
-  large amount of reputation. Failing one you accepted costs what finishing it would have
-  paid. The price reflects the target, rated Routine, Hard or Grim.
+  a real mission that pays gold and a large amount of reputation, and puts up favour with
+  that guild, which you get back when you finish and lose if you fail or hand it back.
+  Guilds never ask for your front line: they name land or a lord far from your borders,
+  or of a faction you are at peace with (which means war, and pays double). They also
+  post jobs (hold gold, raise a champion, research a named technology, take captives),
+  ask you to build one of their own buildings, or set your heroes on a named settlement,
+  army or character. Every race's heroes can do it. The price reflects the target and its
+  distance, rated Routine, Hard or Grim.
 - **Leadership.** Whichever faction of your race holds the most reputation with a guild
   leads it. The leader gets an extra bonus, and nobody else can buy that guild's dearest
   service. The Leaderboard tab shows who leads each guild.
@@ -145,6 +150,8 @@ You need:
 
 ```sh
 lua tools/_guilds_harness.lua              # the model and panel against a stubbed campaign
+lua tools/_guilds_bounty_harness.lua       # the bounty board against a stubbed world
+py tools/mutate_guilds.py                  # break the bounty rules 12 ways; a harness must notice each
 py tools/gen_great_guilds.py --check       # DB rows, loc and every design rule
 py tools/gen_great_guilds.py --write       # regenerate the TSVs
 py tools/gen_guilds_ui.py --write          # regenerate the .twui.xml layouts

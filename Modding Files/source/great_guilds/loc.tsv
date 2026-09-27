@@ -187,6 +187,20 @@ derpy_gg_bounty_taken	Taken	false
 derpy_gg_bounty_pays	Pays	false
 derpy_gg_bounty_turns	turns left	false
 derpy_gg_bounty_lord	Their general	false
+derpy_gg_bounty_war	War with	false
+derpy_gg_bounty_war_tip	Taking this means war with	false
+derpy_gg_bounty_stake_tip	Favour you put up to take this bounty. You get it back when you finish, and lose it if you fail or hand it back.	false
+derpy_gg_bounty_stake_short	Needs %n favour with this guild to take. You have %m.	false
+derpy_gg_bounty_char	Their lord or hero	false
+derpy_gg_bounty_obj_coffers	Save %n gold more than you hold now	false
+derpy_gg_bounty_obj_coffers_taken	Hold %n gold	false
+derpy_gg_bounty_obj_champion	A lord or hero at rank %n	false
+derpy_gg_bounty_obj_research	Research	false
+derpy_gg_bounty_obj_build	Build	false
+derpy_gg_bounty_obj_captives	Take %n captives in battle	false
+derpy_gg_bounty_obj_sabotage	Sabotage	false
+derpy_gg_bounty_obj_harry	Harry	false
+derpy_gg_bounty_obj_strike	Wound or kill	false
 derpy_gg_leader	Leader	false
 derpy_gg_nobody	Nobody yet	false
 derpy_gg_hdr_stand	Hover a row for the full table.	false
@@ -269,11 +283,11 @@ derpy_gg_help_p1	#Two numbers, per guild||-REPUTATION is earned by playing and i
 derpy_gg_help_t2	Earning	false
 derpy_gg_help_p2	#What each guild pays for||-The Brass Tablets: your income, every turn||-The Immortals: battles won, doubled when outnumbered||-The Daemonsmiths: technologies completed||-The Khanate: successful hero actions||-The Overseers: settlements growing a level, and buildings no other guild claims||-The Slavers: settlements sacked, more when razed||-A finished BUILDING pays its own guild - a forge the Daemonsmiths, a dock the Brass Tablets, a barracks the Immortals. Higher levels pay more, and its card names the guild.||#Every guild at once||-Every completed MISSION raises your reputation with all six guilds.||#Rivalry||-Brass Tablets and Khanate / Immortals and Daemonsmiths / Overseers and Slavers||-Earning with one takes reputation from its rival once you reach Indebted there - never a rank.||#A limit each turn||-Most guilds pay only so much each turn. The Guilds tab shows what each paid.	false
 derpy_gg_help_t3	Bounties	false
-derpy_gg_help_p3	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Finish it and that guild pays gold and a large amount of reputation - far more than an ordinary mission.||-Leave it alone, or hand it back, and nothing is lost but the offer.||-Take it and FAIL it and that guild takes back what finishing it would have paid. Declining work is free; promising it and not delivering is not.||#The price is the target||-A defended provincial capital is worth several times a ruined border town.||-A veteran faction leader several times a fresh general.||-Every offer is rated Routine, Hard or Grim, which is the guild saying why the number is what it is.||#Two rules about the price||-An offer you have NOT taken re-prices as the world moves.||-One you HAVE taken keeps the price you agreed.	false
+derpy_gg_help_p3	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Taking one puts up FAVOUR with that guild - the number on its plate. You get it back when you finish, and lose it if you fail or hand it back.||-Finish it and that guild pays gold and a large amount of reputation.||#What the guilds ask for||-Never your front line: land or a lord far from your borders and armies, or of a faction you are at peace with. That last kind means war, and pays far more.||-Or a job: hold gold, raise a champion, research, build one of the guild's own buildings, or take captives.||-Or hero work: send your heroes against a named settlement, army or character.||#The price||-Read off the target and the distance, rated Routine, Hard or Grim. An offer you have NOT taken re-prices as the world moves; one you HAVE taken keeps its price.	false
 derpy_gg_help_t4	The Court	false
 derpy_gg_help_p4	#Leading a guild||-Held by whichever faction in the world has the most reputation with it - you or a rival.||-The leader carries an extra bonus, and the guild's dearest service is sold to nobody else.||-It can be taken from you. The Leaderboard tab shows who leads each guild.||#Demands||-Every so often a guild that already knows you asks for something, with a deadline on it.||-It wants either gold, or the favour you hold with its own rival.||-Pay it and your reputation jumps. Let the deadline pass and it falls, far enough to cost you a rank.||#A patron||-One of your lords, bound to one guild. Select them on the campaign map, then press Appoint.||-Their army gains replenishment and campaign movement.||-That guild's reputation pays half again and its services cost less.||-One lord, one guild. Appointing a second moves the post.	false
 derpy_gg_help_t5	Losing reputation	false
-derpy_gg_help_p5	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Leaving an offer alone costs nothing, and handing one back costs nothing.||-Failing one you accepted costs what finishing it would have paid.	false
+derpy_gg_help_p5	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, and what finishing it would have paid.	false
 derpy_gg_help_of	of	false
 derpy_gg_court_help	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
 message_event_text_text_derpy_gg_demand_title	A Guild Asks	false
@@ -283,9 +297,9 @@ message_event_text_text_derpy_gg_demand_fail_title	A Guild Is Answered With Sile
 message_event_text_text_derpy_gg_demand_fail_primary	The deadline has passed and nothing was paid. Your reputation with that guild has fallen.	false
 message_event_text_text_derpy_gg_demand_fail_secondary	The ledger is kept whether you read it or not.	false
 message_event_text_text_derpy_gg_bounty_fail_title	A Guild Is Left Waiting	false
-message_event_text_text_derpy_gg_bounty_fail_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs nothing; taking it and failing costs what finishing it would have paid.	false
+message_event_text_text_derpy_gg_bounty_fail_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs only the favour you put up; taking it and failing costs what finishing it would have paid.	false
 message_event_text_text_derpy_gg_bounty_fail_secondary	A promise in the ledger is a debt.	false
-derpy_gg_bounty_help	A guild posts work it wants done. Take one and it becomes a mission; finish it and that guild pays gold and a large amount of reputation - far more than a normal mission. Leave an offer alone, or hand it back through the objectives panel, and nothing is lost but the offer.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline costs that guild's reputation - exactly what finishing it would have paid. Declining work is free; promising it and not delivering is not.||The pay is read off the target, not fixed: a defended provincial capital is worth several times a ruined border town, and a rank-40 faction leader several times a fresh general. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
+derpy_gg_bounty_help	A guild posts work it wants done. Take one and it becomes a mission. Taking it puts up favour with that guild; you get it back when you finish, and lose it if you fail or hand it back.||Guilds never ask for your front line. They name land or a lord far from your borders, or of a faction you are at peace with - which means war, and pays far more - or a job, a building, or work for your heroes.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline also costs that guild's reputation - what finishing it would have paid.||The pay is read off the target and its distance. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
 derpy_gg_locked_hint	Your rank with this guild is too low. Keep earning reputation.	false
 message_event_text_text_derpy_gg_hit_title	A Guild Moves Against You	false
 message_event_text_text_derpy_gg_hit_primary	A rival has bought the favour of a guild, and it has been spent on you.	false
@@ -445,21 +459,63 @@ derpy_gg_gained	gained	false
 missions_localised_title_derpy_gg_bounty_brass	Seize the Market	false
 missions_localised_description_derpy_gg_bounty_brass	The Tablets want the tolls of that place counted in our column. Take it intact.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_brass	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_brass	A Commission	false
+missions_localised_description_derpy_gg_build_brass	The Brass Tablets want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_brass	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_brass	Fill the Coffers	false
+missions_localised_description_derpy_gg_job_brass	The Brass Tablets want to see your treasury full, and kept full. Hold the sum named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_brass	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_immortals	Break Their Champion	false
 missions_localised_description_derpy_gg_bounty_immortals	A general is being spoken of with respect. Correct that.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_immortals	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_immortals	A Commission	false
+missions_localised_description_derpy_gg_build_immortals	The Immortals want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_immortals	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_immortals	Harry Their March	false
+missions_localised_description_derpy_gg_hero_immortals	The Immortals want an army slowed and bled before it arrives. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_immortals	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_immortals	Prove a Champion	false
+missions_localised_description_derpy_gg_job_immortals	The Immortals want a champion worth the name. Raise one of your lords or heroes to the rank named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_immortals	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_daemonsmiths	Strip the Works	false
 missions_localised_description_derpy_gg_bounty_daemonsmiths	Everything in that place that was forged can be forged again, here. Bring it back in pieces.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_daemonsmiths	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_daemonsmiths	A Commission	false
+missions_localised_description_derpy_gg_build_daemonsmiths	The Daemonsmiths want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_daemonsmiths	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_daemonsmiths	Crack the Walls	false
+missions_localised_description_derpy_gg_hero_daemonsmiths	The Daemonsmiths want a settlement weakened from inside. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_daemonsmiths	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_daemonsmiths	Commissioned Work	false
+missions_localised_description_derpy_gg_job_daemonsmiths	The Daemonsmiths have paid in advance for a piece of learning. Research the technology named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_daemonsmiths	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_khanate	A Knife for a Name	false
 missions_localised_description_derpy_gg_bounty_khanate	The Khanate does not care how it is done, only that the name stops being used.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_khanate	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_khanate	A Commission	false
+missions_localised_description_derpy_gg_build_khanate	The Khanate want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_khanate	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_khanate	A Quiet Word	false
+missions_localised_description_derpy_gg_job_khanate	The Khanate want a name to stop being spoken. Wound or kill the lord or hero named on the Great Guilds panel with a hero.	false
+missions_localised_mission_completed_text_derpy_gg_job_khanate	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_overseers	Hands, Not Ashes	false
 missions_localised_description_derpy_gg_bounty_overseers	Take it whole. Ashes cannot be put to work, and the Overseers are counting hands.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_overseers	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_overseers	A Commission	false
+missions_localised_description_derpy_gg_build_overseers	The Overseers want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_overseers	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_slavers	Fill the Coffles	false
 missions_localised_description_derpy_gg_bounty_slavers	Empty it. The column that leaves is the payment, and it is measured in bodies.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_slavers	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_slavers	A Commission	false
+missions_localised_description_derpy_gg_build_slavers	The Slavers want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_slavers	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_slavers	Fill the Pens	false
+missions_localised_description_derpy_gg_job_slavers	The Slavers are short of hands. Take the number of captives named on the Great Guilds panel in your battles.	false
+missions_localised_mission_completed_text_derpy_gg_job_slavers	The guild has been paid in full, and so have you.	false
+mission_text_text_derpy_gg_hero_harry	Succeed with two hero actions against the army named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_sabotage	Succeed with two hero actions against the settlement named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_strike	Wound or kill the character named on the Great Guilds panel with a hero.	false
 derpy_gg_rank_name_1_emp	Outsider	false
 derpy_gg_rank_name_2_emp	Apprentice	false
 derpy_gg_rank_name_3_emp	Journeyman	false
@@ -645,6 +701,20 @@ derpy_gg_bounty_taken_emp	Taken	false
 derpy_gg_bounty_pays_emp	Pays	false
 derpy_gg_bounty_turns_emp	turns left	false
 derpy_gg_bounty_lord_emp	Their general	false
+derpy_gg_bounty_war_emp	War with	false
+derpy_gg_bounty_war_tip_emp	Taking this means war with	false
+derpy_gg_bounty_stake_tip_emp	Favour you put up to take this bounty. You get it back when you finish, and lose it if you fail or hand it back.	false
+derpy_gg_bounty_stake_short_emp	Needs %n favour with this guild to take. You have %m.	false
+derpy_gg_bounty_char_emp	Their lord or hero	false
+derpy_gg_bounty_obj_coffers_emp	Save %n gold more than you hold now	false
+derpy_gg_bounty_obj_coffers_taken_emp	Hold %n gold	false
+derpy_gg_bounty_obj_champion_emp	A lord or hero at rank %n	false
+derpy_gg_bounty_obj_research_emp	Research	false
+derpy_gg_bounty_obj_build_emp	Build	false
+derpy_gg_bounty_obj_captives_emp	Take %n captives in battle	false
+derpy_gg_bounty_obj_sabotage_emp	Sabotage	false
+derpy_gg_bounty_obj_harry_emp	Harry	false
+derpy_gg_bounty_obj_strike_emp	Wound or kill	false
 derpy_gg_leader_emp	Leader	false
 derpy_gg_nobody_emp	Nobody yet	false
 derpy_gg_hdr_stand_emp	Hover a row for the full table.	false
@@ -727,11 +797,11 @@ derpy_gg_help_p1_emp	#Two numbers, per guild||-REPUTATION is earned by playing a
 derpy_gg_help_t2_emp	Earning	false
 derpy_gg_help_p2_emp	#What each guild pays for||-The Merchant Guilds: your income, every turn||-The Greatswords: battles won, doubled when outnumbered||-The Engineers' School: technologies completed||-The Thieves' Guild: successful hero actions||-The Masons' Guild: settlements growing a level, and buildings no other guild claims||-The Free Companies: settlements sacked, more when razed||-A finished BUILDING pays its own guild - a forge the Engineers' School, a dock the Merchant Guilds, a barracks the Greatswords. Higher levels pay more, and its card names the guild.||#Every guild at once||-Every completed MISSION raises your reputation with all six guilds.||#Rivalry||-Merchant Guilds and Thieves' Guild / Greatswords and Engineers' School / Masons' Guild and Free Companies||-Earning with one takes reputation from its rival once you reach Apprentice there - never a rank.||#A limit each turn||-Most guilds pay only so much each turn. The Guilds tab shows what each paid.	false
 derpy_gg_help_t3_emp	Bounties	false
-derpy_gg_help_p3_emp	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Finish it and that guild pays gold and a large amount of reputation - far more than an ordinary mission.||-Leave it alone, or hand it back, and nothing is lost but the offer.||-Take it and FAIL it and that guild takes back what finishing it would have paid. Declining work is free; promising it and not delivering is not.||#The price is the target||-A defended provincial capital is worth several times a ruined border town.||-A veteran faction leader several times a fresh general.||-Every offer is rated Routine, Hard or Grim, which is the guild saying why the number is what it is.||#Two rules about the price||-An offer you have NOT taken re-prices as the world moves.||-One you HAVE taken keeps the price you agreed.	false
+derpy_gg_help_p3_emp	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Taking one puts up FAVOUR with that guild - the number on its plate. You get it back when you finish, and lose it if you fail or hand it back.||-Finish it and that guild pays gold and a large amount of reputation.||#What the guilds ask for||-Never your front line: land or a lord far from your borders and armies, or of a faction you are at peace with. That last kind means war, and pays far more.||-Or a job: hold gold, raise a champion, research, build one of the guild's own buildings, or take captives.||-Or hero work: send your heroes against a named settlement, army or character.||#The price||-Read off the target and the distance, rated Routine, Hard or Grim. An offer you have NOT taken re-prices as the world moves; one you HAVE taken keeps its price.	false
 derpy_gg_help_t4_emp	The Court	false
 derpy_gg_help_p4_emp	#Leading a guild||-Held by whichever faction in the world has the most reputation with it - you or a rival.||-The leader carries an extra bonus, and the guild's dearest service is sold to nobody else.||-It can be taken from you. The Leaderboard tab shows who leads each guild.||#Demands||-Every so often a guild that already knows you asks for something, with a deadline on it.||-It wants either gold, or the favour you hold with its own rival.||-Pay it and your reputation jumps. Let the deadline pass and it falls, far enough to cost you a rank.||#A patron||-One of your lords, bound to one guild. Select them on the campaign map, then press Appoint.||-Their army gains replenishment and campaign movement.||-That guild's reputation pays half again and its services cost less.||-One lord, one guild. Appointing a second moves the post.	false
 derpy_gg_help_t5_emp	Losing reputation	false
-derpy_gg_help_p5_emp	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Leaving an offer alone costs nothing, and handing one back costs nothing.||-Failing one you accepted costs what finishing it would have paid.	false
+derpy_gg_help_p5_emp	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, and what finishing it would have paid.	false
 derpy_gg_help_of_emp	of	false
 derpy_gg_court_help_emp	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
 message_event_text_text_derpy_gg_demand_emp_title	A Guild Asks	false
@@ -741,9 +811,9 @@ message_event_text_text_derpy_gg_demand_fail_emp_title	A Guild Is Answered With 
 message_event_text_text_derpy_gg_demand_fail_emp_primary	The deadline has passed and nothing was paid. Your reputation with that guild has fallen.	false
 message_event_text_text_derpy_gg_demand_fail_emp_secondary	The ledger is kept whether you read it or not.	false
 message_event_text_text_derpy_gg_bounty_fail_emp_title	A Guild Is Left Waiting	false
-message_event_text_text_derpy_gg_bounty_fail_emp_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs nothing; taking it and failing costs what finishing it would have paid.	false
+message_event_text_text_derpy_gg_bounty_fail_emp_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs only the favour you put up; taking it and failing costs what finishing it would have paid.	false
 message_event_text_text_derpy_gg_bounty_fail_emp_secondary	A promise in the ledger is a debt.	false
-derpy_gg_bounty_help_emp	A guild posts work it wants done. Take one and it becomes a mission; finish it and that guild pays gold and a large amount of reputation - far more than a normal mission. Leave an offer alone, or hand it back through the objectives panel, and nothing is lost but the offer.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline costs that guild's reputation - exactly what finishing it would have paid. Declining work is free; promising it and not delivering is not.||The pay is read off the target, not fixed: a defended provincial capital is worth several times a ruined border town, and a rank-40 faction leader several times a fresh general. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
+derpy_gg_bounty_help_emp	A guild posts work it wants done. Take one and it becomes a mission. Taking it puts up favour with that guild; you get it back when you finish, and lose it if you fail or hand it back.||Guilds never ask for your front line. They name land or a lord far from your borders, or of a faction you are at peace with - which means war, and pays far more - or a job, a building, or work for your heroes.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline also costs that guild's reputation - what finishing it would have paid.||The pay is read off the target and its distance. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
 derpy_gg_locked_hint_emp	Your rank with this guild is too low. Keep earning reputation.	false
 message_event_text_text_derpy_gg_hit_emp_title	A Guild Moves Against You	false
 message_event_text_text_derpy_gg_hit_emp_primary	A rival has bought the favour of a guild, and it has been spent on you.	false
@@ -903,21 +973,63 @@ derpy_gg_gained_emp	gained	false
 missions_localised_title_derpy_gg_bounty_brass_emp	Open the Market	false
 missions_localised_description_derpy_gg_bounty_brass_emp	The Merchant Guilds want that town's tolls paid in Altdorf. Take it intact.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_brass_emp	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_brass_emp	A Commission	false
+missions_localised_description_derpy_gg_build_brass_emp	The Merchant Guilds want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_brass_emp	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_brass_emp	Fill the Coffers	false
+missions_localised_description_derpy_gg_job_brass_emp	The Merchant Guilds want to see your treasury full, and kept full. Hold the sum named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_brass_emp	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_immortals_emp	A Duel for the Banner	false
 missions_localised_description_derpy_gg_bounty_immortals_emp	A general is being spoken of with respect. The Greatswords would like that corrected.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_immortals_emp	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_immortals_emp	A Commission	false
+missions_localised_description_derpy_gg_build_immortals_emp	The Greatswords want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_immortals_emp	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_immortals_emp	Harry Their March	false
+missions_localised_description_derpy_gg_hero_immortals_emp	The Greatswords want an army slowed and bled before it arrives. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_immortals_emp	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_immortals_emp	Prove a Champion	false
+missions_localised_description_derpy_gg_job_immortals_emp	The Greatswords want a champion worth the name. Raise one of your lords or heroes to the rank named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_immortals_emp	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_daemonsmiths_emp	Salvage the Works	false
 missions_localised_description_derpy_gg_bounty_daemonsmiths_emp	Whatever that place has built, the School wants on its own benches. Bring it back in pieces.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_daemonsmiths_emp	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_daemonsmiths_emp	A Commission	false
+missions_localised_description_derpy_gg_build_daemonsmiths_emp	The Engineers' School want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_daemonsmiths_emp	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_daemonsmiths_emp	Crack the Walls	false
+missions_localised_description_derpy_gg_hero_daemonsmiths_emp	The Engineers' School want a settlement weakened from inside. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_daemonsmiths_emp	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_daemonsmiths_emp	Commissioned Work	false
+missions_localised_description_derpy_gg_job_daemonsmiths_emp	The Engineers' School have paid in advance for a piece of learning. Research the technology named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_daemonsmiths_emp	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_khanate_emp	A Name Crossed Out	false
 missions_localised_description_derpy_gg_bounty_khanate_emp	The Guild does not care how it is done, only that the name stops being used.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_khanate_emp	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_khanate_emp	A Commission	false
+missions_localised_description_derpy_gg_build_khanate_emp	The Thieves' Guild want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_khanate_emp	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_khanate_emp	A Quiet Word	false
+missions_localised_description_derpy_gg_job_khanate_emp	The Thieves' Guild want a name to stop being spoken. Wound or kill the lord or hero named on the Great Guilds panel with a hero.	false
+missions_localised_mission_completed_text_derpy_gg_job_khanate_emp	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_overseers_emp	Stone Still Standing	false
 missions_localised_description_derpy_gg_bounty_overseers_emp	Take it whole. The Masons want the walls left up, so they can be paid to mend them.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_overseers_emp	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_overseers_emp	A Commission	false
+missions_localised_description_derpy_gg_build_overseers_emp	The Masons' Guild want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_overseers_emp	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_slavers_emp	Pay Day	false
 missions_localised_description_derpy_gg_bounty_slavers_emp	Empty it. The companies are owed, and that place can pay them.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_slavers_emp	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_slavers_emp	A Commission	false
+missions_localised_description_derpy_gg_build_slavers_emp	The Free Companies want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_slavers_emp	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_slavers_emp	Fill the Pens	false
+missions_localised_description_derpy_gg_job_slavers_emp	The Free Companies are short of hands. Take the number of captives named on the Great Guilds panel in your battles.	false
+missions_localised_mission_completed_text_derpy_gg_job_slavers_emp	The guild has been paid in full, and so have you.	false
+mission_text_text_derpy_gg_hero_harry_emp	Succeed with two hero actions against the army named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_sabotage_emp	Succeed with two hero actions against the settlement named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_strike_emp	Wound or kill the character named on the Great Guilds panel with a hero.	false
 derpy_gg_rank_name_1_dwf	Stranger	false
 derpy_gg_rank_name_2_dwf	Beardling	false
 derpy_gg_rank_name_3_dwf	Oathsworn	false
@@ -1103,6 +1215,20 @@ derpy_gg_bounty_taken_dwf	Taken	false
 derpy_gg_bounty_pays_dwf	Pays	false
 derpy_gg_bounty_turns_dwf	turns left	false
 derpy_gg_bounty_lord_dwf	Their general	false
+derpy_gg_bounty_war_dwf	War with	false
+derpy_gg_bounty_war_tip_dwf	Taking this means war with	false
+derpy_gg_bounty_stake_tip_dwf	Favour you put up to take this bounty. You get it back when you finish, and lose it if you fail or hand it back.	false
+derpy_gg_bounty_stake_short_dwf	Needs %n favour with this guild to take. You have %m.	false
+derpy_gg_bounty_char_dwf	Their lord or hero	false
+derpy_gg_bounty_obj_coffers_dwf	Save %n gold more than you hold now	false
+derpy_gg_bounty_obj_coffers_taken_dwf	Hold %n gold	false
+derpy_gg_bounty_obj_champion_dwf	A lord or hero at rank %n	false
+derpy_gg_bounty_obj_research_dwf	Research	false
+derpy_gg_bounty_obj_build_dwf	Build	false
+derpy_gg_bounty_obj_captives_dwf	Take %n captives in battle	false
+derpy_gg_bounty_obj_sabotage_dwf	Sabotage	false
+derpy_gg_bounty_obj_harry_dwf	Harry	false
+derpy_gg_bounty_obj_strike_dwf	Wound or kill	false
 derpy_gg_leader_dwf	Leader	false
 derpy_gg_nobody_dwf	Nobody yet	false
 derpy_gg_hdr_stand_dwf	Hover a row for the full table.	false
@@ -1185,11 +1311,11 @@ derpy_gg_help_p1_dwf	#Two numbers, per guild||-REPUTATION is earned by playing a
 derpy_gg_help_t2_dwf	Earning	false
 derpy_gg_help_p2_dwf	#What each guild pays for||-The Merchant Clans: your income, every turn||-The Hammerers: battles won, doubled when outnumbered||-The Engineers' Guild: technologies completed||-The Rangers: successful hero actions||-The Miners' Guild: settlements growing a level, and buildings no other guild claims||-The Grudge-Settlers: settlements sacked, more when razed||-A finished BUILDING pays its own guild - a forge the Engineers' Guild, a dock the Merchant Clans, a barracks the Hammerers. Higher levels pay more, and its card names the guild.||#Every guild at once||-Every completed MISSION raises your reputation with all six guilds.||#Rivalry||-Merchant Clans and Rangers / Hammerers and Engineers' Guild / Miners' Guild and Grudge-Settlers||-Earning with one takes reputation from its rival once you reach Beardling there - never a rank.||#A limit each turn||-Most guilds pay only so much each turn. The Guilds tab shows what each paid.	false
 derpy_gg_help_t3_dwf	Bounties	false
-derpy_gg_help_p3_dwf	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Finish it and that guild pays gold and a large amount of reputation - far more than an ordinary mission.||-Leave it alone, or hand it back, and nothing is lost but the offer.||-Take it and FAIL it and that guild takes back what finishing it would have paid. Declining work is free; promising it and not delivering is not.||#The price is the target||-A defended provincial capital is worth several times a ruined border town.||-A veteran faction leader several times a fresh general.||-Every offer is rated Routine, Hard or Grim, which is the guild saying why the number is what it is.||#Two rules about the price||-An offer you have NOT taken re-prices as the world moves.||-One you HAVE taken keeps the price you agreed.	false
+derpy_gg_help_p3_dwf	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Taking one puts up FAVOUR with that guild - the number on its plate. You get it back when you finish, and lose it if you fail or hand it back.||-Finish it and that guild pays gold and a large amount of reputation.||#What the guilds ask for||-Never your front line: land or a lord far from your borders and armies, or of a faction you are at peace with. That last kind means war, and pays far more.||-Or a job: hold gold, raise a champion, research, build one of the guild's own buildings, or take captives.||-Or hero work: send your heroes against a named settlement, army or character.||#The price||-Read off the target and the distance, rated Routine, Hard or Grim. An offer you have NOT taken re-prices as the world moves; one you HAVE taken keeps its price.	false
 derpy_gg_help_t4_dwf	The Court	false
 derpy_gg_help_p4_dwf	#Leading a guild||-Held by whichever faction in the world has the most reputation with it - you or a rival.||-The leader carries an extra bonus, and the guild's dearest service is sold to nobody else.||-It can be taken from you. The Leaderboard tab shows who leads each guild.||#Demands||-Every so often a guild that already knows you asks for something, with a deadline on it.||-It wants either gold, or the favour you hold with its own rival.||-Pay it and your reputation jumps. Let the deadline pass and it falls, far enough to cost you a rank.||#A patron||-One of your lords, bound to one guild. Select them on the campaign map, then press Appoint.||-Their army gains replenishment and campaign movement.||-That guild's reputation pays half again and its services cost less.||-One lord, one guild. Appointing a second moves the post.	false
 derpy_gg_help_t5_dwf	Losing reputation	false
-derpy_gg_help_p5_dwf	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Leaving an offer alone costs nothing, and handing one back costs nothing.||-Failing one you accepted costs what finishing it would have paid.	false
+derpy_gg_help_p5_dwf	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, and what finishing it would have paid.	false
 derpy_gg_help_of_dwf	of	false
 derpy_gg_court_help_dwf	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
 message_event_text_text_derpy_gg_demand_dwf_title	A Guild Asks	false
@@ -1199,9 +1325,9 @@ message_event_text_text_derpy_gg_demand_fail_dwf_title	A Guild Is Answered With 
 message_event_text_text_derpy_gg_demand_fail_dwf_primary	The deadline has passed and nothing was paid. Your reputation with that guild has fallen.	false
 message_event_text_text_derpy_gg_demand_fail_dwf_secondary	The ledger is kept whether you read it or not.	false
 message_event_text_text_derpy_gg_bounty_fail_dwf_title	A Guild Is Left Waiting	false
-message_event_text_text_derpy_gg_bounty_fail_dwf_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs nothing; taking it and failing costs what finishing it would have paid.	false
+message_event_text_text_derpy_gg_bounty_fail_dwf_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs only the favour you put up; taking it and failing costs what finishing it would have paid.	false
 message_event_text_text_derpy_gg_bounty_fail_dwf_secondary	A promise in the ledger is a debt.	false
-derpy_gg_bounty_help_dwf	A guild posts work it wants done. Take one and it becomes a mission; finish it and that guild pays gold and a large amount of reputation - far more than a normal mission. Leave an offer alone, or hand it back through the objectives panel, and nothing is lost but the offer.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline costs that guild's reputation - exactly what finishing it would have paid. Declining work is free; promising it and not delivering is not.||The pay is read off the target, not fixed: a defended provincial capital is worth several times a ruined border town, and a rank-40 faction leader several times a fresh general. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
+derpy_gg_bounty_help_dwf	A guild posts work it wants done. Take one and it becomes a mission. Taking it puts up favour with that guild; you get it back when you finish, and lose it if you fail or hand it back.||Guilds never ask for your front line. They name land or a lord far from your borders, or of a faction you are at peace with - which means war, and pays far more - or a job, a building, or work for your heroes.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline also costs that guild's reputation - what finishing it would have paid.||The pay is read off the target and its distance. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
 derpy_gg_locked_hint_dwf	Your rank with this guild is too low. Keep earning reputation.	false
 message_event_text_text_derpy_gg_hit_dwf_title	A Guild Moves Against You	false
 message_event_text_text_derpy_gg_hit_dwf_primary	A rival has bought the favour of a guild, and it has been spent on you.	false
@@ -1361,21 +1487,63 @@ derpy_gg_gained_dwf	gained	false
 missions_localised_title_derpy_gg_bounty_brass_dwf	Reopen the Road	false
 missions_localised_description_derpy_gg_bounty_brass_dwf	The Merchant Clans want that place back in their ledgers. Take it intact.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_brass_dwf	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_brass_dwf	A Commission	false
+missions_localised_description_derpy_gg_build_brass_dwf	The Merchant Clans want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_brass_dwf	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_brass_dwf	Fill the Coffers	false
+missions_localised_description_derpy_gg_job_brass_dwf	The Merchant Clans want to see your treasury full, and kept full. Hold the sum named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_brass_dwf	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_immortals_dwf	A Grudge on a Name	false
 missions_localised_description_derpy_gg_bounty_immortals_dwf	A general has been boasting. The Hammerers would like that settled.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_immortals_dwf	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_immortals_dwf	A Commission	false
+missions_localised_description_derpy_gg_build_immortals_dwf	The Hammerers want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_immortals_dwf	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_immortals_dwf	Harry Their March	false
+missions_localised_description_derpy_gg_hero_immortals_dwf	The Hammerers want an army slowed and bled before it arrives. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_immortals_dwf	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_immortals_dwf	Prove a Champion	false
+missions_localised_description_derpy_gg_job_immortals_dwf	The Hammerers want a champion worth the name. Raise one of your lords or heroes to the rank named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_immortals_dwf	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_daemonsmiths_dwf	Recover the Craft	false
 missions_localised_description_derpy_gg_bounty_daemonsmiths_dwf	Whatever was forged in that place was likely stolen from us first. Bring it back in pieces.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_daemonsmiths_dwf	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_daemonsmiths_dwf	A Commission	false
+missions_localised_description_derpy_gg_build_daemonsmiths_dwf	The Engineers' Guild want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_daemonsmiths_dwf	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_daemonsmiths_dwf	Crack the Walls	false
+missions_localised_description_derpy_gg_hero_daemonsmiths_dwf	The Engineers' Guild want a settlement weakened from inside. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_daemonsmiths_dwf	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_daemonsmiths_dwf	Commissioned Work	false
+missions_localised_description_derpy_gg_job_daemonsmiths_dwf	The Engineers' Guild have paid in advance for a piece of learning. Research the technology named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_daemonsmiths_dwf	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_khanate_dwf	Silence in the Passes	false
 missions_localised_description_derpy_gg_bounty_khanate_dwf	The Rangers want the name stopped. How is their affair.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_khanate_dwf	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_khanate_dwf	A Commission	false
+missions_localised_description_derpy_gg_build_khanate_dwf	The Rangers want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_khanate_dwf	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_khanate_dwf	A Quiet Word	false
+missions_localised_description_derpy_gg_job_khanate_dwf	The Rangers want a name to stop being spoken. Wound or kill the lord or hero named on the Great Guilds panel with a hero.	false
+missions_localised_mission_completed_text_derpy_gg_job_khanate_dwf	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_overseers_dwf	Reclaim the Hold	false
 missions_localised_description_derpy_gg_bounty_overseers_dwf	Take it whole. The Miners' Guild wants tunnels, not rubble.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_overseers_dwf	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_overseers_dwf	A Commission	false
+missions_localised_description_derpy_gg_build_overseers_dwf	The Miners' Guild want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_overseers_dwf	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_slavers_dwf	Strike a Line	false
 missions_localised_description_derpy_gg_bounty_slavers_dwf	Sack it. One more grudge struck from the Book, and paid for.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_slavers_dwf	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_slavers_dwf	A Commission	false
+missions_localised_description_derpy_gg_build_slavers_dwf	The Grudge-Settlers want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_slavers_dwf	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_slavers_dwf	Fill the Pens	false
+missions_localised_description_derpy_gg_job_slavers_dwf	The Grudge-Settlers are short of hands. Take the number of captives named on the Great Guilds panel in your battles.	false
+missions_localised_mission_completed_text_derpy_gg_job_slavers_dwf	The guild has been paid in full, and so have you.	false
+mission_text_text_derpy_gg_hero_harry_dwf	Succeed with two hero actions against the army named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_sabotage_dwf	Succeed with two hero actions against the settlement named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_strike_dwf	Wound or kill the character named on the Great Guilds panel with a hero.	false
 derpy_gg_rank_name_1_brt	Peasant	false
 derpy_gg_rank_name_2_brt	Yeoman	false
 derpy_gg_rank_name_3_brt	Squire	false
@@ -1561,6 +1729,20 @@ derpy_gg_bounty_taken_brt	Taken	false
 derpy_gg_bounty_pays_brt	Pays	false
 derpy_gg_bounty_turns_brt	turns left	false
 derpy_gg_bounty_lord_brt	Their general	false
+derpy_gg_bounty_war_brt	War with	false
+derpy_gg_bounty_war_tip_brt	Taking this means war with	false
+derpy_gg_bounty_stake_tip_brt	Favour you put up to take this bounty. You get it back when you finish, and lose it if you fail or hand it back.	false
+derpy_gg_bounty_stake_short_brt	Needs %n favour with this guild to take. You have %m.	false
+derpy_gg_bounty_char_brt	Their lord or hero	false
+derpy_gg_bounty_obj_coffers_brt	Save %n gold more than you hold now	false
+derpy_gg_bounty_obj_coffers_taken_brt	Hold %n gold	false
+derpy_gg_bounty_obj_champion_brt	A lord or hero at rank %n	false
+derpy_gg_bounty_obj_research_brt	Research	false
+derpy_gg_bounty_obj_build_brt	Build	false
+derpy_gg_bounty_obj_captives_brt	Take %n captives in battle	false
+derpy_gg_bounty_obj_sabotage_brt	Sabotage	false
+derpy_gg_bounty_obj_harry_brt	Harry	false
+derpy_gg_bounty_obj_strike_brt	Wound or kill	false
 derpy_gg_leader_brt	Leader	false
 derpy_gg_nobody_brt	Nobody yet	false
 derpy_gg_hdr_stand_brt	Hover a row for the full table.	false
@@ -1643,11 +1825,11 @@ derpy_gg_help_p1_brt	#Two numbers, per guild||-REPUTATION is earned by playing a
 derpy_gg_help_t2_brt	Earning	false
 derpy_gg_help_p2_brt	#What each guild pays for||-The Wine Merchants: your income, every turn||-The Knights Errant: battles won, doubled when outnumbered||-The Grail Damsels: technologies completed||-The Forest Outlaws: successful hero actions||-The Castle-Wrights: settlements growing a level, and buildings no other guild claims||-The Crusaders: settlements sacked, more when razed||-A finished BUILDING pays its own guild - a forge the Grail Damsels, a dock the Wine Merchants, a barracks the Knights Errant. Higher levels pay more, and its card names the guild.||#Every guild at once||-Every completed MISSION raises your reputation with all six guilds.||#Rivalry||-Wine Merchants and Forest Outlaws / Knights Errant and Grail Damsels / Castle-Wrights and Crusaders||-Earning with one takes reputation from its rival once you reach Yeoman there - never a rank.||#A limit each turn||-Most guilds pay only so much each turn. The Guilds tab shows what each paid.	false
 derpy_gg_help_t3_brt	Bounties	false
-derpy_gg_help_p3_brt	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Finish it and that guild pays gold and a large amount of reputation - far more than an ordinary mission.||-Leave it alone, or hand it back, and nothing is lost but the offer.||-Take it and FAIL it and that guild takes back what finishing it would have paid. Declining work is free; promising it and not delivering is not.||#The price is the target||-A defended provincial capital is worth several times a ruined border town.||-A veteran faction leader several times a fresh general.||-Every offer is rated Routine, Hard or Grim, which is the guild saying why the number is what it is.||#Two rules about the price||-An offer you have NOT taken re-prices as the world moves.||-One you HAVE taken keeps the price you agreed.	false
+derpy_gg_help_p3_brt	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Taking one puts up FAVOUR with that guild - the number on its plate. You get it back when you finish, and lose it if you fail or hand it back.||-Finish it and that guild pays gold and a large amount of reputation.||#What the guilds ask for||-Never your front line: land or a lord far from your borders and armies, or of a faction you are at peace with. That last kind means war, and pays far more.||-Or a job: hold gold, raise a champion, research, build one of the guild's own buildings, or take captives.||-Or hero work: send your heroes against a named settlement, army or character.||#The price||-Read off the target and the distance, rated Routine, Hard or Grim. An offer you have NOT taken re-prices as the world moves; one you HAVE taken keeps its price.	false
 derpy_gg_help_t4_brt	The Court	false
 derpy_gg_help_p4_brt	#Leading a guild||-Held by whichever faction in the world has the most reputation with it - you or a rival.||-The leader carries an extra bonus, and the guild's dearest service is sold to nobody else.||-It can be taken from you. The Leaderboard tab shows who leads each guild.||#Demands||-Every so often a guild that already knows you asks for something, with a deadline on it.||-It wants either gold, or the favour you hold with its own rival.||-Pay it and your reputation jumps. Let the deadline pass and it falls, far enough to cost you a rank.||#A patron||-One of your lords, bound to one guild. Select them on the campaign map, then press Appoint.||-Their army gains replenishment and campaign movement.||-That guild's reputation pays half again and its services cost less.||-One lord, one guild. Appointing a second moves the post.	false
 derpy_gg_help_t5_brt	Losing reputation	false
-derpy_gg_help_p5_brt	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Leaving an offer alone costs nothing, and handing one back costs nothing.||-Failing one you accepted costs what finishing it would have paid.	false
+derpy_gg_help_p5_brt	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, and what finishing it would have paid.	false
 derpy_gg_help_of_brt	of	false
 derpy_gg_court_help_brt	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
 message_event_text_text_derpy_gg_demand_brt_title	A Guild Asks	false
@@ -1657,9 +1839,9 @@ message_event_text_text_derpy_gg_demand_fail_brt_title	A Guild Is Answered With 
 message_event_text_text_derpy_gg_demand_fail_brt_primary	The deadline has passed and nothing was paid. Your reputation with that guild has fallen.	false
 message_event_text_text_derpy_gg_demand_fail_brt_secondary	The ledger is kept whether you read it or not.	false
 message_event_text_text_derpy_gg_bounty_fail_brt_title	A Guild Is Left Waiting	false
-message_event_text_text_derpy_gg_bounty_fail_brt_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs nothing; taking it and failing costs what finishing it would have paid.	false
+message_event_text_text_derpy_gg_bounty_fail_brt_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs only the favour you put up; taking it and failing costs what finishing it would have paid.	false
 message_event_text_text_derpy_gg_bounty_fail_brt_secondary	A promise in the ledger is a debt.	false
-derpy_gg_bounty_help_brt	A guild posts work it wants done. Take one and it becomes a mission; finish it and that guild pays gold and a large amount of reputation - far more than a normal mission. Leave an offer alone, or hand it back through the objectives panel, and nothing is lost but the offer.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline costs that guild's reputation - exactly what finishing it would have paid. Declining work is free; promising it and not delivering is not.||The pay is read off the target, not fixed: a defended provincial capital is worth several times a ruined border town, and a rank-40 faction leader several times a fresh general. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
+derpy_gg_bounty_help_brt	A guild posts work it wants done. Take one and it becomes a mission. Taking it puts up favour with that guild; you get it back when you finish, and lose it if you fail or hand it back.||Guilds never ask for your front line. They name land or a lord far from your borders, or of a faction you are at peace with - which means war, and pays far more - or a job, a building, or work for your heroes.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline also costs that guild's reputation - what finishing it would have paid.||The pay is read off the target and its distance. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
 derpy_gg_locked_hint_brt	Your rank with this guild is too low. Keep earning reputation.	false
 message_event_text_text_derpy_gg_hit_brt_title	A Guild Moves Against You	false
 message_event_text_text_derpy_gg_hit_brt_primary	A rival has bought the favour of a guild, and it has been spent on you.	false
@@ -1819,21 +2001,63 @@ derpy_gg_gained_brt	gained	false
 missions_localised_title_derpy_gg_bounty_brass_brt	Open the Cellars	false
 missions_localised_description_derpy_gg_bounty_brass_brt	The Wine Merchants want that town's trade flowing to Bordeleaux. Take it intact.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_brass_brt	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_brass_brt	A Commission	false
+missions_localised_description_derpy_gg_build_brass_brt	The Wine Merchants want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_brass_brt	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_brass_brt	Fill the Coffers	false
+missions_localised_description_derpy_gg_job_brass_brt	The Wine Merchants want to see your treasury full, and kept full. Hold the sum named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_brass_brt	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_immortals_brt	A Challenge of Honour	false
 missions_localised_description_derpy_gg_bounty_immortals_brt	A general is being spoken of with respect. The Knights Errant would like to test that.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_immortals_brt	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_immortals_brt	A Commission	false
+missions_localised_description_derpy_gg_build_immortals_brt	The Knights Errant want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_immortals_brt	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_immortals_brt	Harry Their March	false
+missions_localised_description_derpy_gg_hero_immortals_brt	The Knights Errant want an army slowed and bled before it arrives. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_immortals_brt	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_immortals_brt	Prove a Champion	false
+missions_localised_description_derpy_gg_job_immortals_brt	The Knights Errant want a champion worth the name. Raise one of your lords or heroes to the rank named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_immortals_brt	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_daemonsmiths_brt	Out of Unworthy Hands	false
 missions_localised_description_derpy_gg_bounty_daemonsmiths_brt	Whatever that place keeps, the Damsels want it taken from those who should not have it. Bring it back in pieces.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_daemonsmiths_brt	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_daemonsmiths_brt	A Commission	false
+missions_localised_description_derpy_gg_build_daemonsmiths_brt	The Grail Damsels want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_daemonsmiths_brt	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_daemonsmiths_brt	Crack the Walls	false
+missions_localised_description_derpy_gg_hero_daemonsmiths_brt	The Grail Damsels want a settlement weakened from inside. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_daemonsmiths_brt	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_daemonsmiths_brt	Commissioned Work	false
+missions_localised_description_derpy_gg_job_daemonsmiths_brt	The Grail Damsels have paid in advance for a piece of learning. Research the technology named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_daemonsmiths_brt	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_khanate_brt	A Name in the Forest	false
 missions_localised_description_derpy_gg_bounty_khanate_brt	The Outlaws do not care how it is done, only that the name stops being used.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_khanate_brt	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_khanate_brt	A Commission	false
+missions_localised_description_derpy_gg_build_khanate_brt	The Forest Outlaws want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_khanate_brt	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_khanate_brt	A Quiet Word	false
+missions_localised_description_derpy_gg_job_khanate_brt	The Forest Outlaws want a name to stop being spoken. Wound or kill the lord or hero named on the Great Guilds panel with a hero.	false
+missions_localised_mission_completed_text_derpy_gg_job_khanate_brt	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_overseers_brt	A Keep Worth Keeping	false
 missions_localised_description_derpy_gg_bounty_overseers_brt	Take it whole. The Castle-Wrights want a keep to improve, not rubble.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_overseers_brt	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_overseers_brt	A Commission	false
+missions_localised_description_derpy_gg_build_overseers_brt	The Castle-Wrights want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_overseers_brt	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_slavers_brt	A Crusade's Worth	false
 missions_localised_description_derpy_gg_bounty_slavers_brt	Sack it. The Crusaders are owed, and that place can pay.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_slavers_brt	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_slavers_brt	A Commission	false
+missions_localised_description_derpy_gg_build_slavers_brt	The Crusaders want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_slavers_brt	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_slavers_brt	Fill the Pens	false
+missions_localised_description_derpy_gg_job_slavers_brt	The Crusaders are short of hands. Take the number of captives named on the Great Guilds panel in your battles.	false
+missions_localised_mission_completed_text_derpy_gg_job_slavers_brt	The guild has been paid in full, and so have you.	false
+mission_text_text_derpy_gg_hero_harry_brt	Succeed with two hero actions against the army named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_sabotage_brt	Succeed with two hero actions against the settlement named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_strike_brt	Wound or kill the character named on the Great Guilds panel with a hero.	false
 derpy_gg_rank_name_1_cth	Commoner	false
 derpy_gg_rank_name_2_cth	Scholar	false
 derpy_gg_rank_name_3_cth	Official	false
@@ -2019,6 +2243,20 @@ derpy_gg_bounty_taken_cth	Taken	false
 derpy_gg_bounty_pays_cth	Pays	false
 derpy_gg_bounty_turns_cth	turns left	false
 derpy_gg_bounty_lord_cth	Their general	false
+derpy_gg_bounty_war_cth	War with	false
+derpy_gg_bounty_war_tip_cth	Taking this means war with	false
+derpy_gg_bounty_stake_tip_cth	Favour you put up to take this bounty. You get it back when you finish, and lose it if you fail or hand it back.	false
+derpy_gg_bounty_stake_short_cth	Needs %n favour with this guild to take. You have %m.	false
+derpy_gg_bounty_char_cth	Their lord or hero	false
+derpy_gg_bounty_obj_coffers_cth	Save %n gold more than you hold now	false
+derpy_gg_bounty_obj_coffers_taken_cth	Hold %n gold	false
+derpy_gg_bounty_obj_champion_cth	A lord or hero at rank %n	false
+derpy_gg_bounty_obj_research_cth	Research	false
+derpy_gg_bounty_obj_build_cth	Build	false
+derpy_gg_bounty_obj_captives_cth	Take %n captives in battle	false
+derpy_gg_bounty_obj_sabotage_cth	Sabotage	false
+derpy_gg_bounty_obj_harry_cth	Harry	false
+derpy_gg_bounty_obj_strike_cth	Wound or kill	false
 derpy_gg_leader_cth	Leader	false
 derpy_gg_nobody_cth	Nobody yet	false
 derpy_gg_hdr_stand_cth	Hover a row for the full table.	false
@@ -2101,11 +2339,11 @@ derpy_gg_help_p1_cth	#Two numbers, per guild||-REPUTATION is earned by playing a
 derpy_gg_help_t2_cth	Earning	false
 derpy_gg_help_p2_cth	#What each guild pays for||-The Caravan Masters: your income, every turn||-The Dragon Guard: battles won, doubled when outnumbered||-The Imperial Academy: technologies completed||-The Crow Society: successful hero actions||-The Bastion Builders: settlements growing a level, and buildings no other guild claims||-The Punitive Host: settlements sacked, more when razed||-A finished BUILDING pays its own guild - a forge the Imperial Academy, a dock the Caravan Masters, a barracks the Dragon Guard. Higher levels pay more, and its card names the guild.||#Every guild at once||-Every completed MISSION raises your reputation with all six guilds.||#Rivalry||-Caravan Masters and Crow Society / Dragon Guard and Imperial Academy / Bastion Builders and Punitive Host||-Earning with one takes reputation from its rival once you reach Scholar there - never a rank.||#A limit each turn||-Most guilds pay only so much each turn. The Guilds tab shows what each paid.	false
 derpy_gg_help_t3_cth	Bounties	false
-derpy_gg_help_p3_cth	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Finish it and that guild pays gold and a large amount of reputation - far more than an ordinary mission.||-Leave it alone, or hand it back, and nothing is lost but the offer.||-Take it and FAIL it and that guild takes back what finishing it would have paid. Declining work is free; promising it and not delivering is not.||#The price is the target||-A defended provincial capital is worth several times a ruined border town.||-A veteran faction leader several times a fresh general.||-Every offer is rated Routine, Hard or Grim, which is the guild saying why the number is what it is.||#Two rules about the price||-An offer you have NOT taken re-prices as the world moves.||-One you HAVE taken keeps the price you agreed.	false
+derpy_gg_help_p3_cth	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Taking one puts up FAVOUR with that guild - the number on its plate. You get it back when you finish, and lose it if you fail or hand it back.||-Finish it and that guild pays gold and a large amount of reputation.||#What the guilds ask for||-Never your front line: land or a lord far from your borders and armies, or of a faction you are at peace with. That last kind means war, and pays far more.||-Or a job: hold gold, raise a champion, research, build one of the guild's own buildings, or take captives.||-Or hero work: send your heroes against a named settlement, army or character.||#The price||-Read off the target and the distance, rated Routine, Hard or Grim. An offer you have NOT taken re-prices as the world moves; one you HAVE taken keeps its price.	false
 derpy_gg_help_t4_cth	The Court	false
 derpy_gg_help_p4_cth	#Leading a guild||-Held by whichever faction in the world has the most reputation with it - you or a rival.||-The leader carries an extra bonus, and the guild's dearest service is sold to nobody else.||-It can be taken from you. The Leaderboard tab shows who leads each guild.||#Demands||-Every so often a guild that already knows you asks for something, with a deadline on it.||-It wants either gold, or the favour you hold with its own rival.||-Pay it and your reputation jumps. Let the deadline pass and it falls, far enough to cost you a rank.||#A patron||-One of your lords, bound to one guild. Select them on the campaign map, then press Appoint.||-Their army gains replenishment and campaign movement.||-That guild's reputation pays half again and its services cost less.||-One lord, one guild. Appointing a second moves the post.	false
 derpy_gg_help_t5_cth	Losing reputation	false
-derpy_gg_help_p5_cth	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Leaving an offer alone costs nothing, and handing one back costs nothing.||-Failing one you accepted costs what finishing it would have paid.	false
+derpy_gg_help_p5_cth	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, and what finishing it would have paid.	false
 derpy_gg_help_of_cth	of	false
 derpy_gg_court_help_cth	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
 message_event_text_text_derpy_gg_demand_cth_title	A Guild Asks	false
@@ -2115,9 +2353,9 @@ message_event_text_text_derpy_gg_demand_fail_cth_title	A Guild Is Answered With 
 message_event_text_text_derpy_gg_demand_fail_cth_primary	The deadline has passed and nothing was paid. Your reputation with that guild has fallen.	false
 message_event_text_text_derpy_gg_demand_fail_cth_secondary	The ledger is kept whether you read it or not.	false
 message_event_text_text_derpy_gg_bounty_fail_cth_title	A Guild Is Left Waiting	false
-message_event_text_text_derpy_gg_bounty_fail_cth_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs nothing; taking it and failing costs what finishing it would have paid.	false
+message_event_text_text_derpy_gg_bounty_fail_cth_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs only the favour you put up; taking it and failing costs what finishing it would have paid.	false
 message_event_text_text_derpy_gg_bounty_fail_cth_secondary	A promise in the ledger is a debt.	false
-derpy_gg_bounty_help_cth	A guild posts work it wants done. Take one and it becomes a mission; finish it and that guild pays gold and a large amount of reputation - far more than a normal mission. Leave an offer alone, or hand it back through the objectives panel, and nothing is lost but the offer.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline costs that guild's reputation - exactly what finishing it would have paid. Declining work is free; promising it and not delivering is not.||The pay is read off the target, not fixed: a defended provincial capital is worth several times a ruined border town, and a rank-40 faction leader several times a fresh general. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
+derpy_gg_bounty_help_cth	A guild posts work it wants done. Take one and it becomes a mission. Taking it puts up favour with that guild; you get it back when you finish, and lose it if you fail or hand it back.||Guilds never ask for your front line. They name land or a lord far from your borders, or of a faction you are at peace with - which means war, and pays far more - or a job, a building, or work for your heroes.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline also costs that guild's reputation - what finishing it would have paid.||The pay is read off the target and its distance. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
 derpy_gg_locked_hint_cth	Your rank with this guild is too low. Keep earning reputation.	false
 message_event_text_text_derpy_gg_hit_cth_title	A Guild Moves Against You	false
 message_event_text_text_derpy_gg_hit_cth_primary	A rival has bought the favour of a guild, and it has been spent on you.	false
@@ -2277,21 +2515,63 @@ derpy_gg_gained_cth	gained	false
 missions_localised_title_derpy_gg_bounty_brass_cth	Open the Road	false
 missions_localised_description_derpy_gg_bounty_brass_cth	The Caravan Masters want that town's markets on the Ivory Road. Take it intact.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_brass_cth	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_brass_cth	A Commission	false
+missions_localised_description_derpy_gg_build_brass_cth	The Caravan Masters want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_brass_cth	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_brass_cth	Fill the Coffers	false
+missions_localised_description_derpy_gg_job_brass_cth	The Caravan Masters want to see your treasury full, and kept full. Hold the sum named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_brass_cth	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_immortals_cth	A Lesson in Respect	false
 missions_localised_description_derpy_gg_bounty_immortals_cth	A general is being spoken of with respect. The Dragon Guard would like that corrected.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_immortals_cth	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_immortals_cth	A Commission	false
+missions_localised_description_derpy_gg_build_immortals_cth	The Dragon Guard want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_immortals_cth	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_immortals_cth	Harry Their March	false
+missions_localised_description_derpy_gg_hero_immortals_cth	The Dragon Guard want an army slowed and bled before it arrives. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_immortals_cth	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_immortals_cth	Prove a Champion	false
+missions_localised_description_derpy_gg_job_immortals_cth	The Dragon Guard want a champion worth the name. Raise one of your lords or heroes to the rank named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_immortals_cth	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_daemonsmiths_cth	Collect the Texts	false
 missions_localised_description_derpy_gg_bounty_daemonsmiths_cth	Whatever that place has written down, the Academy wants in its archive. Bring it back in pieces.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_daemonsmiths_cth	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_daemonsmiths_cth	A Commission	false
+missions_localised_description_derpy_gg_build_daemonsmiths_cth	The Imperial Academy want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_daemonsmiths_cth	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_daemonsmiths_cth	Crack the Walls	false
+missions_localised_description_derpy_gg_hero_daemonsmiths_cth	The Imperial Academy want a settlement weakened from inside. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_daemonsmiths_cth	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_daemonsmiths_cth	Commissioned Work	false
+missions_localised_description_derpy_gg_job_daemonsmiths_cth	The Imperial Academy have paid in advance for a piece of learning. Research the technology named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_daemonsmiths_cth	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_khanate_cth	A Name Forgotten	false
 missions_localised_description_derpy_gg_bounty_khanate_cth	The Society does not care how it is done, only that the name stops being used.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_khanate_cth	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_khanate_cth	A Commission	false
+missions_localised_description_derpy_gg_build_khanate_cth	The Crow Society want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_khanate_cth	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_khanate_cth	A Quiet Word	false
+missions_localised_description_derpy_gg_job_khanate_cth	The Crow Society want a name to stop being spoken. Wound or kill the lord or hero named on the Great Guilds panel with a hero.	false
+missions_localised_mission_completed_text_derpy_gg_job_khanate_cth	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_overseers_cth	Walls for the Empire	false
 missions_localised_description_derpy_gg_bounty_overseers_cth	Take it whole. The Bastion Builders want walls to strengthen, not rubble.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_overseers_cth	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_overseers_cth	A Commission	false
+missions_localised_description_derpy_gg_build_overseers_cth	The Bastion Builders want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_overseers_cth	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_slavers_cth	Punish Them	false
 missions_localised_description_derpy_gg_bounty_slavers_cth	Sack it. The Host is owed, and that place can pay.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_slavers_cth	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_slavers_cth	A Commission	false
+missions_localised_description_derpy_gg_build_slavers_cth	The Punitive Host want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_slavers_cth	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_slavers_cth	Fill the Pens	false
+missions_localised_description_derpy_gg_job_slavers_cth	The Punitive Host are short of hands. Take the number of captives named on the Great Guilds panel in your battles.	false
+missions_localised_mission_completed_text_derpy_gg_job_slavers_cth	The guild has been paid in full, and so have you.	false
+mission_text_text_derpy_gg_hero_harry_cth	Succeed with two hero actions against the army named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_sabotage_cth	Succeed with two hero actions against the settlement named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_strike_cth	Wound or kill the character named on the Great Guilds panel with a hero.	false
 derpy_gg_rank_name_1_ksl	Serf	false
 derpy_gg_rank_name_2_ksl	Kossar	false
 derpy_gg_rank_name_3_ksl	Druzhina	false
@@ -2477,6 +2757,20 @@ derpy_gg_bounty_taken_ksl	Taken	false
 derpy_gg_bounty_pays_ksl	Pays	false
 derpy_gg_bounty_turns_ksl	turns left	false
 derpy_gg_bounty_lord_ksl	Their general	false
+derpy_gg_bounty_war_ksl	War with	false
+derpy_gg_bounty_war_tip_ksl	Taking this means war with	false
+derpy_gg_bounty_stake_tip_ksl	Favour you put up to take this bounty. You get it back when you finish, and lose it if you fail or hand it back.	false
+derpy_gg_bounty_stake_short_ksl	Needs %n favour with this guild to take. You have %m.	false
+derpy_gg_bounty_char_ksl	Their lord or hero	false
+derpy_gg_bounty_obj_coffers_ksl	Save %n gold more than you hold now	false
+derpy_gg_bounty_obj_coffers_taken_ksl	Hold %n gold	false
+derpy_gg_bounty_obj_champion_ksl	A lord or hero at rank %n	false
+derpy_gg_bounty_obj_research_ksl	Research	false
+derpy_gg_bounty_obj_build_ksl	Build	false
+derpy_gg_bounty_obj_captives_ksl	Take %n captives in battle	false
+derpy_gg_bounty_obj_sabotage_ksl	Sabotage	false
+derpy_gg_bounty_obj_harry_ksl	Harry	false
+derpy_gg_bounty_obj_strike_ksl	Wound or kill	false
 derpy_gg_leader_ksl	Leader	false
 derpy_gg_nobody_ksl	Nobody yet	false
 derpy_gg_hdr_stand_ksl	Hover a row for the full table.	false
@@ -2559,11 +2853,11 @@ derpy_gg_help_p1_ksl	#Two numbers, per guild||-REPUTATION is earned by playing a
 derpy_gg_help_t2_ksl	Earning	false
 derpy_gg_help_p2_ksl	#What each guild pays for||-The Erengrad Merchants: your income, every turn||-The Tzar Guard: battles won, doubled when outnumbered||-The Ice Court: technologies completed||-The Oblast Smugglers: successful hero actions||-The Stanitsa Builders: settlements growing a level, and buildings no other guild claims||-The Ungol Raiders: settlements sacked, more when razed||-A finished BUILDING pays its own guild - a forge the Ice Court, a dock the Erengrad Merchants, a barracks the Tzar Guard. Higher levels pay more, and its card names the guild.||#Every guild at once||-Every completed MISSION raises your reputation with all six guilds.||#Rivalry||-Erengrad Merchants and Oblast Smugglers / Tzar Guard and Ice Court / Stanitsa Builders and Ungol Raiders||-Earning with one takes reputation from its rival once you reach Kossar there - never a rank.||#A limit each turn||-Most guilds pay only so much each turn. The Guilds tab shows what each paid.	false
 derpy_gg_help_t3_ksl	Bounties	false
-derpy_gg_help_p3_ksl	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Finish it and that guild pays gold and a large amount of reputation - far more than an ordinary mission.||-Leave it alone, or hand it back, and nothing is lost but the offer.||-Take it and FAIL it and that guild takes back what finishing it would have paid. Declining work is free; promising it and not delivering is not.||#The price is the target||-A defended provincial capital is worth several times a ruined border town.||-A veteran faction leader several times a fresh general.||-Every offer is rated Routine, Hard or Grim, which is the guild saying why the number is what it is.||#Two rules about the price||-An offer you have NOT taken re-prices as the world moves.||-One you HAVE taken keeps the price you agreed.	false
+derpy_gg_help_p3_ksl	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Taking one puts up FAVOUR with that guild - the number on its plate. You get it back when you finish, and lose it if you fail or hand it back.||-Finish it and that guild pays gold and a large amount of reputation.||#What the guilds ask for||-Never your front line: land or a lord far from your borders and armies, or of a faction you are at peace with. That last kind means war, and pays far more.||-Or a job: hold gold, raise a champion, research, build one of the guild's own buildings, or take captives.||-Or hero work: send your heroes against a named settlement, army or character.||#The price||-Read off the target and the distance, rated Routine, Hard or Grim. An offer you have NOT taken re-prices as the world moves; one you HAVE taken keeps its price.	false
 derpy_gg_help_t4_ksl	The Court	false
 derpy_gg_help_p4_ksl	#Leading a guild||-Held by whichever faction in the world has the most reputation with it - you or a rival.||-The leader carries an extra bonus, and the guild's dearest service is sold to nobody else.||-It can be taken from you. The Leaderboard tab shows who leads each guild.||#Demands||-Every so often a guild that already knows you asks for something, with a deadline on it.||-It wants either gold, or the favour you hold with its own rival.||-Pay it and your reputation jumps. Let the deadline pass and it falls, far enough to cost you a rank.||#A patron||-One of your lords, bound to one guild. Select them on the campaign map, then press Appoint.||-Their army gains replenishment and campaign movement.||-That guild's reputation pays half again and its services cost less.||-One lord, one guild. Appointing a second moves the post.	false
 derpy_gg_help_t5_ksl	Losing reputation	false
-derpy_gg_help_p5_ksl	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Leaving an offer alone costs nothing, and handing one back costs nothing.||-Failing one you accepted costs what finishing it would have paid.	false
+derpy_gg_help_p5_ksl	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, and what finishing it would have paid.	false
 derpy_gg_help_of_ksl	of	false
 derpy_gg_court_help_ksl	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
 message_event_text_text_derpy_gg_demand_ksl_title	A Guild Asks	false
@@ -2573,9 +2867,9 @@ message_event_text_text_derpy_gg_demand_fail_ksl_title	A Guild Is Answered With 
 message_event_text_text_derpy_gg_demand_fail_ksl_primary	The deadline has passed and nothing was paid. Your reputation with that guild has fallen.	false
 message_event_text_text_derpy_gg_demand_fail_ksl_secondary	The ledger is kept whether you read it or not.	false
 message_event_text_text_derpy_gg_bounty_fail_ksl_title	A Guild Is Left Waiting	false
-message_event_text_text_derpy_gg_bounty_fail_ksl_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs nothing; taking it and failing costs what finishing it would have paid.	false
+message_event_text_text_derpy_gg_bounty_fail_ksl_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs only the favour you put up; taking it and failing costs what finishing it would have paid.	false
 message_event_text_text_derpy_gg_bounty_fail_ksl_secondary	A promise in the ledger is a debt.	false
-derpy_gg_bounty_help_ksl	A guild posts work it wants done. Take one and it becomes a mission; finish it and that guild pays gold and a large amount of reputation - far more than a normal mission. Leave an offer alone, or hand it back through the objectives panel, and nothing is lost but the offer.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline costs that guild's reputation - exactly what finishing it would have paid. Declining work is free; promising it and not delivering is not.||The pay is read off the target, not fixed: a defended provincial capital is worth several times a ruined border town, and a rank-40 faction leader several times a fresh general. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
+derpy_gg_bounty_help_ksl	A guild posts work it wants done. Take one and it becomes a mission. Taking it puts up favour with that guild; you get it back when you finish, and lose it if you fail or hand it back.||Guilds never ask for your front line. They name land or a lord far from your borders, or of a faction you are at peace with - which means war, and pays far more - or a job, a building, or work for your heroes.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline also costs that guild's reputation - what finishing it would have paid.||The pay is read off the target and its distance. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
 derpy_gg_locked_hint_ksl	Your rank with this guild is too low. Keep earning reputation.	false
 message_event_text_text_derpy_gg_hit_ksl_title	A Guild Moves Against You	false
 message_event_text_text_derpy_gg_hit_ksl_primary	A rival has bought the favour of a guild, and it has been spent on you.	false
@@ -2735,21 +3029,63 @@ derpy_gg_gained_ksl	gained	false
 missions_localised_title_derpy_gg_bounty_brass_ksl	Open the Market	false
 missions_localised_description_derpy_gg_bounty_brass_ksl	The Erengrad Merchants want that town's trade in their ledgers. Take it intact.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_brass_ksl	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_brass_ksl	A Commission	false
+missions_localised_description_derpy_gg_build_brass_ksl	The Erengrad Merchants want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_brass_ksl	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_brass_ksl	Fill the Coffers	false
+missions_localised_description_derpy_gg_job_brass_ksl	The Erengrad Merchants want to see your treasury full, and kept full. Hold the sum named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_brass_ksl	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_immortals_ksl	A Duel in the Snow	false
 missions_localised_description_derpy_gg_bounty_immortals_ksl	A general is being spoken of with respect. The Tzar Guard would like that corrected.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_immortals_ksl	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_immortals_ksl	A Commission	false
+missions_localised_description_derpy_gg_build_immortals_ksl	The Tzar Guard want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_immortals_ksl	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_immortals_ksl	Harry Their March	false
+missions_localised_description_derpy_gg_hero_immortals_ksl	The Tzar Guard want an army slowed and bled before it arrives. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_immortals_ksl	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_immortals_ksl	Prove a Champion	false
+missions_localised_description_derpy_gg_job_immortals_ksl	The Tzar Guard want a champion worth the name. Raise one of your lords or heroes to the rank named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_immortals_ksl	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_daemonsmiths_ksl	Claim the Lore	false
 missions_localised_description_derpy_gg_bounty_daemonsmiths_ksl	Whatever that place knows, the Ice Court wants. Bring it back in pieces.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_daemonsmiths_ksl	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_daemonsmiths_ksl	A Commission	false
+missions_localised_description_derpy_gg_build_daemonsmiths_ksl	The Ice Court want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_daemonsmiths_ksl	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_daemonsmiths_ksl	Crack the Walls	false
+missions_localised_description_derpy_gg_hero_daemonsmiths_ksl	The Ice Court want a settlement weakened from inside. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_daemonsmiths_ksl	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_daemonsmiths_ksl	Commissioned Work	false
+missions_localised_description_derpy_gg_job_daemonsmiths_ksl	The Ice Court have paid in advance for a piece of learning. Research the technology named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_daemonsmiths_ksl	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_khanate_ksl	Lost in the Snow	false
 missions_localised_description_derpy_gg_bounty_khanate_ksl	The Smugglers do not care how it is done, only that the name stops being used.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_khanate_ksl	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_khanate_ksl	A Commission	false
+missions_localised_description_derpy_gg_build_khanate_ksl	The Oblast Smugglers want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_khanate_ksl	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_khanate_ksl	A Quiet Word	false
+missions_localised_description_derpy_gg_job_khanate_ksl	The Oblast Smugglers want a name to stop being spoken. Wound or kill the lord or hero named on the Great Guilds panel with a hero.	false
+missions_localised_mission_completed_text_derpy_gg_job_khanate_ksl	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_overseers_ksl	Hold the Line	false
 missions_localised_description_derpy_gg_bounty_overseers_ksl	Take it whole. The Stanitsa Builders want walls that hold, not rubble.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_overseers_ksl	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_overseers_ksl	A Commission	false
+missions_localised_description_derpy_gg_build_overseers_ksl	The Stanitsa Builders want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_overseers_ksl	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_slavers_ksl	Ride and Take	false
 missions_localised_description_derpy_gg_bounty_slavers_ksl	Sack it. The Raiders are owed, and that place can pay.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_slavers_ksl	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_slavers_ksl	A Commission	false
+missions_localised_description_derpy_gg_build_slavers_ksl	The Ungol Raiders want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_slavers_ksl	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_slavers_ksl	Fill the Pens	false
+missions_localised_description_derpy_gg_job_slavers_ksl	The Ungol Raiders are short of hands. Take the number of captives named on the Great Guilds panel in your battles.	false
+missions_localised_mission_completed_text_derpy_gg_job_slavers_ksl	The guild has been paid in full, and so have you.	false
+mission_text_text_derpy_gg_hero_harry_ksl	Succeed with two hero actions against the army named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_sabotage_ksl	Succeed with two hero actions against the settlement named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_strike_ksl	Wound or kill the character named on the Great Guilds panel with a hero.	false
 derpy_gg_rank_name_1_def	Thrall	false
 derpy_gg_rank_name_2_def	Corsair	false
 derpy_gg_rank_name_3_def	Highborn	false
@@ -2935,6 +3271,20 @@ derpy_gg_bounty_taken_def	Taken	false
 derpy_gg_bounty_pays_def	Pays	false
 derpy_gg_bounty_turns_def	turns left	false
 derpy_gg_bounty_lord_def	Their general	false
+derpy_gg_bounty_war_def	War with	false
+derpy_gg_bounty_war_tip_def	Taking this means war with	false
+derpy_gg_bounty_stake_tip_def	Favour you put up to take this bounty. You get it back when you finish, and lose it if you fail or hand it back.	false
+derpy_gg_bounty_stake_short_def	Needs %n favour with this guild to take. You have %m.	false
+derpy_gg_bounty_char_def	Their lord or hero	false
+derpy_gg_bounty_obj_coffers_def	Save %n gold more than you hold now	false
+derpy_gg_bounty_obj_coffers_taken_def	Hold %n gold	false
+derpy_gg_bounty_obj_champion_def	A lord or hero at rank %n	false
+derpy_gg_bounty_obj_research_def	Research	false
+derpy_gg_bounty_obj_build_def	Build	false
+derpy_gg_bounty_obj_captives_def	Take %n captives in battle	false
+derpy_gg_bounty_obj_sabotage_def	Sabotage	false
+derpy_gg_bounty_obj_harry_def	Harry	false
+derpy_gg_bounty_obj_strike_def	Wound or kill	false
 derpy_gg_leader_def	Leader	false
 derpy_gg_nobody_def	Nobody yet	false
 derpy_gg_hdr_stand_def	Hover a row for the full table.	false
@@ -3017,11 +3367,11 @@ derpy_gg_help_p1_def	#Two numbers, per guild||-REPUTATION is earned by playing a
 derpy_gg_help_t2_def	Earning	false
 derpy_gg_help_p2_def	#What each guild pays for||-The Karond Kar Traders: your income, every turn||-The Black Guard: battles won, doubled when outnumbered||-The Convent of Ghrond: technologies completed||-The Khainite Assassins: successful hero actions||-The Naggarond Builders: settlements growing a level, and buildings no other guild claims||-The Black Ark Corsairs: settlements sacked, more when razed||-A finished BUILDING pays its own guild - a forge the Convent of Ghrond, a dock the Karond Kar Traders, a barracks the Black Guard. Higher levels pay more, and its card names the guild.||#Every guild at once||-Every completed MISSION raises your reputation with all six guilds.||#Rivalry||-Karond Kar Traders and Khainite Assassins / Black Guard and Convent of Ghrond / Naggarond Builders and Black Ark Corsairs||-Earning with one takes reputation from its rival once you reach Corsair there - never a rank.||#A limit each turn||-Most guilds pay only so much each turn. The Guilds tab shows what each paid.	false
 derpy_gg_help_t3_def	Bounties	false
-derpy_gg_help_p3_def	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Finish it and that guild pays gold and a large amount of reputation - far more than an ordinary mission.||-Leave it alone, or hand it back, and nothing is lost but the offer.||-Take it and FAIL it and that guild takes back what finishing it would have paid. Declining work is free; promising it and not delivering is not.||#The price is the target||-A defended provincial capital is worth several times a ruined border town.||-A veteran faction leader several times a fresh general.||-Every offer is rated Routine, Hard or Grim, which is the guild saying why the number is what it is.||#Two rules about the price||-An offer you have NOT taken re-prices as the world moves.||-One you HAVE taken keeps the price you agreed.	false
+derpy_gg_help_p3_def	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Taking one puts up FAVOUR with that guild - the number on its plate. You get it back when you finish, and lose it if you fail or hand it back.||-Finish it and that guild pays gold and a large amount of reputation.||#What the guilds ask for||-Never your front line: land or a lord far from your borders and armies, or of a faction you are at peace with. That last kind means war, and pays far more.||-Or a job: hold gold, raise a champion, research, build one of the guild's own buildings, or take captives.||-Or hero work: send your heroes against a named settlement, army or character.||#The price||-Read off the target and the distance, rated Routine, Hard or Grim. An offer you have NOT taken re-prices as the world moves; one you HAVE taken keeps its price.	false
 derpy_gg_help_t4_def	The Court	false
 derpy_gg_help_p4_def	#Leading a guild||-Held by whichever faction in the world has the most reputation with it - you or a rival.||-The leader carries an extra bonus, and the guild's dearest service is sold to nobody else.||-It can be taken from you. The Leaderboard tab shows who leads each guild.||#Demands||-Every so often a guild that already knows you asks for something, with a deadline on it.||-It wants either gold, or the favour you hold with its own rival.||-Pay it and your reputation jumps. Let the deadline pass and it falls, far enough to cost you a rank.||#A patron||-One of your lords, bound to one guild. Select them on the campaign map, then press Appoint.||-Their army gains replenishment and campaign movement.||-That guild's reputation pays half again and its services cost less.||-One lord, one guild. Appointing a second moves the post.	false
 derpy_gg_help_t5_def	Losing reputation	false
-derpy_gg_help_p5_def	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Leaving an offer alone costs nothing, and handing one back costs nothing.||-Failing one you accepted costs what finishing it would have paid.	false
+derpy_gg_help_p5_def	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, and what finishing it would have paid.	false
 derpy_gg_help_of_def	of	false
 derpy_gg_court_help_def	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
 message_event_text_text_derpy_gg_demand_def_title	A Guild Asks	false
@@ -3031,9 +3381,9 @@ message_event_text_text_derpy_gg_demand_fail_def_title	A Guild Is Answered With 
 message_event_text_text_derpy_gg_demand_fail_def_primary	The deadline has passed and nothing was paid. Your reputation with that guild has fallen.	false
 message_event_text_text_derpy_gg_demand_fail_def_secondary	The ledger is kept whether you read it or not.	false
 message_event_text_text_derpy_gg_bounty_fail_def_title	A Guild Is Left Waiting	false
-message_event_text_text_derpy_gg_bounty_fail_def_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs nothing; taking it and failing costs what finishing it would have paid.	false
+message_event_text_text_derpy_gg_bounty_fail_def_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs only the favour you put up; taking it and failing costs what finishing it would have paid.	false
 message_event_text_text_derpy_gg_bounty_fail_def_secondary	A promise in the ledger is a debt.	false
-derpy_gg_bounty_help_def	A guild posts work it wants done. Take one and it becomes a mission; finish it and that guild pays gold and a large amount of reputation - far more than a normal mission. Leave an offer alone, or hand it back through the objectives panel, and nothing is lost but the offer.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline costs that guild's reputation - exactly what finishing it would have paid. Declining work is free; promising it and not delivering is not.||The pay is read off the target, not fixed: a defended provincial capital is worth several times a ruined border town, and a rank-40 faction leader several times a fresh general. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
+derpy_gg_bounty_help_def	A guild posts work it wants done. Take one and it becomes a mission. Taking it puts up favour with that guild; you get it back when you finish, and lose it if you fail or hand it back.||Guilds never ask for your front line. They name land or a lord far from your borders, or of a faction you are at peace with - which means war, and pays far more - or a job, a building, or work for your heroes.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline also costs that guild's reputation - what finishing it would have paid.||The pay is read off the target and its distance. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
 derpy_gg_locked_hint_def	Your rank with this guild is too low. Keep earning reputation.	false
 message_event_text_text_derpy_gg_hit_def_title	A Guild Moves Against You	false
 message_event_text_text_derpy_gg_hit_def_primary	A rival has bought the favour of a guild, and it has been spent on you.	false
@@ -3193,21 +3543,63 @@ derpy_gg_gained_def	gained	false
 missions_localised_title_derpy_gg_bounty_brass_def	Fresh Markets	false
 missions_localised_description_derpy_gg_bounty_brass_def	The Karond Kar Traders want that town's trade in their ledgers. Take it intact.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_brass_def	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_brass_def	A Commission	false
+missions_localised_description_derpy_gg_build_brass_def	The Karond Kar Traders want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_brass_def	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_brass_def	Fill the Coffers	false
+missions_localised_description_derpy_gg_job_brass_def	The Karond Kar Traders want to see your treasury full, and kept full. Hold the sum named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_brass_def	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_immortals_def	A Test of Blades	false
 missions_localised_description_derpy_gg_bounty_immortals_def	A general is being spoken of with respect. The Black Guard would like that corrected.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_immortals_def	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_immortals_def	A Commission	false
+missions_localised_description_derpy_gg_build_immortals_def	The Black Guard want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_immortals_def	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_immortals_def	Harry Their March	false
+missions_localised_description_derpy_gg_hero_immortals_def	The Black Guard want an army slowed and bled before it arrives. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_immortals_def	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_immortals_def	Prove a Champion	false
+missions_localised_description_derpy_gg_job_immortals_def	The Black Guard want a champion worth the name. Raise one of your lords or heroes to the rank named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_immortals_def	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_daemonsmiths_def	Plunder the Lore	false
 missions_localised_description_derpy_gg_bounty_daemonsmiths_def	Whatever that place knows, the Convent wants. Bring it back in pieces.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_daemonsmiths_def	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_daemonsmiths_def	A Commission	false
+missions_localised_description_derpy_gg_build_daemonsmiths_def	The Convent of Ghrond want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_daemonsmiths_def	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_daemonsmiths_def	Crack the Walls	false
+missions_localised_description_derpy_gg_hero_daemonsmiths_def	The Convent of Ghrond want a settlement weakened from inside. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_daemonsmiths_def	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_daemonsmiths_def	Commissioned Work	false
+missions_localised_description_derpy_gg_job_daemonsmiths_def	The Convent of Ghrond have paid in advance for a piece of learning. Research the technology named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_daemonsmiths_def	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_khanate_def	A Name for Khaine	false
 missions_localised_description_derpy_gg_bounty_khanate_def	The Assassins do not care how it is done, only that the name stops being used.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_khanate_def	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_khanate_def	A Commission	false
+missions_localised_description_derpy_gg_build_khanate_def	The Khainite Assassins want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_khanate_def	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_khanate_def	A Quiet Word	false
+missions_localised_description_derpy_gg_job_khanate_def	The Khainite Assassins want a name to stop being spoken. Wound or kill the lord or hero named on the Great Guilds panel with a hero.	false
+missions_localised_mission_completed_text_derpy_gg_job_khanate_def	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_overseers_def	A Tower Worth Taking	false
 missions_localised_description_derpy_gg_bounty_overseers_def	Take it whole. The Naggarond Builders want walls to raise higher, not rubble.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_overseers_def	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_overseers_def	A Commission	false
+missions_localised_description_derpy_gg_build_overseers_def	The Naggarond Builders want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_overseers_def	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_slavers_def	A Harvest of Captives	false
 missions_localised_description_derpy_gg_bounty_slavers_def	Sack it. The Corsairs are owed, and that place can pay.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_slavers_def	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_slavers_def	A Commission	false
+missions_localised_description_derpy_gg_build_slavers_def	The Black Ark Corsairs want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_slavers_def	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_slavers_def	Fill the Pens	false
+missions_localised_description_derpy_gg_job_slavers_def	The Black Ark Corsairs are short of hands. Take the number of captives named on the Great Guilds panel in your battles.	false
+missions_localised_mission_completed_text_derpy_gg_job_slavers_def	The guild has been paid in full, and so have you.	false
+mission_text_text_derpy_gg_hero_harry_def	Succeed with two hero actions against the army named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_sabotage_def	Succeed with two hero actions against the settlement named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_strike_def	Wound or kill the character named on the Great Guilds panel with a hero.	false
 derpy_gg_rank_name_1_hef	Citizen	false
 derpy_gg_rank_name_2_hef	Warden	false
 derpy_gg_rank_name_3_hef	Noble	false
@@ -3393,6 +3785,20 @@ derpy_gg_bounty_taken_hef	Taken	false
 derpy_gg_bounty_pays_hef	Pays	false
 derpy_gg_bounty_turns_hef	turns left	false
 derpy_gg_bounty_lord_hef	Their general	false
+derpy_gg_bounty_war_hef	War with	false
+derpy_gg_bounty_war_tip_hef	Taking this means war with	false
+derpy_gg_bounty_stake_tip_hef	Favour you put up to take this bounty. You get it back when you finish, and lose it if you fail or hand it back.	false
+derpy_gg_bounty_stake_short_hef	Needs %n favour with this guild to take. You have %m.	false
+derpy_gg_bounty_char_hef	Their lord or hero	false
+derpy_gg_bounty_obj_coffers_hef	Save %n gold more than you hold now	false
+derpy_gg_bounty_obj_coffers_taken_hef	Hold %n gold	false
+derpy_gg_bounty_obj_champion_hef	A lord or hero at rank %n	false
+derpy_gg_bounty_obj_research_hef	Research	false
+derpy_gg_bounty_obj_build_hef	Build	false
+derpy_gg_bounty_obj_captives_hef	Take %n captives in battle	false
+derpy_gg_bounty_obj_sabotage_hef	Sabotage	false
+derpy_gg_bounty_obj_harry_hef	Harry	false
+derpy_gg_bounty_obj_strike_hef	Wound or kill	false
 derpy_gg_leader_hef	Leader	false
 derpy_gg_nobody_hef	Nobody yet	false
 derpy_gg_hdr_stand_hef	Hover a row for the full table.	false
@@ -3475,11 +3881,11 @@ derpy_gg_help_p1_hef	#Two numbers, per guild||-REPUTATION is earned by playing a
 derpy_gg_help_t2_hef	Earning	false
 derpy_gg_help_p2_hef	#What each guild pays for||-The Lothern Merchants: your income, every turn||-The Swordmasters: battles won, doubled when outnumbered||-The Loremasters: technologies completed||-The Shadow Warriors: successful hero actions||-The Ulthuan Masons: settlements growing a level, and buildings no other guild claims||-The Ellyrian Reavers: settlements sacked, more when razed||-A finished BUILDING pays its own guild - a forge the Loremasters, a dock the Lothern Merchants, a barracks the Swordmasters. Higher levels pay more, and its card names the guild.||#Every guild at once||-Every completed MISSION raises your reputation with all six guilds.||#Rivalry||-Lothern Merchants and Shadow Warriors / Swordmasters and Loremasters / Ulthuan Masons and Ellyrian Reavers||-Earning with one takes reputation from its rival once you reach Warden there - never a rank.||#A limit each turn||-Most guilds pay only so much each turn. The Guilds tab shows what each paid.	false
 derpy_gg_help_t3_hef	Bounties	false
-derpy_gg_help_p3_hef	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Finish it and that guild pays gold and a large amount of reputation - far more than an ordinary mission.||-Leave it alone, or hand it back, and nothing is lost but the offer.||-Take it and FAIL it and that guild takes back what finishing it would have paid. Declining work is free; promising it and not delivering is not.||#The price is the target||-A defended provincial capital is worth several times a ruined border town.||-A veteran faction leader several times a fresh general.||-Every offer is rated Routine, Hard or Grim, which is the guild saying why the number is what it is.||#Two rules about the price||-An offer you have NOT taken re-prices as the world moves.||-One you HAVE taken keeps the price you agreed.	false
+derpy_gg_help_p3_hef	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Taking one puts up FAVOUR with that guild - the number on its plate. You get it back when you finish, and lose it if you fail or hand it back.||-Finish it and that guild pays gold and a large amount of reputation.||#What the guilds ask for||-Never your front line: land or a lord far from your borders and armies, or of a faction you are at peace with. That last kind means war, and pays far more.||-Or a job: hold gold, raise a champion, research, build one of the guild's own buildings, or take captives.||-Or hero work: send your heroes against a named settlement, army or character.||#The price||-Read off the target and the distance, rated Routine, Hard or Grim. An offer you have NOT taken re-prices as the world moves; one you HAVE taken keeps its price.	false
 derpy_gg_help_t4_hef	The Court	false
 derpy_gg_help_p4_hef	#Leading a guild||-Held by whichever faction in the world has the most reputation with it - you or a rival.||-The leader carries an extra bonus, and the guild's dearest service is sold to nobody else.||-It can be taken from you. The Leaderboard tab shows who leads each guild.||#Demands||-Every so often a guild that already knows you asks for something, with a deadline on it.||-It wants either gold, or the favour you hold with its own rival.||-Pay it and your reputation jumps. Let the deadline pass and it falls, far enough to cost you a rank.||#A patron||-One of your lords, bound to one guild. Select them on the campaign map, then press Appoint.||-Their army gains replenishment and campaign movement.||-That guild's reputation pays half again and its services cost less.||-One lord, one guild. Appointing a second moves the post.	false
 derpy_gg_help_t5_hef	Losing reputation	false
-derpy_gg_help_p5_hef	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Leaving an offer alone costs nothing, and handing one back costs nothing.||-Failing one you accepted costs what finishing it would have paid.	false
+derpy_gg_help_p5_hef	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, and what finishing it would have paid.	false
 derpy_gg_help_of_hef	of	false
 derpy_gg_court_help_hef	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
 message_event_text_text_derpy_gg_demand_hef_title	A Guild Asks	false
@@ -3489,9 +3895,9 @@ message_event_text_text_derpy_gg_demand_fail_hef_title	A Guild Is Answered With 
 message_event_text_text_derpy_gg_demand_fail_hef_primary	The deadline has passed and nothing was paid. Your reputation with that guild has fallen.	false
 message_event_text_text_derpy_gg_demand_fail_hef_secondary	The ledger is kept whether you read it or not.	false
 message_event_text_text_derpy_gg_bounty_fail_hef_title	A Guild Is Left Waiting	false
-message_event_text_text_derpy_gg_bounty_fail_hef_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs nothing; taking it and failing costs what finishing it would have paid.	false
+message_event_text_text_derpy_gg_bounty_fail_hef_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs only the favour you put up; taking it and failing costs what finishing it would have paid.	false
 message_event_text_text_derpy_gg_bounty_fail_hef_secondary	A promise in the ledger is a debt.	false
-derpy_gg_bounty_help_hef	A guild posts work it wants done. Take one and it becomes a mission; finish it and that guild pays gold and a large amount of reputation - far more than a normal mission. Leave an offer alone, or hand it back through the objectives panel, and nothing is lost but the offer.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline costs that guild's reputation - exactly what finishing it would have paid. Declining work is free; promising it and not delivering is not.||The pay is read off the target, not fixed: a defended provincial capital is worth several times a ruined border town, and a rank-40 faction leader several times a fresh general. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
+derpy_gg_bounty_help_hef	A guild posts work it wants done. Take one and it becomes a mission. Taking it puts up favour with that guild; you get it back when you finish, and lose it if you fail or hand it back.||Guilds never ask for your front line. They name land or a lord far from your borders, or of a faction you are at peace with - which means war, and pays far more - or a job, a building, or work for your heroes.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline also costs that guild's reputation - what finishing it would have paid.||The pay is read off the target and its distance. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
 derpy_gg_locked_hint_hef	Your rank with this guild is too low. Keep earning reputation.	false
 message_event_text_text_derpy_gg_hit_hef_title	A Guild Moves Against You	false
 message_event_text_text_derpy_gg_hit_hef_primary	A rival has bought the favour of a guild, and it has been spent on you.	false
@@ -3651,21 +4057,63 @@ derpy_gg_gained_hef	gained	false
 missions_localised_title_derpy_gg_bounty_brass_hef	Open the Harbour	false
 missions_localised_description_derpy_gg_bounty_brass_hef	The Lothern Merchants want that town's trade on their ships. Take it intact.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_brass_hef	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_brass_hef	A Commission	false
+missions_localised_description_derpy_gg_build_brass_hef	The Lothern Merchants want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_brass_hef	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_brass_hef	Fill the Coffers	false
+missions_localised_description_derpy_gg_job_brass_hef	The Lothern Merchants want to see your treasury full, and kept full. Hold the sum named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_brass_hef	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_immortals_hef	A Lesson in Blades	false
 missions_localised_description_derpy_gg_bounty_immortals_hef	A general is being spoken of with respect. The Swordmasters would like that corrected.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_immortals_hef	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_immortals_hef	A Commission	false
+missions_localised_description_derpy_gg_build_immortals_hef	The Swordmasters want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_immortals_hef	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_immortals_hef	Harry Their March	false
+missions_localised_description_derpy_gg_hero_immortals_hef	The Swordmasters want an army slowed and bled before it arrives. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_immortals_hef	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_immortals_hef	Prove a Champion	false
+missions_localised_description_derpy_gg_job_immortals_hef	The Swordmasters want a champion worth the name. Raise one of your lords or heroes to the rank named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_immortals_hef	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_daemonsmiths_hef	Recover the Lore	false
 missions_localised_description_derpy_gg_bounty_daemonsmiths_hef	Whatever that place knows, the Loremasters want kept safe. Bring it back in pieces.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_daemonsmiths_hef	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_daemonsmiths_hef	A Commission	false
+missions_localised_description_derpy_gg_build_daemonsmiths_hef	The Loremasters want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_daemonsmiths_hef	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_daemonsmiths_hef	Crack the Walls	false
+missions_localised_description_derpy_gg_hero_daemonsmiths_hef	The Loremasters want a settlement weakened from inside. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_daemonsmiths_hef	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_daemonsmiths_hef	Commissioned Work	false
+missions_localised_description_derpy_gg_job_daemonsmiths_hef	The Loremasters have paid in advance for a piece of learning. Research the technology named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_daemonsmiths_hef	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_khanate_hef	A Shadow Falls	false
 missions_localised_description_derpy_gg_bounty_khanate_hef	The Shadow Warriors do not care how it is done, only that the name stops being used.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_khanate_hef	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_khanate_hef	A Commission	false
+missions_localised_description_derpy_gg_build_khanate_hef	The Shadow Warriors want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_khanate_hef	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_khanate_hef	A Quiet Word	false
+missions_localised_description_derpy_gg_job_khanate_hef	The Shadow Warriors want a name to stop being spoken. Wound or kill the lord or hero named on the Great Guilds panel with a hero.	false
+missions_localised_mission_completed_text_derpy_gg_job_khanate_hef	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_overseers_hef	Walls for Ulthuan	false
 missions_localised_description_derpy_gg_bounty_overseers_hef	Take it whole. The Masons want walls to strengthen, not rubble.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_overseers_hef	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_overseers_hef	A Commission	false
+missions_localised_description_derpy_gg_build_overseers_hef	The Ulthuan Masons want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_overseers_hef	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_slavers_hef	Reave It	false
 missions_localised_description_derpy_gg_bounty_slavers_hef	Sack it. The Reavers are owed, and that place can pay.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_slavers_hef	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_slavers_hef	A Commission	false
+missions_localised_description_derpy_gg_build_slavers_hef	The Ellyrian Reavers want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_slavers_hef	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_slavers_hef	Fill the Pens	false
+missions_localised_description_derpy_gg_job_slavers_hef	The Ellyrian Reavers are short of hands. Take the number of captives named on the Great Guilds panel in your battles.	false
+missions_localised_mission_completed_text_derpy_gg_job_slavers_hef	The guild has been paid in full, and so have you.	false
+mission_text_text_derpy_gg_hero_harry_hef	Succeed with two hero actions against the army named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_sabotage_hef	Succeed with two hero actions against the settlement named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_strike_hef	Wound or kill the character named on the Great Guilds panel with a hero.	false
 derpy_gg_rank_name_1_gen	Stranger	false
 derpy_gg_rank_name_2_gen	Known	false
 derpy_gg_rank_name_3_gen	Trusted	false
@@ -3851,6 +4299,20 @@ derpy_gg_bounty_taken_gen	Taken	false
 derpy_gg_bounty_pays_gen	Pays	false
 derpy_gg_bounty_turns_gen	turns left	false
 derpy_gg_bounty_lord_gen	Their general	false
+derpy_gg_bounty_war_gen	War with	false
+derpy_gg_bounty_war_tip_gen	Taking this means war with	false
+derpy_gg_bounty_stake_tip_gen	Favour you put up to take this bounty. You get it back when you finish, and lose it if you fail or hand it back.	false
+derpy_gg_bounty_stake_short_gen	Needs %n favour with this guild to take. You have %m.	false
+derpy_gg_bounty_char_gen	Their lord or hero	false
+derpy_gg_bounty_obj_coffers_gen	Save %n gold more than you hold now	false
+derpy_gg_bounty_obj_coffers_taken_gen	Hold %n gold	false
+derpy_gg_bounty_obj_champion_gen	A lord or hero at rank %n	false
+derpy_gg_bounty_obj_research_gen	Research	false
+derpy_gg_bounty_obj_build_gen	Build	false
+derpy_gg_bounty_obj_captives_gen	Take %n captives in battle	false
+derpy_gg_bounty_obj_sabotage_gen	Sabotage	false
+derpy_gg_bounty_obj_harry_gen	Harry	false
+derpy_gg_bounty_obj_strike_gen	Wound or kill	false
 derpy_gg_leader_gen	Leader	false
 derpy_gg_nobody_gen	Nobody yet	false
 derpy_gg_hdr_stand_gen	Hover a row for the full table.	false
@@ -3933,11 +4395,11 @@ derpy_gg_help_p1_gen	#Two numbers, per guild||-REPUTATION is earned by playing a
 derpy_gg_help_t2_gen	Earning	false
 derpy_gg_help_p2_gen	#What each guild pays for||-The Merchant Houses: your income, every turn||-The Veterans' Company: battles won, doubled when outnumbered||-The Artisans' Guild: technologies completed||-The Shadow Guild: successful hero actions||-The Builders' Guild: settlements growing a level, and buildings no other guild claims||-The Raiders' Guild: settlements sacked, more when razed||-A finished BUILDING pays its own guild - a forge the Artisans' Guild, a dock the Merchant Houses, a barracks the Veterans' Company. Higher levels pay more, and its card names the guild.||#Every guild at once||-Every completed MISSION raises your reputation with all six guilds.||#Rivalry||-Merchant Houses and Shadow Guild / Veterans' Company and Artisans' Guild / Builders' Guild and Raiders' Guild||-Earning with one takes reputation from its rival once you reach Known there - never a rank.||#A limit each turn||-Most guilds pay only so much each turn. The Guilds tab shows what each paid.	false
 derpy_gg_help_t3_gen	Bounties	false
-derpy_gg_help_p3_gen	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Finish it and that guild pays gold and a large amount of reputation - far more than an ordinary mission.||-Leave it alone, or hand it back, and nothing is lost but the offer.||-Take it and FAIL it and that guild takes back what finishing it would have paid. Declining work is free; promising it and not delivering is not.||#The price is the target||-A defended provincial capital is worth several times a ruined border town.||-A veteran faction leader several times a fresh general.||-Every offer is rated Routine, Hard or Grim, which is the guild saying why the number is what it is.||#Two rules about the price||-An offer you have NOT taken re-prices as the world moves.||-One you HAVE taken keeps the price you agreed.	false
+derpy_gg_help_p3_gen	#The board||-Three offers at a time, drawn from every guild. Taking one turns it into a real mission.||-Taking one puts up FAVOUR with that guild - the number on its plate. You get it back when you finish, and lose it if you fail or hand it back.||-Finish it and that guild pays gold and a large amount of reputation.||#What the guilds ask for||-Never your front line: land or a lord far from your borders and armies, or of a faction you are at peace with. That last kind means war, and pays far more.||-Or a job: hold gold, raise a champion, research, build one of the guild's own buildings, or take captives.||-Or hero work: send your heroes against a named settlement, army or character.||#The price||-Read off the target and the distance, rated Routine, Hard or Grim. An offer you have NOT taken re-prices as the world moves; one you HAVE taken keeps its price.	false
 derpy_gg_help_t4_gen	The Court	false
 derpy_gg_help_p4_gen	#Leading a guild||-Held by whichever faction in the world has the most reputation with it - you or a rival.||-The leader carries an extra bonus, and the guild's dearest service is sold to nobody else.||-It can be taken from you. The Leaderboard tab shows who leads each guild.||#Demands||-Every so often a guild that already knows you asks for something, with a deadline on it.||-It wants either gold, or the favour you hold with its own rival.||-Pay it and your reputation jumps. Let the deadline pass and it falls, far enough to cost you a rank.||#A patron||-One of your lords, bound to one guild. Select them on the campaign map, then press Appoint.||-Their army gains replenishment and campaign movement.||-That guild's reputation pays half again and its services cost less.||-One lord, one guild. Appointing a second moves the post.	false
 derpy_gg_help_t5_gen	Losing reputation	false
-derpy_gg_help_p5_gen	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Leaving an offer alone costs nothing, and handing one back costs nothing.||-Failing one you accepted costs what finishing it would have paid.	false
+derpy_gg_help_p5_gen	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, and what finishing it would have paid.	false
 derpy_gg_help_of_gen	of	false
 derpy_gg_court_help_gen	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
 message_event_text_text_derpy_gg_demand_gen_title	A Guild Asks	false
@@ -3947,9 +4409,9 @@ message_event_text_text_derpy_gg_demand_fail_gen_title	A Guild Is Answered With 
 message_event_text_text_derpy_gg_demand_fail_gen_primary	The deadline has passed and nothing was paid. Your reputation with that guild has fallen.	false
 message_event_text_text_derpy_gg_demand_fail_gen_secondary	The ledger is kept whether you read it or not.	false
 message_event_text_text_derpy_gg_bounty_fail_gen_title	A Guild Is Left Waiting	false
-message_event_text_text_derpy_gg_bounty_fail_gen_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs nothing; taking it and failing costs what finishing it would have paid.	false
+message_event_text_text_derpy_gg_bounty_fail_gen_primary	Work you took from a guild has gone undone, and its reputation has been taken back. Handing an offer back costs only the favour you put up; taking it and failing costs what finishing it would have paid.	false
 message_event_text_text_derpy_gg_bounty_fail_gen_secondary	A promise in the ledger is a debt.	false
-derpy_gg_bounty_help_gen	A guild posts work it wants done. Take one and it becomes a mission; finish it and that guild pays gold and a large amount of reputation - far more than a normal mission. Leave an offer alone, or hand it back through the objectives panel, and nothing is lost but the offer.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline costs that guild's reputation - exactly what finishing it would have paid. Declining work is free; promising it and not delivering is not.||The pay is read off the target, not fixed: a defended provincial capital is worth several times a ruined border town, and a rank-40 faction leader several times a fresh general. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
+derpy_gg_bounty_help_gen	A guild posts work it wants done. Take one and it becomes a mission. Taking it puts up favour with that guild; you get it back when you finish, and lose it if you fail or hand it back.||Guilds never ask for your front line. They name land or a lord far from your borders, or of a faction you are at peace with - which means war, and pays far more - or a job, a building, or work for your heroes.||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish before its deadline also costs that guild's reputation - what finishing it would have paid.||The pay is read off the target and its distance. Each offer says whether the guild rates the job Routine, Hard or Grim. An offer you have not taken re-prices as the world moves; one you have taken keeps the price you agreed.	false
 derpy_gg_locked_hint_gen	Your rank with this guild is too low. Keep earning reputation.	false
 message_event_text_text_derpy_gg_hit_gen_title	A Guild Moves Against You	false
 message_event_text_text_derpy_gg_hit_gen_primary	A rival has bought the favour of a guild, and it has been spent on you.	false
@@ -4109,21 +4571,63 @@ derpy_gg_gained_gen	gained	false
 missions_localised_title_derpy_gg_bounty_brass_gen	Take the Market	false
 missions_localised_description_derpy_gg_bounty_brass_gen	The Merchant Houses want that town's tolls paid to them. Take it intact.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_brass_gen	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_brass_gen	A Commission	false
+missions_localised_description_derpy_gg_build_brass_gen	The Merchant Houses want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_brass_gen	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_brass_gen	Fill the Coffers	false
+missions_localised_description_derpy_gg_job_brass_gen	The Merchant Houses want to see your treasury full, and kept full. Hold the sum named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_brass_gen	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_immortals_gen	A Challenge Answered	false
 missions_localised_description_derpy_gg_bounty_immortals_gen	A general is being spoken of with respect. The Company would like that corrected.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_immortals_gen	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_immortals_gen	A Commission	false
+missions_localised_description_derpy_gg_build_immortals_gen	The Veterans' Company want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_immortals_gen	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_immortals_gen	Harry Their March	false
+missions_localised_description_derpy_gg_hero_immortals_gen	The Veterans' Company want an army slowed and bled before it arrives. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_immortals_gen	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_immortals_gen	Prove a Champion	false
+missions_localised_description_derpy_gg_job_immortals_gen	The Veterans' Company want a champion worth the name. Raise one of your lords or heroes to the rank named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_immortals_gen	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_daemonsmiths_gen	Strip the Workshops	false
 missions_localised_description_derpy_gg_bounty_daemonsmiths_gen	Whatever that place has built, the Artisans want on their own benches. Bring it back in pieces.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_daemonsmiths_gen	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_daemonsmiths_gen	A Commission	false
+missions_localised_description_derpy_gg_build_daemonsmiths_gen	The Artisans' Guild want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_daemonsmiths_gen	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_hero_daemonsmiths_gen	Crack the Walls	false
+missions_localised_description_derpy_gg_hero_daemonsmiths_gen	The Artisans' Guild want a settlement weakened from inside. Send your heroes against the one named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_hero_daemonsmiths_gen	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_daemonsmiths_gen	Commissioned Work	false
+missions_localised_description_derpy_gg_job_daemonsmiths_gen	The Artisans' Guild have paid in advance for a piece of learning. Research the technology named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_job_daemonsmiths_gen	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_khanate_gen	A Quiet Removal	false
 missions_localised_description_derpy_gg_bounty_khanate_gen	The Guild does not care how it is done, only that the name stops being used.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_khanate_gen	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_khanate_gen	A Commission	false
+missions_localised_description_derpy_gg_build_khanate_gen	The Shadow Guild want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_khanate_gen	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_khanate_gen	A Quiet Word	false
+missions_localised_description_derpy_gg_job_khanate_gen	The Shadow Guild want a name to stop being spoken. Wound or kill the lord or hero named on the Great Guilds panel with a hero.	false
+missions_localised_mission_completed_text_derpy_gg_job_khanate_gen	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_overseers_gen	Leave the Walls Standing	false
 missions_localised_description_derpy_gg_bounty_overseers_gen	Take it whole. The Builders want walls to work on, not rubble.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_overseers_gen	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_overseers_gen	A Commission	false
+missions_localised_description_derpy_gg_build_overseers_gen	The Builders' Guild want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_overseers_gen	The guild has been paid in full, and so have you.	false
 missions_localised_title_derpy_gg_bounty_slavers_gen	A Raid Worth Taking	false
 missions_localised_description_derpy_gg_bounty_slavers_gen	Sack it. The Guild is owed, and that place can pay.	false
 missions_localised_mission_completed_text_derpy_gg_bounty_slavers_gen	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_build_slavers_gen	A Commission	false
+missions_localised_description_derpy_gg_build_slavers_gen	The Raiders' Guild want one of their own buildings raised in your lands. It is named on the Great Guilds panel.	false
+missions_localised_mission_completed_text_derpy_gg_build_slavers_gen	The guild has been paid in full, and so have you.	false
+missions_localised_title_derpy_gg_job_slavers_gen	Fill the Pens	false
+missions_localised_description_derpy_gg_job_slavers_gen	The Raiders' Guild are short of hands. Take the number of captives named on the Great Guilds panel in your battles.	false
+missions_localised_mission_completed_text_derpy_gg_job_slavers_gen	The guild has been paid in full, and so have you.	false
+mission_text_text_derpy_gg_hero_harry_gen	Succeed with two hero actions against the army named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_sabotage_gen	Succeed with two hero actions against the settlement named on the Great Guilds panel.	false
+mission_text_text_derpy_gg_hero_strike_gen	Wound or kill the character named on the Great Guilds panel with a hero.	false
 effects_description_derpy_gg_built_brass	[[col:yellow]]Completing this earns reputation with the Brass Tablets[[/col]]	false
 effects_description_derpy_gg_built_immortals	[[col:yellow]]Completing this earns reputation with the Immortals[[/col]]	false
 effects_description_derpy_gg_built_daemonsmiths	[[col:yellow]]Completing this earns reputation with the Daemonsmiths[[/col]]	false

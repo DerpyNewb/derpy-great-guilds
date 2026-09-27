@@ -52,14 +52,23 @@ TABS = ["gg_tab_guilds", "gg_tab_stand", "gg_tab_bounty", "gg_tab_court", "gg_ta
 TAB_W, TAB_H = 125, 34
 PANEL_LAYOUT = {
     "gg_crest":      (16,  9,   34,  34),
-    # CENTRED ON THE PANEL: 60px in from both sides, so the middle of the box is the
-    # middle of the panel, clear of the crest (ends x=50) and the close cross (x=748).
-    "gg_title":      (60,  8,   670, 34),
+    # CENTRED ON THE PANEL, on CA's title plate: 95..695, clear of the crest (ends x=50)
+    # and the close cross (x=748), and ending at y=54 above the tabs. 600 is the width
+    # CA's Hell-Forge header draws the same plate at.
+    "gg_title":      (95,  0,   600, 54),
     "gg_close":      (748, 12,  30,  30),
     "gg_divider":    (20,  44,  750, 10),
-    "gg_rank_line":  (20,  104, 750, 26),
-    "gg_bar_track":  (20,  138, 750, 12),
-    "gg_rep_bar":    (20,  138, 750, 12),
+    # THE HELL-FORGE HEADER BAR (see RANK_BAR_LAYERS) with the guild's glyph in CA's round
+    # holder over its left end, the way the Hell-Forge draws "Melee Infantry". The bar's
+    # lower third is its bronze strip, so the text is lifted into the dark band above it.
+    "gg_rank_line":  (20,  92,  750, 46),
+    # NAMED TO SORT AFTER gg_rank_line: siblings draw in hierarchy order, which is sorted
+    # name order here, and as gg_rank_icon it drew UNDER the bar and vanished.
+    "gg_rank_mark":  (18,  89,  44,  47),
+    # The convoys panel's segmented bar, and its fill inside the frame's trough: the
+    # trough is x 18..338, y 8..21 of the 356x29 file, measured off its alpha.
+    "gg_bar_track":  (20,  140, 750, 29),
+    "gg_rep_bar":    (38,  148, 714, 13),
     "gg_card_1":     (20,  170, 750, 120),
     "gg_card_2":     (20,  300, 750, 120),
     "gg_card_3":     (20,  430, 750, 120),
@@ -80,6 +89,9 @@ GTAB_W, GTAB_STEP = 38, 48
 for _i, _name in enumerate(GUILD_BTNS):
     PANEL_LAYOUT[_name] = (256 + _i * GTAB_STEP, 596, GTAB_W, GTAB_W)
 PANEL_LAYOUT["gg_gsel"] = (256, 590, GTAB_W, 4)
+# The Hell-Forge's bronze button bar behind the six, 16px past each end, drawn first
+# (gg_gbar sorts before gg_gtab_*) so the buttons sit on it.
+PANEL_LAYOUT["gg_gbar"] = (240, 598, 310, 34)
 # THE LOG'S FILTERS, in the band the reputation bar and its track use on the Guilds tab -
 # both are hidden on the Log, and the first of its 21 lines starts at y=168.
 LOG_FILTERS = ["gg_lf_all", "gg_lf_mine", "gg_lf_rivals", "gg_lf_ranks"]
@@ -99,12 +111,17 @@ CARD_W, CARD_H = 750, 120
 # a smudge, and the card has the room - 68 square sits inside a 120-tall card with 26
 # clear above and below. The text column moves from x=72 to x=92 to clear it; both
 # still stop short of the cost/buy column at x=596.
+#
+# NOW IN CA'S ROUND BRONZE HOLDER (CARD_ICON_LAYERS), 100x106 at the file's 62:66, with
+# the glyph at 62 in its dark disc - still a downscale of the 74px source. The text
+# column moves to x=114 to clear it; the description still ends at 594, short of 596.
+# The price sits on the Hell-Forge's small title plate, 30 tall as CA draws it.
 CARD_LAYOUT = {
-    "card_icon": (14, 26, 68, 68),
-    "card_name": (92, 12, 440, 26),
-    "card_desc_1": (92, 44, 480, 20),
-    "card_desc_2": (92, 64, 480, 20),
-    "card_cost": (596, 12, 138, 26),
+    "card_icon": (8, 7, 100, 106),
+    "card_name": (114, 12, 440, 26),
+    "card_desc_1": (114, 44, 480, 20),
+    "card_desc_2": (114, 64, 480, 20),
+    "card_cost": (596, 10, 138, 30),
     "card_buy":  (596, 60, 138, 38),
 }
 
@@ -345,33 +362,146 @@ PANEL_LAYERS = [
      "offset": (0, 0), "dw": 0, "dh": 0, "margin": 30, "tile": True, "dock": None},
 ]
 
-# A CARD IS A RECESS, NOT A BUTTON. The card used to be one 750x120 button plate,
-# and a button texture stretched that far is a smear - it read as unfinished more
-# than anything else on the panel. Same body-then-border pair as the panel frame, at
-# a tighter border margin so the cards nest inside it.
-CARD_LAYERS = [
-    {"path": "ui/skins/default/panel_back_tile.png",
-     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 5, "tile": True, "dock": None},
-    {"path": "ui/skins/default/panel_back_border.png",
-     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 18, "tile": True, "dock": None},
+# ------------------------------------------------ the Chaos Dwarf dressing ---
+# CA'S OWN CHAOS DWARF FRAMES, referenced out of its ui packs and never copied in, and
+# every margin copied from the component that draws the same file in CA's own panel -
+# hellforge_panel_unit_caps_tab, hellforge_panel_category_tab, hellforge_panel_main and
+# military_convoys. CA reuses these outside the Chaos Dwarf panels too: Nurgle's plague
+# panel wears sub_title.png and the High Elves' Valiant Imperatives the large square
+# button, so a guild panel wearing them is the house style rather than a borrowing.
+HF = "ui/skins/default/dlc23_chd_hell_forge/"
+
+# THE TITLE PLATE. CA's panels name ui/skins/default/panel_title.png and the game swaps
+# in the player's own culture's copy - ui/skins/wh3_dlc23_chd_chaos_dwarfs/panel_title.png
+# is the spiked one the Hell-Forge shows, and fifteen cultures ship their own. So this is
+# the DEFAULT path on purpose: a Dwarf player gets the Dwarf plate, as on CA's panels.
+# Margins are the Hell-Forge header's, which draws this file at 600 wide.
+TITLE_PLATE = "ui/skins/default/panel_title.png"
+TITLE_LAYERS = [
+    {"path": TITLE_PLATE, "offset": (0, 0), "dw": 0, "dh": 0,
+     "margin": (0, 165, 0, 165), "tile": True, "dock": None},
 ]
 
-# The empty half of the reputation track. Without it a faction with no standing sees
-# a gap where the bar should be, which reads as a missing element rather than zero.
+# THE HEADER BAR - the Hell-Forge's unit-cap group title, the bar "Melee Infantry" sits
+# on. Its dark band is rows 9..32 of 54 and the rest is a bronze strip, so the text is
+# lifted by RANK_TY: bottom padding 11 moves a Center-aligned line up 5.5px, onto the
+# band's middle at 46px tall. RANK_TX clears the round holder over the bar's left end.
+RANK_BAR_LAYERS = [
+    {"path": HF + "cap_title_holder.png", "offset": (0, 0), "dw": 0, "dh": 0,
+     "margin": (0, 50, 0, 60), "tile": True, "dock": None},
+]
+RANK_TX, RANK_TY = "50.00,0.00", "0.00,11.00"
+
+# A GLYPH IN CA'S ROUND HOLDER, placed by OFFSET WITH NO DOCKPOINT: on an image the two
+# are cumulative (docs/CUSTOM_UI.md), so an inset plus dock Center draws the glyph off
+# centre by its own inset. The holder's dark disc is 43 of its 62 wide, centred at
+# 0.484 across and 0.455 down, measured off the file; the glyph is sized to sit inside it.
+ICON_HOLDER = HF + "cap_category_iconm_holder.png"
+
+
+def holder_layers(w, h, glyph, path):
+    """The round holder at w x h and a glyph-px square centred on its disc."""
+    ox = int(round(0.484 * w - glyph / 2.0))
+    oy = int(round(0.455 * h - glyph / 2.0))
+    return [
+        {"path": ICON_HOLDER, "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0,
+         "dock": None},
+        {"path": path, "offset": (ox, oy), "dw": glyph - w, "dh": glyph - h,
+         "margin": 0, "dock": None},
+    ]
+
+
+# A CARD IS A RECESS, NOT A BUTTON - and now it is the Hell-Forge's own recess, the
+# bronze plate behind each unit group, sliced left and right only as CA slices it.
+# Measured mean luminance 52 (top 75): FFF8D7 text on it is about 11:1 and the C9BFA8
+# descriptions about 5:1 at the brightest edge.
+#
+# A SERVICE THAT IS RUNNING LIGHTS ITS CARD (asked for 2026-09-26, after the rites panel's
+# look): CA's own "active" art over the plate - the Hell-Forge's red heat glow behind the
+# icon and the Tower of Zharr's glowing rim around the card. Both layers ship as CLEAR -
+# our own fully transparent file - and the Lua swaps the glow in by index, so a card is
+# unlit unless the Lua says otherwise, including the pick card built from this template.
+#
+# NOT CA's icon_blank.png, which this first used. It is 24x24, and the rim layer's
+# 9-slice margin is 40: a margin larger than its texture samples OUTSIDE it, into
+# whatever the game's texture atlas holds beside it. SEEN IN GAME 2026-09-26 as streaks,
+# arrows and red and blue bars across every card on three tabs - and invisible in the
+# preview, whose renderer reads the PNG alone and has no atlas to bleed from.
+# check_margins_fit_textures() now refuses any layer whose margins exceed a texture it
+# can hold, including the ones the Lua swaps in.
+CLEAR = "ui/campaign ui/derpy_gg_icons/clear.png"
+CLEAR_PX = 128
+CARD_OFF = CLEAR
+CARD_HEAT = HF + "heat_glow.png"
+CARD_RIM = "ui/skins/default/dlc23_tower_of_zharr/district_complete_glow_02.png"
+CARD_LAYERS = [
+    {"path": HF + "cap_group_background.png", "offset": (0, 0), "dw": 0, "dh": 0,
+     "margin": (0, 24, 0, 24), "tile": True, "dock": None},
+    # From the card's left edge to twice the icon holder's middle (58): the glow's bright
+    # centre sits behind the name, where the eye lands, and its left half behind the holder.
+    # Nothing may draw outside the card - the engine does not clip.
+    {"path": CARD_OFF, "offset": (0, 0), "dw": 300 - CARD_W, "dh": 0, "margin": 0,
+     "dock": None},
+    {"path": CARD_OFF, "offset": (0, 0), "dw": 0, "dh": 0, "margin": (40, 40, 40, 40),
+     "dock": None},
+]
+CARD_HEAT_INDEX, CARD_RIM_INDEX = 1, 2
+
+# THE REPUTATION TRACK is the convoys panel's segmented bronze bar, and the fill is its
+# own fill texture drawn in the frame's trough (gg_rep_bar sits inside gg_bar_track).
+# The middle tiles, as CA's does, so the segment marks keep their spacing at 750 wide.
 REP_TRACK_LAYERS = [
-    {"path": "ui/skins/default/1x1_blank_white.png",
-     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "colour": "#00000099",
+    {"path": "ui/skins/default/dlc23_chd_military_convoys/"
+             "military_convoys_completed_convoys_bar.png",
+     "offset": (0, 0), "dw": 0, "dh": 0, "margin": (0, 20, 0, 20), "tile": True,
      "dock": None},
 ]
 
 # The per-guild glyph on each card. The file ships ONE placeholder and the campaign
 # Lua swaps it per service with SetImagePath - the card is a single template used by
 # all six guilds, so the icon cannot be baked in. GGUI.GUILD_ICON holds the real
-# mapping and check() proves every path in it exists.
-CARD_ICON_LAYERS = [
-    {"path": "ui/campaign ui/effect_bundles/income.png",
-     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "dock": "Center"},
+# mapping and check() proves every path in it exists. The glyph is image CARD_ICON,
+# over the holder; GGUI.CARD_ICON_INDEX must say the same, which check() pins.
+CARD_GLYPH = 62
+CARD_ICON_LAYERS = holder_layers(CARD_LAYOUT["card_icon"][2], CARD_LAYOUT["card_icon"][3],
+                                 CARD_GLYPH, "ui/campaign ui/effect_bundles/income.png")
+CARD_ICON = 1
+
+# The same holder over the header bar's left end, repainted to the guild on screen.
+RANK_GLYPH = 28
+RANK_ICON_LAYERS = holder_layers(PANEL_LAYOUT["gg_rank_mark"][2],
+                                 PANEL_LAYOUT["gg_rank_mark"][3], RANK_GLYPH,
+                                 "ui/campaign ui/derpy_gg_icons/brass.png")
+
+# The price, on the Hell-Forge's small title plate, drawn at the full box. The plate's
+# art stops at row 24 of 30 (the rest is shadow), so its middle is ~2px above the box's -
+# and so is the game font's, which draws a Center-aligned line high. A 3px drop that
+# centred the plate on the box put the number on its top rim, SEEN IN GAME 2026-09-26.
+COST_LAYERS = [
+    {"path": HF + "sub_title.png", "offset": (0, 0), "dw": 0, "dh": 0,
+     "margin": (0, 12, 0, 12), "tile": True, "dock": None},
 ]
+
+# The bronze bar the six guild buttons sit on, as the Hell-Forge's category buttons do.
+GBAR_LAYERS = [
+    {"path": HF + "buttons_holder.png", "offset": (0, 0), "dw": 0, "dh": 0,
+     "margin": (0, 20, 0, 20), "tile": True, "dock": None},
+]
+
+# THE TABS: the Hell-Forge's large square button. Sliced LEFT AND RIGHT ONLY, so it
+# squashes vertically as one picture. Its frame is rows 3..10 and 69..78 of 82, and
+# slicing those at full size left 12px of red at 34px tall - SEEN IN GAME 2026-09-26: the
+# caption ran over both frame lines. Squashed, the frames are 3-4px and the red is ~24px.
+# The middle stretches rather than tiles, so the gradient keeps its shading.
+# The open tab wears _selected, set from GGUI.TAB_PLATE by the Lua - the file cannot
+# know which tab is open.
+TAB_PLATE = HF + "button_square_extra_large_%s.png"
+TAB_STATES = ("active", "hover", "selected", "selected_hover")
+
+
+def tab_plate(state):
+    return [{"path": TAB_PLATE % state, "offset": (0, 0), "dw": 0, "dh": 0,
+             "margin": (0, 12, 0, 12), "dock": None}]
 
 # The same one-placeholder idea for the Leaderboard row's glyph, repainted per guild.
 ROW_ICON_LAYERS = [
@@ -477,15 +607,12 @@ def plate(h, state):
              "margin": 8, "dock": None}]
 
 
-TAB_LAYERS = plate(34, "active")
-TAB_HOVER = plate(34, "hover")
-# A progress bar, not a button: a flat tinted pixel stretched to width. The Exchange
-# draws its sparkline bars the same way, and for the same reason - a decorative
-# banner texture sliced this thin reads as a smudge rather than a bar.
+# The convoys bar's own fill, 32x13 and flat along its length, so stretching it to the
+# fraction earned is exact. The Lua narrows the component; the image follows it.
 REP_BAR_LAYERS = [
-    {"path": "ui/skins/default/1x1_blank_white.png",
-     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "colour": "#C8A05AFF",
-     "dock": None},
+    {"path": "ui/skins/default/dlc23_chd_military_convoys/"
+             "military_convoys_completed_convoys_bar_fill.png",
+     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "dock": None},
 ]
 
 
@@ -529,6 +656,13 @@ def _panel():
                   "tx": "-2.00,0.00", "ty": "-1.00,0.00"}
         elif name == "gg_gsel":
             kw = {"layers": GSEL_LAYERS}
+        elif name == "gg_gbar":
+            kw = {"layers": GBAR_LAYERS}
+        elif name == "gg_rank_mark":
+            kw = {"layers": RANK_ICON_LAYERS}
+        elif name in TABS:
+            kw = dict(BTN_TEXT, layers=tab_plate("active"), hover=tab_plate("hover"),
+                      interactive=True, sound=SOUND_TAB)
         elif name == "gg_close":
             # A cross, not a caption: no text block, so there is nothing to write
             # onto it and nothing that can vanish off it.
@@ -550,9 +684,14 @@ def _panel():
         elif name == "gg_crest":
             kw = {"layers": CREST_LAYERS}
         elif name == "gg_title":
-            # The largest bold header CA has, centred with no side offset.
-            kw = {"text": True, "size": 24, "align": "Center", "valign": "Center",
+            # The largest bold header CA has, centred with no side offset, on CA's plate.
+            kw = {"layers": TITLE_LAYERS,
+                  "text": True, "size": 24, "align": "Center", "valign": "Center",
                   "fontcat": "header_24_bold", "tx": "0.00,0.00", "ty": "0.00,0.00"}
+        elif name == "gg_rank_line":
+            kw = {"layers": RANK_BAR_LAYERS,
+                  "text": True, "size": 12, "align": "Left", "valign": "Center",
+                  "fontcat": "body_12", "tx": RANK_TX, "ty": RANK_TY}
         elif name.startswith("gg_help_"):
             kw = {"text": True, "size": 12, "align": "Left", "valign": "Center",
                   "fontcat": "body_12", "colour": "#C9BFA8FF",
@@ -590,7 +729,8 @@ def _card():
                   "fontcat": "header_14", "tx": LABEL_TX, "ty": LABEL_TY}
         elif name == "card_cost":
             # The number reads better against the Buy button below it when centred.
-            kw = {"text": True, "size": 14, "align": "Center", "valign": "Center",
+            kw = {"layers": COST_LAYERS,
+                  "text": True, "size": 14, "align": "Center", "valign": "Center",
                   "tx": "0.00,0.00", "ty": "0.00,0.00"}
         else:
             kw = {"text": True, "size": 14, "align": "Left", "valign": "Center",
@@ -1148,6 +1288,100 @@ def check_opener_crest(lua):
     return out
 
 
+_TEX_SIZES = {}
+
+
+def tex_size(path):
+    """(w, h) of a texture: ours from where it is staged, CA's out of the ui packs."""
+    if path in _TEX_SIZES:
+        return _TEX_SIZES[path]
+    from PIL import Image
+    local = os.path.join(ROOT, "Modding Files", "pack", path.replace("/", os.sep))
+    size = None
+    if os.path.isfile(local):
+        size = Image.open(local).size
+    else:
+        import read_pack_index as RP
+        from read_vanilla_loc import _decompress
+        game = r"F:\SteamLibrary\steamapps\common\Total War WARHAMMER III\data"
+        for pk in ("ui.pack", "ui2.pack", "ui3.pack", "ui_3.pack"):
+            fp = os.path.join(game, pk)
+            if not os.path.isfile(fp):
+                continue
+            for _p, comp, blob in RP.read(fp, path):
+                if _p == path:
+                    size = Image.open(io.BytesIO(_decompress(blob) if comp else blob)).size
+                    break
+            if size:
+                break
+    _TEX_SIZES[path] = size
+    return size
+
+
+def _margins(lay):
+    m = lay.get("margin", 0)
+    return tuple(m) if isinstance(m, (tuple, list)) else (m,) * 4
+
+
+def check_margins_fit_textures():
+    """A 9-slice margin must fit inside EVERY texture its layer can show.
+
+    Top+bottom under the texture's height and left+right under its width. Past that the
+    engine samples outside the image, into its neighbours in the texture atlas - streaks
+    and fragments of other panels' art across the component, which is what the card's
+    rim layer drew over every card on 2026-09-26 with a 40px margin on CA's 24px
+    icon_blank. The preview cannot show it: it rasterises the PNG alone.
+
+    The layers the Lua repaints are checked against what it paints in as well as what the
+    file ships - the tab plate's four states, the card's two glows.
+    """
+    out = []
+    pairs = []
+    for fname, builder, _c in FILES:
+        for c in builder().walk():
+            for lay in EU._spec(c.kw, "layers") + EU._spec(c.kw, "hover"):
+                pairs.append((fname, c.name, lay, lay["path"]))
+    for st in TAB_STATES:
+        pairs.append(("derpy_gg_panel.twui.xml", "tabs", tab_plate(st)[0], TAB_PLATE % st))
+    pairs.append(("derpy_gg_card.twui.xml", "card heat", CARD_LAYERS[CARD_HEAT_INDEX],
+                  CARD_HEAT))
+    pairs.append(("derpy_gg_card.twui.xml", "card rim", CARD_LAYERS[CARD_RIM_INDEX],
+                  CARD_RIM))
+    for fname, name, lay, path in pairs:
+        t, r, b, lft = _margins(lay)
+        if not (t or r or b or lft):
+            continue
+        size = tex_size(path)
+        if size is None:
+            out.append("%s: %s's texture %s could not be read to check its margins"
+                       % (fname, name, path))
+            continue
+        w, h = size
+        if lft + r >= w or t + b >= h:
+            out.append("%s: %s has margins %r on %s, which is only %dx%d - the slices "
+                       "reach outside the texture and draw its atlas neighbours"
+                       % (fname, name, (t, r, b, lft), path.rsplit("/", 1)[-1], w, h))
+    # And CLEAR must be what it says: fully transparent and as large as it claims.
+    try:
+        from PIL import Image
+        im = Image.open(os.path.join(ROOT, "Modding Files", "pack",
+                                     CLEAR.replace("/", os.sep))).convert("RGBA")
+        if im.size != (CLEAR_PX, CLEAR_PX) or im.getchannel("A").getextrema() != (0, 0):
+            out.append("%s is %r with alpha %r - it must be %dpx and fully transparent"
+                       % (CLEAR, im.size, im.getchannel("A").getextrema(), CLEAR_PX))
+    except OSError:
+        out.append("%s is not staged - run --write" % CLEAR)
+    return out
+
+
+def write_clear():
+    """Our fully transparent 'off' texture. Written, not copied: it is nobody's art."""
+    from PIL import Image
+    path = os.path.join(ROOT, "Modding Files", "pack", CLEAR.replace("/", os.sep))
+    Image.new("RGBA", (CLEAR_PX, CLEAR_PX), (0, 0, 0, 0)).save(path)
+    return path
+
+
 def check():
     """Refuses to write on anything that is a silent non-draw in game."""
     out = []
@@ -1272,7 +1506,8 @@ def check():
             m = re.search(r"GGUI\.GUILD_ICON\s*=\s*\{(.*?)\n\}",
                           io.open(lua_i, encoding="utf-8").read(), re.S)
             if m:
-                box = CARD_LAYOUT["card_icon"][2]
+                # The GLYPH's size, not the card_icon box's: the box is the holder now.
+                box = CARD_GLYPH
                 for _g, _p in re.findall(r'(\w+)\s*=\s*"([^"]+)"', m.group(1)):
                     drawn.append((_p, box))
         # EVERY FLAVOUR'S COPY is drawn in the same box as ours.
@@ -1510,6 +1745,7 @@ def check():
                 out.append("%s: DE15 is RETIRED and must not be reused" % fname)
 
     out += check_scroll_parts(files)
+    out += check_margins_fit_textures()
 
     # THE CREST FALLBACK MUST RESOLVE. It is drawn with [[img:]] markup rather than as a
     # component image, and that markup fails the same way an imagepath does: a path the
@@ -1648,12 +1884,19 @@ def check():
     # overscanned by 16px to crop the art's dead outer rows and the result was a black ring
     # around the OUTSIDE of the gold frame, painted onto the campaign map. Every deliberate
     # inset in this file is negative dw/dh, which is safe for the same reason this is not.
-    for lname, layers, (cw, ch) in (("panel", PANEL_LAYERS, (PANEL_W, PANEL_H)),
-                                    ("card", CARD_LAYERS, (CARD_W, CARD_H)),
-                                    ("card icon", CARD_ICON_LAYERS, (68, 68)),
-                                    ("row icon", ROW_ICON_LAYERS,
-                                     tuple(ROW_LAYOUT["row_icon"][2:])),
-                                    ("row", ROW_LAYERS, (ROW_W, ROW_H))):
+    sized = (("panel", PANEL_LAYERS, (PANEL_W, PANEL_H)),
+             ("card", CARD_LAYERS, (CARD_W, CARD_H)),
+             ("card icon", CARD_ICON_LAYERS, tuple(CARD_LAYOUT["card_icon"][2:])),
+             ("card cost", COST_LAYERS, tuple(CARD_LAYOUT["card_cost"][2:])),
+             ("rank icon", RANK_ICON_LAYERS, tuple(PANEL_LAYOUT["gg_rank_mark"][2:])),
+             ("rank bar", RANK_BAR_LAYERS, tuple(PANEL_LAYOUT["gg_rank_line"][2:])),
+             ("title", TITLE_LAYERS, tuple(PANEL_LAYOUT["gg_title"][2:])),
+             ("rep track", REP_TRACK_LAYERS, tuple(PANEL_LAYOUT["gg_bar_track"][2:])),
+             ("guild bar", GBAR_LAYERS, tuple(PANEL_LAYOUT["gg_gbar"][2:])),
+             ("tab", tab_plate("active"), (TAB_W, TAB_H)),
+             ("row icon", ROW_ICON_LAYERS, tuple(ROW_LAYOUT["row_icon"][2:])),
+             ("row", ROW_LAYERS, (ROW_W, ROW_H)))
+    for lname, layers, (cw, ch) in sized:
         for lay in layers:
             ox, oy = lay.get("offset", (0, 0))
             w, h = cw + lay.get("dw", 0), ch + lay.get("dh", 0)
@@ -1662,6 +1905,75 @@ def check():
                            "the engine does not clip, so this lands on whatever is behind "
                            "the panel" % (lname, lay["path"].rsplit("/", 1)[-1],
                                           ox, oy, w, h, cw, ch))
+            # A NINE-SLICE WHOSE EDGES MEET HAS NO MIDDLE: the corners overlap and the
+            # frame draws folded over itself. Top+bottom must stay under the drawn
+            # height and left+right under the drawn width.
+            m = lay.get("margin", 0)
+            t, r, b, lft = tuple(m) if isinstance(m, (tuple, list)) else (m,) * 4
+            if t + b >= h or lft + r >= w:
+                out.append("%s layer %s has margins %r on a %dx%d image - the slices "
+                           "overlap" % (lname, lay["path"].rsplit("/", 1)[-1],
+                                        (t, r, b, lft), w, h))
+
+    # DRAW ORDER IS NAME ORDER. Siblings are declared sorted, and a later sibling draws
+    # over an earlier one - the holder must land on the bar, the bar under the buttons.
+    order = sorted(PANEL_LAYOUT)
+    for under, over in (("gg_rank_line", "gg_rank_mark"), ("gg_gbar", GUILD_BTNS[0])):
+        if order.index(under) > order.index(over):
+            out.append("%s sorts after %s, so it draws on top of it" % (under, over))
+
+    # THE LUA REPAINTS THESE BY INDEX, so each index is pinned to the layer order here,
+    # the way GUILD_BTN_ICON is: an index one off paints the glyph over the holder and
+    # leaves the placeholder showing, with nothing in the log.
+    lua_ix = os.path.join(ROOT, "Modding Files", "pack", "script", "campaign", "mod",
+                          "zzz_derpy_guilds_ui.lua")
+    if os.path.isfile(lua_ix):
+        src = io.open(lua_ix, encoding="utf-8").read()
+        rank_glyph = len(RANK_ICON_LAYERS) - 1
+        for const, want in (("CARD_ICON_INDEX", CARD_ICON), ("RANK_ICON_INDEX", rank_glyph)):
+            m = re.search(r"GGUI\.%s\s*=\s*(\d+)" % const, src)
+            if not m or int(m.group(1)) != want:
+                out.append("GGUI.%s is %s but the glyph is image %d"
+                           % (const, m and m.group(1), want))
+        if CARD_ICON_LAYERS[CARD_ICON]["path"] == ICON_HOLDER:
+            out.append("CARD_ICON points at the holder, not the glyph")
+        # THE LIT CARD: the two glow layers by index, and the three paths the Lua swaps
+        # between. Off must be what the file ships, or every card starts lit.
+        for const, want in (("CARD_HEAT_INDEX", CARD_HEAT_INDEX),
+                            ("CARD_RIM_INDEX", CARD_RIM_INDEX)):
+            m = re.search(r"GGUI\.%s\s*=\s*(\d+)" % const, src)
+            if not m or int(m.group(1)) != want:
+                out.append("GGUI.%s is %s but that glow is card image %d"
+                           % (const, m and m.group(1), want))
+            if CARD_LAYERS[want]["path"] != CARD_OFF:
+                out.append("card image %d ships %s, not the blank - the card starts lit"
+                           % (want, CARD_LAYERS[want]["path"]))
+        for const, want in (("CARD_OFF", CARD_OFF), ("CARD_HEAT", CARD_HEAT),
+                            ("CARD_RIM", CARD_RIM)):
+            m = re.search(r'GGUI\.%s\s*=\s*"([^"]+)"' % const, src)
+            if not m or m.group(1) != want:
+                out.append("GGUI.%s is %r but the generator says %r"
+                           % (const, m and m.group(1), want))
+        try:
+            assets = _assets()
+            for p in (CARD_HEAT, CARD_RIM):
+                if p not in assets:
+                    out.append("card glow %s is in no ui pack - a running service's card "
+                               "would draw a blank square" % p)
+        except Exception as e:                                      # noqa: BLE001
+            out.append("could not verify the card glows: %r" % (e,))
+        # The open tab's plate is written by the Lua from its own copy of the pattern.
+        m = re.search(r'GGUI\.TAB_PLATE\s*=\s*"([^"]+)"', src)
+        if not m or m.group(1) != TAB_PLATE:
+            out.append("GGUI.TAB_PLATE is %r but the tabs draw %r"
+                       % (m and m.group(1), TAB_PLATE))
+        try:
+            assets = _assets()
+            for st in TAB_STATES:
+                if TAB_PLATE % st not in assets:
+                    out.append("tab plate %s is in no ui pack" % (TAB_PLATE % st))
+        except Exception as e:                                      # noqa: BLE001
+            out.append("could not verify the tab plates: %r" % (e,))
 
     return out
 
@@ -1670,7 +1982,7 @@ def write_ui(outdir=None):
     outdir = outdir or OUT
     if not os.path.isdir(outdir):
         os.makedirs(outdir)
-    written = []
+    written = [write_clear()]
     for fname, text in sorted(build_xml().items()):
         path = os.path.join(outdir, fname)
         with io.open(path, "w", encoding="utf-8", newline="\n") as fh:

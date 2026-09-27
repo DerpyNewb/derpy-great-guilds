@@ -3,6 +3,68 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-09-27 - build 7AB4585D
+
+MD5 `7AB4585DC0B61C952AA5F151A69091D8`, 32,469,435 bytes.
+
+- **The Guilds button keeps to the end of the top bar.** The bar grows and shrinks as
+  effects come and go. The button used to stay where the end had been until the next
+  turn and then jump; now it moves with the bar as soon as the bar changes.
+
+- **The Guilds button is there from the first turn.** On a campaign with a long opening it gave
+  up waiting before the top bar had settled and only appeared at the next turn.
+
+- **Bounties no longer pay you for the war you were already fighting.** A guild never asks
+  for your front line. It names land or a lord far from your borders and armies, or one of
+  a faction you are at peace with.
+- **A bounty on a faction at peace means war, and pays for it:** twice the gold and half as
+  much Reputation again. Allies, pacts and vassals are never named, and an offer is withdrawn if you make peace or a
+  pact with its target before you take it.
+- **Taking a bounty puts up favour with that guild.** It is the number on the card's plate.
+  You get it back when you finish, and lose it if you fail or hand it back. The amount is a
+  setting in the mod's options.
+- **Every guild has a job as well as a fight:** hold a sum of gold, raise a champion,
+  research a named technology or take captives in battle.
+- **Every guild can ask you to build one of its own buildings**, and only ones you can build
+  in an ordinary settlement: never one that needs a resource, a port, a landmark or a horde.
+- **Hero work:** the Daemonsmiths want a settlement sabotaged, the Immortals want an army
+  harried, and the Khanate wants a named lord or hero wounded or killed. Any hero can do it,
+  including Dwarf and Empire heroes, and the card counts your progress.
+
+## 2026-09-26 - build 7F9D5CF2
+
+MD5 `7F9D5CF2E71EA5788DBC20AC21E16DBA`, 32,266,153 bytes.
+
+- **No more streaks across the cards.** Build 1A9B7828 drew fragments of other game art
+  over every card on the Guilds, Bounties and Court tabs.
+- **A card with no price no longer shows an empty price bar**, for example the Court's
+  demand and patron cards.
+
+## 2026-09-26 - build 1A9B7828
+
+MD5 `1A9B7828529AAD5F1784FB99F2D78362`, 32,265,300 bytes.
+
+- **A service that is running lights up its card**, with the red glow the Hell-Forge and
+  the Tower of Zharr use for something active.
+- **Every Guild effect now has an icon** in the game's effect lists: the guild's mark on
+  the same teal disc as the game's own effects. Before this they showed no picture.
+- **Tab names and prices fit inside their plates.** They ran over the edges in the
+  previous build.
+
+## 2026-09-26 - build 54E67BC9
+
+MD5 `54E67BC9EA44A86EF81FF7A3C6586907`, 32,157,758 bytes.
+
+- **The panel wears the Chaos Dwarf frames the Hell-Forge uses.** These are the header bar,
+  the round bronze holders around the guild icons, the bronze service cards, the price
+  plates, and the large square tabs, with a distinct look for the open one. The reputation
+  bar is now the convoy panel's segmented bar, and the six guild buttons sit on a bronze
+  bar.
+- **The title sits on the game's title plate.** For a Chaos Dwarf player it should be the
+  spiked Chaos Dwarf plate (seen in game), and other races should get their own, the way
+  the game's own panels do.
+- All of it is the game's own art, used where it already is. The mod adds no new images.
+
 ## 2026-09-25 - build DA1C0218
 
 MD5 `DA1C0218EA4134C3CF72A5755455D836`, 32,151,169 bytes.

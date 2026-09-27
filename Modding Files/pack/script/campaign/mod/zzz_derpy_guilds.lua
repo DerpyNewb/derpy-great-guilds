@@ -665,17 +665,70 @@ GG.BOUNTY_OFFER_LIFE = 6     -- turns an UNTAKEN offer stays before it is withdr
 -- evaluates, so the string is what lives here.
 GG.BOUNTY_KINDS = {
     region_take = {otype = "CAPTURE_REGIONS", obj = "region %s",
-                   gold = 3000, target = "region"},
+                   gold = 3000, target = "region", military = true, family = "bounty"},
     region_sack = {otype = "RAZE_OR_SACK_N_DIFFERENT_SETTLEMENTS_INCLUDING",
-                   obj = "region %s;total 1", gold = 2000, target = "region"},
+                   obj = "region %s;total 1", gold = 2000, target = "region",
+                   military = true, family = "bounty"},
     lord_kill   = {otype = "KILL_CHARACTER_BY_ANY_MEANS", obj = "family_member %s",
-                   gold = 1500, target = "lord"},
+                   gold = 1500, target = "lord", military = true, family = "bounty"},
+
+    -- THE JOBS (spec 5). Objective strings copied from CA's generate_*_objective
+    -- helpers in campaign/main_warhammer/victory_objectives_config_utils.lua.
+    job_coffers  = {otype = "HAVE_AT_LEAST_X_MONEY", obj = "total %s",
+                    gold = 1500, target = "none", family = "job", pick = "coffers",
+                    arg = "amount"},
+    job_champion = {otype = "ACHIEVE_CHARACTER_RANK",
+                    obj = "total 1;total2 %s;include_generals",
+                    gold = 2000, target = "none", family = "job", pick = "champion",
+                    valid = "champion", arg = "amount"},
+    job_research = {otype = "RESEARCH_N_TECHS_INCLUDING", obj = "total 1;technology %s",
+                    gold = 2000, target = "tech", family = "job", pick = "research",
+                    valid = "research", arg = "target"},
+    job_captives = {otype = "CAPTURE_X_BATTLE_CAPTIVES", obj = "total %s",
+                    gold = 1500, target = "none", family = "job", pick = "captives",
+                    arg = "amount"},
+    job_build    = {otype = "CONSTRUCT_N_OF_A_BUILDING", obj = "total 1;building_level %s",
+                    gold = 2500, target = "building", family = "build", pick = "build",
+                    valid = "build", arg = "target", with_faction = true},
+
+    -- HERO WORK (spec 5.5): SCRIPTED, completed by the mod off the agent-action events.
+    -- front_ok: the front is where heroes work, and the point is to get them working.
+    hero_sabotage = {otype = "SCRIPTED",
+                     obj = "script_key derpy_gg_hero;override_text mission_text_text_derpy_gg_hero_%s",
+                     gold = 1200, target = "region", family = "hero", shape = "sabotage",
+                     arg = "shape", front_ok = true, needed = 2},
+    hero_harry    = {otype = "SCRIPTED",
+                     obj = "script_key derpy_gg_hero;override_text mission_text_text_derpy_gg_hero_%s",
+                     gold = 1200, target = "lord", family = "hero", shape = "harry",
+                     arg = "shape", front_ok = true, needed = 2},
+    hero_strike   = {otype = "SCRIPTED",
+                     obj = "script_key derpy_gg_hero;override_text mission_text_text_derpy_gg_hero_%s",
+                     gold = 1200, target = "character", family = "job", shape = "strike",
+                     arg = "shape", front_ok = true, needed = 1},
 }
 
 GG.BOUNTIES = {
     brass = "region_take", immortals = "lord_kill", daemonsmiths = "region_sack",
     khanate = "lord_kill", overseers = "region_take", slavers = "region_sack",
 }
+
+-- THE OTHER KINDS EACH GUILD MAY POST, after its military one (spec 5). Mirrored by
+-- BOUNTY_EXTRA in tools/gen_great_guilds.py.
+GG.BOUNTY_EXTRA = {
+    brass        = {"job_coffers", "job_build"},
+    immortals    = {"job_champion", "job_build", "hero_harry"},
+    daemonsmiths = {"job_research", "job_build", "hero_sabotage"},
+    khanate      = {"hero_strike", "job_build"},
+    overseers    = {"job_build"},
+    slavers      = {"job_captives", "job_build"},
+}
+-- Where a job finds its target and whether it still stands; filled further down.
+GG.BOUNTY_PICK = GG.BOUNTY_PICK or {}
+GG.BOUNTY_VALID = GG.BOUNTY_VALID or {}
+
+-- A NEW-WAR offer's premium, as percentages (spec 3.4).
+GG.BOUNTY_WAR_GOLD = 200
+GG.BOUNTY_WAR_REP = 150
 
 GG.bounties = GG.bounties or {}   -- [faction] = { offer, ... }, at most BOUNTY_SLOTS
 
@@ -1696,6 +1749,142 @@ function GG.bounty_pay()
     return n
 end
 
+-- THE STAKE (spec 4): favour put up to take a bounty. A quarter of what it pays in
+-- reputation by default. Spent on take, handed back on success or when the mod itself
+-- voids the offer, lost on failure or hand-back.
+function GG.bounty_stake(rep)
+    local pct = GG.setting("rate_bounty_stake") or 0
+    if pct <= 0 or not rep or rep <= 0 then return 0 end
+    return math.ceil(rep * pct / 100)
+end
+
+-- FAVOUR BACK, AND NOTHING ELSE. Not GG.grant: a grant is also reputation, and also
+-- charges the rival guild, for favour the player already owned. And not capped: it was
+-- theirs before they staked it.
+function GG.refund(faction, guild, amount)
+    if not amount or amount <= 0 then return end
+    GG.state[faction] = GG.state[faction] or blank()
+    local g = GG.state[faction][guild]
+    if g then g.fav = g.fav + amount end
+end
+
+-- EACH FAMILY OF KIND HAS ITS OWN MISSION ROW (spec 6), because the objectives panel
+-- reads the title off the key. One live bounty per guild keeps them from colliding.
+function GG.offer_mission_key(o, faction)
+    local k = o and GG.BOUNTY_KINDS[o.kind]
+    local fam = (k and k.family) or "bounty"
+    return "derpy_gg_" .. fam .. "_" .. tostring(o and o.guild) .. GG.tag(faction)
+end
+
+-- WHO A GUILD MAY SEND YOU AFTER (spec 3.1). Never a friend of yours in any treaty
+-- sense, never a human, never the dead, and never one of the realm or rift factions CA's
+-- own contract script filters out. A question the model cannot answer is a no.
+GG.BOUNTY_BLOCK_BUNDLES = {"wh3_main_bundle_realm_factions",
+                           "wh3_main_bundle_rift_factions"}
+
+function GG.bounty_rival_ok(pf, e)
+    local ok, yes = pcall(function()
+        if e:is_dead() or e:is_human() or e:name() == pf:name() then return false end
+        if pf:military_allies_with(e) or pf:defensive_allies_with(e) then return false end
+        if pf:non_aggression_pact_with(e) then return false end
+        if pf:is_vassal_of(e) or e:is_vassal_of(pf) then return false end
+        if pf:is_ally_vassal_or_client_state_of(e)
+           or e:is_ally_vassal_or_client_state_of(pf) then return false end
+        for i = 1, #GG.BOUNTY_BLOCK_BUNDLES do
+            if e:has_effect_bundle(GG.BOUNTY_BLOCK_BUNDLES[i]) then return false end
+        end
+        return true
+    end)
+    return ok and yes == true
+end
+
+-- war = false: the enemies you already fight (a FAR ENEMY offer).
+-- war = true: factions you have met and are at peace with (a NEW WAR offer).
+function GG.bounty_pool(faction, war)
+    local out = {}
+    pcall(function()
+        local pf = cm:get_faction(faction)
+        if not pf or pf:is_null_interface() then return end
+        local list = war and pf:factions_met() or pf:factions_at_war_with()
+        for i = 0, list:num_items() - 1 do
+            local e = list:item_at(i)
+            if (not war or not pf:at_war_with(e)) and GG.bounty_rival_ok(pf, e) then
+                out[#out + 1] = e
+            end
+        end
+    end)
+    return out
+end
+
+-- THE FRONT LINE IS NEVER A BOUNTY (spec 3.2). Work the war finishes anyway is the
+-- exploit this whole pass removes. A region is on the front when you own it or it
+-- touches one you own; a character when it stands within GG.BOUNTY_FRONT_DIST2 (squared
+-- logical distance) of any settlement or army of yours. 50000 is the figure CA's own
+-- contract script uses for "near" (max_distance_between_player_settlement_and_issuer_capital).
+--
+-- A MODEL THAT CANNOT ANSWER MEANS NOT-ON-THE-FRONT. The offer is then posted, which is
+-- the old behaviour, rather than the board going empty on a question mark.
+GG.BOUNTY_FRONT_DIST2 = 50000
+
+function GG.front_regions(faction)
+    local set = {}
+    pcall(function()
+        local rl = cm:get_faction(faction):region_list()
+        for i = 0, rl:num_items() - 1 do
+            local r = rl:item_at(i)
+            set[r:name()] = true
+            local adj = r:adjacent_region_list()
+            for j = 0, adj:num_items() - 1 do set[adj:item_at(j):name()] = true end
+        end
+    end)
+    return set
+end
+
+function GG.front_points(faction, with_armies)
+    local pts = {}
+    pcall(function()
+        local f = cm:get_faction(faction)
+        local rl = f:region_list()
+        for i = 0, rl:num_items() - 1 do
+            local s = rl:item_at(i):settlement()
+            pts[#pts + 1] = {s:logical_position_x(), s:logical_position_y()}
+        end
+        if not with_armies then return end
+        local mfl = f:military_force_list()
+        for i = 0, mfl:num_items() - 1 do
+            local mf = mfl:item_at(i)
+            if mf:has_general() and not mf:is_armed_citizenry() then
+                local g = mf:general_character()
+                pts[#pts + 1] = {g:logical_position_x(), g:logical_position_y()}
+            end
+        end
+    end)
+    return pts
+end
+
+function GG.nearest_d2(pts, x, y)
+    local best = nil
+    for i = 1, #pts do
+        local dx, dy = pts[i][1] - x, pts[i][2] - y
+        local d = dx * dx + dy * dy
+        if not best or d < best then best = d end
+    end
+    return best
+end
+
+function GG.region_on_front(faction, key)
+    return GG.front_regions(faction)[key] == true
+end
+
+function GG.char_on_front(faction, c)
+    local ok, near = pcall(function()
+        local d = GG.nearest_d2(GG.front_points(faction, true),
+                                c:logical_position_x(), c:logical_position_y())
+        return d ~= nil and d <= GG.BOUNTY_FRONT_DIST2
+    end)
+    return ok and near == true
+end
+
 -- The target, and the faction that owns it. Both are keys or numbers, never display
 -- text: resolving a name here would mean a loc call from a turn handler, which CTDs
 -- at turn 1 and is not catchable by pcall. The panel resolves names at draw time.
@@ -1712,68 +1901,64 @@ end
 -- Every candidate is gathered before one is picked, rather than stopping at the first
 -- hit of the first enemy. That is what makes the dedupe possible at all, and it also
 -- lets the board name several enemy factions instead of always the same one.
-function GG.bounty_target(faction, kind, used)
+function GG.bounty_target(faction, kind, used, war, guild)
     local k = GG.BOUNTY_KINDS[kind]
     if not k then return nil end
     used = used or {}
-    -- Assigned inside the closure below and read after it: an upvalue survives the
-    -- pcall, so the reason the walk came back empty survives with it.
+    if k.pick then return GG.BOUNTY_PICK[k.pick](faction, kind, used, guild) end
     local why = "walk never started"
     local ok, target, owner = pcall(function()
-        local f = cm:get_faction(faction)
-        if not f or f:is_null_interface() then
-            why = "no faction interface"
+        local pool = GG.bounty_pool(faction, war == true)
+        if #pool == 0 then
+            why = war and "nobody met and at peace" or "at war with nobody eligible"
             return nil
         end
-        local wars = f:factions_at_war_with()
-        if not wars then
-            why = "factions_at_war_with returned nothing"
-            return nil
-        end
-        local n = wars:num_items()
-        if n == 0 then
-            why = "at war with nobody, so no guild has anyone to send you after"
-            return nil
-        end
-
+        -- The front is never military work; hero work may be done there (spec 5.5).
+        local front = (not k.front_ok) and GG.front_regions(faction) or {}
         local found = {}
-        for i = 0, n - 1 do
-            local e = wars:item_at(i)
-            if not e:is_dead() then
-                local ename = e:name()
-                if k.target == "region" then
-                    local rl = e:region_list()
-                    for j = 0, rl:num_items() - 1 do
-                        local key = rl:item_at(j):name()
-                        if key and not used[key] then
-                            found[#found + 1] = {key, ename}
+        for i = 1, #pool do
+            local e = pool[i]
+            local ename = e:name()
+            if k.target == "region" then
+                local rl = e:region_list()
+                for j = 0, rl:num_items() - 1 do
+                    local key = rl:item_at(j):name()
+                    if key and not used[key] and not front[key] then
+                        found[#found + 1] = {key, ename}
+                    end
+                end
+            else
+                -- "lord": generals with an army. "character": those, plus heroes.
+                local seen = {}
+                local mfl = e:military_force_list()
+                for j = 0, mfl:num_items() - 1 do
+                    local mf = mfl:item_at(j)
+                    if mf:has_general() and not mf:is_armed_citizenry() then
+                        local gen = mf:general_character()
+                        local cqi = tostring(gen:family_member():command_queue_index())
+                        seen[cqi] = true
+                        if gen:has_region() and not used[cqi]
+                           and (k.front_ok or not GG.char_on_front(faction, gen)) then
+                            found[#found + 1] = {cqi, ename}
                         end
                     end
-                else
-                    local mfl = e:military_force_list()
-                    for j = 0, mfl:num_items() - 1 do
-                        local mf = mfl:item_at(j)
-                        -- is_armed_citizenry filters garrisons, whose general cannot be
-                        -- hunted down on the map. CA's contract script filters the same
-                        -- way, for the same reason.
-                        if mf:has_general() and not mf:is_armed_citizenry() then
-                            local gen = mf:general_character()
-                            if gen:has_region() then
-                                local cqi = tostring(gen:family_member()
-                                                        :command_queue_index())
-                                if not used[cqi] then
-                                    found[#found + 1] = {cqi, ename}
-                                end
-                            end
+                end
+                if k.target == "character" then
+                    local cl = e:character_list()
+                    for j = 0, cl:num_items() - 1 do
+                        local c = cl:item_at(j)
+                        local cqi = tostring(c:family_member():command_queue_index())
+                        if not seen[cqi] and not used[cqi] and c:has_region()
+                           and not c:character_type("general")
+                           and not c:character_type("colonel") then
+                            found[#found + 1] = {cqi, ename}
                         end
                     end
                 end
             end
         end
-
         if #found == 0 then
-            why = "at war with " .. n .. ", but no unused " .. k.target
-                  .. " among them"
+            why = "no unused " .. tostring(k.target) .. " off the front"
             return nil
         end
         local pick = found[GG.roll(#found)]
@@ -1781,12 +1966,31 @@ function GG.bounty_target(faction, kind, used)
     end)
     if ok and target then return target, owner end
     if not ok then
-        -- `target` holds the error message when pcall failed.
         GG.trace("bounty target walk ERRORED for " .. tostring(kind) .. ": "
                  .. tostring(target))
     else
         GG.trace("no " .. tostring(kind) .. " target: " .. tostring(why))
     end
+    return nil
+end
+
+-- WHERE A TARGET STANDS, in logical coordinates, for the distance term. nil when it
+-- has no place on the map (a job, a dead lord).
+function GG.target_pos(o)
+    local k = o and GG.BOUNTY_KINDS[o.kind]
+    if not k then return nil end
+    local ok, x, y = pcall(function()
+        if k.target == "region" then
+            local s = cm:get_region(o.target):settlement()
+            return s:logical_position_x(), s:logical_position_y()
+        elseif k.target == "lord" or k.target == "character" then
+            local c = cm:get_family_member_by_cqi(tonumber(o.target) or 0):character()
+            if not c or c:is_null_interface() then return nil end
+            return c:logical_position_x(), c:logical_position_y()
+        end
+        return nil
+    end)
+    if ok and x then return x, y end
     return nil
 end
 
@@ -1805,22 +2009,45 @@ function GG.bounty_still_valid(faction, o)
     local k = GG.BOUNTY_KINDS[o and o.kind]
     if not k then return false end
     local ok, valid = pcall(function()
+        local f = cm:get_faction(faction)
         if k.target == "region" then
             local r = cm:get_region(o.target)
             if not r or r:is_null_interface() then return false end
             local owner = r:owning_faction()
             if not owner or owner:is_null_interface() then return false end
             if owner:name() == faction then return false end
-            local f = cm:get_faction(faction)
-            if f and not f:is_null_interface() and not f:at_war_with(owner) then
+            local oe = cm:get_faction(owner:name())
+            if f and not f:is_null_interface() and oe and not oe:is_null_interface() then
+                -- A far offer is war work; a new-war offer survives the war it asked for.
+                if o.war ~= 1 and not f:at_war_with(oe) then return false end
+                if not GG.bounty_rival_ok(f, oe) then return false end
+            end
+            if k.military and not o.taken and GG.region_on_front(faction, o.target) then
+                return false
+            end
+            return true
+        elseif k.target == "lord" or k.target == "character" then
+            local fm = cm:get_family_member_by_cqi(tonumber(o.target) or 0)
+            if not fm or fm:is_null_interface() then return false end
+            local c = fm:character()
+            if not c or c:is_null_interface() then return false end
+            -- The same owner rules as a town (spec 3.5): peace ends a far offer, and a
+            -- pact or an alliance ends any offer.
+            local oe = cm:get_faction(c:faction():name())
+            if oe and not oe:is_null_interface() then
+                if oe:name() == faction then return false end
+                if f and not f:is_null_interface() then
+                    if o.war ~= 1 and not f:at_war_with(oe) then return false end
+                    if not GG.bounty_rival_ok(f, oe) then return false end
+                end
+            end
+            if k.military and not o.taken and GG.char_on_front(faction, c) then
                 return false
             end
             return true
         end
-        local fm = cm:get_family_member_by_cqi(tonumber(o.target) or 0)
-        if not fm or fm:is_null_interface() then return false end
-        local c = fm:character()
-        if not c or c:is_null_interface() then return false end
+        -- Jobs (Task 7) answer through their own check.
+        if k.valid then return GG.BOUNTY_VALID[k.valid](faction, o) end
         return true
     end)
     if not ok then return true end
@@ -1883,10 +2110,11 @@ function GG.purge_bounties(faction)
                 -- offer you have TAKEN keeps the price you took it at - that is the
                 -- deal you accepted, and re-pricing it under you would be sharp
                 -- practice from a guild and a bug report from a player.
-                local d = GG.bounty_difficulty(o.kind, o.target)
+                local d = GG.bounty_difficulty(o.kind, o.target, o, faction)
                 if d ~= o.diff then
                     o.diff = d
-                    o.gold, o.rep = GG.bounty_price(o.kind, d)
+                    o.gold, o.rep = GG.bounty_price(o.kind, d, o.war)
+                    o.stake = GG.bounty_stake and GG.bounty_stake(o.rep) or 0
                 end
             end
         end
@@ -1919,7 +2147,8 @@ function GG.drop_bounty_target(cqi)
         for i = #list, 1, -1 do
             local o = list[i]
             local k = GG.BOUNTY_KINDS[o.kind]
-            if not o.taken and o.target == key and k and k.target == "lord" then
+            if not o.taken and o.target == key and k
+               and (k.target == "lord" or k.target == "character") then
                 GG.trace("withdrew " .. tostring(o.guild) .. "'s bounty: target " .. key
                          .. " was destroyed")
                 table.remove(list, i)
@@ -1931,6 +2160,25 @@ function GG.drop_bounty_target(cqi)
         -- every faction on the map, so a saved value per death would be a write per
         -- battle for a board that did not change.
         if hit then GG.save_bounties(faction) end
+        -- A TAKEN STRIKE whose target died is DONE, whoever killed him; a taken HARRY
+        -- has nothing left to harry and is voided. Each after the save above, because
+        -- both calls can reload the board.
+        for _, o in ipairs(GG.bounties[faction] or {}) do
+            local k = GG.BOUNTY_KINDS[o.kind]
+            if o.taken and not o.void and o.target == key and k and k.shape then
+                if k.shape == "strike" then
+                    o.done = o.amount
+                    GG.save_bounties(faction)
+                    local mk = GG.offer_mission_key(o, faction)
+                    pcall(function()
+                        cm:complete_scripted_mission_objective(faction, mk, "derpy_gg_hero", true)
+                    end)
+                elseif k.shape == "harry" then
+                    GG.void_bounty(faction, o)
+                end
+                break
+            end
+        end
     end
     return dropped
 end
@@ -1954,17 +2202,31 @@ GG.BOUNTY_DIFF = {
     per_rank       = 3,     -- a lord's level, which runs 1 to 45ish
     per_unit       = 6,     -- how much army he has around him
     faction_leader = 55,    -- killing the head of a faction
+    per_distance   = 10,    -- one point per ten map units from your nearest settlement
+    distance_max   = 60,    -- ...up to this many (spec 3.4)
 }
 
 -- A dead target, a region this campaign does not have, a lord who left his army: all
 -- read as 0 here, which prices the offer at base. NOT as a refusal - an offer that
 -- cannot be priced is still a perfectly good offer, it is just worth the minimum.
-function GG.bounty_difficulty(kind, target)
+-- `o` and `faction` are optional: a job prices off the offer (Task 7), and a military
+-- target adds its distance from the player's nearest settlement when the faction is known.
+function GG.bounty_difficulty(kind, target, o, faction)
     local k = GG.BOUNTY_KINDS[kind]
     if not k then return 0 end
     local D = GG.BOUNTY_DIFF
     local ok, score = pcall(function()
         local n = 0
+        -- A JOB IS PRICED OFF WHAT IT ASKS (spec 5.3); `amount` holds the ask, the
+        -- tech's tier or the building's rank in its chain.
+        if k.pick then
+            local a = (o and o.amount) or 0
+            if k.pick == "coffers" then return math.floor(a / 100) end
+            if k.pick == "champion" then return 40 end
+            if k.pick == "research" then return a * 15 end
+            if k.pick == "build" then return a * 25 end
+            return 0
+        end
         if k.target == "region" then
             local r = cm:get_region(target)
             if not r or r:is_null_interface() then return 0 end
@@ -1989,6 +2251,19 @@ function GG.bounty_difficulty(kind, target)
         return n
     end)
     if not ok or type(score) ~= "number" or score < 0 then return 0 end
+    -- DISTANCE (spec 3.4): the far edge of your reach pays more. Military only; hero
+    -- work is done where the heroes are, and a job has no place.
+    if k.military and faction then
+        local x, y = GG.target_pos({kind = kind, target = target})
+        if x then
+            local d2 = GG.nearest_d2(GG.front_points(faction, false), x, y)
+            if d2 then
+                local add = math.floor(math.sqrt(d2) / D.per_distance)
+                if add > D.distance_max then add = D.distance_max end
+                score = score + add
+            end
+        end
+    end
     if score > GG.BOUNTY_DIFF_MAX then return GG.BOUNTY_DIFF_MAX end
     return math.floor(score)
 end
@@ -1997,26 +2272,257 @@ end
 -- can run 3x without touching anything else; reputation drives the rank ladder, whose
 -- thresholds are fixed, and bounty reputation is the one grant that does NOT go through
 -- the per-turn cap. Tripling it would make one lucky offer worth a whole rank.
-function GG.bounty_price(kind, diff)
+function GG.bounty_price(kind, diff, war)
     local k = GG.BOUNTY_KINDS[kind]
     if not k then return 0, 0 end
     diff = diff or 0
-    return math.floor(k.gold * (100 + diff) / 100),
-           math.floor(GG.bounty_pay() * (100 + diff / 2) / 100)
+    -- A NEW-WAR offer pays the premium on both (spec 3.4). The reputation line is the
+    -- old `pay * (100 + diff / 2) / 100`, written as one division so it stays integer.
+    local gm, rm = 100, 100
+    if war == 1 then gm, rm = GG.BOUNTY_WAR_GOLD, GG.BOUNTY_WAR_REP end
+    return math.floor(k.gold * (100 + diff) * gm / 10000),
+           math.floor(GG.bounty_pay() * (200 + diff) * rm / 20000)
 end
 
-function GG.make_bounty(faction, guild, turn, used)
-    local kind = GG.BOUNTIES[guild]
-    local k = kind and GG.BOUNTY_KINDS[kind]
+function GG.guild_kinds(guild)
+    local out = {GG.BOUNTIES[guild]}
+    local extra = GG.BOUNTY_EXTRA[guild] or {}
+    for i = 1, #extra do out[#out + 1] = extra[i] end
+    return out
+end
+
+-- ONE OFFER OF ONE KIND, or nil when that kind has nothing to name.
+-- THE WAR ROLL (spec 3.3): a 3 on a d3 asks for a new war, anything else a far enemy,
+-- and each falls back to the other. A 3 rather than a 1 because a campaign with no
+-- random source rolls 1 (GG.roll), and that must keep meaning "the war you are in".
+function GG.make_offer(faction, guild, kind, turn, used)
+    local k = GG.BOUNTY_KINDS[kind]
     if not k then return nil end
-    local target, owner = GG.bounty_target(faction, kind, used)
+    local target, owner, amount, war = nil, nil, nil, 0
+    if k.military then
+        local first = (GG.roll(3) == 3)
+        target, owner = GG.bounty_target(faction, kind, used, first)
+        war = first and 1 or 0
+        if not target then
+            target, owner = GG.bounty_target(faction, kind, used, not first)
+            war = first and 0 or 1
+        end
+    else
+        target, owner, amount = GG.bounty_target(faction, kind, used, false, guild)
+    end
     if not target then return nil end
+    -- Hero work counts successes toward a fixed number (spec 5.5).
+    if k.shape then amount = k.needed end
+    local o = {guild = guild, kind = kind, target = target, owner = owner or "",
+               posted = turn, taken = false, war = war, amount = amount or 0,
+               done = 0, void = false}
     -- diff is stored, not just the prices it produced: the panel names the job's
     -- difficulty from it, and a re-price on a later turn needs no second read.
-    local diff = GG.bounty_difficulty(kind, target)
-    local gold, pay = GG.bounty_price(kind, diff)
-    return {guild = guild, kind = kind, target = target, owner = owner or "",
-            gold = gold, rep = pay, diff = diff, posted = turn, taken = false}
+    o.diff = GG.bounty_difficulty(kind, target, o, faction)
+    o.gold, o.rep = GG.bounty_price(kind, o.diff, war)
+    o.stake = GG.bounty_stake and GG.bounty_stake(o.rep) or 0
+    return o
+end
+
+-- A GUILD'S OFFER THIS TURN: one of its kinds, starting from a rolled one and trying
+-- the rest in order, so a kind with nothing to name gives way to one that has.
+function GG.make_bounty(faction, guild, turn, used)
+    local kinds = GG.guild_kinds(guild)
+    local n = #kinds
+    local start = GG.roll(n)
+    for step = 0, n - 1 do
+        local o = GG.make_offer(faction, guild, kinds[((start + step - 1) % n) + 1],
+                                turn, used)
+        if o then return o end
+    end
+    return nil
+end
+
+function GG.highest_rank(faction)
+    local best = 0
+    pcall(function()
+        local cl = cm:get_faction(faction):character_list()
+        for i = 0, cl:num_items() - 1 do
+            local r = cl:item_at(i):rank() or 0
+            if r > best then best = r end
+        end
+    end)
+    return best
+end
+
+function GG.player_has_building(faction, level)
+    local ok, has = pcall(function()
+        local rl = cm:get_faction(faction):region_list()
+        for i = 0, rl:num_items() - 1 do
+            if rl:item_at(i):building_exists(level) then return true end
+        end
+        return false
+    end)
+    return ok and has == true
+end
+
+-- WHERE A JOB'S TARGET COMES FROM (spec 5.1). Each returns target, owner, amount - or
+-- nil when there is nothing to ask for, and the guild posts another kind instead.
+-- A job with no map target stores its kind key as the target, which keeps the board's
+-- one-target-once rule working without a special case.
+GG.BOUNTY_PICK = {
+    coffers = function(faction, kind)
+        local inc = 0
+        pcall(function() inc = cm:get_faction(faction):net_income() or 0 end)
+        local ask = inc * 5
+        if ask < 5000 then ask = 5000 end
+        ask = math.ceil(ask / 500) * 500
+        return kind, "", ask
+    end,
+    champion = function(faction, kind)
+        local top = GG.highest_rank(faction)
+        if top >= 37 then return nil end
+        return kind, "", top + 4
+    end,
+    research = function(faction, kind, used)
+        local list = GG.BOUNTY_TECHS_FACTION and GG.BOUNTY_TECHS_FACTION[faction]
+        if not list then list = GG.BOUNTY_TECHS and GG.BOUNTY_TECHS[GG.tag(faction)] end
+        if not list then return nil end
+        local f = cm:get_faction(faction)
+        local found = {}
+        for i = 1, #list do
+            local key = list[i][1]
+            local ok, has = pcall(function() return f:has_technology(key) end)
+            if ok and not has and not used[key] then found[#found + 1] = list[i] end
+        end
+        if #found == 0 then return nil end
+        local pick = found[GG.roll(#found)]
+        return pick[1], "", pick[2]
+    end,
+    captives = function(_faction, kind)
+        local n = GG.turn_now() * 10 + 300
+        if n > 1500 then n = 1500 end
+        return kind, "", n
+    end,
+    build = function(faction, kind, used, guild)
+        local per = GG.BOUNTY_BUILDINGS and GG.BOUNTY_BUILDINGS[GG.tag(faction)]
+        local list = per and per[guild]
+        if not list then return nil end
+        local found = {}
+        for i = 1, #list do
+            local lvl = list[i][1]
+            if not used[lvl] and not GG.player_has_building(faction, lvl) then
+                found[#found + 1] = list[i]
+            end
+        end
+        if #found == 0 then return nil end
+        local pick = found[GG.roll(#found)]
+        return pick[1], "", pick[2]
+    end,
+}
+
+GG.BOUNTY_VALID = {
+    champion = function(faction, o) return GG.highest_rank(faction) < (o.amount or 0) end,
+    research = function(faction, o)
+        local ok, has = pcall(function()
+            return cm:get_faction(faction):has_technology(o.target)
+        end)
+        return not (ok and has)
+    end,
+    build = function(faction, o) return not GG.player_has_building(faction, o.target) end,
+}
+
+GG.HERO_SHAPES = {
+    sabotage = {"damage_building", "damage_walls", "assault_garrison"},
+    harry    = {"assault_unit", "block_army", "hinder_replenishment"},
+    strike   = {"wound", "assassinate"},
+}
+
+-- Matched on the agent_actions unique_id, e.g.
+-- wh2_main_agent_action_champion_hinder_settlement_damage_building. The ability alone
+-- would also count scouting and treasure hunts, which share hinder_settlement.
+--
+-- NO PLAIN FLAG ON string.find: in this game it corrupts the string library for the whole
+-- process (check_lua_api.py refuses it). None of these words holds a pattern character -
+-- letters and underscores only - so the pattern match is the same match.
+function GG.hero_action_matches(shape, action_key)
+    if type(action_key) ~= "string" then return false end
+    if string.find(action_key, "convert") then return false end
+    local words = GG.HERO_SHAPES[shape] or {}
+    for i = 1, #words do
+        if string.find(action_key, words[i]) then return true end
+    end
+    return false
+end
+
+-- One successful hero action by `faction` against `target` (a region key or a family
+-- member cqi as a string). SAVED BEFORE THE COMPLETION CALL: that call can raise
+-- MissionSucceeded, whose handler reloads the board from the save and pays.
+function GG.hero_progress(faction, action_key, target, won)
+    if not won or target == nil then return nil end
+    local list = GG.bounties[faction]
+    if not list then return nil end
+    for i = 1, #list do
+        local o = list[i]
+        local k = GG.BOUNTY_KINDS[o.kind]
+        if o.taken and not o.void and k and k.shape and o.target == tostring(target)
+           and GG.hero_action_matches(k.shape, action_key) then
+            o.done = (o.done or 0) + 1
+            GG.save_bounties(faction)
+            if o.done == (o.amount or 1) then
+                local key = GG.offer_mission_key(o, faction)
+                pcall(function()
+                    cm:complete_scripted_mission_objective(faction, key, "derpy_gg_hero", true)
+                end)
+            end
+            return o
+        end
+    end
+    return nil
+end
+
+-- THE MOD WITHDRAWS A TAKEN HERO BOUNTY whose target is gone. Flag and save FIRST: the
+-- cancel raises MissionCancelled, whose handler reloads the board and refunds only an
+-- offer it reads as void.
+function GG.void_bounty(faction, o)
+    o.void = true
+    GG.save_bounties(faction)
+    local key = GG.offer_mission_key(o, faction)
+    pcall(function() cm:cancel_custom_mission(faction, key) end)
+end
+
+function GG.hero_target_alive(faction, o)
+    local k = GG.BOUNTY_KINDS[o.kind]
+    local ok, alive = pcall(function()
+        if k.target == "region" then
+            local r = cm:get_region(o.target)
+            if not r or r:is_null_interface() then return false end
+            local owner = r:owning_faction()
+            if owner:is_null_interface() or owner:name() == faction then return false end
+            return cm:get_faction(faction):at_war_with(owner)
+        end
+        local c = cm:get_family_member_by_cqi(tonumber(o.target) or 0):character()
+        if not c or c:is_null_interface() then return false end
+        if k.target == "lord" then return c:has_military_force() end
+        return true
+    end)
+    if not ok then return true end     -- cannot tell: keep the contract
+    return alive == true
+end
+
+-- ONE AT A TIME, RE-READING THE BOARD AFTER EACH: every void can reload it. Called at
+-- turn start AFTER the board is saved (see the turn handler), never from inside
+-- GG.purge_bounties, whose own save afterwards would bring a voided offer back.
+function GG.void_stale_hero_bounties(faction)
+    for _ = 1, GG.BOUNTY_SLOTS do
+        GG.load_bounties(faction)
+        local hit = nil
+        for _, o in ipairs(GG.bounties[faction] or {}) do
+            local k = GG.BOUNTY_KINDS[o.kind]
+            if o.taken and not o.void and k and k.shape and k.shape ~= "strike"
+               and not GG.hero_target_alive(faction, o) then
+                hit = o
+                break
+            end
+        end
+        if not hit then return end
+        GG.void_bounty(faction, hit)
+    end
 end
 
 -- Called once per faction turn. Withdraws stale offers, then fills the board.
@@ -2061,16 +2567,23 @@ end
 function GG.bounty_string(faction, o)
     local k = GG.BOUNTY_KINDS[o.kind]
     if not k then return nil end
+    -- WHAT THE OBJECTIVE IS FILLED WITH: the target key, a number the offer carries
+    -- (a treasury figure, a rank, a count), or a hero shape's own loc stem, tagged per
+    -- race because retag appends the tag to every loc key it ships.
+    local arg = o.target
+    if k.arg == "amount" then arg = tostring(o.amount or 0)
+    elseif k.arg == "shape" then arg = k.shape .. GG.tag(faction) end
+    local body = string.format(k.obj, arg)
+    if k.with_faction then body = "faction " .. faction .. ";" .. body end
     -- CLAN_ELDERS is a vanilla mission_issuers row and the issuer this workspace's
     -- own Chaos Dwarf quests already ship. An unknown issuer fails the string parse,
     -- which raises MissionStringParseErrorEvent and nothing the player can see.
     return "mission{"
-        .. "key " .. GG.bounty_mission_key(o.guild, faction) .. ";"
+        .. "key " .. GG.offer_mission_key(o, faction) .. ";"
         .. "issuer CLAN_ELDERS;"
         .. "turn_limit " .. GG.BOUNTY_TURN_LIMIT .. ";"
         .. "primary_objectives_and_payload{"
-        .. "objective{type " .. k.otype .. ";"
-        .. string.format(k.obj, o.target) .. ";}"
+        .. "objective{type " .. k.otype .. ";" .. body .. ";}"
         .. "payload{money " .. o.gold .. ";}"
         .. "}"
         .. "}"
@@ -2080,8 +2593,24 @@ function GG.take_bounty(faction, index)
     local list = GG.bounties[faction]
     local o = list and list[index]
     if not o or o.taken then return false end
+    -- THE STAKE, spent before anything is marked or issued: a refused spend leaves the
+    -- offer exactly as it was.
+    local stake = o.stake or 0
+    if stake > 0 and not GG.spend(faction, o.guild, stake) then return false end
+    -- COFFERS IS FIXED WHEN TAKEN (spec 5.1): the treasury moves while an offer waits,
+    -- so the figure is what you hold now plus what the guild asked for. `ask` is
+    -- session-only; after the take, `amount` is the full figure the objective and the
+    -- card both need.
+    local kk = GG.BOUNTY_KINDS[o.kind]
+    if kk and kk.pick == "coffers" and not o.ask then
+        o.ask = o.amount
+        pcall(function() o.amount = cm:get_faction(faction):treasury() + o.ask end)
+    end
     local str = GG.bounty_string(faction, o)
-    if not str then return false end
+    if not str then
+        GG.refund(faction, o.guild, stake)
+        return false
+    end
     -- MARKED AND SAVED BEFORE THE ENGINE CALL, NOT AFTER. Marking afterwards is how
     -- one offer issued four missions in the 2026-09-12 session: the trigger can resolve
     -- the mission inside the call that creates it - a KILL_CHARACTER objective naming a
@@ -2093,11 +2622,15 @@ function GG.take_bounty(faction, index)
     o.taken = true
     o.issued = GG.turn_now()
     GG.save_bounties(faction)
+    -- The stake too: the same handler runs GG.load, and a spend held only in memory
+    -- would be thrown away by it.
+    GG.save(faction)
 
     local ok = pcall(function()
         cm:trigger_custom_mission_from_string(faction, str)
     end)
     if not ok then
+        GG.refund(faction, o.guild, stake)
         -- Nothing was issued, so the offer goes back on the board - found again through
         -- GG.bounties rather than through `o`, because the call may have replaced the
         -- list before it threw and clearing the flag on the old one is the fault this
@@ -2107,10 +2640,20 @@ function GG.take_bounty(faction, index)
             if now[i].target == o.target and now[i].guild == o.guild then
                 now[i].taken = false
                 now[i].issued = nil
+                -- A coffers figure goes back to the ask it was built from.
+                if o.ask then now[i].amount, now[i].ask = o.ask, nil end
             end
         end
         GG.save_bounties(faction)
         return false
+    end
+    -- HERO WORK POINTS THE OBJECTIVE AT ITS TARGET, so the objectives panel can zoom there.
+    if kk and kk.shape then
+        local x, y = GG.target_pos(o)
+        if x then
+            local key = GG.offer_mission_key(o, faction)
+            pcall(function() cm:set_scripted_mission_position(key, "derpy_gg_hero", x, y) end)
+        end
     end
     return true
 end
@@ -2123,16 +2666,18 @@ function GG.bounty_done(faction, mission_key)
     if not list then return false end
     for i = #list, 1, -1 do
         local o = list[i]
-        if o.taken and GG.bounty_mission_key(o.guild, faction) == mission_key then
+        if o.taken and GG.offer_mission_key(o, faction) == mission_key then
             -- OFF THE BOARD AND SAVED BEFORE THE PAYOUT, for the reason spelled out in
             -- GG.take_bounty. GG.grant can rank the player up, which shows a message
             -- event; anything that re-enters script from there reloads the board and
             -- puts the offer being paid out back onto it - and the MissionSucceeded
             -- handler saves afterwards, so it would be back for good, unpayable and
             -- unremovable.
-            local guild, rep = o.guild, o.rep or 0
+            local guild, rep, stake = o.guild, o.rep or 0, o.stake or 0
             table.remove(list, i)
             GG.save_bounties(faction)
+            -- The stake comes back as favour, before the reward (spec 4).
+            GG.refund(faction, guild, stake)
             GG.grant(faction, guild, rep, "bounties")
             return true
         end
@@ -2140,8 +2685,10 @@ function GG.bounty_done(faction, mission_key)
     return false
 end
 
--- HANDED BACK. The slot clears and the guild may post again, and there is no penalty -
--- a guild that punishes you for declining work is a guild you would stop dealing with.
+-- HANDED BACK. The slot clears and the guild may post again, and there is no reputation
+-- penalty - a guild that punishes you for declining work is a guild you would stop
+-- dealing with. Since bounties v2 the favour staked to take it is lost, which is the
+-- price of having taken it at all; leaving an offer alone still costs nothing.
 --
 -- THAT REASONING IS ABOUT DECLINING AND IT WAS BEING APPLIED TO FAILING. This function
 -- used to serve both, from one handler registered for MissionFailed and MissionCancelled
@@ -2151,7 +2698,16 @@ end
 -- them". GG.bounty_failed below is that half. Returning the offer rather than a boolean is
 -- what lets the caller price the penalty off the job that was refused.
 function GG.bounty_lost(faction, mission_key)
-    return GG.take_bounty_slot(faction, mission_key) ~= nil
+    return GG.bounty_cancelled(faction, mission_key) ~= nil
+end
+
+-- CANCELLED: handed back by the player, or voided by the mod (spec 5.5). The engine
+-- raises the same event for both, so the offer's own flag tells them apart: a hand-back
+-- loses the stake, a void refunds it.
+function GG.bounty_cancelled(faction, mission_key)
+    local o = GG.take_bounty_slot(faction, mission_key)
+    if o and o.void then GG.refund(faction, o.guild, o.stake) end
+    return o
 end
 
 -- The taken offer matching a mission key, removed from the board. Shared by the two
@@ -2161,7 +2717,7 @@ function GG.take_bounty_slot(faction, mission_key)
     if not list then return nil end
     for i = #list, 1, -1 do
         local o = list[i]
-        if o.taken and GG.bounty_mission_key(o.guild, faction) == mission_key then
+        if o.taken and GG.offer_mission_key(o, faction) == mission_key then
             table.remove(list, i)
             return o
         end
@@ -2207,7 +2763,11 @@ function GG.save_bounties(faction)
         -- purge re-reads the target, which is the right answer anyway.
         parts[#parts + 1] = table.concat({o.guild, o.kind, o.target, o.owner or "",
                                           o.gold, o.rep, o.posted,
-                                          o.taken and 1 or 0, o.diff or 0}, ",")
+                                          o.taken and 1 or 0, o.diff or 0,
+                                          -- v2, APPENDED (2026-09-27): a save from
+                                          -- before reads these five as zero.
+                                          o.war or 0, o.stake or 0, o.amount or 0,
+                                          o.done or 0, o.void and 1 or 0}, ",")
     end
     cm:set_saved_value("derpy_gg_bounties_" .. faction, table.concat(parts, ";"))
 end
@@ -2227,7 +2787,12 @@ function GG.load_bounties(faction)
                                rep = tonumber(f[6]) or 0,
                                posted = tonumber(f[7]) or 0,
                                taken = f[8] == "1",
-                               diff = tonumber(f[9]) or 0}
+                               diff = tonumber(f[9]) or 0,
+                               war = tonumber(f[10]) or 0,
+                               stake = tonumber(f[11]) or 0,
+                               amount = tonumber(f[12]) or 0,
+                               done = tonumber(f[13]) or 0,
+                               void = f[14] == "1"}
         end
     end
     GG.bounties[faction] = list
@@ -2764,6 +3329,9 @@ GG.TUNE_DEFAULTS = {
     -- paid. 100 is Medieval 2's symmetry: the failure is worth what the success was.
     -- Handing a bounty back through the objectives panel is not a failure and is free.
     rate_bounty_fail = 100,
+    -- THE STAKE (bounties v2). Favour a bounty stakes, as a percentage of the Reputation
+    -- it pays. Returned on success, lost on failure or hand-back. 0 switches it off.
+    rate_bounty_stake = 25,
     -- THE PATRON. Extra reputation, as a percentage, for the guild the patron serves.
     rate_patron = 50,
 }
@@ -2793,6 +3361,7 @@ GG.TUNE_ORDER = {
     "rate_decay",
     "decay_from",
     "rate_bounty_fail",
+    "rate_bounty_stake",
 }
 
 GG.TUNE = GG.TUNE or nil
@@ -2845,6 +3414,7 @@ GG.PRESETS = {
         -- Half upkeep and forty turns of grace, and a failed bounty costs a third of what
         -- it would have paid rather than all of it.
         rate_decay = 50, decay_from = 40, rate_bounty_fail = 35,
+        rate_bounty_stake = 15,
     },
 
     -- SLOWER, AND THE COURT PRESSES. About a quarter less per event against tighter caps,
@@ -2860,6 +3430,7 @@ GG.PRESETS = {
         demand_every = 9, demand_turns = 6, demand_reward = 100, demand_penalty = 90,
         -- Half again the upkeep from turn 20, and a failed bounty costs its full worth.
         rate_decay = 150, decay_from = 20, rate_bounty_fail = 100,
+        rate_bounty_stake = 35,
     },
 
     -- CUTTHROAT. Standing is roughly half the default rate against caps to match, the
@@ -2878,6 +3449,7 @@ GG.PRESETS = {
         -- Double upkeep from turn 12, and a failed bounty costs half again what it would
         -- have paid - so taking a job you cannot finish is worse than never taking it.
         rate_decay = 200, decay_from = 12, rate_bounty_fail = 150,
+        rate_bounty_stake = 50,
     },
 }
 
@@ -3116,6 +3688,9 @@ function GG.register()
             GG.load_bounties(name)
             GG.post_bounties(name)
             GG.save_bounties(name)
+            -- AFTER the save: a void cancels a mission, which can reload the board, so
+            -- nothing may save a list held across it (spec 5.5, plan ruling T8-R1).
+            GG.void_stale_hero_bounties(name)
 
             -- THE PATRON, re-read from the character every turn. The lord can die, lose
             -- their army or be given a new one without this mod hearing about any of
@@ -3282,8 +3857,13 @@ function GG.register()
                 return context:mission():mission_record_key()
             end)
             if not mkey then return end
+            GG.load(name)
             GG.load_bounties(name)
-            if GG.bounty_lost(name, mkey) then GG.save_bounties(name) end
+            if GG.bounty_cancelled(name, mkey) then
+                GG.save_bounties(name)
+                -- A void refunds the stake into the standings, so both are written.
+                GG.save(name)
+            end
         end, true)
 
     core:add_listener("gg_bounty_MissionFailed", "MissionFailed", true,
@@ -3326,6 +3906,24 @@ function GG.register()
                       or context:mission_result_critial_success()
             end)
             GG.load(name); GG.on_agent_action(name, won); GG.save(name)
+            -- HERO BOUNTIES (spec 5.5). The target is a settlement for a garrison action
+            -- and a character otherwise. The action key is traced while a hero bounty is
+            -- live, for the in-game check that it is agent_actions.unique_id.
+            local akey, target = nil, nil
+            pcall(function() akey = context:agent_action_key() end)
+            if event == "CharacterGarrisonTargetAction" then
+                pcall(function() target = context:garrison_residence():region():name() end)
+            else
+                pcall(function()
+                    target = tostring(context:target_character():family_member()
+                                          :command_queue_index())
+                end)
+            end
+            GG.load_bounties(name)
+            if GG.hero_progress(name, akey, target, won) then
+                GG.trace("hero bounty progress: " .. tostring(akey) .. " on "
+                         .. tostring(target))
+            end
         end, true)
     end
 
@@ -3753,8 +4351,13 @@ end
 GG.MP_OPS.bounty = function(faction, arg)
     local n = tonumber(arg)
     if not n then return end
+    GG.load(faction)
     GG.load_bounties(faction)
-    if GG.take_bounty(faction, n) then GG.save_bounties(faction) end
+    if GG.take_bounty(faction, n) then
+        GG.save_bounties(faction)
+        -- THE STAKE LIVES IN THE STANDINGS, so both saved values are written.
+        GG.save(faction)
+    end
 end
 
 GG.MP_OPS.demand = function(faction)

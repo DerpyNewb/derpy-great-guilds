@@ -234,6 +234,18 @@ LEAD_SERVICES = set(s["key"] for s in SERVICES if s["rank"] == 4)
 # is_positive_value_good=True, read out of vanilla's effects table on 2026-09-11, so
 # both values are positive; vanilla's own maxima on these pairs are 50 and 90.
 PATRON_BUNDLE = "derpy_gg_patron"
+
+
+# THE PICTURE A BUNDLE WEARS IN THE GAME'S EFFECT LISTS - a file name, which the engine
+# looks up in ui/campaign ui/effect_bundles/. Every bundle shipped with "" until
+# 2026-09-26 and drew bare. Written by tools/make_guild_bundle_icons.py: the guild's mark
+# on CA's teal disc, in the race's flavour (the flavour pass re-tags the name the way it
+# re-tags the key), and the crest for the patron, whose bundle names no guild.
+def bundle_icon(guild):
+    return "derpy_gg_%s.png" % guild
+
+
+PATRON_ICON = "derpy_gg_patron.png"
 PATRON_EFFECTS = [
     ("wh_main_effect_force_all_campaign_replenishment_rate", "force_to_force_own", 10),
     ("wh_main_effect_force_all_campaign_movement_range", "force_to_force_own", 10),
@@ -488,13 +500,41 @@ GUILD_EARN = dict((g, d.split("||", 1)[1]) for g, d in GUILD_DESC.items())
 # which is not the bounty either guild is paying for.
 BOUNTY_KINDS = {
     "region_take": {"mtype": "CAPTURE_REGIONS", "otype": "CAPTURE_REGIONS",
-                    "obj": "region %s", "gold": 3000},
+                    "obj": "region %s", "gold": 3000, "family": "bounty"},
     "region_sack": {"mtype": "RAZE_OR_SACK_N_DIFFERENT_SETTLEMENTS_INCLUDING",
                     "otype": "RAZE_OR_SACK_N_DIFFERENT_SETTLEMENTS_INCLUDING",
-                    "obj": "region %s;total 1", "gold": 2000},
+                    "obj": "region %s;total 1", "gold": 2000, "family": "bounty"},
     "lord_kill":   {"mtype": "ELIMINATE_CHARACTER_IN_BATTLE",
                     "otype": "KILL_CHARACTER_BY_ANY_MEANS",
-                    "obj": "family_member %s", "gold": 1500},
+                    "obj": "family_member %s", "gold": 1500, "family": "bounty"},
+    # v2 (2026-09-27). mtype is the DB column (a label); otype is what the string
+    # carries. The mtype values are each on vanilla rows; RESEARCH_N_TECHS_INCLUDING has
+    # none, so its row is labelled RESEARCH_TECHNOLOGY.
+    "job_coffers":   {"mtype": "HAVE_AT_LEAST_X_MONEY", "otype": "HAVE_AT_LEAST_X_MONEY",
+                      "obj": "total %s", "gold": 1500, "family": "job"},
+    "job_champion":  {"mtype": "ACHIEVE_CHARACTER_RANK", "otype": "ACHIEVE_CHARACTER_RANK",
+                      "obj": "total 1;total2 %s;include_generals", "gold": 2000,
+                      "family": "job"},
+    "job_research":  {"mtype": "RESEARCH_TECHNOLOGY", "otype": "RESEARCH_N_TECHS_INCLUDING",
+                      "obj": "total 1;technology %s", "gold": 2000, "family": "job"},
+    "job_captives":  {"mtype": "CAPTURE_X_BATTLE_CAPTIVES",
+                      "otype": "CAPTURE_X_BATTLE_CAPTIVES", "obj": "total %s",
+                      "gold": 1500, "family": "job"},
+    "job_build":     {"mtype": "CONSTRUCT_N_OF_A_BUILDING",
+                      "otype": "CONSTRUCT_N_OF_A_BUILDING",
+                      "obj": "total 1;building_level %s", "gold": 2500, "family": "build"},
+    "hero_sabotage": {"mtype": "SCRIPTED", "otype": "SCRIPTED",
+                      "obj": "script_key derpy_gg_hero;override_text "
+                             "mission_text_text_derpy_gg_hero_%s", "gold": 1200,
+                      "family": "hero"},
+    "hero_harry":    {"mtype": "SCRIPTED", "otype": "SCRIPTED",
+                      "obj": "script_key derpy_gg_hero;override_text "
+                             "mission_text_text_derpy_gg_hero_%s", "gold": 1200,
+                      "family": "hero"},
+    "hero_strike":   {"mtype": "SCRIPTED", "otype": "SCRIPTED",
+                      "obj": "script_key derpy_gg_hero;override_text "
+                             "mission_text_text_derpy_gg_hero_%s", "gold": 1200,
+                      "family": "job"},
 }
 
 # The three objective types CA's own contract script issues from a string against a
@@ -532,6 +572,60 @@ BOUNTIES = {
                      "Empty it. The column that leaves is the payment, and it is "
                      "measured in bodies."),
 }
+# Mirrors GG.BOUNTY_EXTRA in the campaign Lua; import_great_guilds.py compares the two.
+BOUNTY_EXTRA = {
+    "brass":        ["job_coffers", "job_build"],
+    "immortals":    ["job_champion", "job_build", "hero_harry"],
+    "daemonsmiths": ["job_research", "job_build", "hero_sabotage"],
+    "khanate":      ["hero_strike", "job_build"],
+    "overseers":    ["job_build"],
+    "slavers":      ["job_captives", "job_build"],
+}
+
+
+def bounty_families(g):
+    return ["bounty"] + sorted({BOUNTY_KINDS[k]["family"] for k in BOUNTY_EXTRA[g]})
+
+
+def family_kind(g, fam):
+    for k in BOUNTY_EXTRA[g]:
+        if BOUNTY_KINDS[k]["family"] == fam:
+            return k
+    return None
+
+
+# ONE TITLE PER KIND, the description naming the flavour's own guild (ruling T9-R1 in
+# the plan: the spec asked for each race's own voice; the guild's name carries it, and
+# 117 hand-written lines can replace any of these later as data only).
+BOUNTY_TEXT = {
+    "job_coffers":   ("Fill the Coffers", "{guild} want to see your treasury full, and "
+                      "kept full. Hold the sum named on the Great Guilds panel."),
+    "job_champion":  ("Prove a Champion", "{guild} want a champion worth the name. Raise "
+                      "one of your lords or heroes to the rank named on the Great Guilds "
+                      "panel."),
+    "job_research":  ("Commissioned Work", "{guild} have paid in advance for a piece of "
+                      "learning. Research the technology named on the Great Guilds panel."),
+    "job_captives":  ("Fill the Pens", "{guild} are short of hands. Take the number of "
+                      "captives named on the Great Guilds panel in your battles."),
+    "job_build":     ("A Commission", "{guild} want one of their own buildings raised in "
+                      "your lands. It is named on the Great Guilds panel."),
+    "hero_sabotage": ("Crack the Walls", "{guild} want a settlement weakened from inside. "
+                      "Send your heroes against the one named on the Great Guilds panel."),
+    "hero_harry":    ("Harry Their March", "{guild} want an army slowed and bled before it "
+                      "arrives. Send your heroes against the one named on the Great Guilds "
+                      "panel."),
+    "hero_strike":   ("A Quiet Word", "{guild} want a name to stop being spoken. Wound or "
+                      "kill the lord or hero named on the Great Guilds panel with a hero."),
+}
+HERO_OBJECTIVE_TEXT = {
+    "sabotage": "Succeed with two hero actions against the settlement named on the Great "
+                "Guilds panel.",
+    "harry": "Succeed with two hero actions against the army named on the Great Guilds "
+             "panel.",
+    "strike": "Wound or kill the character named on the Great Guilds panel with a hero.",
+}
+
+
 # The category is a REFERENCE to cdir_events_categories.category_key - confirmed in
 # RPFM's own schema for missions_tables on 2026-09-11 - so a category invented for this
 # mod is an unresolvable foreign key, which is a startup reject and not a warning.
@@ -1346,19 +1440,19 @@ def help_pages(tag=""):
         "#The board",
         "-Three offers at a time, drawn from every guild. Taking one turns it into a "
         "real mission.",
-        "-Finish it and that guild pays gold and a large amount of reputation - far "
-        "more than an ordinary mission.",
-        "-Leave it alone, or hand it back, and nothing is lost but the offer.",
-        "-Take it and FAIL it and that guild takes back what finishing it would have "
-        "paid. Declining work is free; promising it and not delivering is not.",
-        "#The price is the target",
-        "-A defended provincial capital is worth several times a ruined border town.",
-        "-A veteran faction leader several times a fresh general.",
-        "-Every offer is rated Routine, Hard or Grim, which is the guild saying why the "
-        "number is what it is.",
-        "#Two rules about the price",
-        "-An offer you have NOT taken re-prices as the world moves.",
-        "-One you HAVE taken keeps the price you agreed.",
+        "-Taking one puts up FAVOUR with that guild - the number on its plate. You get "
+        "it back when you finish, and lose it if you fail or hand it back.",
+        "-Finish it and that guild pays gold and a large amount of reputation.",
+        "#What the guilds ask for",
+        "-Never your front line: land or a lord far from your borders and armies, or of "
+        "a faction you are at peace with. That last kind means war, and pays far more.",
+        "-Or a job: hold gold, raise a champion, research, build one of the guild's own "
+        "buildings, or take captives.",
+        "-Or hero work: send your heroes against a named settlement, army or character.",
+        "#The price",
+        "-Read off the target and the distance, rated Routine, Hard or Grim. An offer "
+        "you have NOT taken re-prices as the world moves; one you HAVE taken keeps its "
+        "price.",
     ]
 
     page4 = [
@@ -1399,8 +1493,8 @@ def help_pages(tag=""):
         "-The Court tab holds the terms and the deadline. Silence costs more than the "
         "demand asked for.",
         "#A bounty you took and failed",
-        "-Leaving an offer alone costs nothing, and handing one back costs nothing.",
-        "-Failing one you accepted costs what finishing it would have paid.",
+        "-Handing one back costs the favour you put up to take it.",
+        "-Failing one costs that too, and what finishing it would have paid.",
     ]
 
     return [page1, page2, page3, page4, page5]
@@ -1462,7 +1556,7 @@ def _build_one(tag):
                 "localised_title": title,
                 "bundle_target": "faction",
                 "priority": "1",
-                "ui_icon": "",
+                "ui_icon": bundle_icon(g),
                 "is_global_effect": "true",
                 "show_in_3d_space": "false",
                 "owner_only": "true",
@@ -1504,7 +1598,7 @@ def _build_one(tag):
             "localised_title": ltitle,
             "bundle_target": "faction",
             "priority": "1",
-            "ui_icon": "",
+            "ui_icon": bundle_icon(g),
             "is_global_effect": "true",
             "show_in_3d_space": "false",
             "owner_only": "true",
@@ -1539,7 +1633,7 @@ def _build_one(tag):
         # to apply_effect_bundle_to_force is the kind of mismatch nothing reports.
         "bundle_target": "force",
         "priority": "1",
-        "ui_icon": "",
+        "ui_icon": PATRON_ICON,
         "is_global_effect": "true",
         "show_in_3d_space": "false",
         "owner_only": "true",
@@ -1597,7 +1691,7 @@ def _build_one(tag):
             "localised_title": SERVICE_NAMES[s["key"]],
             "bundle_target": "faction",
             "priority": "1",
-            "ui_icon": "",
+            "ui_icon": bundle_icon(s["guild"]),
             "is_global_effect": "true",
             "show_in_3d_space": "false",
             "owner_only": "true",
@@ -1706,6 +1800,23 @@ def _build_one(tag):
                       # character's own name needs a loc call this panel cannot make
                       # cheaply, and the faction is the part a player navigates by.
                       ("bounty_lord", "Their general"),
+                      ("bounty_war", "War with"),
+                      ("bounty_war_tip", "Taking this means war with"),
+                      ("bounty_stake_tip", "Favour you put up to take this bounty. You "
+                       "get it back when you finish, and lose it if you fail or hand it "
+                       "back."),
+                      ("bounty_stake_short", "Needs %n favour with this guild to take. "
+                       "You have %m."),
+                      ("bounty_char", "Their lord or hero"),
+                      ("bounty_obj_coffers", "Save %n gold more than you hold now"),
+                      ("bounty_obj_coffers_taken", "Hold %n gold"),
+                      ("bounty_obj_champion", "A lord or hero at rank %n"),
+                      ("bounty_obj_research", "Research"),
+                      ("bounty_obj_build", "Build"),
+                      ("bounty_obj_captives", "Take %n captives in battle"),
+                      ("bounty_obj_sabotage", "Sabotage"),
+                      ("bounty_obj_harry", "Harry"),
+                      ("bounty_obj_strike", "Wound or kill"),
                       # Labels the standings' third column. Without it the row read
                       # "The Brass Tablets  Unmarked (63)  You Unmarked" - two ranks
                       # side by side and nothing saying which was whose.
@@ -1903,26 +2014,25 @@ def _build_one(tag):
                 "text": "A Guild Is Left Waiting", "tooltip": "false"})
     loc.append({"key": "message_event_text_text_derpy_gg_bounty_fail_primary",
                 "text": "Work you took from a guild has gone undone, and its reputation "
-                        "has been taken back. Handing an offer back costs nothing; "
+                        "has been taken back. Handing an offer back costs only the favour you put up; "
                         "taking it and failing costs what finishing it would have paid.",
                 "tooltip": "false"})
     loc.append({"key": "message_event_text_text_derpy_gg_bounty_fail_secondary",
                 "text": "A promise in the ledger is a debt.", "tooltip": "false"})
 
     loc.append({"key": "derpy_gg_bounty_help",
-                "text": "A guild posts work it wants done. Take one and it becomes a mission; finish it "
-        "and that guild pays gold and a large amount of reputation - far more than "
-        "a normal mission. Leave an offer alone, or hand it back through the "
-        "objectives panel, and nothing is lost but the offer."
-        "||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not "
-        "finish before its deadline costs that guild's reputation - "
-        "exactly what finishing it would have paid. Declining work is free; "
-        "promising it and not delivering is not."
-        "||The pay is read off the target, not fixed: a defended provincial capital "
-        "is worth several times a ruined border town, and a rank-40 faction leader "
-        "several times a fresh general. Each offer says whether the guild rates the "
-        "job Routine, Hard or Grim. An offer you have not taken re-prices as the "
-        "world moves; one you have taken keeps the price you agreed.",
+                "text": "A guild posts work it wants done. Take one and it becomes a "
+        "mission. Taking it puts up favour with that guild; you get it back when you "
+        "finish, and lose it if you fail or hand it back."
+        "||Guilds never ask for your front line. They name land or a lord far from your "
+        "borders, or of a faction you are at peace with - which means war, and pays "
+        "far more - or a job, a building, or work for your heroes."
+        "||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish "
+        "before its deadline also costs that guild's reputation - what finishing it "
+        "would have paid."
+        "||The pay is read off the target and its distance. Each offer says whether the "
+        "guild rates the job Routine, Hard or Grim. An offer you have not taken "
+        "re-prices as the world moves; one you have taken keeps the price you agreed.",
                 "tooltip": "false"})
     loc.append({"key": "derpy_gg_locked_hint",
                 "text": "Your rank with this guild is too low. Keep earning reputation.",
@@ -2101,6 +2211,34 @@ def _build_one(tag):
                     "text": desc, "tooltip": "false"})
         loc.append({"key": "missions_localised_mission_completed_text_%s"
                     % bounty_key(g), "text": done, "tooltip": "false"})
+        # v2: one more row per family of kind the guild may post (spec 6). Nothing is
+        # inherited from the military row above; each is written out whole.
+        for fam in bounty_families(g)[1:]:
+            kind = family_kind(g, fam)
+            key = "derpy_gg_%s_%s" % (fam, g)
+            title, desc = BOUNTY_TEXT[kind]
+            desc = desc.format(guild=GUILD_NAMES[g])
+            missions.append({
+                "key": key, "mission_type": BOUNTY_KINDS[kind]["mtype"],
+                "localised_title": title, "localised_description": desc,
+                "ui_image": "chd/generic", "ui_icon": "rom_event_mission.png",
+                "generate": "false", "prioritised": "false",
+                "event_category": BOUNTY_CATEGORY, "set_piece_battle": "",
+                "location_x": "0", "location_y": "0",
+                "quest_mission": "false", "quest_mission_final": "false",
+                "trigger_radius": "0.0000", "quest_character": "",
+                "sticky_by_default": "false",
+                "localised_mission_completed_text": done,
+                "can_be_manually_cancelled": "true"})
+            for field, text in (("title", title), ("description", desc),
+                                ("mission_completed_text", done)):
+                loc.append({"key": "missions_localised_%s_%s" % (field, key),
+                            "text": text, "tooltip": "false"})
+    # The SCRIPTED hero objective's own line; retag appends each race's tag, which is
+    # what the Lua builds (k.shape .. GG.tag(faction)).
+    for shape, text in sorted(HERO_OBJECTIVE_TEXT.items()):
+        loc.append({"key": "mission_text_text_derpy_gg_hero_" + shape, "text": text,
+                    "tooltip": "false"})
 
     return {"missions": missions,
             "effect_bundles": bundles,
@@ -2158,7 +2296,10 @@ def retag(tables, tag):
     out = {
         "loc": [dict(r, key=tag_loc_key(r["key"], tag))
                 for r in tables["loc"] if r["key"] not in patron_loc],
-        "effect_bundles": [dict(r, key=r["key"] + tag)
+        # The icon is re-tagged with the key: brass.png becomes brass_emp.png.
+        "effect_bundles": [dict(r, key=r["key"] + tag,
+                                ui_icon=(r["ui_icon"][:-len(".png")] + tag + ".png"
+                                         if r["ui_icon"] else ""))
                            for r in tables["effect_bundles"]
                            if r["key"] != PATRON_BUNDLE],
         "effect_bundles_to_effects_junctions": [
@@ -2326,16 +2467,21 @@ def check_bounties():
     rows = tables["missions"]
     lockeys = set(r["key"] for r in tables["loc"])
 
-    if len(rows) != len(GUILDS) * len(FLAVOURS):
-        out.append("one bounty per guild per flavour: %d rows for %d guilds and %d "
-                   "flavours" % (len(rows), len(GUILDS), len(FLAVOURS)))
+    want = sum(len(bounty_families(g)) for g in GUILDS) * len(FLAVOURS)
+    if len(rows) != want:
+        out.append("one mission row per guild per family per flavour: %d rows, want %d"
+                   % (len(rows), want))
     for g in GUILDS:
         if g not in BOUNTIES:
             out.append("no bounty defined for guild: " + g)
             continue
-        kind = BOUNTIES[g][0]
-        if kind not in BOUNTY_KINDS:
-            out.append("%s: bounty kind %r is not in BOUNTY_KINDS" % (g, kind))
+        fams = [BOUNTY_KINDS[k]["family"] for k in BOUNTY_EXTRA.get(g, [])]
+        if len(fams) != len(set(fams)):
+            out.append("%s: two kinds share a family, so one mission row would carry "
+                       "two different titles" % g)
+        for k in [BOUNTIES[g][0]] + BOUNTY_EXTRA.get(g, []):
+            if k not in BOUNTY_KINDS:
+                out.append("%s: bounty kind %r is not in BOUNTY_KINDS" % (g, k))
 
     keys = [r["key"] for r in rows]
     if len(set(keys)) != len(keys):
@@ -2370,6 +2516,21 @@ def check_bounties():
                 out.append("%s: CA's contract script never issues objective type %s "
                            "against a runtime target, so nothing proves it accepts one"
                            % (g, kind["otype"]))
+        # THE OTHER FAMILIES: the row's mission_type must be one CA's own rows use, and
+        # the objective must be one CA's victory helpers build (or SCRIPTED).
+        vanilla_types = set(r["mission_type"] for r in mrows)
+        helpers = io.open("Modding Files/reference/ca_scripts_wh3/campaign/main_warhammer/"
+                          "victory_objectives_config_utils.lua", encoding="utf-8").read()
+        for kind, spec in sorted(BOUNTY_KINDS.items()):
+            if spec["family"] == "bounty":
+                continue
+            if spec["mtype"] not in vanilla_types:
+                out.append("%s: mission_type %s is on no vanilla mission row"
+                           % (kind, spec["mtype"]))
+            if spec["otype"] != "SCRIPTED" and (
+                    "generate_%s_objective" % spec["otype"]) not in helpers:
+                out.append("%s: CA's victory helpers never build objective %s"
+                           % (kind, spec["otype"]))
     except Exception as e:
         out.append("bounty vanilla checks could not run: %r" % (e,))
     return out
@@ -3050,6 +3211,230 @@ def check_built_effects():
     return out
 
 
+BOUNTY_DATA_LUA = "Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_bounty_data.lua"
+TECH_SENTINEL_TIER = 900     # chd_mil carries a tier-999 node that is not on the tree
+
+
+def check_bounty_data():
+    """The data file must be current, and name only things the installed game has.
+
+    A tech or building key the game does not have is a bounty nobody can finish, and the
+    game would never say so.
+    """
+    out = []
+    try:
+        want = bounty_data_lua()
+    except Exception as exc:                                   # noqa: BLE001
+        return ["cannot build the bounty data: %r" % (exc,)]
+    have = io.open(BOUNTY_DATA_LUA, encoding="utf-8").read() if os.path.isfile(
+        BOUNTY_DATA_LUA) else ""
+    if have != want:
+        out.append("%s is stale - run gen_great_guilds.py --write" % BOUNTY_DATA_LUA)
+    techs = {r["key"] for r in live_rows("technologies")}
+    levels = {r["level_name"] for r in live_rows("building_levels")}
+    sys.path.insert(0, "tools")
+    import read_vanilla_loc as L
+    bloc = dict(L.load("building_culture_variants"))
+    per_tag, per_faction = bounty_techs()
+    for tag, rows in per_tag.items():
+        if not rows:
+            out.append("flavour %r has no technology a bounty can ask for" % tag)
+        for key, _tier in rows:
+            if key not in techs:
+                out.append("bounty tech %s is not in the installed game" % key)
+    builds, locs = bounty_buildings()
+    chain_of = {r["level_name"]: r["chain"] for r in live_rows("building_levels")}
+    superchain = {r["key"]: r["building_superchain"] for r in live_rows("building_chains")}
+    open_chains = chains_open_to_a_race()
+    for tag, per_guild in builds.items():
+        for g, rows in per_guild.items():
+            for lvl, _rank in rows:
+                chain = chain_of.get(lvl, "")
+                if building_region_locked(chain, superchain):
+                    out.append("bounty building %s (%s) can only be built in some "
+                               "places - most players cannot finish it" % (lvl, g))
+                if chain not in open_chains:
+                    out.append("bounty building %s (%s) is granted to one faction or "
+                               "campaign, not the whole race" % (lvl, g))
+    for tag, per_guild in builds.items():
+        if not per_guild.get("overseers"):
+            out.append("flavour %r: the Overseers have no building to ask for, and "
+                       "building is their only job" % tag)
+        for g, rows in per_guild.items():
+            for lvl, _rank in rows:
+                if lvl not in levels:
+                    out.append("bounty building %s is not in the installed game" % lvl)
+                if locs.get(lvl) not in bloc:
+                    out.append("bounty building %s has no name in CA's loc (%s)"
+                               % (lvl, locs.get(lvl)))
+    return out
+
+
+def _script_locked_techs():
+    """Every technology CA's own scripts lock - a bounty must never ask for one.
+
+    No script call answers "can this faction research X", so the filter is measured:
+    every cm:lock_technology call in all 7,540 shipped script files.
+    """
+    root = "Modding Files/reference/ca_scripts_wh3"
+    pat = re.compile(r'lock_technology\(\s*[^,]+,\s*"([^"]+)"')
+    out = set()
+    for dirpath, _dirs, files in os.walk(root):
+        for name in files:
+            if name.endswith(".lua"):
+                text = io.open(os.path.join(dirpath, name), encoding="utf-8",
+                               errors="ignore").read()
+                out.update(pat.findall(text))
+    return out
+
+
+def bounty_techs():
+    """({tag: [(tech, tier)]}, {faction: [(tech, tier)]}) - the upper half of each tree.
+
+    One node set per culture with no faction_key; a faction with its own set (the
+    Empire's Wulfhart) gets its own list. Campaign-only nodes and the sentinel tier are
+    dropped, and so is anything CA's scripts lock.
+    """
+    locked = _script_locked_techs()
+    sets = live_rows("technology_node_sets")
+    nodes = live_rows("technology_nodes")
+
+    def upper(set_key):
+        rows = [n for n in nodes if n["technology_node_set"] == set_key
+                and not n["campaign_key"] and n["tier"] < TECH_SENTINEL_TIER
+                and n["technology_key"] not in locked]
+        if not rows:
+            return []
+        top = max(n["tier"] for n in rows)
+        cut = (top + 1) // 2
+        return sorted({(n["technology_key"], n["tier"]) for n in rows if n["tier"] >= cut})
+
+    per_tag, per_faction = {}, {}
+    for tag, F in FLAVOURS.items():
+        if not F.get("culture"):
+            continue
+        for s in sets:
+            if s["culture"] != F["culture"] or s["campaign_key"] or s["subculture"]:
+                continue
+            if s["faction_key"]:
+                per_faction[s["faction_key"]] = upper(s["key"])
+            else:
+                per_tag[tag] = upper(s["key"])
+    return per_tag, per_faction
+
+
+# NOT EVERY REGION CAN BUILD IT. building_levels.resource_requirement is blank on every
+# resource chain (read back 2026-09-27, final review), so the lock is read off the
+# superchain - the resource, port, main-settlement, foreign and allied slots - and off the
+# chain name: landmarks are special_, and the Chaos Dwarf _tower_ chains are the Tower
+# of Zharr's own slots.
+# Horde chains (a Black Ark, the Spirit of Grungni, a dragonship) need a horde the player
+# may not have; kislev_city, underdeep and bastion chains are granted race-wide but only
+# build in one city, one hold's deeps, or the Great Bastion's gates.
+LOCKED_SUPERCHAIN = ("_resource_", "_sch_port", "_sch_main_settlement", "foreign_slot",
+                     "allied_outpost", "_sch_special")
+LOCKED_CHAIN = ("special_", "_chd_tower_", "horde", "spirit_of_grungni", "dragonship",
+                "kislev_city", "underdeep", "bastion", "sea_patrol")
+
+
+def building_region_locked(chain, superchain):
+    sc = superchain.get(chain, "")
+    return (any(s in sc for s in LOCKED_SUPERCHAIN)
+            or any(s in chain for s in LOCKED_CHAIN))
+
+
+def chains_open_to_a_race():
+    """Chains some availability set grants race-wide, in every campaign. One granted only
+    to a single faction (Aislinn's colonies) or a single campaign is not something a
+    guild can ask of every player of that race."""
+    open_sets = {r["set_id"] for r in live_rows("building_chain_availabilities")
+                 if not r["faction"] and not r["campaign"]}
+    return {r["building_chain"] for r in live_rows("building_chain_availability_sets")
+            if r["id"] in open_sets}
+
+
+def bounty_buildings():
+    """({tag: {guild: [(level, rank)]}}, {level: loc key}).
+
+    A level qualifies when its chain is one covered race's own, the SHIPPED
+    GG.guild_of_chain pays it to that guild (unmatched chains fall back to the Overseers,
+    as GG.on_building pays them), it is the third or later NON-RUIN level of its chain,
+    it shows in the UI, it needs no resource, and the chain is not a main settlement.
+    """
+    owner = covered_chains()
+    levels = live_rows("building_levels")
+    by_chain = {}
+    for r in levels:
+        if r["chain"] in owner and not r["level_name"].endswith("_ruin"):
+            by_chain.setdefault(r["chain"], []).append(r)
+    lua = _lua_guilds_of(sorted(by_chain))
+    variants = live_rows("building_culture_variants")
+    superchain = {r["key"]: r["building_superchain"] for r in live_rows("building_chains")}
+    open_chains = chains_open_to_a_race()
+    out, locs = {}, {}
+    for chain, rows in sorted(by_chain.items()):
+        if ("settlement" in chain or building_region_locked(chain, superchain)
+                or chain not in open_chains):
+            continue
+        tag = owner[chain]
+        culture = FLAVOURS[tag]["culture"]
+        g = lua[chain] or "overseers"
+        for rank, r in enumerate(sorted(rows, key=lambda r: r["level"]), start=1):
+            if rank < 3 or not r["visible_in_ui"] or r["resource_requirement"]:
+                continue
+            lvl = r["level_name"]
+            # MOST VARIANT ROWS HAVE A BLANK CULTURE - one name for every race that can
+            # build it. An exact-culture row wins when there is one; check_bounty_data
+            # proves the key it builds is in CA's loc either way.
+            vs = [v for v in variants if v["building"] == lvl
+                  and v["culture"] in (culture, "")]
+            vs.sort(key=lambda v: (v["culture"] != culture, v["subculture"] != "",
+                                   v["faction"] != ""))
+            if not vs:
+                continue
+            v = vs[0]
+            locs[lvl] = ("building_culture_variants_name_" + v["building"] + v["culture"]
+                         + v["subculture"] + v["faction"])
+            out.setdefault(tag, {}).setdefault(g, []).append((lvl, rank))
+    return out, locs
+
+
+def bounty_data_lua():
+    """The generated Lua, as text. Deterministic: sorted everywhere."""
+    per_tag, per_faction = bounty_techs()
+    builds, locs = bounty_buildings()
+    L = ["-- GENERATED by tools/gen_great_guilds.py --write. Do not edit.",
+         "-- What a bounty may ask for that no script call can list: the upper half of the",
+         "-- technology tree of each race, and the buildings each guild is paid for.",
+         "GG = GG or {}",
+         "GG.BOUNTY_TECHS = {"]
+    for tag in sorted(per_tag):
+        L.append('    [%r] = {%s},' % (tag, ", ".join('{"%s", %d}' % t for t in per_tag[tag])))
+    L.append("}")
+    L.append("GG.BOUNTY_TECHS_FACTION = {")
+    for f in sorted(per_faction):
+        L.append('    [%r] = {%s},' % (f, ", ".join('{"%s", %d}' % t for t in per_faction[f])))
+    L.append("}")
+    L.append("GG.BOUNTY_BUILDINGS = {")
+    for tag in sorted(builds):
+        L.append("    [%r] = {" % tag)
+        for g in sorted(builds[tag]):
+            L.append('        %s = {%s},' % (g, ", ".join('{"%s", %d}' % t
+                                                            for t in builds[tag][g])))
+        L.append("    },")
+    L.append("}")
+    L.append("GG.BOUNTY_BUILDING_LOC = {")
+    for lvl in sorted(locs):
+        L.append('    ["%s"] = "%s",' % (lvl, locs[lvl]))
+    L.append("}")
+    return "\n".join(L).replace("'", '"') + "\n"
+
+
+def write_bounty_data():
+    io.open(BOUNTY_DATA_LUA, "w", encoding="utf-8", newline="\n").write(bounty_data_lua())
+    return BOUNTY_DATA_LUA
+
+
 def check_live_references():
     """Every reference cell this pack ships must resolve against the INSTALLED game.
 
@@ -3503,6 +3888,7 @@ def check():
     out += check_player_scope()
     out += check_building_theme()
     out += check_built_effects()
+    out += check_bounty_data()
     out += check_live_references()
     out += check_presets()
     out += check_bounties()
@@ -3782,13 +4168,17 @@ def selftest():
     tables = _build_one("")
     # The bounties: one per guild, each naming a kind that exists, and the objective
     # template must carry exactly one %s or the target is never substituted in.
-    assert len(tables["missions"]) == len(GUILDS), "one bounty mission row per guild"
+    want_rows = sum(len(bounty_families(g)) for g in GUILDS)
+    assert len(tables["missions"]) == want_rows, "one mission row per guild per family"
     for g in GUILDS:
         kind = BOUNTIES[g][0]
         assert kind in BOUNTY_KINDS, "%s: unknown bounty kind %s" % (g, kind)
-        assert BOUNTY_KINDS[kind]["obj"].count("%s") == 1, \
+        for k in BOUNTY_EXTRA[g]:
+            assert k in BOUNTY_KINDS, "%s: unknown bounty kind %s" % (g, k)
+    for kind, spec in BOUNTY_KINDS.items():
+        assert spec["obj"].count("%s") == 1, \
             "%s: objective template must take exactly one target" % kind
-        assert BOUNTY_KINDS[kind]["gold"] > 0, "%s: a bounty must pay" % kind
+        assert spec["gold"] > 0, "%s: a bounty must pay" % kind
     assert not check_bounties(), check_bounties()
     eb = tables["effect_bundles"]
     rank_rows = [r for r in eb if r["key"].startswith("derpy_gg_rank_")]
@@ -3873,7 +4263,7 @@ def selftest():
                              "_gen"], list(FLAVOURS)
     full = build()
     n = len(FLAVOURS)
-    assert len(full["missions"]) == len(GUILDS) * n, len(full["missions"])
+    assert len(full["missions"]) == want_rows * n, len(full["missions"])
     # Every bundle once per flavour, except the patron, which is one shared row.
     assert len(full["effect_bundles"]) == (want_eb - 1) * n + 1, len(full["effect_bundles"])
     assert len(full["event_feed_message_events"]) == 4 * n
@@ -3946,6 +4336,7 @@ if __name__ == "__main__":
         for _p in write_tsvs("Modding Files/source/great_guilds"):
             print("wrote " + _p)
         print("wrote " + write_mct_names())
+        print("wrote " + write_bounty_data())
     if "--check" in sys.argv:
         problems = check()
         for p in problems:

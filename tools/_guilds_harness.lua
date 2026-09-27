@@ -31,6 +31,10 @@ cm = {
   apply_effect_bundle = function(_, b, f, t) applied[#applied + 1] = {b, f, t} end,
   remove_effect_bundle = function(_, b, f) removed[#removed + 1] = {b, f} end,
   add_first_tick_callback = function(_, fn) FIRST_TICKS[#FIRST_TICKS + 1] = fn end,
+  repeat_real_callback = function(_, fn, ms, name)
+    REAL_TIMERS = REAL_TIMERS or {}
+    REAL_TIMERS[#REAL_TIMERS + 1] = {fn = fn, ms = ms, name = name}
+  end,
   -- OVERRIDDEN BELOW, at the CULTURE block. Kept only so the table is complete if
   -- something reads it before then; the stub that matters is the later one.
   get_faction = function(_, k)
@@ -86,7 +90,14 @@ local function ENEMY(name, regions, generals)
     return {name = function() return name end,
             is_dead = function() return false end,
             region_list = function() return LIST(rs) end,
-            military_force_list = function() return LIST(mfs) end}
+            military_force_list = function() return LIST(mfs) end,
+            -- What GG.bounty_rival_ok asks of a target (bounties v2, 2026-09-27). This
+            -- world's enemies are nobody's friend, so every answer is no.
+            is_human = function() return false end,
+            has_effect_bundle = function() return false end,
+            is_vassal_of = function() return false end,
+            is_ally_vassal_or_client_state_of = function() return false end,
+            character_list = function() return LIST({}) end}
 end
 
 cm.model = function() return {turn_number = function() return TURN end} end
@@ -144,7 +155,21 @@ cm.get_faction = function(_, k)
             -- branch of GG.demand_payable is never actually exercised.
             treasury = function() return TREASURY[k] or 0 end,
             -- What the Brass Tablets will pay this faction at its next turn start.
-            net_income = function() return INCOME[k] or 0 end}
+            net_income = function() return INCOME[k] or 0 end,
+            -- Bounties v2 (2026-09-27): treaties, the peace pool and the front. This
+            -- world has no treaties, has met nobody and holds no land, so the board
+            -- behaves as it did before v2: enemies only, nothing on a front.
+            is_human = function() return k == THE_PLAYER end,
+            has_effect_bundle = function() return false end,
+            military_allies_with = function() return false end,
+            defensive_allies_with = function() return false end,
+            non_aggression_pact_with = function() return false end,
+            is_vassal_of = function() return false end,
+            is_ally_vassal_or_client_state_of = function() return false end,
+            factions_met = function() return LIST({}) end,
+            region_list = function() return LIST({}) end,
+            military_force_list = function() return LIST({}) end,
+            character_list = function() return LIST({}) end}
 end
 
 TREASURY = {}
@@ -1664,6 +1689,15 @@ assert(fields == #GG.TUNE_ORDER,
 local BF = "cr_bounty"
 GG.TUNE = GG.TUNE or {}
 GG.TUNE.rate_bounty = 80
+-- v2's stake is its own block in _guilds_bounty_harness.lua. Off here, so every test
+-- below still means what it was written to mean: taking costs nothing.
+GG.TUNE.rate_bounty_stake = 0
+-- Likewise v2's jobs, building requests and hero work (GG.BOUNTY_EXTRA): this block tests
+-- the board's mechanics on the military kinds it was written for, and a guild with no
+-- military target must still leave its slot empty here. A global, not a local - the main
+-- chunk is at Lua 5.1's local ceiling.
+BOUNTY_EXTRA_V2 = GG.BOUNTY_EXTRA
+GG.BOUNTY_EXTRA = {}
 
 -- THE AI SECTION ABOVE REPLACED BOTH OF THESE. It makes cm:model() return nil, to
 -- prove the AI guards a missing model, and swaps the deterministic roll for a real
@@ -1674,8 +1708,9 @@ cm.model = function() return {turn_number = function() return TURN end} end
 cm.random_number = function(_, _n) return 1 end
 assert(GG.turn_now() == TURN, "the harness cannot read a turn number")
 
--- AT PEACE, NOTHING IS POSTED. A guild's bounty always names a faction you already
--- fight, so an empty war list must leave an empty board rather than erroring.
+-- AT PEACE WITH NOBODY MET, NOTHING IS POSTED. Since v2 a guild may ask for a new war
+-- against a faction you have met; this world has met nobody (factions_met is empty), so
+-- an empty war list still leaves an empty board rather than erroring.
 WARS[BF] = {}
 GG.bounties[BF] = nil
 GG.post_bounties(BF)
@@ -6100,7 +6135,7 @@ end)()
     GGUI.S = 2
     GGUI.layout()
     find_uicomponent, is_uicomponent = prev_find, prev_is
-    assert(moved.gg_title == (100 + 60 * 2) .. "," .. (50 + 8 * 2),
+    assert(moved.gg_title == (100 + 95 * 2) .. "," .. (50 + 0 * 2),
            "gg_title at 2x, got " .. tostring(moved.gg_title))
     assert(moved.derpy_gg_row_2 == (100 + 20 * 2) .. "," .. (50 + (170 + 44) * 2),
            "the second standings row at 2x, got " .. tostring(moved.derpy_gg_row_2))
@@ -6329,6 +6364,7 @@ end)()
 
     me = nil
     created, retries = 0, 0
+    GGUI.btn_chain = false                  -- the stub never runs the queued retry
     GGUI.place_opener(1)
     assert(created == 0 and retries == 1,
            "an unreadable player is tried again, not given a button: created "
@@ -6339,6 +6375,141 @@ end)()
     GGUI.btn_at = prev_at
     cm.get_local_faction_name = prev_local
     CULTURE[E], CULTURE[L], GG.CULTURE_OF[E], GG.CULTURE_OF[L] = nil, nil, nil, nil
+end)()
+
+-- ---------------------------------------------- the opener outlasts the intro --
+-- THE BUTTON MUST BE THERE ON TURN 1. resources_bar is off-screen for the whole intro;
+-- a 2026-09-27 Middenland load kept it away ~245s after first tick, the chain ran out at
+-- 24s ("GAVE UP ... (unsettled)") and the button first appeared at turn 2. And while it
+-- is not placed, every FactionTurnStart - ~190 a round - must not start a chain of its
+-- own.
+;(function()
+    local E = "cr_intro_emp"
+    CULTURE[E] = "wh_main_emp_empire"
+    GG.CULTURE_OF[E] = nil
+    local prev_local = cm.get_local_faction_name
+    cm.get_local_faction_name = function() return E end
+    local hidden = 125                      -- 250s at one read per 2s try
+    local noop = function() end
+    local btn_x, btn_y
+    local BTN = setmetatable({
+        MoveTo = function(_, x, y) btn_x, btn_y = x, y end,
+        Position = function() return btn_x, btn_y end,
+    }, {__index = function() return noop end})
+    local BAR = setmetatable({
+        Position = function()
+            if hidden > 0 then return 431, -600 end
+            return 431, -4
+        end,
+        Dimensions = function() return 1019, 60 end,
+    }, {__index = function() return noop end})
+    local made = false
+    local prev_root, prev_res, prev_cb = core.get_ui_root, core.get_screen_resolution,
+                                         cm.callback
+    local prev_find, prev_is = find_uicomponent, is_uicomponent
+    core.get_ui_root = function()
+        return {CreateComponent = function() made = true end}
+    end
+    core.get_screen_resolution = function() return 1920, 1080 end
+    find_uicomponent = function(_, name)
+        if name == "resources_bar" then return BAR end
+        if name == GGUI.BTN and made then return BTN end
+        return nil
+    end
+    is_uicomponent = function(x) return type(x) == "table" end
+    local queue, most = {}, 0
+    cm.callback = function(_, fn) queue[#queue + 1] = fn end
+    local prev_at = GGUI.btn_at
+    GGUI.btn_at, GGUI.btn_chain = nil, false
+
+    -- The intro: the first-tick chain alone, no turn start until it is over.
+    GGUI.place_opener(1)
+    local ticks = 0
+    while #queue > 0 and ticks < 1000 do
+        local fn = table.remove(queue, 1)
+        fn()
+        ticks = ticks + 1
+        hidden = hidden - 1                 -- time passes per try, not per read
+    end
+    assert(GGUI.btn_at, "the button must be placed after a 250s intro, gave up after "
+           .. ticks .. " tries")
+
+    -- A round of turn starts while the strip is away and nothing is placed yet.
+    GGUI.btn_at, hidden, queue = nil, 1000, {}
+    for _ = 1, 190 do GGUI.place_opener(1) end
+    most = #queue
+    assert(most <= 1, "one placement chain at a time, a round queued " .. most)
+    queue, GGUI.btn_chain = {}, false
+
+    core.get_ui_root, core.get_screen_resolution, cm.callback = prev_root, prev_res,
+                                                                 prev_cb
+    find_uicomponent, is_uicomponent = prev_find, prev_is
+    GGUI.btn_at = prev_at
+    cm.get_local_faction_name = prev_local
+    CULTURE[E], GG.CULTURE_OF[E] = nil, nil
+end)()
+
+-- ---------------------------------------------- the opener follows the strip --
+-- resources_bar sizes to its content, so its right end moves mid-turn (an effect icon
+-- appears, a rank changes). Placement ran only at load and turn start, so the button sat
+-- where the end USED to be until the next turn, then jumped (reported 2026-09-27: "why
+-- doesnt it auto adjust"). A UI-timed poll keeps it on the end.
+;(function()
+    -- Wired to the first tick (the harness never runs the UI's own first ticks), and
+    -- registered when it runs.
+    local src = io.open("Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_ui.lua"):read("*a")
+    assert(src:find("add_first_tick_callback(function() GGUI.start_follow() end)", 1, true),
+           "the follow poll is never started")
+    assert(GGUI.start_follow, "the follow poll is never started")
+    GGUI.start_follow()
+    local timer
+    for _, t in ipairs(REAL_TIMERS or {}) do
+        if t.name == "gg_follow_bar" then timer = t end
+    end
+    assert(timer, "nothing polls the strip - the opener only moves at turn start")
+    assert(timer.ms <= 500, "the follow poll is too slow to look attached: " .. timer.ms)
+
+    local bx, by, bw = 431, -4, 1019
+    local btn_x, btn_y, moves = 0, 0, 0
+    local BTN = setmetatable({
+        MoveTo = function(_, x, y) btn_x, btn_y, moves = x, y, moves + 1 end,
+        Position = function() return btn_x, btn_y end,
+    }, {__index = function() return function() end end})
+    local BAR = setmetatable({
+        Position = function() return bx, by end,
+        Dimensions = function() return bw, 60 end,
+    }, {__index = function() return function() end end})
+    local prev_find, prev_is, prev_ex, prev_at = find_uicomponent, is_uicomponent, EX,
+                                                  GGUI.btn_at
+    local prev_res = core.get_screen_resolution
+    core.get_screen_resolution = function() return 1920, 1080 end
+    find_uicomponent = function(_, name)
+        if name == "resources_bar" then return BAR end
+        if name == GGUI.BTN then return BTN end
+    end
+    is_uicomponent = function(x) return type(x) == "table" end
+    EX = nil
+
+    GGUI.btn_at = nil
+    timer.fn()
+    assert(moves == 0, "the poll must not place a button that is not placed yet")
+
+    GGUI.btn_at = "placed"
+    timer.fn()
+    local x0 = btn_x
+    bx, bw = 381, 1119                      -- an icon appears: the end moves 50 right
+    timer.fn()
+    assert(btn_x == x0 + 50, "the opener must follow the strip's end: " .. x0 .. " -> "
+           .. btn_x)
+    local n = moves
+    timer.fn()
+    assert(moves == n, "an unchanged strip must not MoveTo again every tick")
+    by = -600                               -- the strip slides away for end turn
+    timer.fn()
+    assert(btn_x == x0 + 50 and moves == n, "a strip that is away must leave the button")
+
+    find_uicomponent, is_uicomponent, EX, GGUI.btn_at = prev_find, prev_is, prev_ex, prev_at
+    core.get_screen_resolution = prev_res
 end)()
 
 -- ---------------------------------------------- the opener's tooltip, on hover --
@@ -7318,5 +7489,100 @@ end)()
     GG.state[ME], GG.cooldowns[ME], GG.patrons[ME] = nil, nil, nil
     GG.CULTURE_OF[ME], GG.CULTURE_OF[RIVAL] = nil, nil
 end)()
+
+-- ------------------------------------------------ a running service lights its card ---
+-- GGUI.service_running decides which card glows: a bundle service whose bundle is on the
+-- buyer now. A hostile bundle sits on its victim and a gold service has no bundle, so
+-- neither may light the buyer's card. GGUI.light_card writes both glows by index.
+;(function()
+    local function svc(key)
+        for _, s in ipairs(GG.SERVICES) do if s.key == key then return s end end
+    end
+    local knife, khan, levy = svc("knife_in_dark"), svc("khans_price"), svc("caravan_levy")
+    assert(knife and khan and levy, "the three services the lit-card test uses exist")
+    local HAS, prev = {}, cm.get_faction
+    GG.CULTURE_OF["cr_lit"] = GG.CHD_CULTURE
+    cm.get_faction = function(_, k)
+        return {is_null_interface = function() return false end,
+                name = function() return k end,
+                has_effect_bundle = function(_, b) return HAS[b] == true end}
+    end
+    assert(GGUI.service_running("cr_lit", knife) == false, "unbought: dark")
+    HAS["derpy_gg_svc_knife_in_dark"] = true
+    assert(GGUI.service_running("cr_lit", knife) == true, "its bundle is on: lit")
+    -- Even with a bundle of its name on the faction: the rule is the service's KIND.
+    HAS["derpy_gg_svc_caravan_levy"] = true
+    assert(GGUI.service_running("cr_lit", levy) == false, "a gold service never lights")
+    HAS["derpy_gg_svc_khans_price"] = true
+    assert(GGUI.service_running("cr_lit", khan) == false,
+           "a hostile bundle is the victim's, not the buyer's")
+    assert(GGUI.service_running("cr_lit", nil) == false, "an empty slot is dark")
+    GG.CULTURE_OF["cr_lit_emp"] = "wh_main_emp_empire"
+    HAS["derpy_gg_svc_knife_in_dark_emp"] = nil
+    assert(GGUI.service_running("cr_lit_emp", knife) == false,
+           "an Empire buyer is asked about its own tagged bundle, not the Chaos Dwarf one")
+    HAS["derpy_gg_svc_knife_in_dark_emp"] = true
+    assert(GGUI.service_running("cr_lit_emp", knife) == true, "and lit by it")
+    cm.get_faction = prev
+
+    local set = {}
+    local card = {SetImagePath = function(_, p, i) set[i] = p end}
+    GGUI.light_card(card, true)
+    assert(set[GGUI.CARD_HEAT_INDEX] == GGUI.CARD_HEAT and set[GGUI.CARD_RIM_INDEX] == GGUI.CARD_RIM,
+           "lit: both glows on, each at its own index")
+    GGUI.light_card(card, false)
+    assert(set[GGUI.CARD_HEAT_INDEX] == GGUI.CARD_OFF and set[GGUI.CARD_RIM_INDEX] == GGUI.CARD_OFF,
+           "unlit: both back to the blank")
+end)()
+
+-- ------------------------------------------------- the price plate follows the price ---
+-- The price sits on a plate, and a plate with no number on it is an empty dark bar - the
+-- Court drew two. GGUI.set_cost shows the plate exactly when there is a price.
+;(function()
+    local shown, text = nil, nil
+    local cost = {SetText = function(_, s) text = s end,
+                  SetVisible = function(_, v) shown = v end}
+    local prev_find, prev_is = find_uicomponent, is_uicomponent
+    find_uicomponent = function(_, name) if name == "card_cost" then return cost end end
+    is_uicomponent = function(x) return x ~= nil end
+    GGUI.set_cost({}, "150")
+    assert(text == "150" and shown == true, "a price shows its plate")
+    GGUI.set_cost({}, "")
+    assert(text == "" and shown == false, "no price hides the plate")
+    GGUI.set_cost({}, nil)
+    assert(text == "" and shown == false, "nil is no price")
+    find_uicomponent, is_uicomponent = prev_find, prev_is
+end)()
+
+do
+    -- THE BOUNTY CARD SAYS WHAT A v2 OFFER IS. Labels are asked for by key, so this
+    -- checks which keys a job card and a war card ask for.
+    local asked = {}
+    common = {get_localised_string = function(k) asked[#asked + 1] = k return "x" end}
+    local o = {guild = "brass", kind = "region_take", target = "t", owner = "f", war = 1}
+    GGUI.bounty_target_label(o)
+    local joined = table.concat(asked, " ")
+    assert(joined:find("derpy_gg_bounty_war", 1, true), "a new-war card must say so")
+    asked = {}
+    local s = GGUI.bounty_target_label({guild = "brass", kind = "job_coffers",
+                                        target = "job_coffers", amount = 6000})
+    joined = table.concat(asked, " ")
+    assert(joined:find("derpy_gg_bounty_obj_coffers", 1, true), "a coffers card names the ask")
+    asked = {}
+    GGUI.bounty_target_label({guild = "brass", kind = "job_build", target = "lvl_x"})
+    joined = table.concat(asked, " ")
+    assert(joined:find("derpy_gg_bounty_obj_build", 1, true), "a build card says Build")
+    -- A taken hero bounty counts up on the card.
+    s = GGUI.bounty_target_label({guild = "daemonsmiths", kind = "hero_sabotage",
+                                  target = "r", owner = "f", taken = true, done = 1,
+                                  amount = 2})
+    assert(s:find("(1/2)", 1, true), "a taken hero card shows its progress: " .. s)
+    -- %n is filled, and nothing else is touched.
+    assert(GGUI.fill("Hold %n gold", 6000) == "Hold 6000 gold")
+    -- A job has nowhere on the map to show.
+    assert(GGUI.bounty_pos({kind = "job_coffers", target = "job_coffers"}) == nil,
+           "a job card must not offer a map click")
+    common = nil
+end
 
 print("harness ok")

@@ -254,7 +254,7 @@ end
 -- drift here is silent misplacement rather than an error.
 GGUI.PANEL_XY = {
     gg_crest      = {16, 9},
-    gg_title      = {60, 8},
+    gg_title      = {95, 0},
     gg_close      = {748, 12},
     gg_divider    = {20, 44},
     gg_tab_guilds = {20, 56},
@@ -263,9 +263,10 @@ GGUI.PANEL_XY = {
     gg_tab_court  = {395, 56},
     gg_tab_log    = {520, 56},
     gg_tab_help   = {645, 56},
-    gg_rank_line  = {20, 104},
-    gg_bar_track  = {20, 138},
-    gg_rep_bar    = {20, 138},
+    gg_rank_line  = {20, 92},
+    gg_rank_mark  = {18, 89},
+    gg_bar_track  = {20, 140},
+    gg_rep_bar    = {38, 148},
     gg_card_1     = {20, 170},
     gg_card_2     = {20, 300},
     gg_card_3     = {20, 430},
@@ -279,6 +280,7 @@ GGUI.PANEL_XY = {
     gg_gtab_5     = {448, 596},
     gg_gtab_6     = {496, 596},
     gg_gsel       = {256, 590},
+    gg_gbar       = {240, 598},
     -- The Log's filters, in the band the reputation bar uses on the Guilds tab.
     gg_lf_all     = {20, 138},
     gg_lf_mine    = {140, 138},
@@ -312,11 +314,11 @@ GGUI.PANEL_XY = {
 -- Mirrors HELP_SLOTS in tools/gen_guilds_ui.py; check() refuses if the two differ.
 GGUI.HELP_SLOTS = 21
 GGUI.CARD_CHILD_XY = {
-    card_icon = {14, 26},
-    card_name = {92, 12},
-    card_desc_1 = {92, 44},
-    card_desc_2 = {92, 64},
-    card_cost = {596, 12},
+    card_icon = {8, 7},
+    card_name = {114, 12},
+    card_desc_1 = {114, 44},
+    card_desc_2 = {114, 64},
+    card_cost = {596, 10},
     card_buy  = {596, 60},
 }
 
@@ -338,6 +340,63 @@ GGUI.GUILD_ICON = {
     overseers    = "ui/campaign ui/derpy_gg_icons/overseers.png",
     slavers      = "ui/campaign ui/derpy_gg_icons/slavers.png",
 }
+
+-- WHICH IMAGE IS THE GLYPH. The card icon and the header's icon are CA's round bronze
+-- holder with the glyph over it, so image 0 is the holder and 1 the glyph; painting 0
+-- would put the guild's mark where the holder was and leave the placeholder inside it.
+-- gen_guilds_ui.check() pins both against the layer order.
+GGUI.CARD_ICON_INDEX = 1
+GGUI.RANK_ICON_INDEX = 1
+
+-- A RUNNING SERVICE LIGHTS ITS CARD: CA's heat glow behind the icon (image 2 of the card,
+-- index CARD_HEAT_INDEX) and the Tower of Zharr's glowing rim around it (CARD_RIM_INDEX).
+-- Off is CLEAR, our own fully transparent 128px file, which is also what the .twui.xml
+-- ships (NOT CA's 24px icon_blank: the rim's 40px 9-slice margin read past its edge into
+-- the texture atlas and drew streaks over every card, seen in game 2026-09-26). So a
+-- card nobody lit - the pick card, a bounty - stays dark. Mirrors CARD_LAYERS in
+-- tools/gen_guilds_ui.py, which check() pins.
+GGUI.CARD_HEAT_INDEX = 1
+GGUI.CARD_RIM_INDEX = 2
+GGUI.CARD_OFF = "ui/campaign ui/derpy_gg_icons/clear.png"
+GGUI.CARD_HEAT = "ui/skins/default/dlc23_chd_hell_forge/heat_glow.png"
+GGUI.CARD_RIM = "ui/skins/default/dlc23_tower_of_zharr/district_complete_glow_02.png"
+
+function GGUI.light_card(card, lit)
+    if not card then return end
+    pcall(function()
+        card:SetImagePath(lit and GGUI.CARD_HEAT or GGUI.CARD_OFF, GGUI.CARD_HEAT_INDEX)
+        card:SetImagePath(lit and GGUI.CARD_RIM or GGUI.CARD_OFF, GGUI.CARD_RIM_INDEX)
+    end)
+end
+
+-- THE PRICE AND ITS PLATE GO TOGETHER. The price sits on the Hell-Forge's small title
+-- plate, and a plate with nothing on it is an empty dark bar - the Court's demand and
+-- patron cards drew two of them, seen in game 2026-09-26. Every write to card_cost comes
+-- through here, so the plate shows exactly when there is a number to put on it.
+function GGUI.set_cost(card, text)
+    local c = comp("card_cost", card)
+    if not c then return end
+    text = text or ""
+    set_text(c, text)
+    pcall(function() c:SetVisible(text ~= "") end)
+end
+
+-- WHETHER A SERVICE IS IN EFFECT ON THIS FACTION: its bundle is on the faction now. Only a
+-- bundle service can be; a hostile one sits on its victim, not on the buyer.
+function GGUI.service_running(faction, s)
+    if not s or s.kind ~= "bundle" or s.hostile then return false end
+    local ok, on = pcall(function()
+        local f = cm:get_faction(faction)
+        if not f or f:is_null_interface() then return false end
+        return f:has_effect_bundle("derpy_gg_svc_" .. s.key .. GG.tag(faction))
+    end)
+    return ok and on == true
+end
+
+-- THE TAB PLATE, in the Hell-Forge's large square button. The open tab wears the
+-- _selected pair, so the strip says which view is up in the art as well as the colour.
+-- Mirrors TAB_PLATE in tools/gen_guilds_ui.py, which check() pins.
+GGUI.TAB_PLATE = "ui/skins/default/dlc23_chd_hell_forge/button_square_extra_large_%s.png"
 
 -- THE PANEL GROUND, ONE PICTURE PER GUILD. The panel component carries FOUR images in
 -- this order - the plain tile, the art, the scrim over it, the frame around it - and
@@ -370,8 +429,8 @@ GGUI.PANEL_BG = {
 -- goes away. gen_guilds_ui.check() pins the two together.
 GGUI.BOUNTY_LIFE = 6
 
-GGUI.REP_BAR_W = 750
-GGUI.REP_BAR_H = 12
+GGUI.REP_BAR_W = 714
+GGUI.REP_BAR_H = 13
 
 -- Mirrors ROW_LAYOUT in tools/gen_guilds_ui.py; check() compares the two. The leader
 -- column was widened to 324px because it now carries the round's movement as well as
@@ -716,11 +775,12 @@ end
 function GGUI.draw_card(faction, i, s)
     local card = GGUI.card(i)
     if not card then return end
+    GGUI.light_card(card, GGUI.service_running(faction, s))
     if not s then
         set_text(comp("card_name", card), "")
         set_text(comp("card_desc_1", card), "")
         set_text(comp("card_desc_2", card), "")
-        set_text(comp("card_cost", card), "")
+        GGUI.set_cost(card, "")
         set_text(comp("card_buy", card), "")
         local eb = comp("card_buy", card)
         if eb then pcall(function() eb:SetVisible(false) end) end
@@ -768,13 +828,13 @@ function GGUI.draw_card(faction, i, s)
     if not ok and why == "favour" then
         cost_text = "[[col:red]]" .. tostring(cost_now) .. "[[/col]]"
     end
-    set_text(comp("card_cost", card), cost_text)
+    GGUI.set_cost(card, cost_text)
 
     local ic = comp("card_icon", card)
     if ic then
         pcall(function()
             ic:SetVisible(true)
-            ic:SetImagePath(GGUI.icon(GGUI.current_guild()) or "", 0)
+            ic:SetImagePath(GGUI.icon(GGUI.current_guild()) or "", GGUI.CARD_ICON_INDEX)
         end)
     end
 
@@ -883,9 +943,14 @@ function GGUI.loc_raw(key)
     return ""
 end
 
+-- %n in a loc line is the number the card fills in. One placeholder, one number: a
+-- sentence with the number in the middle is easier to translate than one built in pieces.
+function GGUI.fill(s, n)
+    return (string.gsub(s, "%%n", tostring(n)))
+end
+
 function GGUI.bounty_title(o)
-    local t = GGUI.loc_raw("missions_localised_title_"
-                           .. GG.bounty_mission_key(o.guild, GGUI.me()))
+    local t = GGUI.loc_raw("missions_localised_title_" .. GG.offer_mission_key(o, GGUI.me()))
     if t ~= "" then return t end
     return GGUI.loc_guild(o.guild)
 end
@@ -910,16 +975,55 @@ function GGUI.bounty_owner_now(o)
     return o.owner or ""
 end
 
+-- A NEW-WAR OFFER SAYS SO IN RED, because taking it declares the war. A hero bounty
+-- leads with what the heroes are to do and, once taken, counts up (1/2).
 function GGUI.bounty_target_label(o)
-    local owner = GGUI.faction_name(GGUI.bounty_owner_now(o))
     local k = GG.BOUNTY_KINDS[o.kind]
-    if k and k.target == "region" then
-        -- regions_onscreen_<region_key>, read out of CA's own regions__.loc.
-        local nm = GGUI.loc_raw("regions_onscreen_" .. tostring(o.target))
-        if nm == "" then nm = tostring(o.target) end
-        return nm .. "  (" .. owner .. ")"
+    if not k then return "" end
+    local owner = GGUI.faction_name(GGUI.bounty_owner_now(o))
+    local progress = ""
+    if k.shape and o.taken then
+        progress = "  (" .. (o.done or 0) .. "/" .. (o.amount or 1) .. ")"
     end
-    return GGUI.loc("bounty_lord") .. "  (" .. owner .. ")"
+    local lead = ""
+    -- Every key spelled out whole, so check_loc_keys can see each one ships.
+    if k.shape then
+        lead = GGUI.loc(({sabotage = "bounty_obj_sabotage", harry = "bounty_obj_harry",
+                          strike = "bounty_obj_strike"})[k.shape]) .. ": "
+    end
+    local who
+    if k.target == "region" then
+        -- regions_onscreen_<region_key>, read out of CA's own regions__.loc.
+        who = GGUI.loc_raw("regions_onscreen_" .. tostring(o.target))
+        if who == "" then who = tostring(o.target) end
+    elseif k.target == "lord" then
+        who = GGUI.loc("bounty_lord")
+    elseif k.target == "character" then
+        who = GGUI.loc("bounty_char")
+    end
+    if who then
+        if o.war == 1 then
+            return lead .. who .. "  [[col:red]]" .. GGUI.loc("bounty_war") .. " "
+                   .. owner .. "[[/col]]"
+        end
+        return lead .. who .. "  (" .. owner .. ")" .. progress
+    elseif k.pick == "coffers" and o.taken then
+        return GGUI.fill(GGUI.loc("bounty_obj_coffers_taken"), o.amount or 0)
+    elseif k.pick == "coffers" then
+        return GGUI.fill(GGUI.loc("bounty_obj_coffers"), o.amount or 0)
+    elseif k.pick == "champion" then
+        return GGUI.fill(GGUI.loc("bounty_obj_champion"), o.amount or 0)
+    elseif k.pick == "captives" then
+        return GGUI.fill(GGUI.loc("bounty_obj_captives"), o.amount or 0)
+    elseif k.pick == "research" then
+        local nm = GGUI.loc_raw("technologies_onscreen_name_" .. tostring(o.target))
+        return GGUI.loc("bounty_obj_research") .. ": " .. (nm ~= "" and nm or tostring(o.target))
+    elseif k.pick == "build" then
+        local lk = GG.BOUNTY_BUILDING_LOC and GG.BOUNTY_BUILDING_LOC[o.target]
+        local nm = lk and GGUI.loc_raw(lk) or ""
+        return GGUI.loc("bounty_obj_build") .. ": " .. (nm ~= "" and nm or tostring(o.target))
+    end
+    return ""
 end
 
 -- THE DIFFICULTY BANDS, read off the stored score rather than recomputed. The model
@@ -988,15 +1092,17 @@ function GGUI.draw_bounties(faction)
                 pay = pay .. "   " .. left .. " " .. GGUI.loc("bounty_turns")
             end
             set_text(comp("card_desc_2", card), pay)
-            set_text(comp("card_cost", card), tostring(o.gold or 0))
-            set_tooltip(comp("card_cost", card), GGUI.loc("bounty_pays") .. " "
-                        .. (o.gold or 0))
+            -- THE PLATE IS THE STAKE, as a service card's plate is its favour price
+            -- (ruling T10-R1). The gold is already on the pay line.
+            local stake = o.stake or 0
+            GGUI.set_cost(card, (stake > 0 and not o.taken) and tostring(stake) or "")
+            set_tooltip(comp("card_cost", card), GGUI.loc("bounty_stake_tip"))
 
             local ic = comp("card_icon", card)
             if ic then
                 pcall(function()
                     ic:SetVisible(true)
-                    ic:SetImagePath(GGUI.icon(o.guild) or "", 0)
+                    ic:SetImagePath(GGUI.icon(o.guild) or "", GGUI.CARD_ICON_INDEX)
                 end)
             end
 
@@ -1004,10 +1110,13 @@ function GGUI.draw_bounties(faction)
             -- somewhere to show, since a dead lord has no position.
             local tip = GGUI.loc_guild(o.guild) .. "  -  "
                         .. GGUI.loc_raw("missions_localised_description_"
-                                        .. GG.bounty_mission_key(o.guild, GGUI.me()))
+                                        .. GG.offer_mission_key(o, GGUI.me()))
                         .. "||" .. GGUI.loc("bounty_help")
+            if o.war == 1 then
+                tip = tip .. "||" .. GGUI.loc("bounty_war_tip") .. " "
+                      .. GGUI.faction_name(GGUI.bounty_owner_now(o)) .. "."
+            end
             if GGUI.bounty_pos(o) then tip = tip .. "||" .. GGUI.loc("map_tip") end
-            set_tooltip(card, tip)
 
             local btn = comp("card_buy", card)
             if btn then
@@ -1017,10 +1126,20 @@ function GGUI.draw_bounties(faction)
                 -- "it still lets me take it". The row keeps saying Taken beside the pay.
                 pcall(function() btn:SetVisible(not o.taken) end)
                 if not o.taken then
-                    set_text(btn, GGUI.loc("take"))
-                    pcall(function() btn:SetDisabled(false) end)
+                    -- SHORT OF FAVOUR, the Take is red and dead, the way a service the
+                    -- player cannot afford is, and the tooltip says by how much.
+                    local _, fav = GG.get(faction, o.guild)
+                    local short = (o.stake or 0) > (fav or 0)
+                    set_text(btn, short and ("[[col:red]]" .. GGUI.loc("take") .. "[[/col]]")
+                                        or GGUI.loc("take"))
+                    pcall(function() btn:SetDisabled(short) end)
+                    if short then
+                        tip = tip .. "||" .. string.gsub(GGUI.fill(
+                            GGUI.loc("bounty_stake_short"), o.stake), "%%m", tostring(fav or 0))
+                    end
                 end
             end
+            set_tooltip(card, tip)
         end
     end
 end
@@ -1043,13 +1162,13 @@ function GGUI.fill_card(card, icon, name, l1, l2, right, button, enabled, tip)
     set_text(comp("card_name", card), name or "")
     set_text(comp("card_desc_1", card), l1 or "")
     set_text(comp("card_desc_2", card), l2 or "")
-    set_text(comp("card_cost", card), right or "")
+    GGUI.set_cost(card, right or "")
     local ic = comp("card_icon", card)
     if ic then
         pcall(function()
             local has = icon ~= nil and icon ~= ""
             ic:SetVisible(has)
-            if has then ic:SetImagePath(icon, 0) end
+            if has then ic:SetImagePath(icon, GGUI.CARD_ICON_INDEX) end
         end)
     end
     local btn = comp("card_buy", card)
@@ -1200,6 +1319,13 @@ function GGUI.refresh()
     -- or picking a row on Standings changes the hall behind the text.
     GGUI.paint_ground(GGUI.ground_guild())
     GGUI.paint_crest()
+    -- The header's round holder carries the glyph of the guild whose hall is behind it.
+    local ri = comp("gg_rank_mark")
+    if ri then
+        pcall(function()
+            ri:SetImagePath(GGUI.icon(GGUI.ground_guild()) or "", GGUI.RANK_ICON_INDEX)
+        end)
+    end
     set_named_text("gg_title", GGUI.loc("panel_title"))
 
     -- THE TAB ROW, THE PAGER AND THE BUY BUTTONS ARE BUTTONS WITH NO TEXT OF THEIR
@@ -1215,6 +1341,16 @@ function GGUI.refresh()
             label = "[[col:yellow]]" .. label .. "[[/col]]"
         end
         set_named_text(tabs[i], label)
+        -- Image 0 is the standard state's plate and 1 the hover state's.
+        local t = comp(tabs[i])
+        if t then
+            local sel = (i == GGUI.TAB)
+            pcall(function()
+                t:SetImagePath(string.format(GGUI.TAB_PLATE, sel and "selected" or "active"), 0)
+                t:SetImagePath(string.format(GGUI.TAB_PLATE,
+                                             sel and "selected_hover" or "hover"), 1)
+            end)
+        end
     end
     set_named_text("gg_prev", GGUI.loc("prev"))
     set_named_text("gg_next", GGUI.loc("next"))
@@ -1389,6 +1525,9 @@ function GGUI.refresh()
     for i = 1, #GGUI.CARD_XY do
         local card = GGUI.card(i)
         if card then pcall(function() card:SetVisible(show_cards) end) end
+        -- UNLIT FIRST. The bounty board and the Court reuse these three cards, so a glow
+        -- left from the Guilds tab would light a bounty. draw_card relights its own.
+        GGUI.light_card(card, false)
     end
     for i = 1, #GG.GUILDS do
         local row = comp(GGUI.ROW .. "_" .. i, comp(GGUI.PANEL))
@@ -2101,6 +2240,9 @@ function GGUI.draw_guild_buttons(faction)
             end
         end
     end
+    -- The bronze bar the buttons sit on goes with them.
+    local gbar = comp("gg_gbar")
+    if gbar then pcall(function() gbar:SetVisible(quick) end) end
     local bar, panel = comp(GGUI.GUILD_SEL), comp(GGUI.PANEL)
     if not bar or not panel then return end
     pcall(function()
@@ -2427,12 +2569,17 @@ function GGUI.show_on_map(x, y)
     return true
 end
 
--- WHERE A BOUNTY'S TARGET STANDS: the settlement for a region, the lord for a lord. A
+-- WHERE A BOUNTY'S TARGET STANDS: the settlement for a region, the lord or hero for a
+-- lord or a character. A
 -- family member outlives its character (CA's model_hierarchy), so a dead lord is a null
 -- character here and has no position.
 function GGUI.bounty_pos(o)
     local k = o and GG.BOUNTY_KINDS[o.kind]
-    if not k then return nil end
+    -- A job has nowhere to show: a sum, a rank, a technology, a building anywhere.
+    if not k or not (k.target == "region" or k.target == "lord"
+                     or k.target == "character") then
+        return nil
+    end
     local ok, x, y = pcall(function()
         if k.target == "region" then
             local r = cm:get_region(o.target)
@@ -2696,8 +2843,14 @@ function GGUI.badge(faction)
 end
 
 GGUI.BTN_GAP  = 4
-GGUI.BTN_TRIES = 12
+-- LONGER THAN ANY INTRO. It was 12 (24 seconds), and a 2026-09-27 Middenland load kept
+-- resources_bar off-screen ~245s after first tick: the chain gave up "(unsettled)" and
+-- the button first showed at turn 2. The Zharr Exchange measured the same race on
+-- 2026-09-06 and settled on 150 (EX.PLACE_TRIES); the chain ends at the first placement,
+-- so the count only matters if CA renames the anchor.
+GGUI.BTN_TRIES = 150        -- x2.0s = 5 minutes
 GGUI.btn_at = nil           -- set once placed; stops the retry chain for good
+GGUI.btn_chain = false      -- a retry is queued; a turn start must not start another
 
 -- Dimensions(), NOT Bounds(). Bounds() is the extent INCLUDING children, so while
 -- the HUD is still settling the root's bounds balloon past the real display and an
@@ -2788,6 +2941,54 @@ function GGUI.btn_anchor()
            string.format("in the exchange slot, bar %d,%d %dx%d", bx, by, bw, bh)
 end
 
+-- Within one button of the screen is clamped onto it; further out is a bad or
+-- mid-animation read and answers nil. Shared by placement and the follow poll, so the
+-- two cannot disagree about what counts as a real reading.
+function GGUI.fit_opener(x, y)
+    local sw, sh = screen()
+    local tol = GGUI.BTN_SIZE
+    if x < -tol or y < -tol or x + GGUI.BTN_SIZE > sw + tol
+       or y + GGUI.BTN_SIZE > sh + tol then
+        return nil
+    end
+    if x < 0 then x = 0 end
+    if y < 0 then y = 0 end
+    if x + GGUI.BTN_SIZE > sw then x = sw - GGUI.BTN_SIZE end
+    if y + GGUI.BTN_SIZE > sh then y = sh - GGUI.BTN_SIZE end
+    return x, y
+end
+
+-- THE BUTTON FOLLOWS THE STRIP'S END. resources_bar is docked Top Center and sizes to its
+-- content, so its right end moves whenever an effect icon or faction widget appears -
+-- mid-turn, with no event for it. Placement alone ran at load and turn start, so the
+-- button sat where the end used to be and jumped at the next turn (reported 2026-09-27).
+-- This polls on the UI clock, a few times a second: one find and two reads, and a MoveTo
+-- only when the answer changed. Does nothing until the button is placed, and nothing while
+-- the strip is away (btn_anchor refuses an unsettled strip). Local and UI-only, so it
+-- cannot desync multiplayer.
+GGUI.FOLLOW_MS = 300
+
+function GGUI.follow_bar()
+    if not GGUI.btn_at then return end
+    local b = comp(GGUI.BTN)
+    if not b then return end
+    local x, y = GGUI.btn_anchor()
+    if not x then return end
+    x, y = GGUI.fit_opener(x, y)
+    if not x then return end
+    local ax, ay = b:Position()
+    if ax == x and ay == y then return end
+    b:MoveTo(x, y)
+    GGUI.btn_at = x .. "," .. y
+end
+
+function GGUI.start_follow()
+    cm:repeat_real_callback(function() pcall(GGUI.follow_bar) end, GGUI.FOLLOW_MS,
+                            "gg_follow_bar")
+end
+
+cm:add_first_tick_callback(function() GGUI.start_follow() end)
+
 function GGUI.place_opener(attempt)
     attempt = attempt or 1
     local root = core:get_ui_root()
@@ -2796,11 +2997,20 @@ function GGUI.place_opener(attempt)
     -- Every "not ready" branch routes through here so the chain cannot be given up
     -- on in one place and kept alive in another. Stops on the first success.
     local function retry()
-        if GGUI.btn_at or attempt >= GGUI.BTN_TRIES then return false end
+        if GGUI.btn_at or attempt >= GGUI.BTN_TRIES then
+            GGUI.btn_chain = false
+            return false
+        end
+        GGUI.btn_chain = true
         cm:callback(function() GGUI.place_opener(attempt + 1) end, 2.0,
                     "gg_place_opener_" .. attempt)
         return true
     end
+    -- ONE CHAIN. FactionTurnStart fires ~190 times a round; while the button is not yet
+    -- placed each would otherwise start its own 150-try chain. A queued retry is already
+    -- going to look again, so a fresh start has nothing to add.
+    if attempt == 1 and GGUI.btn_chain then return end
+    GGUI.btn_chain = false
 
     -- NO GUILDS, NO BUTTON. A race this mod writes no guilds for gets no way in; GG.covered
     -- keeps it out of the race as well. An unreadable player is loading, not a verdict.
@@ -2834,19 +3044,15 @@ function GGUI.place_opener(attempt)
     -- sit a few pixels higher and settle at y = -5, and refusing those leaves the
     -- mod with no way in at all. Within one button of the screen is a real anchor
     -- merely poking out.
-    local tol = GGUI.BTN_SIZE
-    if x < -tol or y < -tol or x + GGUI.BTN_SIZE > sw + tol
-       or y + GGUI.BTN_SIZE > sh + tol then
+    local fx, fy = GGUI.fit_opener(x, y)
+    if not fx then
         if not retry() and not GGUI.btn_at then
             GGUI.say("GAVE UP - resources_bar put the button at " .. x .. "," .. y
                      .. " on a " .. sw .. "x" .. sh .. " screen, too far out to clamp")
         end
         return
     end
-    if x < 0 then x = 0 end
-    if y < 0 then y = 0 end
-    if x + GGUI.BTN_SIZE > sw then x = sw - GGUI.BTN_SIZE end
-    if y + GGUI.BTN_SIZE > sh then y = sh - GGUI.BTN_SIZE end
+    x, y = fx, fy
 
     b:MoveTo(x, y)
     b:SetVisible(true)

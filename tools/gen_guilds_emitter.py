@@ -184,8 +184,12 @@ def _state(c, name, sguid, entries, target):
                 out += '\t\t\t\t\t\t\tdockpoint="%s"\n' % dock
             if lay.get("colour"):
                 out += '\t\t\t\t\t\t\tcolour="%s"\n' % lay["colour"]
-            m = float(lay.get("margin", 0))
-            out += '\t\t\t\t\t\t\tmargin="%.2f,%.2f,%.2f,%.2f"/>\n' % (m, m, m, m)
+            # A number is all four sides; a 4-tuple is top,right,bottom,left, CA's order
+            # (TWUI Studio's rasteriser reads it the same way). CA's Chaos Dwarf bars slice
+            # left and right only - cap_title_holder is 0,50,0,60 - which one number cannot say.
+            m = lay.get("margin", 0)
+            m = tuple(m) if isinstance(m, (tuple, list)) else (m,) * 4
+            out += '\t\t\t\t\t\t\tmargin="%.2f,%.2f,%.2f,%.2f"/>\n' % tuple(map(float, m))
         out += "\t\t\t\t\t</imagemetrics>\n"
 
     if target:

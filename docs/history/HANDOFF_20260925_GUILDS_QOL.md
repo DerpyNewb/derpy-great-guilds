@@ -2,6 +2,19 @@
 
 2026-09-25. Built and packed:
 
+- **Current, 2026-09-26:** MD5 `7f9d5cf2e71ea5788dbc20ac21e16dba`, 32,266,153 bytes. It
+  fixes the card streaks and the empty price plates (section 9). Built while the game was
+  running and deployed by a background copy once it closed, after checking that `data/`
+  still held `1a9b7828`. MD5 matched. Not pushed, not uploaded.
+- `1a9b7828529aad5f1784fb99f2d78362` (32,265,300 bytes) lit the card of a running service and
+  gave every effect bundle an icon (section 8). Backed up with the suffix
+  `.bak_20260926_pre_atlas_fix_1a9b7828`.
+- `056810bc2182ed85082a51c681251c90` (32,157,734 bytes) fixed the tab and price text seen in
+  game (section 8). It was deployed by a background copy once the game closed. Backed up with
+  the suffix `.bak_20260926_pre_lit_cards_056810bc` in `Modpacks/` and `data/`.
+- `54e67bc9ea44a86ef81ff7a3c6586907` (32,157,758 bytes) dressed the panel in CA's Chaos Dwarf
+  frames (section 7). Backed up with the suffix `.bak_20260926_pre_text_fit_54e67bc9`. The
+  `da1c0218` before it is backed up with the suffix `.bak_20260926_pre_chd_art_da1c0218`.
 - `derpy_great_guilds.pack`, MD5 `da1c0218ea4134c3cf72a5755455d836`, 32,151,169 bytes. This
   build adds the leadership fix (section 6). It was built while the game was running and
   copied into `data/` once the game closed, after a check that `data/` still held
@@ -14,7 +27,8 @@
 - The build before QoL (`40fe934a`, see `HANDOFF_20260925_GUILDS_MP_MCT.md`) is backed up as
   `Modpacks/derpy_great_guilds.pack.bak_20260925_pre_qol_40fe934a`.
 - Pushed to GitHub on 2026-09-25 as commit `6998466`, which covers builds 7DBE88C6 through
-  A3918816. The repo copy of this handoff predates this line. Not uploaded to Steam.
+  A3918816, and DA1C0218 as `c59e55b`. The repo copy of this handoff predates this line.
+  Not uploaded to Steam.
 
 The request was "find qol features that can be added on the UI". Eleven were proposed; the
 answer was "do all". A twelfth, the tooltip fix, turned up while building them.
@@ -262,3 +276,189 @@ the challenger has to get clear of one turn's pay.
 
 **Owed in game:** watch the feed across the first five turns of a new campaign for any
 guild announced lost and won in the same round.
+
+## 7. Chaos Dwarf frames (build `54e67bc9`, 2026-09-26)
+
+**The request:** a screenshot of CA's Hell-Forge panel and "use more of the chaos dwarf ui
+borders and elements, the same as other factions".
+
+**What CA does.** The Hell-Forge layout asks for `ui/skins/default/panel_title.png`, but the
+screenshot shows the spiked Chaos Dwarf plate. That plate is
+`ui/skins/wh3_dlc23_chd_chaos_dwarfs/panel_title.png`, a different file, so the game swaps a
+default-skin path for the player's culture copy. Fifteen cultures ship their own
+`panel_title.png`; Empire has none and gets the default. CA also reuses the Hell-Forge
+frames in other factions' panels: `sub_title.png` in Nurgle's plagues and the convoys panel,
+and the large square button in the High Elves' Valiant Imperatives.
+
+**What changed.** Everything is CA's art, referenced by path, and nothing new ships. Every
+margin is copied from the CA component that draws the same file (`hellforge_panel_*`,
+`military_convoys`). The source list is `HF` and the layer lists above `_panel()` in
+`tools/gen_guilds_ui.py`.
+
+| Part | Now |
+|---|---|
+| Title | `panel_title.png` at 600x54, the default path so the culture swap applies |
+| Header line | `cap_title_holder.png`, the bar "Melee Infantry" sits on; the text lifted onto its dark band (`RANK_TX`, `RANK_TY`) |
+| Header glyph | new `gg_rank_mark`: `cap_category_iconm_holder.png` with the guild on screen (`GGUI.ground_guild`) at image 1 |
+| Reputation bar | the convoys panel's segmented bar as the track, its own fill texture as the bar, in the trough (x 18..338, y 8..21 of 356x29) |
+| Service cards | `cap_group_background.png`, sliced left and right only |
+| Card glyph | in the round holder, 100x106, glyph 62 at image 1 (`GGUI.CARD_ICON_INDEX`) |
+| Price | `sub_title.png` |
+| Tabs | `button_square_extra_large_*`; the open tab wears `_selected` / `_selected_hover`, set by the Lua from `GGUI.TAB_PLATE` |
+| Guild buttons | new `gg_gbar`: `buttons_holder.png` behind the six, shown with them |
+
+Buy, Select, Confirm, the arrows, the close cross and the Log filters are unchanged.
+
+**Code.**
+
+- The emitter now writes a four-value margin (top, right, bottom, left, CA's order).
+- The new glyph layers are placed by offset with no dockpoint, because the two stack on an
+  image (`docs/CUSTOM_UI.md`).
+- `holder_layers()` centres a glyph on the holder's dark disc, measured off the file at 0.484
+  across and 0.455 down.
+- Lua: the new layout coordinates, `REP_BAR_W` 714 and `REP_BAR_H` 13, three card repaints
+  moved to `GGUI.CARD_ICON_INDEX`, the header glyph repaint, the open-tab plate, and `gg_gbar`
+  shown and hidden with the guild buttons.
+
+**Found by the preview.** The header holder was first named `gg_rank_icon`. That sorts
+before `gg_rank_line`, so the bar drew over it and it vanished. It is now `gg_rank_mark`.
+
+**New checks in `gen_guilds_ui.check()`:**
+
+- the draw order of both new pieces;
+- `CARD_ICON_INDEX`, `RANK_ICON_INDEX` and `TAB_PLATE` against the generator;
+- all four tab plates exist;
+- no nine-slice whose margins meet;
+- the layer bounds check now covers every new layer list;
+- the icon-size check now measures the card glyph, not its holder.
+
+The preview extracts the selected tab plates, draws the open tab and both glyphs as the Lua
+paints them, and crops the fill to the fraction earned.
+
+**Tests.** Green:
+
+- the harness, after one fix: its 2x scaling test hardcoded the title's old position;
+- `gen_guilds_ui` `--check` and `--selftest`, and TWUI Studio's reader (`preview --check`,
+  `--selftest`);
+- `check_guilds_ui`, `gen_great_guilds --check`, `check_lua_api`, `check_lua_literal_left`
+  and `check_lua_undeclared`;
+- `luac` on the Lua.
+
+The importer's verify passed, and the packed scripts and all six `.twui.xml` files are
+byte-identical to staging.
+
+**Owed in game:**
+
+1. The title plate is the spiked Chaos Dwarf one. The swap has only been seen on CA's own
+   panels, never on a component created by script. If it is the plain default, point
+   `TITLE_PLATE` at `ui/skins/wh3_dlc23_chd_chaos_dwarfs/panel_title.png`; that loses the
+   per-culture plate.
+2. The open tab shows the selected plate, and hovering it shows the selected hover.
+3. The reputation fill narrows correctly. It is a texture now, not a flat tint.
+4. The header text sits on the bar's dark band, clear of the round holder.
+5. The pick card, created on the root, draws the new plate and holder.
+
+## 8. Text fit, lit cards and effect icons (builds `056810bc` and `1a9b7828`, 2026-09-26)
+
+**Seen in game on `54e67bc9`**, with the report "the texts are off and overflowing":
+
+- **The title plate did swap** to the spiked Chaos Dwarf plate on a script-created panel.
+  Section 7's owed check 1 is settled.
+- **Tab captions ran over the plate's frame lines.** The tab plate was sliced at its frame
+  rows (10 and 12px), which left 12px of red at 34px tall. It is now sliced left and right
+  only (`0,12,0,12`) and squashes as one picture, which leaves about 24px of red.
+- **Prices sat on the plate's top rim.** The plate had been drawn 3px low to centre its art
+  on the box. But the game font draws a Center-aligned line about 2px high, and the plate's
+  own art already sits about 2px high (rows 1..24 of 30). It is back at the full box.
+
+Built as `056810bc` while the game was running, and deployed by a background copy once it
+closed. The copy first checked that `data/` still held `54e67bc9`.
+
+**Then asked:** "active effects should also have the background have effects, similar to
+the commission mod". Asked which effects; the answer was both of these:
+
+- **A running service lights its card.** `GGUI.service_running` is true when the service is a
+  bundle kind, is not hostile, and its tagged bundle `derpy_gg_svc_<key><tag>` is on the
+  buyer (`faction:has_effect_bundle`). `GGUI.light_card` then swaps two card layers from CA's
+  transparent `effect_bundles/icon_blank.png` to CA's own "active" art:
+  - the Hell-Forge `heat_glow.png`, across the card's left 300px;
+  - the Tower of Zharr `district_complete_glow_02.png`, as a rim with margin 40.
+
+  The layers are indices 1 and 2 (`GGUI.CARD_HEAT_INDEX` and `CARD_RIM_INDEX`). Every refresh
+  unlights all three cards first, because the bounty board and the Court reuse them.
+- **Every effect bundle has an icon.** All 379 shipped `ui_icon = ""`, so the game's effect
+  lists drew them bare. Each one now names `derpy_gg_<guild><tag>.png`: rank, lead and
+  service bundles use their guild, and the patron uses the crest. The race pass re-tags the
+  name the way it re-tags the key.
+  - `tools/make_guild_bundle_icons.py` writes the 55 icons. Each is the guild mark over CA's
+    teal disc, at 24x24 like all 1,115 of CA's.
+  - CA ships no bare disc, so the tool recovers it on every run from the 520 CA icons that
+    carry it. It fits the circle to the clean left and bottom arc (centre 11.0,13.1, radius
+    10.0). The teal comes from CA's pixels where at least half those icons show it, and from
+    a quadratic fit under the glyphs. The rim follows the measured radial profile.
+  - The importer packs only `derpy_gg_*` files from that shared folder, and refuses when an
+    icon a bundle names is missing.
+
+**The rites panel's animated background** (smoke-particle emitters with a
+`particle_move` animation, in `rituals_panel.twui.xml`) was found and **not** copied. That
+may be what "effects similar to the commission mod" meant. It is the next thing to offer.
+
+**Found, not ours:** while this was being built, `tools/gen_ic_ui.py` and all 13
+`derpy_ic_*.twui.xml` files changed on disk (21:46), from something else working on the Iron
+Court. Nothing here touched them.
+
+**Tests.**
+
+- A harness test for `service_running` and `light_card`. Four mutants were run against the
+  shipped Lua and all four were killed: dropped hostile check, dropped race tag, swapped glow
+  index, dropped kind check. The last survived at first, because the test never put a gold
+  service's bundle on the faction; the test now does.
+- `gen_guilds_ui --check` pins both indices and all three paths. It failed as expected on a
+  drifted index and on a drifted path.
+- `make_guild_bundle_icons --selftest` checks the fit on CA's clean arc: 18 levels on the
+  disc face (limit 20) and 35 on the anti-aliased rim (limit 45). `--check` confirms every
+  named icon is staged.
+- Every section 3 check is green again, and the harness passes. The packed files and 3 of
+  the icons are byte-identical to staging, and the pack holds 55 bundle icons, all ours.
+
+**Owed in game:**
+
+1. Buy a lasting service (Knife in the Dark, Writ of Monopoly): its card glows, and the glow
+   clears on the Bounties and Court tabs and once the service expires.
+2. The Faction Effects list shows each guild row with its mark on the teal disc.
+3. The tab captions and prices sit inside their plates.
+
+## 9. Streaks over every card, and empty price plates (build `7f9d5cf2`, 2026-09-26)
+
+**Seen in game on `1a9b7828`** (three screenshots, with the question "are you using the
+preview tool?"): streaks, gold arrows and red and blue bars across every card on the Guilds,
+Bounties and Court tabs, and an empty dark price bar on the Court's demand and patron cards.
+
+**The streaks: a 9-slice margin larger than its texture.** The card's rim layer had margin
+40 and shipped, as its "off" image, CA's `icon_blank.png`. That file is 24x24, so the slices
+reached outside it into the texture atlas and drew the art beside it.
+
+The preview could not show this: TWUI Studio rasterises the PNG alone, with no atlas behind
+it. The check for "margin under half the component" did not catch it either, because the
+limit that matters is the texture's.
+
+- **Fix:** the "off" image is now `derpy_gg_icons/clear.png`, our own fully transparent
+  128px file, written by `gen_guilds_ui --write`.
+- **New check:** `check_margins_fit_textures()` tests every layer of every file against its
+  shipped texture, and also against every texture the Lua swaps in (the four tab plates and
+  the two card glows). It reports exactly this fault when `icon_blank` is put back, and
+  nothing else in the panel.
+
+**The empty plates.** A price plate draws whether or not there is a number on it; the old
+bare text was invisible when empty. `GGUI.set_cost` now owns every write to `card_cost`, so
+the plate shows exactly when there is a price. There were four writes: an empty service
+slot, a service, a bounty, and `fill_card`.
+
+**Tests:** a harness test for `set_cost`, with two mutants run against the shipped Lua (plate
+always shown, nil not treated as empty), both killed. Every check in section 3 was rerun
+green. The packed Lua, the card and panel layouts and `clear.png` are byte-identical to
+staging.
+
+**Answer to the question.** The preview was used for every build. It showed the layout
+correctly, but it cannot show engine-side sampling, which is what this fault was. The new
+check covers that class of fault without the preview.

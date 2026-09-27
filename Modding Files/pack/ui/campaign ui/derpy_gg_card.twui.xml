@@ -44,11 +44,15 @@
 				<component_image
 					this="GG210004-D001-4000-B000000000000004"
 					uniqueguid="GG210004-D001-4000-B000000000000004"
-					imagepath="ui/skins/default/panel_back_tile.png"/>
+					imagepath="ui/skins/default/dlc23_chd_hell_forge/cap_group_background.png"/>
 				<component_image
 					this="GG210004-D003-4000-B000000000000004"
 					uniqueguid="GG210004-D003-4000-B000000000000004"
-					imagepath="ui/skins/default/panel_back_border.png"/>
+					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
+				<component_image
+					this="GG210004-D005-4000-B000000000000004"
+					uniqueguid="GG210004-D005-4000-B000000000000004"
+					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -67,16 +71,23 @@
 							width="750"
 							height="120"
 							tile="true"
-							margin="5.00,5.00,5.00,5.00"/>
+							margin="0.00,24.00,0.00,24.00"/>
 						<image
 							this="GG210004-D004-4000-B000000000000004"
 							uniqueguid="GG210004-D004-4000-B000000000000004"
 							componentimage="GG210004-D003-4000-B000000000000004"
 							offset="0.00,0.00"
+							width="300"
+							height="120"
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG210004-D006-4000-B000000000000004"
+							uniqueguid="GG210004-D006-4000-B000000000000004"
+							componentimage="GG210004-D005-4000-B000000000000004"
+							offset="0.00,0.00"
 							width="750"
 							height="120"
-							tile="true"
-							margin="18.00,18.00,18.00,18.00"/>
+							margin="40.00,40.00,40.00,40.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -187,13 +198,30 @@
 			uniqueguid="GG21000A-D000-4000-B00000000000000A"
 			currentstate="GG21000B-D000-4000-B00000000000000B"
 			defaultstate="GG21000B-D000-4000-B00000000000000B">
+			<componentimages>
+				<component_image
+					this="GG21000A-D001-4000-B00000000000000A"
+					uniqueguid="GG21000A-D001-4000-B00000000000000A"
+					imagepath="ui/skins/default/dlc23_chd_hell_forge/sub_title.png"/>
+			</componentimages>
 			<states>
 				<standard
 					this="GG21000B-D000-4000-B00000000000000B"
 					name="standard"
 					width="138"
-					height="26"
+					height="30"
 					uniqueguid="GG21000B-D000-4000-B00000000000000B">
+					<imagemetrics>
+						<image
+							this="GG21000A-D002-4000-B00000000000000A"
+							uniqueguid="GG21000A-D002-4000-B00000000000000A"
+							componentimage="GG21000A-D001-4000-B00000000000000A"
+							offset="0.00,0.00"
+							width="138"
+							height="30"
+							tile="true"
+							margin="0.00,12.00,0.00,12.00"/>
+					</imagemetrics>
 					<component_text
 						texthalign="Center"
 						textvalign="Center"
@@ -213,7 +241,7 @@
 						<frame
 							interpolationtime="0"
 							interpolationpropertymask="512"
-							targetmetrics_m_height="26"
+							targetmetrics_m_height="30"
 							targetmetrics_m_width="138"
 							targetmetrics_m_font_scale="1"/>
 					</frames>
@@ -311,14 +339,18 @@
 				<component_image
 					this="GG210013-D001-4000-B000000000000013"
 					uniqueguid="GG210013-D001-4000-B000000000000013"
+					imagepath="ui/skins/default/dlc23_chd_hell_forge/cap_category_iconm_holder.png"/>
+				<component_image
+					this="GG210013-D003-4000-B000000000000013"
+					uniqueguid="GG210013-D003-4000-B000000000000013"
 					imagepath="ui/campaign ui/effect_bundles/income.png"/>
 			</componentimages>
 			<states>
 				<standard
 					this="GG210014-D000-4000-B000000000000014"
 					name="standard"
-					width="68"
-					height="68"
+					width="100"
+					height="106"
 					uniqueguid="GG210014-D000-4000-B000000000000014">
 					<imagemetrics>
 						<image
@@ -326,9 +358,16 @@
 							uniqueguid="GG210013-D002-4000-B000000000000013"
 							componentimage="GG210013-D001-4000-B000000000000013"
 							offset="0.00,0.00"
-							width="68"
-							height="68"
-							dockpoint="Center"
+							width="100"
+							height="106"
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG210013-D004-4000-B000000000000013"
+							uniqueguid="GG210013-D004-4000-B000000000000013"
+							componentimage="GG210013-D003-4000-B000000000000013"
+							offset="17.00,17.00"
+							width="62"
+							height="62"
 							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 				</standard>

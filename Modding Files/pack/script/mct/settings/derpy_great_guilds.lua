@@ -136,7 +136,11 @@ local COURT = {
      "Reputation a bounty takes back when you accept it and do not finish it before the "
      .. "deadline, as a percentage of what finishing it would have paid. 100 makes the "
      .. "failure worth exactly what the success was. Leaving an offer alone or handing "
-     .. "it back is always free - this is only for work you promised. 0 switches it off."},
+     .. "it back costs no reputation - this is only for work you promised. 0 switches it off."},
+    {"rate_bounty_stake", "Bounty stake", 25, 0, 100,
+     "Favour you put up to take a bounty, as a percentage of the reputation it pays. You "
+     .. "get it back when you finish the bounty, and lose it if you fail or hand it back. "
+     .. "0 switches it off."},
 }
 
 for i = 1, #COURT do
@@ -281,7 +285,7 @@ local PRESET_OWNED = {
     "cap_khanate", "cap_overseers", "cap_slavers",
     "rate_missions", "rate_bounty", "rate_rivalry", "rate_patron",
     "demand_every", "demand_turns", "demand_reward", "demand_penalty",
-    "rate_decay", "decay_from", "rate_bounty_fail",
+    "rate_decay", "decay_from", "rate_bounty_fail", "rate_bounty_stake",
 }
 local CUSTOM_ONLY = "Set by the difficulty above. Choose Custom to edit it."
 
