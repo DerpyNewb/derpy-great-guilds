@@ -1,6 +1,7 @@
 # The Great Guilds: Empire and Dwarf flavours - design
 
-Date: 2026-09-23. Status: approved in conversation section by section; this file awaits review.
+Date: 2026-09-23. Status: approved in conversation section by section, and **built the same
+day** - see `HANDOFF_20260923_GUILDS_FLAVOURS.md`.
 
 ## 1. Goal
 

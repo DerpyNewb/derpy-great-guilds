@@ -256,4 +256,4 @@ Added by the final review:
 10. `cm:cancel_custom_mission` raises MissionCancelled. If it does not, a voided hero
     bounty never leaves the board and its stake is never refunded.
 
-Not pushed to GitHub or the Workshop.
+Pushed to GitHub later the same day (commit `ef7bd06`, 2026-09-27 16:55). Not on the Workshop.

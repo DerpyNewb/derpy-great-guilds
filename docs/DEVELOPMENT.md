@@ -15,35 +15,61 @@ something: an effect bundle to apply, a mission to issue, an event-feed entry to
 
 | File | Global | Role |
 |---|---|---|
-| `zzz_derpy_guilds.lua` | `GG` | The model: standing, earning, ranks, services, bounties, demands, patrons, leadership, the log, save state. |
+| `zzz_derpy_guilds.lua` | `GG` | The model: reputation, earning, ranks, services, bounties, demands, patrons, leadership, the log, the per-source ledger, save state, the multiplayer transport. |
 | `zzz_derpy_guilds_ai.lua` | `GGAI` | The AI's purchases, which go through the same `GG.buy` the player uses. |
-| `zzz_derpy_guilds_ui.lua` | `GGUI` | The panel, its six tabs and the HUD opener. It reads `GG` and never writes standing directly. |
+| `zzz_derpy_guilds_ui.lua` | `GGUI` | The panel, its six tabs and the HUD opener. It reads `GG` and never writes reputation directly. |
+| `zzz_derpy_guilds_bounty_data.lua` | `GG` | **Generated** by `gen_great_guilds.py --write`: the technologies a research job may name and the buildings each guild may request, per race. No script call can list either. |
 | `script/mct/settings/derpy_great_guilds.lua` | none | The MCT page. It runs in MCT's own environment and cannot see `GG`. |
 
-Standing lives in saved values rather than pooled resources. That keeps it culture-blind:
-a pooled resource needs a row per campaign group, and a missing row fails silently.
+The code calls reputation *standing*; the player never sees that word. Reputation lives in
+saved values rather than pooled resources. That keeps it culture-blind: a pooled resource
+needs a row per campaign group, and a missing row fails silently.
 
-**Coverage is the player's culture** (`GG.covered`). Every faction of that culture earns,
-and nobody else does. The culture is read off the human faction at runtime, so a culture
-added by another mod is covered as soon as somebody plays it.
+**Coverage is the player's race, and only the eight races the mod writes guilds for**
+(`GG.covered`, `GG.FLAVOURED`). Every faction of the human's culture earns, if that culture
+is one of the eight. Any other culture gets nothing, not even when a human plays it: no
+opener, no reputation, no messages. Before 2026-09-24 any culture a human played was
+covered.
 
-## 2. Where standing comes from
+**Flavours.** Each of the eight races has a tag (`""` Chaos Dwarfs, `_emp`, `_dwf`, `_brt`,
+`_cth`, `_ksl`, `_def`, `_hef`) appended to every key a player reads, and a feed offset
+(0, 10, 20, 40, 50, 60, 70, 80) added to the feed indexes. A ninth, `_gen` at offset 30
+(`GG.GENERIC`), is read only by a message to a human of an uncovered race whom a hostile
+service hit in multiplayer. `GG.FLAVOURED` is mirrored by `FLAVOURS` in
+`gen_great_guilds.py`, and `check_flavour_mirror()` refuses a mismatch.
+
+## 2. Where reputation comes from
 
 | Listener | Event | Pays |
 |---|---|---|
-| `gg_turn` | `FactionTurnStart` | Brass Tablets (from income). Also runs upkeep, cooldowns, the AI technology count, bounties, patrons, demands and leadership. |
-| `gg_battle` | `CharacterCompletedBattle` | Immortals, doubled when outnumbered. |
+| `gg_turn` | `FactionTurnStart` | Brass Tablets (from income). Also runs upkeep, cooldowns and the AI technology count; for humans, posts the bounty board, voids hero bounties whose target has gone, and runs the patron and the demand; for everyone, leadership. |
+| `gg_battle` | `CharacterCompletedBattle` | Immortals, doubled when outnumbered (`pending_battle:attacker_is_stronger()`). |
 | `gg_tech` | `ResearchCompleted` | Daemonsmiths, **for human factions only** (see section 7). |
-| `gg_research_started` | `ResearchStarted` | Nothing. It records the human's current technology for Bound Blueprint. |
-| `gg_agent_*` | `CharacterCharacterTargetAction`, `CharacterGarrisonTargetAction` | Khanate. |
+| `gg_research_started` | `ResearchStarted` | Nothing. It records the current technology of a covered faction for Bound Blueprint. |
+| `gg_agent_*` | `CharacterCharacterTargetAction`, `CharacterGarrisonTargetAction` | Khanate. Also counts progress on a taken hero bounty (`GG.hero_progress`). |
 | `gg_building` | `BuildingCompleted` | The guild the building's chain belongs to (`GG.BUILDING_THEME`, longest token match), scaled by level. |
 | `gg_sack_*` | `CharacterSackedSettlement`, `CharacterRazedSettlement` | Slavers, more for a raze. |
-| `gg_mission` | `MissionSucceeded` | All six guilds, plus the payout for a bounty mission. |
-| `gg_bounty_*` | `MissionFailed`, `MissionCancelled` | A failed bounty takes back what finishing it would have paid. |
-| `gg_character_destroyed` | `CharacterDestroyed` | Nothing. It withdraws a bounty whose target lord is dead. |
+| `gg_mission` | `MissionSucceeded` | All six guilds, or instead the payout for a bounty mission (a bounty is not also paid the blanket rate). |
+| `gg_bounty_MissionCancelled` | `MissionCancelled` | Nothing. A bounty the mod voided gets its favour stake back. |
+| `gg_bounty_MissionFailed` | `MissionFailed` | A failed bounty takes back reputation (`rate_bounty_fail`), and its stake is lost. |
+| `gg_character_destroyed` | `CharacterDestroyed` | Nothing. It withdraws a bounty whose target character is dead. |
+| `gg_ai_turn` | `FactionTurnStart` (in `GGAI`) | Nothing. The AI's purchases, demands and patrons. |
+| `gg_mp` | `UITrigger` | Nothing. The receiving end of the multiplayer transport (section 5). |
 
 Every earn route goes through `GG.grant`, which applies the per-turn cap, the patron share
-and the rivalry term. Demand rewards and bounty payouts bypass the cap on purpose.
+and the rivalry term, and records the amount by source in the human's ledger (the "Reputation
+this turn" line; `GG.LEDGER_SOURCES`, with what the cap held back as `withheld`). Demand
+rewards and bounty payouts bypass the cap on purpose.
+
+**Bounties** are real missions, issued with `cm:trigger_custom_mission_from_string` and
+tracked by the engine's own objectives: `CAPTURE_REGIONS`,
+`RAZE_OR_SACK_N_DIFFERENT_SETTLEMENTS_INCLUDING` and `KILL_CHARACTER_BY_ANY_MEANS` for
+military offers; `HAVE_AT_LEAST_X_MONEY`, `ACHIEVE_CHARACTER_RANK`,
+`RESEARCH_N_TECHS_INCLUDING`, `CAPTURE_X_BATTLE_CAPTIVES` and `CONSTRUCT_N_OF_A_BUILDING`
+for jobs and building requests. Hero bounties use a `SCRIPTED` objective (`derpy_gg_hero`)
+that the mod completes itself with `cm:complete_scripted_mission_objective`, counted off
+the two agent-action events. The kinds and their prices are `GG.BOUNTY_KINDS`; the design is
+`docs/design/2026-09-27-great-guilds-bounties-v2-design.md`.
 
 Default rates (every one can be changed through MCT's Custom preset):
 
@@ -65,13 +91,17 @@ All keys are `cm:set_saved_value` strings.
 |---|---|
 | `derpy_gg_<faction>` | six `rep,fav` pairs in `GG.GUILDS` order (brass, immortals, daemonsmiths, khanate, overseers, slavers), then `;`, then 18 cooldowns in `GG.SERVICES` order |
 | `derpy_gg_world` | the leadership table: `turn|...;culture/guild,rep,margin,leader,flag|...` |
-| `derpy_gg_bounties_<faction>` | the bounty board |
+| `derpy_gg_bounties_<faction>` | the bounty board, offers joined by `;`. Five fields (`war`, `stake`, `amount`, `done`, `void`) were appended on 2026-09-27; an older save reads them as zero |
 | `derpy_gg_demand_<faction>` | the open demand |
 | `derpy_gg_patron_<faction>` | the appointed patron |
-| `derpy_gg_research_<faction>` | the human's technology in progress |
+| `derpy_gg_research_<faction>` | the technology in progress, for Bound Blueprint |
 | `derpy_gg_techs_<faction>` | the AI's completed-technology count (the first read is a baseline, not income) |
+| `derpy_gg_earned_<faction>` | the ledger behind "Reputation this turn": this turn's and last turn's grants by guild and source, humans only |
 | `derpy_gg_log_<faction>` | the Log: `turn,kind,guild,a,b` joined by `|`, newest first, 100 entries, humans only |
-| `derpy_gg_tuned` | the MCT values, frozen at the first turn of a campaign |
+| `derpy_gg_best_<guild>_<faction>` | the highest rank reached, so a promotion message fires only the first time |
+| `derpy_gg_notice_<tag>_<faction>` | a one-time notice (`first`, `half`) has fired |
+| `derpy_gg_ai_last_<faction>` | the service this AI bought last, so it does not buy it twice running |
+| `derpy_gg_tuned` | the MCT values. Single player freezes them at the first tick; multiplayer freezes the host's when the last part arrives (section 7) |
 
 Rank bundles are **not** tracked in the save. On every load, the first turn start
 re-applies each guild's current rank bundle once (`GG.assert_ranks`). That is what lets the
@@ -80,21 +110,31 @@ applied a bundle.
 
 ## 4. Keys the engine reads
 
+`<tag>` is the flavour tag of section 1: empty for Chaos Dwarfs.
+
 | Kind | Key |
 |---|---|
-| Rank bundle | `derpy_gg_rank_<guild>_<rank>`, ranks 2-5 (rank 1 grants nothing) |
-| Leader bundle | `derpy_gg_lead_<guild>`, swept per culture so two races can each have a leader |
-| Service bundle | `derpy_gg_svc_<service>`, with the service's duration |
-| Patron bundle | `derpy_gg_patron`, applied to a force |
-| Bounty mission | `derpy_gg_bounty_<guild>`, one live mission per guild per faction |
+| Rank bundle | `derpy_gg_rank_<guild>_<rank><tag>`, ranks 2-5 (rank 1 grants nothing) |
+| Leader bundle | `derpy_gg_lead_<guild><tag>`, swept per culture so two races can each have a leader |
+| Service bundle | `derpy_gg_svc_<service><tag>`, with the service's duration. The BUYER's tag, even on a hostile service's target, so the victim reads who did it |
+| Patron bundle | `derpy_gg_patron`, applied to a force, untagged |
+| Bounty mission | `derpy_gg_<family>_<guild><tag>`, family `bounty`, `job`, `build` or `hero`; one live mission per key per faction |
+| Building-card line | `derpy_gg_built_<guild><tag>`, a dummy effect on every building level that pays that guild |
 | Feed messages | `message_event_text_text_derpy_gg_<stem>_title` / `_primary` / `_secondary` |
-| Feed indexes | 5001 hostile hit, 5002 demand, 5003 leadership, 5004 rank |
+| Feed indexes | 5001 hostile hit, 5002 demand, 5003 leadership, 5004 rank, each plus the receiver's flavour offset (`GG.feed`) |
 | Panel text | `derpy_gg_<key>`, resolved by `GGUI.loc` at draw time |
 
-The DB side is seven tables plus the loc: `effect_bundles`,
-`effect_bundles_to_effects_junctions`, `missions`, `event_feed_message_events`,
-`campaign_groups`, `campaign_group_members` and `campaign_group_member_criteria_values`.
-The last four exist only to make the feed indexes resolve (section 7).
+The DB side is nine tables plus the loc. Row counts as of build 7AB4585D:
+
+| Table | Rows | Why |
+|---|---|---|
+| `effect_bundles` | 379 | rank 216, leader 54, service 108, patron 1 |
+| `effect_bundles_to_effects_junctions` | 407 | |
+| `effects` | 48 | the building-card lines, six guilds by eight races |
+| `building_effects_junction` | 1,726 | one per building level that pays a guild. `gen_great_guilds.py` runs the Lua's own building-to-guild matching and refuses a line that names a different guild than the one paid |
+| `missions` | 171 | 19 guild-and-family pairs by nine flavours |
+| `event_feed_message_events` | 36 | four indexes by nine offsets |
+| `campaign_groups`, `campaign_group_members`, `campaign_group_member_criteria_values` | 36 each | only to make the feed indexes resolve (section 7) |
 
 ## 5. The panel
 
@@ -105,14 +145,28 @@ The panel is **our own `.twui.xml`, created at runtime**. No CA layout is overri
 - The engine ignores `dockpoint` on a runtime-created component. `GGUI` positions
   everything with `MoveTo`, which is why the layout files carry no offsets and a plain
   viewer stacks the panel in one corner.
-- The tabs, in screen order: Guilds, Standings, Bounties, Court, Log, Help. The Help and
-  Log tabs share 21 text slots (`gg_help_01`..`gg_help_21`) and one pager.
+- The tabs, in screen order: Guilds, Leaderboard, Bounties, Court, Log, Help. The code
+  still calls the Leaderboard `standings`. The Help and Log tabs share 21 text slots
+  (`gg_help_01`..`gg_help_21`) and one pager.
+- The frames are CA's own Chaos Dwarf art, referenced by path where the game already ships
+  it: the Hell-Forge's header bar, card frames, price plates and square tabs, and the Tower
+  of Zharr's glow round a card whose service is running (`GGUI.CARD_RIM`).
 - The panel ground is image index 1 of four on the panel component, and is repainted per
-  guild. The grounds are dimmed until they measure what CA's own `tier_01` ground measures
-  under the scrim, so text keeps its contrast.
-- The opener is a crest button parented to the HUD. It sits left of the Zharr Exchange's
-  button when that mod is present, and stands alone otherwise (`GGUI.btn_anchor`, checked
-  by `check_guilds_anchor.py`).
+  guild and per race. The grounds are dimmed until they measure what CA's own `tier_01`
+  ground measures under the scrim, so text keeps its contrast.
+- **Scale.** `GGUI.scale_for` sizes the panel by `min(w/1920, h/1080)`, never below 1, so it
+  grows at 1440p and 4K and is unchanged at 1080p. The screen a script reads is already
+  divided by the game's UI Scale, so that setting still applies on top.
+- The opener is a crest button parented to the HUD, off the right end of the top resource
+  bar. It sits left of the Zharr Exchange's button when that mod is present, and takes the
+  Exchange's slot otherwise (`GGUI.btn_anchor`, checked by `check_guilds_anchor.py`). The
+  bar grows and shrinks as effects come and go, with no event for it, so a 300ms real-time
+  poll (`gg_follow_bar`) moves the button when the anchor changes. Placement retries every
+  2 seconds for up to 5 minutes (`GGUI.BTN_TRIES = 150`), because a long campaign intro
+  keeps the bar off-screen that long.
+- **Multiplayer.** Every panel action goes out as a `UITrigger` (the `gg1` transport,
+  `GG.mp_send`) and is applied on every machine by `gg_mp`. Nothing in the panel writes
+  the model directly.
 
 ## 6. Build pipeline
 
@@ -120,18 +174,20 @@ Run everything from the repo root.
 
 | Step | Command | Notes |
 |---|---|---|
-| Parse | `luac -p <file>` for the three scripts | Lua 5.1.5 |
+| Parse | `luac -p <file>` for the four scripts | Lua 5.1.5 |
 | Test | `lua tools/_guilds_harness.lua` | Runs the shipped Lua against a stubbed campaign and panel. Prints `harness ok`. |
+| Bounties | `lua tools/_guilds_bounty_harness.lua` | The bounty board against a stubbed world. Prints `bounty harness ok`. |
+| Mutation | `py tools/mutate_guilds.py` | Breaks the bounty rules 12 ways, one at a time, in the shipped Lua; a harness must fail on each. Restores the file byte for byte. |
 | Opener maths | `py tools/check_guilds_anchor.py` | Extracts `GGUI.btn_anchor` from the shipped script and runs it against measured HUD geometry. |
-| Data | `py tools/gen_great_guilds.py --check`, then `--write` | Builds every DB row and loc line and refuses on a broken rule (below). |
-| Layouts | `py tools/gen_guilds_ui.py --check`, then `--write` | |
+| Data | `py tools/gen_great_guilds.py --check`, then `--write` | Builds every DB row and loc line, and `zzz_derpy_guilds_bounty_data.lua`, and refuses on a broken rule (below). |
+| Layouts | `py tools/gen_guilds_ui.py --check`, then `--write` | Its XML emitter is `gen_guilds_emitter.py`, a deliberate copy of the Zharr Exchange's, so a fix made here cannot change that mod's output. |
 | Layout vs Lua | `py tools/check_guilds_ui.py` | Every component name the Lua reaches for exists; GUID pairing is intact. |
 | Look | `py tools/preview_guilds_panel.py` | Renders the panel to a PNG with the game shut, using the vendored source of TWUI Studio (not included). Glyph widths are approximate; positions are exact. |
-| Art | `py tools/make_guild_icons.py`, `py tools/make_guild_backgrounds.py` | Icons are recoloured CA building icons; grounds are cropped and dimmed. `--check` re-measures what ships. **Neither the inputs nor the outputs are in this repo** (they are CA-derived); extract the sources from your own game install. |
-| Pack | `py tools/import_great_guilds.py` | Needs RPFM's MCP server. Refuses if the TSVs disagree with `build()`, packs, saves, then re-opens the saved pack and counts every table's rows. |
+| Art | `py tools/make_guild_icons.py`, `py tools/make_guild_backgrounds.py`, `py tools/make_guild_bundle_icons.py` | Icons are recoloured CA building icons; grounds are cropped and dimmed; effect-bundle icons put the guild's mark on the teal disc recovered from CA's own effect icons. `--check` re-measures what ships. **Neither the inputs nor the outputs are in this repo** (they are CA-derived); extract the sources from your own game install. |
+| Pack | `py tools/import_great_guilds.py` | Needs RPFM's MCP server. Refuses if the TSVs disagree with `build()`, packs, saves, then re-opens the saved pack and counts every table's rows. `--verify-only` re-checks a saved pack. |
 
-The generators, `check_guilds_ui.py`, the preview and the two art tools take `--selftest`,
-which breaks something on purpose and proves the check still reports it.
+The generators, `check_guilds_ui.py`, the preview, `mutate_guilds.py` and the three art tools
+take `--selftest`, which breaks something on purpose and proves the check still reports it.
 
 What `gen_great_guilds.py --check` refuses on, among others: an effect value whose sign
 fights `is_positive_value_good`; an effect key vanilla does not have, or a scope vanilla never
@@ -139,10 +195,16 @@ pairs it with; a value more than 1.5x the largest magnitude vanilla puts on that
 scope; a feed index that collides with vanilla's or disagrees with the Lua; an event picture no
 vanilla row uses; a Help page over its 21 lines; a message title that names a guild without
 its article; a building-theme token with Lua pattern magic in it, or one matching no CA
-chain; a hire unit that is not a real vanilla key.
+chain; a hire unit that is not a real vanilla key; a building-card line that names a
+different guild than the Lua pays; a `GG.FLAVOURED` entry that disagrees with the
+generator's; a bounty technology or building a player cannot reach; any key this pack names
+that the installed game does not have (`check_live_references`, added after patch 9.0
+removed a building the pack still named, which drops the whole pack at load).
 
-The data checks read a dump of vanilla tables in `.skilltree_cache/` (RPFM's JSON
-export), which is CA's data and is not in this repo.
+Most data checks read a dump of vanilla tables in `.skilltree_cache/` (RPFM's JSON export);
+the building, bounty and live-reference checks read the installed game's `db.pack` through
+`read_vanilla_db.py`, and the unit names through `read_vanilla_loc.py`. Neither the dump nor
+the game data is in this repo.
 
 **Deploying:** copy the saved pack into `data/` **with the game closed**. The game holds its
 packs open, and overwriting one under it causes crashes that cannot be traced. Keep the
@@ -187,18 +249,39 @@ Each of these cost a bug or a build to learn. Most fail silently.
 - **Cost effects are signed backwards.** `is_positive_value_good` is false on every cost
   modifier, so `-10` is a discount. A hostile bundle on an enemy inverts it again.
 - **MCT has no campaign gating.** Its context-specific setting is an empty function body.
-  The mod snapshots every value into `derpy_gg_tuned` at the first turn and ignores later
-  changes.
+  The mod snapshots every value into `derpy_gg_tuned` once and ignores later changes. It
+  used to snapshot at the first `FactionTurnStart`, which comes after turn 1 has been
+  played, so turn 1 ran on the defaults; it now snapshots at the first tick, by which time
+  MCT's own `LoadingGame` handler has read the player's values.
+- **MCT is local to each machine.** In multiplayer each machine reading its own would freeze
+  a different economy into each copy of the save. Only the host
+  (`core:svr_load_bool("mct_local_is_host")`, the flag MCT itself reads) sends its values,
+  as `tune` messages of at most 100 characters each, the limit MCT's own multiplayer code
+  works to. Every machine plays the defaults until the last part arrives, then freezes.
+- **A tooltip on a non-interactive component is never shown.** The panel's tooltips were
+  invisible until `set_tooltip` began calling `SetInteractive(true)`.
+- **The game's `string.find` is not stock Lua.** An `init` argument makes it silently find
+  nothing, and the `plain` flag corrupts the string library for every script until the
+  game restarts. The harness runs on stock Lua and passes over both, so neither argument
+  appears in the scripts.
 - **Lua 5.1 allows 200 locals per function.** The harness's main chunk is near that
   ceiling, so new tests go inside `;(function() ... end)()`.
 
 ## 8. Where the design lives
 
 - [docs/design/2026-09-10-great-guilds-design.md](design/2026-09-10-great-guilds-design.md):
-  the original design. Parts are superseded; for example, reputation now falls as well as
-  rises.
+  the original design. Parts are superseded: reputation now falls as well as rises, eight
+  races take part rather than any culture, and the bounty rules are the v2 spec's.
 - [docs/design/2026-09-23-great-guilds-flavours-design.md](design/2026-09-23-great-guilds-flavours-design.md):
-  Empire and Dwarf versions of the guilds. Designed, not built.
-- `docs/plans/`: the plans the ladder, panel, AI and notices were built from.
+  Empire and Dwarf versions of the guilds, and the tag and feed-offset machinery every
+  later race reuses. Built 2026-09-23.
+- [docs/design/2026-09-24-great-guilds-brt-cth-ksl-design.md](design/2026-09-24-great-guilds-brt-cth-ksl-design.md)
+  and [docs/design/2026-09-24-great-guilds-def-hef-design.md](design/2026-09-24-great-guilds-def-hef-design.md):
+  Bretonnia, Cathay, Kislev, Dark Elves and High Elves. Data only; built 2026-09-24.
+- [docs/design/2026-09-27-great-guilds-bounties-v2-design.md](design/2026-09-27-great-guilds-bounties-v2-design.md):
+  bounties that cost a choice (far enemies, new wars, the favour stake, jobs, building
+  requests, hero bounties). Built 2026-09-27.
+- `docs/plans/`: the plans the ladder, panel, AI, notices, flavours and bounties v2 were
+  built from.
 - `docs/history/`: dated handoffs, the most recent last. When a handoff and the code
   disagree, the code wins.

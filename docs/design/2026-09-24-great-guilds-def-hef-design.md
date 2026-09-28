@@ -1,6 +1,7 @@
 # The Great Guilds: Dark Elf and High Elf flavours - design
 
-2026-09-24. **Approved the same day** ("yes, do A for 2, 3. only high elves"): the names
+2026-09-24. **Approved and built the same day** - see
+`HANDOFF_20260924_GUILDS_DEF_HEF_GATE.md` ("yes, do A for 2, 3. only high elves"): the names
 and text as written, Swordmasters for the High Elves, and no Wood Elves. Two more
 flavours, built exactly the way the Bretonnia, Cathay and Kislev ones were
 (`2026-09-24-great-guilds-brt-cth-ksl-design.md`). This file holds only the data.

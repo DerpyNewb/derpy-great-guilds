@@ -7,7 +7,15 @@ Six world-spanning guilds. Every faction earns standing with them by playing its
 and spends that standing on services. Chaos Dwarfs ship first; Dwarfs and the Empire follow
 as loc-and-icon layers with no logic changes.
 
-Implementation plan: not yet written.
+Implementation plans: `2026-09-10-great-guilds-ladder.md`, `-panel.md` and `-ai.md`, then
+`2026-09-12-great-guilds-notices.md`.
+
+**Status (2026-09-28): built and shipped, and superseded in parts.** This is the design of
+the first build (2026-09-10) and is kept as the record of it. Since then: reputation falls
+as well as rises (upkeep), eight races take part and no other culture does
+(`2026-09-23-great-guilds-flavours-design.md` and the two 2026-09-24 flavour specs), and
+bounties follow `2026-09-27-great-guilds-bounties-v2-design.md`. Where this file and the
+code disagree, the code wins.
 
 ---
 

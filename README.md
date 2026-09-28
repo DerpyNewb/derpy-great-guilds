@@ -9,7 +9,7 @@ the AI factions of your own race to lead each guild.
 It is script-driven and self-contained. It overrides no CA file, and every DB row it adds
 has its own key.
 
-**Status:** playable, and tested live in Chaos Dwarf campaigns. It is not on the Steam
+**Status:** playable, and tested live in Chaos Dwarf and Empire campaigns. It is not on the Steam
 Workshop yet. Eight races take part, each with its own guild names, ranks, services and
 bounties (see [Which races take part](#which-races-take-part)).
 
@@ -126,6 +126,7 @@ mirrors the in-pack paths, so the tools run from the repo root unchanged.
 | `Modding Files/pack/script/campaign/mod/zzz_derpy_guilds.lua` | the model: reputation, earning, ranks, services, bounties, Court, leadership, save state |
 | `Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_ai.lua` | the AI's spending |
 | `Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_ui.lua` | the panel and the HUD opener |
+| `Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_bounty_data.lua` | what a bounty may ask for, per race: the technologies and the buildings (generated) |
 | `Modding Files/pack/script/mct/settings/derpy_great_guilds.lua` | the MCT settings page |
 | `Modding Files/pack/ui/campaign ui/` | the six `.twui.xml` layouts (generated) |
 | `Modding Files/source/great_guilds/` | the DB rows and loc as TSV (generated), which the importer packs |
@@ -160,13 +161,14 @@ py tools/preview_guilds_panel.py           # render the panel to a PNG with the 
 py tools/import_great_guilds.py            # pack, save and verify the saved pack
 ```
 
-The generators, `check_guilds_ui.py`, the preview and the two art tools also take
-`--selftest`, which proves each still catches a fault it was built to catch.
+The generators, `check_guilds_ui.py`, the preview, `mutate_guilds.py` and the three art
+tools also take `--selftest`, which proves each still catches a fault it was built to catch.
 
-**No art is included.** The guild icons, the crest and the panel backgrounds are derived
-from Creative Assembly's art, so they ship inside the `.pack` and are not published here.
-`tools/make_guild_icons.py` and `tools/make_guild_backgrounds.py` rebuild them from art
-you extract from your own copy of the game. Without them the scripts still run, but the
+**No art is included.** The guild icons, the crest, the effect icons and the panel
+backgrounds are derived from Creative Assembly's art, so they ship inside the `.pack` and
+are not published here. `tools/make_guild_icons.py`, `tools/make_guild_backgrounds.py` and
+`tools/make_guild_bundle_icons.py` rebuild them from art you extract from your own copy of
+the game. Without them the scripts still run, but the
 panel draws blank squares where the art should be, and the checks that measure the shipped
 art report it missing.
 

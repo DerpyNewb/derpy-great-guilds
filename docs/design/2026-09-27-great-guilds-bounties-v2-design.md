@@ -4,6 +4,9 @@
 at war with" rule in `zzz_derpy_guilds.lua` (THE BOUNTY BOARD header) and in
 `2026-09-10-great-guilds-design.md`.
 
+**Built 2026-09-27** as build 7AB4585D - see `HANDOFF_20260927_GUILDS_BOUNTIES_V2.md`, which
+also lists the ten in-game checks still to play.
+
 ## 1. The problem, in the player's words
 
 "The bounty system currently is too exploitable, offering missions that the player will
