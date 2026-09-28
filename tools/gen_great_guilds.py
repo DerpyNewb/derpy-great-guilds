@@ -1508,6 +1508,22 @@ def bounty_key(guild):
     return "derpy_gg_bounty_%s" % guild
 
 
+def _ladder(blurb, steps):
+    """A rank ladder with its phrase said ONCE: "income from all buildings +3% / +6% /
+    +10% / +15% at 100 / 300 / 700 / 1500 reputation". It said the phrase at every rank,
+    and the guild's description ran to ten lines of the rank line's hover (2026-09-28).
+    Falls back to the long form if the phrase differs between ranks.
+
+    >>> _ladder("%+d%% income", [(3, 100), (6, 300)])
+    'income +3% / +6% at 100 / 300 reputation'
+    """
+    parts = [(blurb % v).split(" ", 1) for v, _t in steps]
+    if len(set(p[1] for p in parts if len(p) == 2)) != 1 or any(len(p) != 2 for p in parts):
+        return " / ".join("%s at %d reputation" % (blurb % v, t) for v, t in steps)
+    return "%s %s at %s reputation" % (parts[0][1], " / ".join(p[0] for p in parts),
+                                       " / ".join(str(t) for _v, t in steps))
+
+
 def _build_one(tag):
     """One flavour's rows, under the Chaos Dwarf keys. build() tags them.
 
@@ -1531,18 +1547,15 @@ def _build_one(tag):
         loc.append({"key": "derpy_gg_guild_name_%s" % g,
                     "text": GUILD_NAMES[g], "tooltip": "false"})
         blurb, reach = EFFECT_BLURB[g]
-        ladder = " / ".join("%s at %d reputation"
-                            % (blurb % (RANK_VALUES[r] * EFFECT_GOOD_SIGN[g]),
-                               RANK_THRESHOLDS[r - 1])
-                            for r in range(2, 6))
-        desc = "%s||Each rank gives, for %s: %s." % (GUILD_DESC[g], reach, ladder)
+        ladder = _ladder(blurb, [(RANK_VALUES[r] * EFFECT_GOOD_SIGN[g],
+                                  RANK_THRESHOLDS[r - 1]) for r in range(2, 6)])
+        desc = "%s||By rank, for %s: %s." % (GUILD_DESC[g], reach, ladder)
         extra = RANK_EFFECTS_EXTRA.get(g)
         if extra:
             xblurb, xreach = EFFECT_BLURB_EXTRA[g]
-            rungs = " / ".join("%s at %d reputation" % (xblurb % extra[2][r],
-                                                 RANK_THRESHOLDS[r - 1])
-                               for r in range(2, 6) if extra[2][r] is not None)
-            desc += " And, for %s: %s." % (xreach, rungs)
+            rungs = _ladder(xblurb, [(extra[2][r], RANK_THRESHOLDS[r - 1])
+                                     for r in range(2, 6) if extra[2][r] is not None])
+            desc += " For %s: %s." % (xreach, rungs.replace(" reputation", ""))
         loc.append({"key": "derpy_gg_guild_desc_%s" % g,
                     "text": desc, "tooltip": "false"})
         for rank in range(2, 6):
@@ -1879,14 +1892,13 @@ def _build_one(tag):
                       # "/turn" with no space: it sits on a 750px line that already
                       # carries three numbers and the rival's name.
                       ("per_turn", "/turn"),
-                      ("upkeep_on", "Upkeep, taken every turn:"),
+                      # "Upkeep: -12/turn." - the number and per_turn are put between.
+                      ("upkeep_on", "Upkeep:"),
                       ("upkeep_soon", "An upkeep begins on turn"),
-                      ("upkeep_help", "Reputation has to be held, not just won. Every "
-                                      "guild you have reputation with charges a little "
-                                      "back each turn, and the higher your rank the "
-                                      "more it costs to sit on - so a guild you stop "
-                                      "feeding slides back down the ladder, and its "
-                                      "bonus goes with it."),
+                      # ONE SENTENCE. It follows the guild's description on the rank
+                      # line's hover, and the two together ran to 17 lines (2026-09-28).
+                      # The Help tab's "Losing reputation" page has the full rule.
+                      ("upkeep_help", "Stop earning and you slide back down."),
                       ("table_head", "Reputation with this guild:"),
                       ("more", "more"),
                       ("unranked", "no reputation yet"),
@@ -1974,24 +1986,26 @@ def _build_one(tag):
                     "text": "||".join(_lines), "tooltip": "false"})
     loc.append({"key": "derpy_gg_help_of", "text": "of", "tooltip": "false"})
 
-    loc.append({"key": "derpy_gg_court_help",
-                "text": "The Court holds the three things a guild does that you do not "
-                        "choose."
-                        "||LEADING a guild is held by whichever faction in the world "
-                        "has the most reputation with it - you or a rival. The leader "
-                        "carries an extra bonus for as long as they lead, and the "
-                        "guild's dearest service is sold to nobody else. It can be "
-                        "taken from you."
-                        "||A DEMAND arrives every so often from a guild that already "
-                        "knows you. Pay it and your reputation with them jumps; let the "
-                        "deadline pass and it falls, far enough to cost you a rank. A "
-                        "guild asks either for gold or for you to renounce the favour "
-                        "you hold with its rival."
-                        "||A PATRON is one of your lords, bound to one guild. Their "
-                        "army is the better for it, that guild's reputation pays half "
-                        "again, and its services cost less. One lord, one guild - "
-                        "appointing a second moves the post.",
-                "tooltip": "false"})
+    # ONE CARD, ONE PART. Every Court card used to carry all three parts of the rules,
+    # 801 characters under a three-line card - 17 lines of tooltip (screenshot
+    # 2026-09-28). Each card now says its own part; the Help tab's Court page has the rest.
+    for key, text in (
+            ("court_intro", "The Court holds the three things a guild does that you do "
+                            "not choose. Hover a card for its part; the Help tab's Court "
+                            "page has the full rules."),
+            ("court_help_lead", "The leader alone gets an extra bonus and the guild's "
+                                "dearest service. Out-earn them to take it."),
+            ("court_help_demand", "Pay it and your reputation with this guild jumps. Let "
+                                  "the deadline pass and it falls, far enough to cost a "
+                                  "rank."),
+            ("court_help_no_demand", "Now and then a guild that knows you asks for gold, "
+                                     "or for you to renounce the favour you hold with its "
+                                     "rival. It appears here, with a deadline."),
+            ("court_help_patron", "A patron is one of your lords, bound to one guild: "
+                                  "their army is the better for it, this guild's "
+                                  "reputation pays half again, and its services cost "
+                                  "less. One lord, one guild.")):
+        loc.append({"key": "derpy_gg_" + key, "text": text, "tooltip": "false"})
 
     # The feed, both halves. A demand that arrives silently is a deadline nobody saw.
     loc.append({"key": "message_event_text_text_derpy_gg_demand_title",

@@ -6,7 +6,7 @@ derpy_gg_rank_name_3	Sworn	false
 derpy_gg_rank_name_4	Favoured	false
 derpy_gg_rank_name_5	Exalted	false
 derpy_gg_guild_name_brass	The Brass Tablets	false
-derpy_gg_guild_desc_brass	Tally-keepers and caravan masters. They record every debt in the Dark Lands and forgive none of them.||You earn reputation from your income every turn, and from their own buildings.||Each rank gives, for every region you own: +3% income from all buildings at 100 reputation / +6% income from all buildings at 300 reputation / +10% income from all buildings at 700 reputation / +15% income from all buildings at 1500 reputation.	false
+derpy_gg_guild_desc_brass	Tally-keepers and caravan masters. They record every debt in the Dark Lands and forgive none of them.||You earn reputation from your income every turn, and from their own buildings.||By rank, for every region you own: income from all buildings +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_2	The Brass Tablets - Indebted	false
 effect_bundles_localised_description_derpy_gg_rank_brass_2	Rank 2 of 5 with The Brass Tablets, reached at 100 reputation. +3% income from all buildings, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_3	The Brass Tablets - Sworn	false
@@ -18,7 +18,7 @@ effect_bundles_localised_description_derpy_gg_rank_brass_5	Rank 5 of 5 with The 
 effect_bundles_localised_title_derpy_gg_lead_brass	The Brass Tablets - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_brass	You hold more reputation with The Brass Tablets than any other faction in the world. +10% income from all buildings, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_immortals	The Immortals	false
-derpy_gg_guild_desc_immortals	The oath-sworn companies who fight for whoever holds their bond, and never break it.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||Each rank gives, for every army: +3% replenishment rate at 100 reputation / +6% replenishment rate at 300 reputation / +10% replenishment rate at 700 reputation / +15% replenishment rate at 1500 reputation. And, for your faction: +1 recruitment capacity at 300 reputation / +2 recruitment capacity at 700 reputation / +3 recruitment capacity at 1500 reputation.	false
+derpy_gg_guild_desc_immortals	The oath-sworn companies who fight for whoever holds their bond, and never break it.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||By rank, for every army: replenishment rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation. For your faction: recruitment capacity +1 / +2 / +3 at 300 / 700 / 1500.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_2	The Immortals - Indebted	false
 effect_bundles_localised_description_derpy_gg_rank_immortals_2	Rank 2 of 5 with The Immortals, reached at 100 reputation. +3% replenishment rate, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_3	The Immortals - Sworn	false
@@ -30,7 +30,7 @@ effect_bundles_localised_description_derpy_gg_rank_immortals_5	Rank 5 of 5 with 
 effect_bundles_localised_title_derpy_gg_lead_immortals	The Immortals - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_immortals	You hold more reputation with The Immortals than any other faction in the world. +10% replenishment rate, for every army, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_daemonsmiths	The Daemonsmiths	false
-derpy_gg_guild_desc_daemonsmiths	Those who bind daemons into iron. They sell knowledge, never cheaply.||You earn reputation from technologies you complete, and from their own buildings.||Each rank gives, for your faction: +3% research rate at 100 reputation / +6% research rate at 300 reputation / +10% research rate at 700 reputation / +15% research rate at 1500 reputation.	false
+derpy_gg_guild_desc_daemonsmiths	Those who bind daemons into iron. They sell knowledge, never cheaply.||You earn reputation from technologies you complete, and from their own buildings.||By rank, for your faction: research rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_2	The Daemonsmiths - Indebted	false
 effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_2	Rank 2 of 5 with The Daemonsmiths, reached at 100 reputation. +3% research rate, for your faction. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_3	The Daemonsmiths - Sworn	false
@@ -42,7 +42,7 @@ effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_5	Rank 5 of 5 wi
 effect_bundles_localised_title_derpy_gg_lead_daemonsmiths	The Daemonsmiths - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_daemonsmiths	You hold more reputation with The Daemonsmiths than any other faction in the world. +10% research rate, for your faction, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_khanate	The Khanate	false
-derpy_gg_guild_desc_khanate	Hobgoblin knives and hobgoblin eyes, for hire to anyone, including against you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||Each rank gives, for every province you own: -3% hero recruitment cost at 100 reputation / -6% hero recruitment cost at 300 reputation / -10% hero recruitment cost at 700 reputation / -15% hero recruitment cost at 1500 reputation.	false
+derpy_gg_guild_desc_khanate	Hobgoblin knives and hobgoblin eyes, for hire to anyone, including against you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||By rank, for every province you own: hero recruitment cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_2	The Khanate - Indebted	false
 effect_bundles_localised_description_derpy_gg_rank_khanate_2	Rank 2 of 5 with The Khanate, reached at 100 reputation. -3% hero recruitment cost, for every province you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_3	The Khanate - Sworn	false
@@ -54,7 +54,7 @@ effect_bundles_localised_description_derpy_gg_rank_khanate_5	Rank 5 of 5 with Th
 effect_bundles_localised_title_derpy_gg_lead_khanate	The Khanate - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_khanate	You hold more reputation with The Khanate than any other faction in the world. -10% hero recruitment cost, for every province you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_overseers	The Overseers	false
-derpy_gg_guild_desc_overseers	The gang-masters who drive the building of Zharr Naggrund and everything like it.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||Each rank gives, for every region you own: -3% building construction cost at 100 reputation / -6% building construction cost at 300 reputation / -10% building construction cost at 700 reputation / -15% building construction cost at 1500 reputation.	false
+derpy_gg_guild_desc_overseers	The gang-masters who drive the building of Zharr Naggrund and everything like it.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||By rank, for every region you own: building construction cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_2	The Overseers - Indebted	false
 effect_bundles_localised_description_derpy_gg_rank_overseers_2	Rank 2 of 5 with The Overseers, reached at 100 reputation. -3% building construction cost, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_3	The Overseers - Sworn	false
@@ -66,7 +66,7 @@ effect_bundles_localised_description_derpy_gg_rank_overseers_5	Rank 5 of 5 with 
 effect_bundles_localised_title_derpy_gg_lead_overseers	The Overseers - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_overseers	You hold more reputation with The Overseers than any other faction in the world. -10% building construction cost, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_slavers	The Slavers	false
-derpy_gg_guild_desc_slavers	The coffle-drivers. Their ledger is measured in bodies, and it is always growing.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||Each rank gives, for every army: +3% income from sacking and razing at 100 reputation / +6% income from sacking and razing at 300 reputation / +10% income from sacking and razing at 700 reputation / +15% income from sacking and razing at 1500 reputation.	false
+derpy_gg_guild_desc_slavers	The coffle-drivers. Their ledger is measured in bodies, and it is always growing.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||By rank, for every army: income from sacking and razing +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_2	The Slavers - Indebted	false
 effect_bundles_localised_description_derpy_gg_rank_slavers_2	Rank 2 of 5 with The Slavers, reached at 100 reputation. +3% income from sacking and razing, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_3	The Slavers - Sworn	false
@@ -222,9 +222,9 @@ derpy_gg_needs_region_own	Select one of your OWN settlements on the campaign map
 derpy_gg_needs_research	Start researching something first - this finishes whatever technology you have queued in the tech tree.	false
 derpy_gg_no_unit	This guild keeps no regiment your people would muster. Their other services are open to you.	false
 derpy_gg_per_turn	/turn	false
-derpy_gg_upkeep_on	Upkeep, taken every turn:	false
+derpy_gg_upkeep_on	Upkeep:	false
 derpy_gg_upkeep_soon	An upkeep begins on turn	false
-derpy_gg_upkeep_help	Reputation has to be held, not just won. Every guild you have reputation with charges a little back each turn, and the higher your rank the more it costs to sit on - so a guild you stop feeding slides back down the ladder, and its bonus goes with it.	false
+derpy_gg_upkeep_help	Stop earning and you slide back down.	false
 derpy_gg_table_head	Reputation with this guild:	false
 derpy_gg_more	more	false
 derpy_gg_unranked	no reputation yet	false
@@ -290,7 +290,11 @@ derpy_gg_help_p4	#Leading a guild||-Held by whichever faction in the world has t
 derpy_gg_help_t5	Losing reputation	false
 derpy_gg_help_p5	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, plus reputation. Each card says how much.	false
 derpy_gg_help_of	of	false
-derpy_gg_court_help	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
+derpy_gg_court_intro	The Court holds the three things a guild does that you do not choose. Hover a card for its part; the Help tab's Court page has the full rules.	false
+derpy_gg_court_help_lead	The leader alone gets an extra bonus and the guild's dearest service. Out-earn them to take it.	false
+derpy_gg_court_help_demand	Pay it and your reputation with this guild jumps. Let the deadline pass and it falls, far enough to cost a rank.	false
+derpy_gg_court_help_no_demand	Now and then a guild that knows you asks for gold, or for you to renounce the favour you hold with its rival. It appears here, with a deadline.	false
+derpy_gg_court_help_patron	A patron is one of your lords, bound to one guild: their army is the better for it, this guild's reputation pays half again, and its services cost less. One lord, one guild.	false
 message_event_text_text_derpy_gg_demand_title	A Guild Asks	false
 message_event_text_text_derpy_gg_demand_primary	One of the Great Guilds has made a demand of you. The Court tab holds the terms and the deadline.	false
 message_event_text_text_derpy_gg_demand_secondary	They do not ask twice.	false
@@ -523,7 +527,7 @@ derpy_gg_rank_name_3_emp	Journeyman	false
 derpy_gg_rank_name_4_emp	Master	false
 derpy_gg_rank_name_5_emp	Grand Master	false
 derpy_gg_guild_name_brass_emp	The Merchant Guilds	false
-derpy_gg_guild_desc_brass_emp	The counting-houses of Altdorf and Nuln. Every road toll, river tariff and letter of credit in the Empire passes through their books.||You earn reputation from your income every turn, and from their own buildings.||Each rank gives, for every region you own: +3% income from all buildings at 100 reputation / +6% income from all buildings at 300 reputation / +10% income from all buildings at 700 reputation / +15% income from all buildings at 1500 reputation.	false
+derpy_gg_guild_desc_brass_emp	The counting-houses of Altdorf and Nuln. Every road toll, river tariff and letter of credit in the Empire passes through their books.||You earn reputation from your income every turn, and from their own buildings.||By rank, for every region you own: income from all buildings +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_2_emp	The Merchant Guilds - Apprentice	false
 effect_bundles_localised_description_derpy_gg_rank_brass_2_emp	Rank 2 of 5 with The Merchant Guilds, reached at 100 reputation. +3% income from all buildings, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_3_emp	The Merchant Guilds - Journeyman	false
@@ -535,7 +539,7 @@ effect_bundles_localised_description_derpy_gg_rank_brass_5_emp	Rank 5 of 5 with 
 effect_bundles_localised_title_derpy_gg_lead_brass_emp	The Merchant Guilds - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_brass_emp	You hold more reputation with The Merchant Guilds than any other faction in the world. +10% income from all buildings, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_immortals_emp	The Greatswords	false
-derpy_gg_guild_desc_immortals_emp	Veterans who swore their lives to an Elector Count's banner. They sell that oath now, to whoever can carry it.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||Each rank gives, for every army: +3% replenishment rate at 100 reputation / +6% replenishment rate at 300 reputation / +10% replenishment rate at 700 reputation / +15% replenishment rate at 1500 reputation. And, for your faction: +1 recruitment capacity at 300 reputation / +2 recruitment capacity at 700 reputation / +3 recruitment capacity at 1500 reputation.	false
+derpy_gg_guild_desc_immortals_emp	Veterans who swore their lives to an Elector Count's banner. They sell that oath now, to whoever can carry it.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||By rank, for every army: replenishment rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation. For your faction: recruitment capacity +1 / +2 / +3 at 300 / 700 / 1500.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_2_emp	The Greatswords - Apprentice	false
 effect_bundles_localised_description_derpy_gg_rank_immortals_2_emp	Rank 2 of 5 with The Greatswords, reached at 100 reputation. +3% replenishment rate, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_3_emp	The Greatswords - Journeyman	false
@@ -547,7 +551,7 @@ effect_bundles_localised_description_derpy_gg_rank_immortals_5_emp	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_immortals_emp	The Greatswords - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_immortals_emp	You hold more reputation with The Greatswords than any other faction in the world. +10% replenishment rate, for every army, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_daemonsmiths_emp	The Engineers' School	false
-derpy_gg_guild_desc_daemonsmiths_emp	Altdorf's engineers, who build what should not work and make it fire. They sell what they know, in instalments.||You earn reputation from technologies you complete, and from their own buildings.||Each rank gives, for your faction: +3% research rate at 100 reputation / +6% research rate at 300 reputation / +10% research rate at 700 reputation / +15% research rate at 1500 reputation.	false
+derpy_gg_guild_desc_daemonsmiths_emp	Altdorf's engineers, who build what should not work and make it fire. They sell what they know, in instalments.||You earn reputation from technologies you complete, and from their own buildings.||By rank, for your faction: research rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_2_emp	The Engineers' School - Apprentice	false
 effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_2_emp	Rank 2 of 5 with The Engineers' School, reached at 100 reputation. +3% research rate, for your faction. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_3_emp	The Engineers' School - Journeyman	false
@@ -559,7 +563,7 @@ effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_5_emp	Rank 5 of 
 effect_bundles_localised_title_derpy_gg_lead_daemonsmiths_emp	The Engineers' School - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_daemonsmiths_emp	You hold more reputation with The Engineers' School than any other faction in the world. +10% research rate, for your faction, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_khanate_emp	The Thieves' Guild	false
-derpy_gg_guild_desc_khanate_emp	Every tavern has a back room, and every back room has an ear. Their knives are for hire to anyone, including against you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||Each rank gives, for every province you own: -3% hero recruitment cost at 100 reputation / -6% hero recruitment cost at 300 reputation / -10% hero recruitment cost at 700 reputation / -15% hero recruitment cost at 1500 reputation.	false
+derpy_gg_guild_desc_khanate_emp	Every tavern has a back room, and every back room has an ear. Their knives are for hire to anyone, including against you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||By rank, for every province you own: hero recruitment cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_2_emp	The Thieves' Guild - Apprentice	false
 effect_bundles_localised_description_derpy_gg_rank_khanate_2_emp	Rank 2 of 5 with The Thieves' Guild, reached at 100 reputation. -3% hero recruitment cost, for every province you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_3_emp	The Thieves' Guild - Journeyman	false
@@ -571,7 +575,7 @@ effect_bundles_localised_description_derpy_gg_rank_khanate_5_emp	Rank 5 of 5 wit
 effect_bundles_localised_title_derpy_gg_lead_khanate_emp	The Thieves' Guild - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_khanate_emp	You hold more reputation with The Thieves' Guild than any other faction in the world. -10% hero recruitment cost, for every province you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_overseers_emp	The Masons' Guild	false
-derpy_gg_guild_desc_overseers_emp	The builders of every wall and temple from the Reikland to Ostland, and the only ones who know where the foundations are weak.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||Each rank gives, for every region you own: -3% building construction cost at 100 reputation / -6% building construction cost at 300 reputation / -10% building construction cost at 700 reputation / -15% building construction cost at 1500 reputation.	false
+derpy_gg_guild_desc_overseers_emp	The builders of every wall and temple from the Reikland to Ostland, and the only ones who know where the foundations are weak.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||By rank, for every region you own: building construction cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_2_emp	The Masons' Guild - Apprentice	false
 effect_bundles_localised_description_derpy_gg_rank_overseers_2_emp	Rank 2 of 5 with The Masons' Guild, reached at 100 reputation. -3% building construction cost, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_3_emp	The Masons' Guild - Journeyman	false
@@ -583,7 +587,7 @@ effect_bundles_localised_description_derpy_gg_rank_overseers_5_emp	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_overseers_emp	The Masons' Guild - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_overseers_emp	You hold more reputation with The Masons' Guild than any other faction in the world. -10% building construction cost, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_slavers_emp	The Free Companies	false
-derpy_gg_guild_desc_slavers_emp	Sell-swords and road-wardens paid in plunder. Their ledger is measured in what they carry home.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||Each rank gives, for every army: +3% income from sacking and razing at 100 reputation / +6% income from sacking and razing at 300 reputation / +10% income from sacking and razing at 700 reputation / +15% income from sacking and razing at 1500 reputation.	false
+derpy_gg_guild_desc_slavers_emp	Sell-swords and road-wardens paid in plunder. Their ledger is measured in what they carry home.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||By rank, for every army: income from sacking and razing +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_2_emp	The Free Companies - Apprentice	false
 effect_bundles_localised_description_derpy_gg_rank_slavers_2_emp	Rank 2 of 5 with The Free Companies, reached at 100 reputation. +3% income from sacking and razing, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_3_emp	The Free Companies - Journeyman	false
@@ -737,9 +741,9 @@ derpy_gg_needs_region_own_emp	Select one of your OWN settlements on the campaign
 derpy_gg_needs_research_emp	Start researching something first - this finishes whatever technology you have queued in the tech tree.	false
 derpy_gg_no_unit_emp	This guild keeps no regiment your people would muster. Their other services are open to you.	false
 derpy_gg_per_turn_emp	/turn	false
-derpy_gg_upkeep_on_emp	Upkeep, taken every turn:	false
+derpy_gg_upkeep_on_emp	Upkeep:	false
 derpy_gg_upkeep_soon_emp	An upkeep begins on turn	false
-derpy_gg_upkeep_help_emp	Reputation has to be held, not just won. Every guild you have reputation with charges a little back each turn, and the higher your rank the more it costs to sit on - so a guild you stop feeding slides back down the ladder, and its bonus goes with it.	false
+derpy_gg_upkeep_help_emp	Stop earning and you slide back down.	false
 derpy_gg_table_head_emp	Reputation with this guild:	false
 derpy_gg_more_emp	more	false
 derpy_gg_unranked_emp	no reputation yet	false
@@ -805,7 +809,11 @@ derpy_gg_help_p4_emp	#Leading a guild||-Held by whichever faction in the world h
 derpy_gg_help_t5_emp	Losing reputation	false
 derpy_gg_help_p5_emp	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, plus reputation. Each card says how much.	false
 derpy_gg_help_of_emp	of	false
-derpy_gg_court_help_emp	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
+derpy_gg_court_intro_emp	The Court holds the three things a guild does that you do not choose. Hover a card for its part; the Help tab's Court page has the full rules.	false
+derpy_gg_court_help_lead_emp	The leader alone gets an extra bonus and the guild's dearest service. Out-earn them to take it.	false
+derpy_gg_court_help_demand_emp	Pay it and your reputation with this guild jumps. Let the deadline pass and it falls, far enough to cost a rank.	false
+derpy_gg_court_help_no_demand_emp	Now and then a guild that knows you asks for gold, or for you to renounce the favour you hold with its rival. It appears here, with a deadline.	false
+derpy_gg_court_help_patron_emp	A patron is one of your lords, bound to one guild: their army is the better for it, this guild's reputation pays half again, and its services cost less. One lord, one guild.	false
 message_event_text_text_derpy_gg_demand_emp_title	A Guild Asks	false
 message_event_text_text_derpy_gg_demand_emp_primary	One of the Great Guilds has made a demand of you. The Court tab holds the terms and the deadline.	false
 message_event_text_text_derpy_gg_demand_emp_secondary	They do not ask twice.	false
@@ -1038,7 +1046,7 @@ derpy_gg_rank_name_3_dwf	Oathsworn	false
 derpy_gg_rank_name_4_dwf	Longbeard	false
 derpy_gg_rank_name_5_dwf	Elder	false
 derpy_gg_guild_name_brass_dwf	The Merchant Clans	false
-derpy_gg_guild_desc_brass_dwf	The traders of the Karaks, who remember every debt for as long as there is stone to write it on.||You earn reputation from your income every turn, and from their own buildings.||Each rank gives, for every region you own: +3% income from all buildings at 100 reputation / +6% income from all buildings at 300 reputation / +10% income from all buildings at 700 reputation / +15% income from all buildings at 1500 reputation.	false
+derpy_gg_guild_desc_brass_dwf	The traders of the Karaks, who remember every debt for as long as there is stone to write it on.||You earn reputation from your income every turn, and from their own buildings.||By rank, for every region you own: income from all buildings +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_2_dwf	The Merchant Clans - Beardling	false
 effect_bundles_localised_description_derpy_gg_rank_brass_2_dwf	Rank 2 of 5 with The Merchant Clans, reached at 100 reputation. +3% income from all buildings, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_3_dwf	The Merchant Clans - Oathsworn	false
@@ -1050,7 +1058,7 @@ effect_bundles_localised_description_derpy_gg_rank_brass_5_dwf	Rank 5 of 5 with 
 effect_bundles_localised_title_derpy_gg_lead_brass_dwf	The Merchant Clans - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_brass_dwf	You hold more reputation with The Merchant Clans than any other faction in the world. +10% income from all buildings, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_immortals_dwf	The Hammerers	false
-derpy_gg_guild_desc_immortals_dwf	The king's own guard, sworn to the throne of their hold. Their oath can be lent, never broken.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||Each rank gives, for every army: +3% replenishment rate at 100 reputation / +6% replenishment rate at 300 reputation / +10% replenishment rate at 700 reputation / +15% replenishment rate at 1500 reputation. And, for your faction: +1 recruitment capacity at 300 reputation / +2 recruitment capacity at 700 reputation / +3 recruitment capacity at 1500 reputation.	false
+derpy_gg_guild_desc_immortals_dwf	The king's own guard, sworn to the throne of their hold. Their oath can be lent, never broken.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||By rank, for every army: replenishment rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation. For your faction: recruitment capacity +1 / +2 / +3 at 300 / 700 / 1500.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_2_dwf	The Hammerers - Beardling	false
 effect_bundles_localised_description_derpy_gg_rank_immortals_2_dwf	Rank 2 of 5 with The Hammerers, reached at 100 reputation. +3% replenishment rate, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_3_dwf	The Hammerers - Oathsworn	false
@@ -1062,7 +1070,7 @@ effect_bundles_localised_description_derpy_gg_rank_immortals_5_dwf	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_immortals_dwf	The Hammerers - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_immortals_dwf	You hold more reputation with The Hammerers than any other faction in the world. +10% replenishment rate, for every army, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_daemonsmiths_dwf	The Engineers' Guild	false
-derpy_gg_guild_desc_daemonsmiths_dwf	Keepers of secrets guarded since the first hold was dug. They share them slowly, and never twice.||You earn reputation from technologies you complete, and from their own buildings.||Each rank gives, for your faction: +3% research rate at 100 reputation / +6% research rate at 300 reputation / +10% research rate at 700 reputation / +15% research rate at 1500 reputation.	false
+derpy_gg_guild_desc_daemonsmiths_dwf	Keepers of secrets guarded since the first hold was dug. They share them slowly, and never twice.||You earn reputation from technologies you complete, and from their own buildings.||By rank, for your faction: research rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_2_dwf	The Engineers' Guild - Beardling	false
 effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_2_dwf	Rank 2 of 5 with The Engineers' Guild, reached at 100 reputation. +3% research rate, for your faction. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_3_dwf	The Engineers' Guild - Oathsworn	false
@@ -1074,7 +1082,7 @@ effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_5_dwf	Rank 5 of 
 effect_bundles_localised_title_derpy_gg_lead_daemonsmiths_dwf	The Engineers' Guild - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_daemonsmiths_dwf	You hold more reputation with The Engineers' Guild than any other faction in the world. +10% research rate, for your faction, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_khanate_dwf	The Rangers	false
-derpy_gg_guild_desc_khanate_dwf	Dwarfs who left the holds to watch the passes. They see everything that moves above ground, and sell it dearly.||You earn reputation when your heroes succeed at an action, and from their own buildings.||Each rank gives, for every province you own: -3% hero recruitment cost at 100 reputation / -6% hero recruitment cost at 300 reputation / -10% hero recruitment cost at 700 reputation / -15% hero recruitment cost at 1500 reputation.	false
+derpy_gg_guild_desc_khanate_dwf	Dwarfs who left the holds to watch the passes. They see everything that moves above ground, and sell it dearly.||You earn reputation when your heroes succeed at an action, and from their own buildings.||By rank, for every province you own: hero recruitment cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_2_dwf	The Rangers - Beardling	false
 effect_bundles_localised_description_derpy_gg_rank_khanate_2_dwf	Rank 2 of 5 with The Rangers, reached at 100 reputation. -3% hero recruitment cost, for every province you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_3_dwf	The Rangers - Oathsworn	false
@@ -1086,7 +1094,7 @@ effect_bundles_localised_description_derpy_gg_rank_khanate_5_dwf	Rank 5 of 5 wit
 effect_bundles_localised_title_derpy_gg_lead_khanate_dwf	The Rangers - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_khanate_dwf	You hold more reputation with The Rangers than any other faction in the world. -10% hero recruitment cost, for every province you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_overseers_dwf	The Miners' Guild	false
-derpy_gg_guild_desc_overseers_dwf	The delvers and stone-cutters who carved every hold. Nothing is built in the mountains without them.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||Each rank gives, for every region you own: -3% building construction cost at 100 reputation / -6% building construction cost at 300 reputation / -10% building construction cost at 700 reputation / -15% building construction cost at 1500 reputation.	false
+derpy_gg_guild_desc_overseers_dwf	The delvers and stone-cutters who carved every hold. Nothing is built in the mountains without them.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||By rank, for every region you own: building construction cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_2_dwf	The Miners' Guild - Beardling	false
 effect_bundles_localised_description_derpy_gg_rank_overseers_2_dwf	Rank 2 of 5 with The Miners' Guild, reached at 100 reputation. -3% building construction cost, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_3_dwf	The Miners' Guild - Oathsworn	false
@@ -1098,7 +1106,7 @@ effect_bundles_localised_description_derpy_gg_rank_overseers_5_dwf	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_overseers_dwf	The Miners' Guild - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_overseers_dwf	You hold more reputation with The Miners' Guild than any other faction in the world. -10% building construction cost, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_slavers_dwf	The Grudge-Settlers	false
-derpy_gg_guild_desc_slavers_dwf	The clans who take the Book of Grudges at its word. Every line struck out is paid for in plunder.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||Each rank gives, for every army: +3% income from sacking and razing at 100 reputation / +6% income from sacking and razing at 300 reputation / +10% income from sacking and razing at 700 reputation / +15% income from sacking and razing at 1500 reputation.	false
+derpy_gg_guild_desc_slavers_dwf	The clans who take the Book of Grudges at its word. Every line struck out is paid for in plunder.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||By rank, for every army: income from sacking and razing +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_2_dwf	The Grudge-Settlers - Beardling	false
 effect_bundles_localised_description_derpy_gg_rank_slavers_2_dwf	Rank 2 of 5 with The Grudge-Settlers, reached at 100 reputation. +3% income from sacking and razing, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_3_dwf	The Grudge-Settlers - Oathsworn	false
@@ -1252,9 +1260,9 @@ derpy_gg_needs_region_own_dwf	Select one of your OWN settlements on the campaign
 derpy_gg_needs_research_dwf	Start researching something first - this finishes whatever technology you have queued in the tech tree.	false
 derpy_gg_no_unit_dwf	This guild keeps no regiment your people would muster. Their other services are open to you.	false
 derpy_gg_per_turn_dwf	/turn	false
-derpy_gg_upkeep_on_dwf	Upkeep, taken every turn:	false
+derpy_gg_upkeep_on_dwf	Upkeep:	false
 derpy_gg_upkeep_soon_dwf	An upkeep begins on turn	false
-derpy_gg_upkeep_help_dwf	Reputation has to be held, not just won. Every guild you have reputation with charges a little back each turn, and the higher your rank the more it costs to sit on - so a guild you stop feeding slides back down the ladder, and its bonus goes with it.	false
+derpy_gg_upkeep_help_dwf	Stop earning and you slide back down.	false
 derpy_gg_table_head_dwf	Reputation with this guild:	false
 derpy_gg_more_dwf	more	false
 derpy_gg_unranked_dwf	no reputation yet	false
@@ -1320,7 +1328,11 @@ derpy_gg_help_p4_dwf	#Leading a guild||-Held by whichever faction in the world h
 derpy_gg_help_t5_dwf	Losing reputation	false
 derpy_gg_help_p5_dwf	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, plus reputation. Each card says how much.	false
 derpy_gg_help_of_dwf	of	false
-derpy_gg_court_help_dwf	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
+derpy_gg_court_intro_dwf	The Court holds the three things a guild does that you do not choose. Hover a card for its part; the Help tab's Court page has the full rules.	false
+derpy_gg_court_help_lead_dwf	The leader alone gets an extra bonus and the guild's dearest service. Out-earn them to take it.	false
+derpy_gg_court_help_demand_dwf	Pay it and your reputation with this guild jumps. Let the deadline pass and it falls, far enough to cost a rank.	false
+derpy_gg_court_help_no_demand_dwf	Now and then a guild that knows you asks for gold, or for you to renounce the favour you hold with its rival. It appears here, with a deadline.	false
+derpy_gg_court_help_patron_dwf	A patron is one of your lords, bound to one guild: their army is the better for it, this guild's reputation pays half again, and its services cost less. One lord, one guild.	false
 message_event_text_text_derpy_gg_demand_dwf_title	A Guild Asks	false
 message_event_text_text_derpy_gg_demand_dwf_primary	One of the Great Guilds has made a demand of you. The Court tab holds the terms and the deadline.	false
 message_event_text_text_derpy_gg_demand_dwf_secondary	They do not ask twice.	false
@@ -1553,7 +1565,7 @@ derpy_gg_rank_name_3_brt	Squire	false
 derpy_gg_rank_name_4_brt	Knight	false
 derpy_gg_rank_name_5_brt	Paladin	false
 derpy_gg_guild_name_brass_brt	The Wine Merchants	false
-derpy_gg_guild_desc_brass_brt	The vintners and shipping houses of Bordeleaux, whose casks reach every court in the Old World. Every duke owes them something.||You earn reputation from your income every turn, and from their own buildings.||Each rank gives, for every region you own: +3% income from all buildings at 100 reputation / +6% income from all buildings at 300 reputation / +10% income from all buildings at 700 reputation / +15% income from all buildings at 1500 reputation.	false
+derpy_gg_guild_desc_brass_brt	The vintners and shipping houses of Bordeleaux, whose casks reach every court in the Old World. Every duke owes them something.||You earn reputation from your income every turn, and from their own buildings.||By rank, for every region you own: income from all buildings +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_2_brt	The Wine Merchants - Yeoman	false
 effect_bundles_localised_description_derpy_gg_rank_brass_2_brt	Rank 2 of 5 with The Wine Merchants, reached at 100 reputation. +3% income from all buildings, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_3_brt	The Wine Merchants - Squire	false
@@ -1565,7 +1577,7 @@ effect_bundles_localised_description_derpy_gg_rank_brass_5_brt	Rank 5 of 5 with 
 effect_bundles_localised_title_derpy_gg_lead_brass_brt	The Wine Merchants - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_brass_brt	You hold more reputation with The Wine Merchants than any other faction in the world. +10% income from all buildings, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_immortals_brt	The Knights Errant	false
-derpy_gg_guild_desc_immortals_brt	Young knights sworn to prove themselves in battle. Whoever gives them the field earns their lances.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||Each rank gives, for every army: +3% replenishment rate at 100 reputation / +6% replenishment rate at 300 reputation / +10% replenishment rate at 700 reputation / +15% replenishment rate at 1500 reputation. And, for your faction: +1 recruitment capacity at 300 reputation / +2 recruitment capacity at 700 reputation / +3 recruitment capacity at 1500 reputation.	false
+derpy_gg_guild_desc_immortals_brt	Young knights sworn to prove themselves in battle. Whoever gives them the field earns their lances.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||By rank, for every army: replenishment rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation. For your faction: recruitment capacity +1 / +2 / +3 at 300 / 700 / 1500.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_2_brt	The Knights Errant - Yeoman	false
 effect_bundles_localised_description_derpy_gg_rank_immortals_2_brt	Rank 2 of 5 with The Knights Errant, reached at 100 reputation. +3% replenishment rate, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_3_brt	The Knights Errant - Squire	false
@@ -1577,7 +1589,7 @@ effect_bundles_localised_description_derpy_gg_rank_immortals_5_brt	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_immortals_brt	The Knights Errant - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_immortals_brt	You hold more reputation with The Knights Errant than any other faction in the world. +10% replenishment rate, for every army, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_daemonsmiths_brt	The Grail Damsels	false
-derpy_gg_guild_desc_daemonsmiths_brt	Handmaidens of the Lady who keep the old lore of Bretonnia. They share it only with those they judge worthy.||You earn reputation from technologies you complete, and from their own buildings.||Each rank gives, for your faction: +3% research rate at 100 reputation / +6% research rate at 300 reputation / +10% research rate at 700 reputation / +15% research rate at 1500 reputation.	false
+derpy_gg_guild_desc_daemonsmiths_brt	Handmaidens of the Lady who keep the old lore of Bretonnia. They share it only with those they judge worthy.||You earn reputation from technologies you complete, and from their own buildings.||By rank, for your faction: research rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_2_brt	The Grail Damsels - Yeoman	false
 effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_2_brt	Rank 2 of 5 with The Grail Damsels, reached at 100 reputation. +3% research rate, for your faction. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_3_brt	The Grail Damsels - Squire	false
@@ -1589,7 +1601,7 @@ effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_5_brt	Rank 5 of 
 effect_bundles_localised_title_derpy_gg_lead_daemonsmiths_brt	The Grail Damsels - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_daemonsmiths_brt	You hold more reputation with The Grail Damsels than any other faction in the world. +10% research rate, for your faction, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_khanate_brt	The Forest Outlaws	false
-derpy_gg_guild_desc_khanate_brt	Poachers and cutpurses who live beyond the law in the deep forests. They will rob anyone, including you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||Each rank gives, for every province you own: -3% hero recruitment cost at 100 reputation / -6% hero recruitment cost at 300 reputation / -10% hero recruitment cost at 700 reputation / -15% hero recruitment cost at 1500 reputation.	false
+derpy_gg_guild_desc_khanate_brt	Poachers and cutpurses who live beyond the law in the deep forests. They will rob anyone, including you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||By rank, for every province you own: hero recruitment cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_2_brt	The Forest Outlaws - Yeoman	false
 effect_bundles_localised_description_derpy_gg_rank_khanate_2_brt	Rank 2 of 5 with The Forest Outlaws, reached at 100 reputation. -3% hero recruitment cost, for every province you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_3_brt	The Forest Outlaws - Squire	false
@@ -1601,7 +1613,7 @@ effect_bundles_localised_description_derpy_gg_rank_khanate_5_brt	Rank 5 of 5 wit
 effect_bundles_localised_title_derpy_gg_lead_khanate_brt	The Forest Outlaws - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_khanate_brt	You hold more reputation with The Forest Outlaws than any other faction in the world. -10% hero recruitment cost, for every province you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_overseers_brt	The Castle-Wrights	false
-derpy_gg_guild_desc_overseers_brt	The master masons who raise every keep and curtain wall in the dukedoms, and who know where each one is weak.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||Each rank gives, for every region you own: -3% building construction cost at 100 reputation / -6% building construction cost at 300 reputation / -10% building construction cost at 700 reputation / -15% building construction cost at 1500 reputation.	false
+derpy_gg_guild_desc_overseers_brt	The master masons who raise every keep and curtain wall in the dukedoms, and who know where each one is weak.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||By rank, for every region you own: building construction cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_2_brt	The Castle-Wrights - Yeoman	false
 effect_bundles_localised_description_derpy_gg_rank_overseers_2_brt	Rank 2 of 5 with The Castle-Wrights, reached at 100 reputation. -3% building construction cost, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_3_brt	The Castle-Wrights - Squire	false
@@ -1613,7 +1625,7 @@ effect_bundles_localised_description_derpy_gg_rank_overseers_5_brt	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_overseers_brt	The Castle-Wrights - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_overseers_brt	You hold more reputation with The Castle-Wrights than any other faction in the world. -10% building construction cost, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_slavers_brt	The Crusaders	false
-derpy_gg_guild_desc_slavers_brt	Knights and men-at-arms back from the Errantry Wars, paid in what they carry home.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||Each rank gives, for every army: +3% income from sacking and razing at 100 reputation / +6% income from sacking and razing at 300 reputation / +10% income from sacking and razing at 700 reputation / +15% income from sacking and razing at 1500 reputation.	false
+derpy_gg_guild_desc_slavers_brt	Knights and men-at-arms back from the Errantry Wars, paid in what they carry home.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||By rank, for every army: income from sacking and razing +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_2_brt	The Crusaders - Yeoman	false
 effect_bundles_localised_description_derpy_gg_rank_slavers_2_brt	Rank 2 of 5 with The Crusaders, reached at 100 reputation. +3% income from sacking and razing, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_3_brt	The Crusaders - Squire	false
@@ -1767,9 +1779,9 @@ derpy_gg_needs_region_own_brt	Select one of your OWN settlements on the campaign
 derpy_gg_needs_research_brt	Start researching something first - this finishes whatever technology you have queued in the tech tree.	false
 derpy_gg_no_unit_brt	This guild keeps no regiment your people would muster. Their other services are open to you.	false
 derpy_gg_per_turn_brt	/turn	false
-derpy_gg_upkeep_on_brt	Upkeep, taken every turn:	false
+derpy_gg_upkeep_on_brt	Upkeep:	false
 derpy_gg_upkeep_soon_brt	An upkeep begins on turn	false
-derpy_gg_upkeep_help_brt	Reputation has to be held, not just won. Every guild you have reputation with charges a little back each turn, and the higher your rank the more it costs to sit on - so a guild you stop feeding slides back down the ladder, and its bonus goes with it.	false
+derpy_gg_upkeep_help_brt	Stop earning and you slide back down.	false
 derpy_gg_table_head_brt	Reputation with this guild:	false
 derpy_gg_more_brt	more	false
 derpy_gg_unranked_brt	no reputation yet	false
@@ -1835,7 +1847,11 @@ derpy_gg_help_p4_brt	#Leading a guild||-Held by whichever faction in the world h
 derpy_gg_help_t5_brt	Losing reputation	false
 derpy_gg_help_p5_brt	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, plus reputation. Each card says how much.	false
 derpy_gg_help_of_brt	of	false
-derpy_gg_court_help_brt	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
+derpy_gg_court_intro_brt	The Court holds the three things a guild does that you do not choose. Hover a card for its part; the Help tab's Court page has the full rules.	false
+derpy_gg_court_help_lead_brt	The leader alone gets an extra bonus and the guild's dearest service. Out-earn them to take it.	false
+derpy_gg_court_help_demand_brt	Pay it and your reputation with this guild jumps. Let the deadline pass and it falls, far enough to cost a rank.	false
+derpy_gg_court_help_no_demand_brt	Now and then a guild that knows you asks for gold, or for you to renounce the favour you hold with its rival. It appears here, with a deadline.	false
+derpy_gg_court_help_patron_brt	A patron is one of your lords, bound to one guild: their army is the better for it, this guild's reputation pays half again, and its services cost less. One lord, one guild.	false
 message_event_text_text_derpy_gg_demand_brt_title	A Guild Asks	false
 message_event_text_text_derpy_gg_demand_brt_primary	One of the Great Guilds has made a demand of you. The Court tab holds the terms and the deadline.	false
 message_event_text_text_derpy_gg_demand_brt_secondary	They do not ask twice.	false
@@ -2068,7 +2084,7 @@ derpy_gg_rank_name_3_cth	Official	false
 derpy_gg_rank_name_4_cth	Magistrate	false
 derpy_gg_rank_name_5_cth	Minister	false
 derpy_gg_guild_name_brass_cth	The Caravan Masters	false
-derpy_gg_guild_desc_brass_cth	The masters of the Ivory Road, whose caravans cross half the world and come back heavier. Every province pays their tolls.||You earn reputation from your income every turn, and from their own buildings.||Each rank gives, for every region you own: +3% income from all buildings at 100 reputation / +6% income from all buildings at 300 reputation / +10% income from all buildings at 700 reputation / +15% income from all buildings at 1500 reputation.	false
+derpy_gg_guild_desc_brass_cth	The masters of the Ivory Road, whose caravans cross half the world and come back heavier. Every province pays their tolls.||You earn reputation from your income every turn, and from their own buildings.||By rank, for every region you own: income from all buildings +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_2_cth	The Caravan Masters - Scholar	false
 effect_bundles_localised_description_derpy_gg_rank_brass_2_cth	Rank 2 of 5 with The Caravan Masters, reached at 100 reputation. +3% income from all buildings, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_3_cth	The Caravan Masters - Official	false
@@ -2080,7 +2096,7 @@ effect_bundles_localised_description_derpy_gg_rank_brass_5_cth	Rank 5 of 5 with 
 effect_bundles_localised_title_derpy_gg_lead_brass_cth	The Caravan Masters - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_brass_cth	You hold more reputation with The Caravan Masters than any other faction in the world. +10% income from all buildings, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_immortals_cth	The Dragon Guard	false
-derpy_gg_guild_desc_immortals_cth	The Emperor's own warriors, sworn to the Celestial Court. Their oath is lent to whoever the Court favours.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||Each rank gives, for every army: +3% replenishment rate at 100 reputation / +6% replenishment rate at 300 reputation / +10% replenishment rate at 700 reputation / +15% replenishment rate at 1500 reputation. And, for your faction: +1 recruitment capacity at 300 reputation / +2 recruitment capacity at 700 reputation / +3 recruitment capacity at 1500 reputation.	false
+derpy_gg_guild_desc_immortals_cth	The Emperor's own warriors, sworn to the Celestial Court. Their oath is lent to whoever the Court favours.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||By rank, for every army: replenishment rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation. For your faction: recruitment capacity +1 / +2 / +3 at 300 / 700 / 1500.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_2_cth	The Dragon Guard - Scholar	false
 effect_bundles_localised_description_derpy_gg_rank_immortals_2_cth	Rank 2 of 5 with The Dragon Guard, reached at 100 reputation. +3% replenishment rate, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_3_cth	The Dragon Guard - Official	false
@@ -2092,7 +2108,7 @@ effect_bundles_localised_description_derpy_gg_rank_immortals_5_cth	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_immortals_cth	The Dragon Guard - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_immortals_cth	You hold more reputation with The Dragon Guard than any other faction in the world. +10% replenishment rate, for every army, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_daemonsmiths_cth	The Imperial Academy	false
-derpy_gg_guild_desc_daemonsmiths_cth	The scholars and astromancers who keep the Empire's learning. They teach it slowly, and never for free.||You earn reputation from technologies you complete, and from their own buildings.||Each rank gives, for your faction: +3% research rate at 100 reputation / +6% research rate at 300 reputation / +10% research rate at 700 reputation / +15% research rate at 1500 reputation.	false
+derpy_gg_guild_desc_daemonsmiths_cth	The scholars and astromancers who keep the Empire's learning. They teach it slowly, and never for free.||You earn reputation from technologies you complete, and from their own buildings.||By rank, for your faction: research rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_2_cth	The Imperial Academy - Scholar	false
 effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_2_cth	Rank 2 of 5 with The Imperial Academy, reached at 100 reputation. +3% research rate, for your faction. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_3_cth	The Imperial Academy - Official	false
@@ -2104,7 +2120,7 @@ effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_5_cth	Rank 5 of 
 effect_bundles_localised_title_derpy_gg_lead_daemonsmiths_cth	The Imperial Academy - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_daemonsmiths_cth	You hold more reputation with The Imperial Academy than any other faction in the world. +10% research rate, for your faction, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_khanate_cth	The Crow Society	false
-derpy_gg_guild_desc_khanate_cth	Informers, poisoners and watchers who sell what they learn at court. They work for anyone, including against you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||Each rank gives, for every province you own: -3% hero recruitment cost at 100 reputation / -6% hero recruitment cost at 300 reputation / -10% hero recruitment cost at 700 reputation / -15% hero recruitment cost at 1500 reputation.	false
+derpy_gg_guild_desc_khanate_cth	Informers, poisoners and watchers who sell what they learn at court. They work for anyone, including against you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||By rank, for every province you own: hero recruitment cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_2_cth	The Crow Society - Scholar	false
 effect_bundles_localised_description_derpy_gg_rank_khanate_2_cth	Rank 2 of 5 with The Crow Society, reached at 100 reputation. -3% hero recruitment cost, for every province you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_3_cth	The Crow Society - Official	false
@@ -2116,7 +2132,7 @@ effect_bundles_localised_description_derpy_gg_rank_khanate_5_cth	Rank 5 of 5 wit
 effect_bundles_localised_title_derpy_gg_lead_khanate_cth	The Crow Society - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_khanate_cth	You hold more reputation with The Crow Society than any other faction in the world. -10% hero recruitment cost, for every province you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_overseers_cth	The Bastion Builders	false
-derpy_gg_guild_desc_overseers_cth	The engineers who keep the Great Bastion standing, and who know where every wall is weak.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||Each rank gives, for every region you own: -3% building construction cost at 100 reputation / -6% building construction cost at 300 reputation / -10% building construction cost at 700 reputation / -15% building construction cost at 1500 reputation.	false
+derpy_gg_guild_desc_overseers_cth	The engineers who keep the Great Bastion standing, and who know where every wall is weak.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||By rank, for every region you own: building construction cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_2_cth	The Bastion Builders - Scholar	false
 effect_bundles_localised_description_derpy_gg_rank_overseers_2_cth	Rank 2 of 5 with The Bastion Builders, reached at 100 reputation. -3% building construction cost, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_3_cth	The Bastion Builders - Official	false
@@ -2128,7 +2144,7 @@ effect_bundles_localised_description_derpy_gg_rank_overseers_5_cth	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_overseers_cth	The Bastion Builders - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_overseers_cth	You hold more reputation with The Bastion Builders than any other faction in the world. -10% building construction cost, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_slavers_cth	The Punitive Host	false
-derpy_gg_guild_desc_slavers_cth	Soldiers sent beyond the Bastion to punish the Emperor's enemies. Their pay is what they bring back.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||Each rank gives, for every army: +3% income from sacking and razing at 100 reputation / +6% income from sacking and razing at 300 reputation / +10% income from sacking and razing at 700 reputation / +15% income from sacking and razing at 1500 reputation.	false
+derpy_gg_guild_desc_slavers_cth	Soldiers sent beyond the Bastion to punish the Emperor's enemies. Their pay is what they bring back.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||By rank, for every army: income from sacking and razing +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_2_cth	The Punitive Host - Scholar	false
 effect_bundles_localised_description_derpy_gg_rank_slavers_2_cth	Rank 2 of 5 with The Punitive Host, reached at 100 reputation. +3% income from sacking and razing, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_3_cth	The Punitive Host - Official	false
@@ -2282,9 +2298,9 @@ derpy_gg_needs_region_own_cth	Select one of your OWN settlements on the campaign
 derpy_gg_needs_research_cth	Start researching something first - this finishes whatever technology you have queued in the tech tree.	false
 derpy_gg_no_unit_cth	This guild keeps no regiment your people would muster. Their other services are open to you.	false
 derpy_gg_per_turn_cth	/turn	false
-derpy_gg_upkeep_on_cth	Upkeep, taken every turn:	false
+derpy_gg_upkeep_on_cth	Upkeep:	false
 derpy_gg_upkeep_soon_cth	An upkeep begins on turn	false
-derpy_gg_upkeep_help_cth	Reputation has to be held, not just won. Every guild you have reputation with charges a little back each turn, and the higher your rank the more it costs to sit on - so a guild you stop feeding slides back down the ladder, and its bonus goes with it.	false
+derpy_gg_upkeep_help_cth	Stop earning and you slide back down.	false
 derpy_gg_table_head_cth	Reputation with this guild:	false
 derpy_gg_more_cth	more	false
 derpy_gg_unranked_cth	no reputation yet	false
@@ -2350,7 +2366,11 @@ derpy_gg_help_p4_cth	#Leading a guild||-Held by whichever faction in the world h
 derpy_gg_help_t5_cth	Losing reputation	false
 derpy_gg_help_p5_cth	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, plus reputation. Each card says how much.	false
 derpy_gg_help_of_cth	of	false
-derpy_gg_court_help_cth	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
+derpy_gg_court_intro_cth	The Court holds the three things a guild does that you do not choose. Hover a card for its part; the Help tab's Court page has the full rules.	false
+derpy_gg_court_help_lead_cth	The leader alone gets an extra bonus and the guild's dearest service. Out-earn them to take it.	false
+derpy_gg_court_help_demand_cth	Pay it and your reputation with this guild jumps. Let the deadline pass and it falls, far enough to cost a rank.	false
+derpy_gg_court_help_no_demand_cth	Now and then a guild that knows you asks for gold, or for you to renounce the favour you hold with its rival. It appears here, with a deadline.	false
+derpy_gg_court_help_patron_cth	A patron is one of your lords, bound to one guild: their army is the better for it, this guild's reputation pays half again, and its services cost less. One lord, one guild.	false
 message_event_text_text_derpy_gg_demand_cth_title	A Guild Asks	false
 message_event_text_text_derpy_gg_demand_cth_primary	One of the Great Guilds has made a demand of you. The Court tab holds the terms and the deadline.	false
 message_event_text_text_derpy_gg_demand_cth_secondary	They do not ask twice.	false
@@ -2583,7 +2603,7 @@ derpy_gg_rank_name_3_ksl	Druzhina	false
 derpy_gg_rank_name_4_ksl	Boyar	false
 derpy_gg_rank_name_5_ksl	Ataman	false
 derpy_gg_guild_name_brass_ksl	The Erengrad Merchants	false
-derpy_gg_guild_desc_brass_ksl	The traders of Erengrad, whose ships and sledges carry furs south and gold north. Every boyar owes them something.||You earn reputation from your income every turn, and from their own buildings.||Each rank gives, for every region you own: +3% income from all buildings at 100 reputation / +6% income from all buildings at 300 reputation / +10% income from all buildings at 700 reputation / +15% income from all buildings at 1500 reputation.	false
+derpy_gg_guild_desc_brass_ksl	The traders of Erengrad, whose ships and sledges carry furs south and gold north. Every boyar owes them something.||You earn reputation from your income every turn, and from their own buildings.||By rank, for every region you own: income from all buildings +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_2_ksl	The Erengrad Merchants - Kossar	false
 effect_bundles_localised_description_derpy_gg_rank_brass_2_ksl	Rank 2 of 5 with The Erengrad Merchants, reached at 100 reputation. +3% income from all buildings, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_3_ksl	The Erengrad Merchants - Druzhina	false
@@ -2595,7 +2615,7 @@ effect_bundles_localised_description_derpy_gg_rank_brass_5_ksl	Rank 5 of 5 with 
 effect_bundles_localised_title_derpy_gg_lead_brass_ksl	The Erengrad Merchants - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_brass_ksl	You hold more reputation with The Erengrad Merchants than any other faction in the world. +10% income from all buildings, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_immortals_ksl	The Tzar Guard	false
-derpy_gg_guild_desc_immortals_ksl	The Tzar's own guard, the finest warriors in Kislev. Their oath can be lent, never broken.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||Each rank gives, for every army: +3% replenishment rate at 100 reputation / +6% replenishment rate at 300 reputation / +10% replenishment rate at 700 reputation / +15% replenishment rate at 1500 reputation. And, for your faction: +1 recruitment capacity at 300 reputation / +2 recruitment capacity at 700 reputation / +3 recruitment capacity at 1500 reputation.	false
+derpy_gg_guild_desc_immortals_ksl	The Tzar's own guard, the finest warriors in Kislev. Their oath can be lent, never broken.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||By rank, for every army: replenishment rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation. For your faction: recruitment capacity +1 / +2 / +3 at 300 / 700 / 1500.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_2_ksl	The Tzar Guard - Kossar	false
 effect_bundles_localised_description_derpy_gg_rank_immortals_2_ksl	Rank 2 of 5 with The Tzar Guard, reached at 100 reputation. +3% replenishment rate, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_3_ksl	The Tzar Guard - Druzhina	false
@@ -2607,7 +2627,7 @@ effect_bundles_localised_description_derpy_gg_rank_immortals_5_ksl	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_immortals_ksl	The Tzar Guard - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_immortals_ksl	You hold more reputation with The Tzar Guard than any other faction in the world. +10% replenishment rate, for every army, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_daemonsmiths_ksl	The Ice Court	false
-derpy_gg_guild_desc_daemonsmiths_ksl	The witches of the Ice Court, who keep what the winter teaches. They part with it slowly, and never for free.||You earn reputation from technologies you complete, and from their own buildings.||Each rank gives, for your faction: +3% research rate at 100 reputation / +6% research rate at 300 reputation / +10% research rate at 700 reputation / +15% research rate at 1500 reputation.	false
+derpy_gg_guild_desc_daemonsmiths_ksl	The witches of the Ice Court, who keep what the winter teaches. They part with it slowly, and never for free.||You earn reputation from technologies you complete, and from their own buildings.||By rank, for your faction: research rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_2_ksl	The Ice Court - Kossar	false
 effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_2_ksl	Rank 2 of 5 with The Ice Court, reached at 100 reputation. +3% research rate, for your faction. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_3_ksl	The Ice Court - Druzhina	false
@@ -2619,7 +2639,7 @@ effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_5_ksl	Rank 5 of 
 effect_bundles_localised_title_derpy_gg_lead_daemonsmiths_ksl	The Ice Court - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_daemonsmiths_ksl	You hold more reputation with The Ice Court than any other faction in the world. +10% research rate, for your faction, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_khanate_ksl	The Oblast Smugglers	false
-derpy_gg_guild_desc_khanate_ksl	Smugglers who know every trail across the oblast and every ear in every stanitsa. They work for anyone, including against you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||Each rank gives, for every province you own: -3% hero recruitment cost at 100 reputation / -6% hero recruitment cost at 300 reputation / -10% hero recruitment cost at 700 reputation / -15% hero recruitment cost at 1500 reputation.	false
+derpy_gg_guild_desc_khanate_ksl	Smugglers who know every trail across the oblast and every ear in every stanitsa. They work for anyone, including against you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||By rank, for every province you own: hero recruitment cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_2_ksl	The Oblast Smugglers - Kossar	false
 effect_bundles_localised_description_derpy_gg_rank_khanate_2_ksl	Rank 2 of 5 with The Oblast Smugglers, reached at 100 reputation. -3% hero recruitment cost, for every province you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_3_ksl	The Oblast Smugglers - Druzhina	false
@@ -2631,7 +2651,7 @@ effect_bundles_localised_description_derpy_gg_rank_khanate_5_ksl	Rank 5 of 5 wit
 effect_bundles_localised_title_derpy_gg_lead_khanate_ksl	The Oblast Smugglers - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_khanate_ksl	You hold more reputation with The Oblast Smugglers than any other faction in the world. -10% hero recruitment cost, for every province you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_overseers_ksl	The Stanitsa Builders	false
-derpy_gg_guild_desc_overseers_ksl	The builders of every palisade and stanitsa that holds the north, and the only ones who know where each is weak.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||Each rank gives, for every region you own: -3% building construction cost at 100 reputation / -6% building construction cost at 300 reputation / -10% building construction cost at 700 reputation / -15% building construction cost at 1500 reputation.	false
+derpy_gg_guild_desc_overseers_ksl	The builders of every palisade and stanitsa that holds the north, and the only ones who know where each is weak.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||By rank, for every region you own: building construction cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_2_ksl	The Stanitsa Builders - Kossar	false
 effect_bundles_localised_description_derpy_gg_rank_overseers_2_ksl	Rank 2 of 5 with The Stanitsa Builders, reached at 100 reputation. -3% building construction cost, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_3_ksl	The Stanitsa Builders - Druzhina	false
@@ -2643,7 +2663,7 @@ effect_bundles_localised_description_derpy_gg_rank_overseers_5_ksl	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_overseers_ksl	The Stanitsa Builders - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_overseers_ksl	You hold more reputation with The Stanitsa Builders than any other faction in the world. -10% building construction cost, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_slavers_ksl	The Ungol Raiders	false
-derpy_gg_guild_desc_slavers_ksl	Horse-raiders of the steppe who ride for pay and plunder. Their ledger is measured in what they carry home.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||Each rank gives, for every army: +3% income from sacking and razing at 100 reputation / +6% income from sacking and razing at 300 reputation / +10% income from sacking and razing at 700 reputation / +15% income from sacking and razing at 1500 reputation.	false
+derpy_gg_guild_desc_slavers_ksl	Horse-raiders of the steppe who ride for pay and plunder. Their ledger is measured in what they carry home.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||By rank, for every army: income from sacking and razing +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_2_ksl	The Ungol Raiders - Kossar	false
 effect_bundles_localised_description_derpy_gg_rank_slavers_2_ksl	Rank 2 of 5 with The Ungol Raiders, reached at 100 reputation. +3% income from sacking and razing, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_3_ksl	The Ungol Raiders - Druzhina	false
@@ -2797,9 +2817,9 @@ derpy_gg_needs_region_own_ksl	Select one of your OWN settlements on the campaign
 derpy_gg_needs_research_ksl	Start researching something first - this finishes whatever technology you have queued in the tech tree.	false
 derpy_gg_no_unit_ksl	This guild keeps no regiment your people would muster. Their other services are open to you.	false
 derpy_gg_per_turn_ksl	/turn	false
-derpy_gg_upkeep_on_ksl	Upkeep, taken every turn:	false
+derpy_gg_upkeep_on_ksl	Upkeep:	false
 derpy_gg_upkeep_soon_ksl	An upkeep begins on turn	false
-derpy_gg_upkeep_help_ksl	Reputation has to be held, not just won. Every guild you have reputation with charges a little back each turn, and the higher your rank the more it costs to sit on - so a guild you stop feeding slides back down the ladder, and its bonus goes with it.	false
+derpy_gg_upkeep_help_ksl	Stop earning and you slide back down.	false
 derpy_gg_table_head_ksl	Reputation with this guild:	false
 derpy_gg_more_ksl	more	false
 derpy_gg_unranked_ksl	no reputation yet	false
@@ -2865,7 +2885,11 @@ derpy_gg_help_p4_ksl	#Leading a guild||-Held by whichever faction in the world h
 derpy_gg_help_t5_ksl	Losing reputation	false
 derpy_gg_help_p5_ksl	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, plus reputation. Each card says how much.	false
 derpy_gg_help_of_ksl	of	false
-derpy_gg_court_help_ksl	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
+derpy_gg_court_intro_ksl	The Court holds the three things a guild does that you do not choose. Hover a card for its part; the Help tab's Court page has the full rules.	false
+derpy_gg_court_help_lead_ksl	The leader alone gets an extra bonus and the guild's dearest service. Out-earn them to take it.	false
+derpy_gg_court_help_demand_ksl	Pay it and your reputation with this guild jumps. Let the deadline pass and it falls, far enough to cost a rank.	false
+derpy_gg_court_help_no_demand_ksl	Now and then a guild that knows you asks for gold, or for you to renounce the favour you hold with its rival. It appears here, with a deadline.	false
+derpy_gg_court_help_patron_ksl	A patron is one of your lords, bound to one guild: their army is the better for it, this guild's reputation pays half again, and its services cost less. One lord, one guild.	false
 message_event_text_text_derpy_gg_demand_ksl_title	A Guild Asks	false
 message_event_text_text_derpy_gg_demand_ksl_primary	One of the Great Guilds has made a demand of you. The Court tab holds the terms and the deadline.	false
 message_event_text_text_derpy_gg_demand_ksl_secondary	They do not ask twice.	false
@@ -3098,7 +3122,7 @@ derpy_gg_rank_name_3_def	Highborn	false
 derpy_gg_rank_name_4_def	Dreadlord	false
 derpy_gg_rank_name_5_def	Tyrant	false
 derpy_gg_guild_name_brass_def	The Karond Kar Traders	false
-derpy_gg_guild_desc_brass_def	The counting-towers of Karond Kar, where every captive the Black Arks bring home is bought and sold. Every Highborn owes them something.||You earn reputation from your income every turn, and from their own buildings.||Each rank gives, for every region you own: +3% income from all buildings at 100 reputation / +6% income from all buildings at 300 reputation / +10% income from all buildings at 700 reputation / +15% income from all buildings at 1500 reputation.	false
+derpy_gg_guild_desc_brass_def	The counting-towers of Karond Kar, where every captive the Black Arks bring home is bought and sold. Every Highborn owes them something.||You earn reputation from your income every turn, and from their own buildings.||By rank, for every region you own: income from all buildings +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_2_def	The Karond Kar Traders - Corsair	false
 effect_bundles_localised_description_derpy_gg_rank_brass_2_def	Rank 2 of 5 with The Karond Kar Traders, reached at 100 reputation. +3% income from all buildings, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_3_def	The Karond Kar Traders - Highborn	false
@@ -3110,7 +3134,7 @@ effect_bundles_localised_description_derpy_gg_rank_brass_5_def	Rank 5 of 5 with 
 effect_bundles_localised_title_derpy_gg_lead_brass_def	The Karond Kar Traders - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_brass_def	You hold more reputation with The Karond Kar Traders than any other faction in the world. +10% income from all buildings, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_immortals_def	The Black Guard	false
-derpy_gg_guild_desc_immortals_def	The Witch King's own guard, sworn to Naggarond and nothing else. Their oath is lent only to those Malekith favours.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||Each rank gives, for every army: +3% replenishment rate at 100 reputation / +6% replenishment rate at 300 reputation / +10% replenishment rate at 700 reputation / +15% replenishment rate at 1500 reputation. And, for your faction: +1 recruitment capacity at 300 reputation / +2 recruitment capacity at 700 reputation / +3 recruitment capacity at 1500 reputation.	false
+derpy_gg_guild_desc_immortals_def	The Witch King's own guard, sworn to Naggarond and nothing else. Their oath is lent only to those Malekith favours.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||By rank, for every army: replenishment rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation. For your faction: recruitment capacity +1 / +2 / +3 at 300 / 700 / 1500.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_2_def	The Black Guard - Corsair	false
 effect_bundles_localised_description_derpy_gg_rank_immortals_2_def	Rank 2 of 5 with The Black Guard, reached at 100 reputation. +3% replenishment rate, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_3_def	The Black Guard - Highborn	false
@@ -3122,7 +3146,7 @@ effect_bundles_localised_description_derpy_gg_rank_immortals_5_def	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_immortals_def	The Black Guard - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_immortals_def	You hold more reputation with The Black Guard than any other faction in the world. +10% replenishment rate, for every army, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_daemonsmiths_def	The Convent of Ghrond	false
-derpy_gg_guild_desc_daemonsmiths_def	The sorceresses of Ghrond, who keep the dark arts and answer to Morathi alone. They part with what they know slowly, and never for free.||You earn reputation from technologies you complete, and from their own buildings.||Each rank gives, for your faction: +3% research rate at 100 reputation / +6% research rate at 300 reputation / +10% research rate at 700 reputation / +15% research rate at 1500 reputation.	false
+derpy_gg_guild_desc_daemonsmiths_def	The sorceresses of Ghrond, who keep the dark arts and answer to Morathi alone. They part with what they know slowly, and never for free.||You earn reputation from technologies you complete, and from their own buildings.||By rank, for your faction: research rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_2_def	The Convent of Ghrond - Corsair	false
 effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_2_def	Rank 2 of 5 with The Convent of Ghrond, reached at 100 reputation. +3% research rate, for your faction. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_3_def	The Convent of Ghrond - Highborn	false
@@ -3134,7 +3158,7 @@ effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_5_def	Rank 5 of 
 effect_bundles_localised_title_derpy_gg_lead_daemonsmiths_def	The Convent of Ghrond - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_daemonsmiths_def	You hold more reputation with The Convent of Ghrond than any other faction in the world. +10% research rate, for your faction, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_khanate_def	The Khainite Assassins	false
-derpy_gg_guild_desc_khanate_def	Assassins of the Temple of Khaine, who kill for the Lord of Murder and for pay. They work for anyone, including against you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||Each rank gives, for every province you own: -3% hero recruitment cost at 100 reputation / -6% hero recruitment cost at 300 reputation / -10% hero recruitment cost at 700 reputation / -15% hero recruitment cost at 1500 reputation.	false
+derpy_gg_guild_desc_khanate_def	Assassins of the Temple of Khaine, who kill for the Lord of Murder and for pay. They work for anyone, including against you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||By rank, for every province you own: hero recruitment cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_2_def	The Khainite Assassins - Corsair	false
 effect_bundles_localised_description_derpy_gg_rank_khanate_2_def	Rank 2 of 5 with The Khainite Assassins, reached at 100 reputation. -3% hero recruitment cost, for every province you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_3_def	The Khainite Assassins - Highborn	false
@@ -3146,7 +3170,7 @@ effect_bundles_localised_description_derpy_gg_rank_khanate_5_def	Rank 5 of 5 wit
 effect_bundles_localised_title_derpy_gg_lead_khanate_def	The Khainite Assassins - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_khanate_def	You hold more reputation with The Khainite Assassins than any other faction in the world. -10% hero recruitment cost, for every province you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_overseers_def	The Naggarond Builders	false
-derpy_gg_guild_desc_overseers_def	The builders of every tower and wall in Naggaroth, raised by thralls in the cold. They know where each one is weak.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||Each rank gives, for every region you own: -3% building construction cost at 100 reputation / -6% building construction cost at 300 reputation / -10% building construction cost at 700 reputation / -15% building construction cost at 1500 reputation.	false
+derpy_gg_guild_desc_overseers_def	The builders of every tower and wall in Naggaroth, raised by thralls in the cold. They know where each one is weak.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||By rank, for every region you own: building construction cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_2_def	The Naggarond Builders - Corsair	false
 effect_bundles_localised_description_derpy_gg_rank_overseers_2_def	Rank 2 of 5 with The Naggarond Builders, reached at 100 reputation. -3% building construction cost, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_3_def	The Naggarond Builders - Highborn	false
@@ -3158,7 +3182,7 @@ effect_bundles_localised_description_derpy_gg_rank_overseers_5_def	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_overseers_def	The Naggarond Builders - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_overseers_def	You hold more reputation with The Naggarond Builders than any other faction in the world. -10% building construction cost, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_slavers_def	The Black Ark Corsairs	false
-derpy_gg_guild_desc_slavers_def	The crews of the Black Arks, who raid every shore they can reach. Their pay is what they carry home.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||Each rank gives, for every army: +3% income from sacking and razing at 100 reputation / +6% income from sacking and razing at 300 reputation / +10% income from sacking and razing at 700 reputation / +15% income from sacking and razing at 1500 reputation.	false
+derpy_gg_guild_desc_slavers_def	The crews of the Black Arks, who raid every shore they can reach. Their pay is what they carry home.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||By rank, for every army: income from sacking and razing +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_2_def	The Black Ark Corsairs - Corsair	false
 effect_bundles_localised_description_derpy_gg_rank_slavers_2_def	Rank 2 of 5 with The Black Ark Corsairs, reached at 100 reputation. +3% income from sacking and razing, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_3_def	The Black Ark Corsairs - Highborn	false
@@ -3312,9 +3336,9 @@ derpy_gg_needs_region_own_def	Select one of your OWN settlements on the campaign
 derpy_gg_needs_research_def	Start researching something first - this finishes whatever technology you have queued in the tech tree.	false
 derpy_gg_no_unit_def	This guild keeps no regiment your people would muster. Their other services are open to you.	false
 derpy_gg_per_turn_def	/turn	false
-derpy_gg_upkeep_on_def	Upkeep, taken every turn:	false
+derpy_gg_upkeep_on_def	Upkeep:	false
 derpy_gg_upkeep_soon_def	An upkeep begins on turn	false
-derpy_gg_upkeep_help_def	Reputation has to be held, not just won. Every guild you have reputation with charges a little back each turn, and the higher your rank the more it costs to sit on - so a guild you stop feeding slides back down the ladder, and its bonus goes with it.	false
+derpy_gg_upkeep_help_def	Stop earning and you slide back down.	false
 derpy_gg_table_head_def	Reputation with this guild:	false
 derpy_gg_more_def	more	false
 derpy_gg_unranked_def	no reputation yet	false
@@ -3380,7 +3404,11 @@ derpy_gg_help_p4_def	#Leading a guild||-Held by whichever faction in the world h
 derpy_gg_help_t5_def	Losing reputation	false
 derpy_gg_help_p5_def	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, plus reputation. Each card says how much.	false
 derpy_gg_help_of_def	of	false
-derpy_gg_court_help_def	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
+derpy_gg_court_intro_def	The Court holds the three things a guild does that you do not choose. Hover a card for its part; the Help tab's Court page has the full rules.	false
+derpy_gg_court_help_lead_def	The leader alone gets an extra bonus and the guild's dearest service. Out-earn them to take it.	false
+derpy_gg_court_help_demand_def	Pay it and your reputation with this guild jumps. Let the deadline pass and it falls, far enough to cost a rank.	false
+derpy_gg_court_help_no_demand_def	Now and then a guild that knows you asks for gold, or for you to renounce the favour you hold with its rival. It appears here, with a deadline.	false
+derpy_gg_court_help_patron_def	A patron is one of your lords, bound to one guild: their army is the better for it, this guild's reputation pays half again, and its services cost less. One lord, one guild.	false
 message_event_text_text_derpy_gg_demand_def_title	A Guild Asks	false
 message_event_text_text_derpy_gg_demand_def_primary	One of the Great Guilds has made a demand of you. The Court tab holds the terms and the deadline.	false
 message_event_text_text_derpy_gg_demand_def_secondary	They do not ask twice.	false
@@ -3613,7 +3641,7 @@ derpy_gg_rank_name_3_hef	Noble	false
 derpy_gg_rank_name_4_hef	Prince	false
 derpy_gg_rank_name_5_hef	Regent	false
 derpy_gg_guild_name_brass_hef	The Lothern Merchants	false
-derpy_gg_guild_desc_brass_hef	The merchant houses of Lothern, whose ships carry the trade of Ulthuan to every coast. Every Sea Lord owes them something.||You earn reputation from your income every turn, and from their own buildings.||Each rank gives, for every region you own: +3% income from all buildings at 100 reputation / +6% income from all buildings at 300 reputation / +10% income from all buildings at 700 reputation / +15% income from all buildings at 1500 reputation.	false
+derpy_gg_guild_desc_brass_hef	The merchant houses of Lothern, whose ships carry the trade of Ulthuan to every coast. Every Sea Lord owes them something.||You earn reputation from your income every turn, and from their own buildings.||By rank, for every region you own: income from all buildings +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_2_hef	The Lothern Merchants - Warden	false
 effect_bundles_localised_description_derpy_gg_rank_brass_2_hef	Rank 2 of 5 with The Lothern Merchants, reached at 100 reputation. +3% income from all buildings, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_3_hef	The Lothern Merchants - Noble	false
@@ -3625,7 +3653,7 @@ effect_bundles_localised_description_derpy_gg_rank_brass_5_hef	Rank 5 of 5 with 
 effect_bundles_localised_title_derpy_gg_lead_brass_hef	The Lothern Merchants - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_brass_hef	You hold more reputation with The Lothern Merchants than any other faction in the world. +10% income from all buildings, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_immortals_hef	The Swordmasters	false
-derpy_gg_guild_desc_immortals_hef	The warriors of the White Tower of Hoeth, sworn to the blade for centuries. Their oath is lent to whoever the Tower favours.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||Each rank gives, for every army: +3% replenishment rate at 100 reputation / +6% replenishment rate at 300 reputation / +10% replenishment rate at 700 reputation / +15% replenishment rate at 1500 reputation. And, for your faction: +1 recruitment capacity at 300 reputation / +2 recruitment capacity at 700 reputation / +3 recruitment capacity at 1500 reputation.	false
+derpy_gg_guild_desc_immortals_hef	The warriors of the White Tower of Hoeth, sworn to the blade for centuries. Their oath is lent to whoever the Tower favours.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||By rank, for every army: replenishment rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation. For your faction: recruitment capacity +1 / +2 / +3 at 300 / 700 / 1500.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_2_hef	The Swordmasters - Warden	false
 effect_bundles_localised_description_derpy_gg_rank_immortals_2_hef	Rank 2 of 5 with The Swordmasters, reached at 100 reputation. +3% replenishment rate, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_3_hef	The Swordmasters - Noble	false
@@ -3637,7 +3665,7 @@ effect_bundles_localised_description_derpy_gg_rank_immortals_5_hef	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_immortals_hef	The Swordmasters - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_immortals_hef	You hold more reputation with The Swordmasters than any other faction in the world. +10% replenishment rate, for every army, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_daemonsmiths_hef	The Loremasters	false
-derpy_gg_guild_desc_daemonsmiths_hef	The Loremasters of Hoeth, who keep the greatest library in the world. They teach it slowly, and never for free.||You earn reputation from technologies you complete, and from their own buildings.||Each rank gives, for your faction: +3% research rate at 100 reputation / +6% research rate at 300 reputation / +10% research rate at 700 reputation / +15% research rate at 1500 reputation.	false
+derpy_gg_guild_desc_daemonsmiths_hef	The Loremasters of Hoeth, who keep the greatest library in the world. They teach it slowly, and never for free.||You earn reputation from technologies you complete, and from their own buildings.||By rank, for your faction: research rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_2_hef	The Loremasters - Warden	false
 effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_2_hef	Rank 2 of 5 with The Loremasters, reached at 100 reputation. +3% research rate, for your faction. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_3_hef	The Loremasters - Noble	false
@@ -3649,7 +3677,7 @@ effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_5_hef	Rank 5 of 
 effect_bundles_localised_title_derpy_gg_lead_daemonsmiths_hef	The Loremasters - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_daemonsmiths_hef	You hold more reputation with The Loremasters than any other faction in the world. +10% research rate, for your faction, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_khanate_hef	The Shadow Warriors	false
-derpy_gg_guild_desc_khanate_hef	The scouts of Nagarythe, who fight a secret war nobody else sees. They work for anyone, including against you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||Each rank gives, for every province you own: -3% hero recruitment cost at 100 reputation / -6% hero recruitment cost at 300 reputation / -10% hero recruitment cost at 700 reputation / -15% hero recruitment cost at 1500 reputation.	false
+derpy_gg_guild_desc_khanate_hef	The scouts of Nagarythe, who fight a secret war nobody else sees. They work for anyone, including against you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||By rank, for every province you own: hero recruitment cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_2_hef	The Shadow Warriors - Warden	false
 effect_bundles_localised_description_derpy_gg_rank_khanate_2_hef	Rank 2 of 5 with The Shadow Warriors, reached at 100 reputation. -3% hero recruitment cost, for every province you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_3_hef	The Shadow Warriors - Noble	false
@@ -3661,7 +3689,7 @@ effect_bundles_localised_description_derpy_gg_rank_khanate_5_hef	Rank 5 of 5 wit
 effect_bundles_localised_title_derpy_gg_lead_khanate_hef	The Shadow Warriors - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_khanate_hef	You hold more reputation with The Shadow Warriors than any other faction in the world. -10% hero recruitment cost, for every province you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_overseers_hef	The Ulthuan Masons	false
-derpy_gg_guild_desc_overseers_hef	The masons who raise every tower and sea wall in Ulthuan, and who know where each one is weak.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||Each rank gives, for every region you own: -3% building construction cost at 100 reputation / -6% building construction cost at 300 reputation / -10% building construction cost at 700 reputation / -15% building construction cost at 1500 reputation.	false
+derpy_gg_guild_desc_overseers_hef	The masons who raise every tower and sea wall in Ulthuan, and who know where each one is weak.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||By rank, for every region you own: building construction cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_2_hef	The Ulthuan Masons - Warden	false
 effect_bundles_localised_description_derpy_gg_rank_overseers_2_hef	Rank 2 of 5 with The Ulthuan Masons, reached at 100 reputation. -3% building construction cost, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_3_hef	The Ulthuan Masons - Noble	false
@@ -3673,7 +3701,7 @@ effect_bundles_localised_description_derpy_gg_rank_overseers_5_hef	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_overseers_hef	The Ulthuan Masons - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_overseers_hef	You hold more reputation with The Ulthuan Masons than any other faction in the world. -10% building construction cost, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_slavers_hef	The Ellyrian Reavers	false
-derpy_gg_guild_desc_slavers_hef	The riders of Ellyrion, who range far past the borders and bring back what they find. Their pay is what they carry home.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||Each rank gives, for every army: +3% income from sacking and razing at 100 reputation / +6% income from sacking and razing at 300 reputation / +10% income from sacking and razing at 700 reputation / +15% income from sacking and razing at 1500 reputation.	false
+derpy_gg_guild_desc_slavers_hef	The riders of Ellyrion, who range far past the borders and bring back what they find. Their pay is what they carry home.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||By rank, for every army: income from sacking and razing +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_2_hef	The Ellyrian Reavers - Warden	false
 effect_bundles_localised_description_derpy_gg_rank_slavers_2_hef	Rank 2 of 5 with The Ellyrian Reavers, reached at 100 reputation. +3% income from sacking and razing, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_3_hef	The Ellyrian Reavers - Noble	false
@@ -3827,9 +3855,9 @@ derpy_gg_needs_region_own_hef	Select one of your OWN settlements on the campaign
 derpy_gg_needs_research_hef	Start researching something first - this finishes whatever technology you have queued in the tech tree.	false
 derpy_gg_no_unit_hef	This guild keeps no regiment your people would muster. Their other services are open to you.	false
 derpy_gg_per_turn_hef	/turn	false
-derpy_gg_upkeep_on_hef	Upkeep, taken every turn:	false
+derpy_gg_upkeep_on_hef	Upkeep:	false
 derpy_gg_upkeep_soon_hef	An upkeep begins on turn	false
-derpy_gg_upkeep_help_hef	Reputation has to be held, not just won. Every guild you have reputation with charges a little back each turn, and the higher your rank the more it costs to sit on - so a guild you stop feeding slides back down the ladder, and its bonus goes with it.	false
+derpy_gg_upkeep_help_hef	Stop earning and you slide back down.	false
 derpy_gg_table_head_hef	Reputation with this guild:	false
 derpy_gg_more_hef	more	false
 derpy_gg_unranked_hef	no reputation yet	false
@@ -3895,7 +3923,11 @@ derpy_gg_help_p4_hef	#Leading a guild||-Held by whichever faction in the world h
 derpy_gg_help_t5_hef	Losing reputation	false
 derpy_gg_help_p5_hef	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, plus reputation. Each card says how much.	false
 derpy_gg_help_of_hef	of	false
-derpy_gg_court_help_hef	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
+derpy_gg_court_intro_hef	The Court holds the three things a guild does that you do not choose. Hover a card for its part; the Help tab's Court page has the full rules.	false
+derpy_gg_court_help_lead_hef	The leader alone gets an extra bonus and the guild's dearest service. Out-earn them to take it.	false
+derpy_gg_court_help_demand_hef	Pay it and your reputation with this guild jumps. Let the deadline pass and it falls, far enough to cost a rank.	false
+derpy_gg_court_help_no_demand_hef	Now and then a guild that knows you asks for gold, or for you to renounce the favour you hold with its rival. It appears here, with a deadline.	false
+derpy_gg_court_help_patron_hef	A patron is one of your lords, bound to one guild: their army is the better for it, this guild's reputation pays half again, and its services cost less. One lord, one guild.	false
 message_event_text_text_derpy_gg_demand_hef_title	A Guild Asks	false
 message_event_text_text_derpy_gg_demand_hef_primary	One of the Great Guilds has made a demand of you. The Court tab holds the terms and the deadline.	false
 message_event_text_text_derpy_gg_demand_hef_secondary	They do not ask twice.	false
@@ -4128,7 +4160,7 @@ derpy_gg_rank_name_3_gen	Trusted	false
 derpy_gg_rank_name_4_gen	Honoured	false
 derpy_gg_rank_name_5_gen	Exalted	false
 derpy_gg_guild_name_brass_gen	The Merchant Houses	false
-derpy_gg_guild_desc_brass_gen	Traders and money-lenders who keep a ledger on every road. They forget no debt and forgive fewer.||You earn reputation from your income every turn, and from their own buildings.||Each rank gives, for every region you own: +3% income from all buildings at 100 reputation / +6% income from all buildings at 300 reputation / +10% income from all buildings at 700 reputation / +15% income from all buildings at 1500 reputation.	false
+derpy_gg_guild_desc_brass_gen	Traders and money-lenders who keep a ledger on every road. They forget no debt and forgive fewer.||You earn reputation from your income every turn, and from their own buildings.||By rank, for every region you own: income from all buildings +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_2_gen	The Merchant Houses - Known	false
 effect_bundles_localised_description_derpy_gg_rank_brass_2_gen	Rank 2 of 5 with The Merchant Houses, reached at 100 reputation. +3% income from all buildings, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_brass_3_gen	The Merchant Houses - Trusted	false
@@ -4140,7 +4172,7 @@ effect_bundles_localised_description_derpy_gg_rank_brass_5_gen	Rank 5 of 5 with 
 effect_bundles_localised_title_derpy_gg_lead_brass_gen	The Merchant Houses - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_brass_gen	You hold more reputation with The Merchant Houses than any other faction in the world. +10% income from all buildings, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_immortals_gen	The Veterans' Company	false
-derpy_gg_guild_desc_immortals_gen	Old soldiers who sell their oath to whoever can pay for it, and keep it once it is sold.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||Each rank gives, for every army: +3% replenishment rate at 100 reputation / +6% replenishment rate at 300 reputation / +10% replenishment rate at 700 reputation / +15% replenishment rate at 1500 reputation. And, for your faction: +1 recruitment capacity at 300 reputation / +2 recruitment capacity at 700 reputation / +3 recruitment capacity at 1500 reputation.	false
+derpy_gg_guild_desc_immortals_gen	Old soldiers who sell their oath to whoever can pay for it, and keep it once it is sold.||You earn reputation from battles you win - double when you win outnumbered - and from their own buildings.||By rank, for every army: replenishment rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation. For your faction: recruitment capacity +1 / +2 / +3 at 300 / 700 / 1500.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_2_gen	The Veterans' Company - Known	false
 effect_bundles_localised_description_derpy_gg_rank_immortals_2_gen	Rank 2 of 5 with The Veterans' Company, reached at 100 reputation. +3% replenishment rate, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_immortals_3_gen	The Veterans' Company - Trusted	false
@@ -4152,7 +4184,7 @@ effect_bundles_localised_description_derpy_gg_rank_immortals_5_gen	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_immortals_gen	The Veterans' Company - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_immortals_gen	You hold more reputation with The Veterans' Company than any other faction in the world. +10% replenishment rate, for every army, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_daemonsmiths_gen	The Artisans' Guild	false
-derpy_gg_guild_desc_daemonsmiths_gen	Craftsmen and inventors who build what others only draw. They sell what they know, a piece at a time.||You earn reputation from technologies you complete, and from their own buildings.||Each rank gives, for your faction: +3% research rate at 100 reputation / +6% research rate at 300 reputation / +10% research rate at 700 reputation / +15% research rate at 1500 reputation.	false
+derpy_gg_guild_desc_daemonsmiths_gen	Craftsmen and inventors who build what others only draw. They sell what they know, a piece at a time.||You earn reputation from technologies you complete, and from their own buildings.||By rank, for your faction: research rate +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_2_gen	The Artisans' Guild - Known	false
 effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_2_gen	Rank 2 of 5 with The Artisans' Guild, reached at 100 reputation. +3% research rate, for your faction. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_daemonsmiths_3_gen	The Artisans' Guild - Trusted	false
@@ -4164,7 +4196,7 @@ effect_bundles_localised_description_derpy_gg_rank_daemonsmiths_5_gen	Rank 5 of 
 effect_bundles_localised_title_derpy_gg_lead_daemonsmiths_gen	The Artisans' Guild - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_daemonsmiths_gen	You hold more reputation with The Artisans' Guild than any other faction in the world. +10% research rate, for your faction, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_khanate_gen	The Shadow Guild	false
-derpy_gg_guild_desc_khanate_gen	Spies, smugglers and knives for hire. They work for anyone, including against you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||Each rank gives, for every province you own: -3% hero recruitment cost at 100 reputation / -6% hero recruitment cost at 300 reputation / -10% hero recruitment cost at 700 reputation / -15% hero recruitment cost at 1500 reputation.	false
+derpy_gg_guild_desc_khanate_gen	Spies, smugglers and knives for hire. They work for anyone, including against you.||You earn reputation when your heroes succeed at an action, and from their own buildings.||By rank, for every province you own: hero recruitment cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_2_gen	The Shadow Guild - Known	false
 effect_bundles_localised_description_derpy_gg_rank_khanate_2_gen	Rank 2 of 5 with The Shadow Guild, reached at 100 reputation. -3% hero recruitment cost, for every province you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_khanate_3_gen	The Shadow Guild - Trusted	false
@@ -4176,7 +4208,7 @@ effect_bundles_localised_description_derpy_gg_rank_khanate_5_gen	Rank 5 of 5 wit
 effect_bundles_localised_title_derpy_gg_lead_khanate_gen	The Shadow Guild - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_khanate_gen	You hold more reputation with The Shadow Guild than any other faction in the world. -10% hero recruitment cost, for every province you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_overseers_gen	The Builders' Guild	false
-derpy_gg_guild_desc_overseers_gen	The builders of every wall and tower worth the name, and the only ones who know where each one is weak.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||Each rank gives, for every region you own: -3% building construction cost at 100 reputation / -6% building construction cost at 300 reputation / -10% building construction cost at 700 reputation / -15% building construction cost at 1500 reputation.	false
+derpy_gg_guild_desc_overseers_gen	The builders of every wall and tower worth the name, and the only ones who know where each one is weak.||You earn reputation when a settlement grows a level, and from any building no other guild claims.||By rank, for every region you own: building construction cost -3% / -6% / -10% / -15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_2_gen	The Builders' Guild - Known	false
 effect_bundles_localised_description_derpy_gg_rank_overseers_2_gen	Rank 2 of 5 with The Builders' Guild, reached at 100 reputation. -3% building construction cost, for every region you own. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_overseers_3_gen	The Builders' Guild - Trusted	false
@@ -4188,7 +4220,7 @@ effect_bundles_localised_description_derpy_gg_rank_overseers_5_gen	Rank 5 of 5 w
 effect_bundles_localised_title_derpy_gg_lead_overseers_gen	The Builders' Guild - Foremost	false
 effect_bundles_localised_description_derpy_gg_lead_overseers_gen	You hold more reputation with The Builders' Guild than any other faction in the world. -10% building construction cost, for every region you own, on top of whatever your rank already pays - and their greatest service is open to you alone. This lasts only while you lead them.	false
 derpy_gg_guild_name_slavers_gen	The Raiders' Guild	false
-derpy_gg_guild_desc_slavers_gen	Raiders paid in plunder. Their ledger is measured in what they carry home.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||Each rank gives, for every army: +3% income from sacking and razing at 100 reputation / +6% income from sacking and razing at 300 reputation / +10% income from sacking and razing at 700 reputation / +15% income from sacking and razing at 1500 reputation.	false
+derpy_gg_guild_desc_slavers_gen	Raiders paid in plunder. Their ledger is measured in what they carry home.||You earn reputation from settlements you sack - more from those you raze - and from their own buildings.||By rank, for every army: income from sacking and razing +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500 reputation.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_2_gen	The Raiders' Guild - Known	false
 effect_bundles_localised_description_derpy_gg_rank_slavers_2_gen	Rank 2 of 5 with The Raiders' Guild, reached at 100 reputation. +3% income from sacking and razing, for every army. This lasts as long as the rank does.	false
 effect_bundles_localised_title_derpy_gg_rank_slavers_3_gen	The Raiders' Guild - Trusted	false
@@ -4342,9 +4374,9 @@ derpy_gg_needs_region_own_gen	Select one of your OWN settlements on the campaign
 derpy_gg_needs_research_gen	Start researching something first - this finishes whatever technology you have queued in the tech tree.	false
 derpy_gg_no_unit_gen	This guild keeps no regiment your people would muster. Their other services are open to you.	false
 derpy_gg_per_turn_gen	/turn	false
-derpy_gg_upkeep_on_gen	Upkeep, taken every turn:	false
+derpy_gg_upkeep_on_gen	Upkeep:	false
 derpy_gg_upkeep_soon_gen	An upkeep begins on turn	false
-derpy_gg_upkeep_help_gen	Reputation has to be held, not just won. Every guild you have reputation with charges a little back each turn, and the higher your rank the more it costs to sit on - so a guild you stop feeding slides back down the ladder, and its bonus goes with it.	false
+derpy_gg_upkeep_help_gen	Stop earning and you slide back down.	false
 derpy_gg_table_head_gen	Reputation with this guild:	false
 derpy_gg_more_gen	more	false
 derpy_gg_unranked_gen	no reputation yet	false
@@ -4410,7 +4442,11 @@ derpy_gg_help_p4_gen	#Leading a guild||-Held by whichever faction in the world h
 derpy_gg_help_t5_gen	Losing reputation	false
 derpy_gg_help_p5_gen	#Reputation can fall||-It is earned by playing and never spent - but four things take it back, and all four can cost you a rank and the bonus that came with it.||#Upkeep, every turn||-After the opening turns, every guild you hold reputation with takes a little of it back each turn.||-The higher your rank there, the more it costs to hold. A guild you stop feeding slides back down the ladder on its own.||-The Guilds tab names the figure, in red, beside your reputation.||#A rival you have been feeding||-Earning with a guild takes reputation from the guild it argues with. You cannot court all six at once.||#A demand you let expire||-The Court tab holds the terms and the deadline. Silence costs more than the demand asked for.||#A bounty you took and failed||-Handing one back costs the favour you put up to take it.||-Failing one costs that too, plus reputation. Each card says how much.	false
 derpy_gg_help_of_gen	of	false
-derpy_gg_court_help_gen	The Court holds the three things a guild does that you do not choose.||LEADING a guild is held by whichever faction in the world has the most reputation with it - you or a rival. The leader carries an extra bonus for as long as they lead, and the guild's dearest service is sold to nobody else. It can be taken from you.||A DEMAND arrives every so often from a guild that already knows you. Pay it and your reputation with them jumps; let the deadline pass and it falls, far enough to cost you a rank. A guild asks either for gold or for you to renounce the favour you hold with its rival.||A PATRON is one of your lords, bound to one guild. Their army is the better for it, that guild's reputation pays half again, and its services cost less. One lord, one guild - appointing a second moves the post.	false
+derpy_gg_court_intro_gen	The Court holds the three things a guild does that you do not choose. Hover a card for its part; the Help tab's Court page has the full rules.	false
+derpy_gg_court_help_lead_gen	The leader alone gets an extra bonus and the guild's dearest service. Out-earn them to take it.	false
+derpy_gg_court_help_demand_gen	Pay it and your reputation with this guild jumps. Let the deadline pass and it falls, far enough to cost a rank.	false
+derpy_gg_court_help_no_demand_gen	Now and then a guild that knows you asks for gold, or for you to renounce the favour you hold with its rival. It appears here, with a deadline.	false
+derpy_gg_court_help_patron_gen	A patron is one of your lords, bound to one guild: their army is the better for it, this guild's reputation pays half again, and its services cost less. One lord, one guild.	false
 message_event_text_text_derpy_gg_demand_gen_title	A Guild Asks	false
 message_event_text_text_derpy_gg_demand_gen_primary	One of the Great Guilds has made a demand of you. The Court tab holds the terms and the deadline.	false
 message_event_text_text_derpy_gg_demand_gen_secondary	They do not ask twice.	false

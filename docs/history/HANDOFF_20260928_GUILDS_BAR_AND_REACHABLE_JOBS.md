@@ -9,6 +9,7 @@ Not uploaded to the Workshop. Pushed to GitHub with a CHANGELOG entry for `FF483
 | `8298EDCA` | bar moved 4px down (superseded, see below) | `data/derpy_great_guilds.pack.bak_gbar_20260928` |
 | `20C88DBC` | bar closed top and bottom; research job asks only for a reachable tech | `.bak_research_20260928` |
 | `FF48368B` | building job asks only for an upgrade the player can make now | `.bak_build_jobs_20260928` |
+| `33819446` | Guilds button greyed outside the player's turn; tooltips cut to 10 lines or fewer | `.bak_opener_grey_20260928` (= `FF48368B`) |
 
 The live pack before this session was `60CA7EAD` (bounty card tooltips, repo commit
 `e260cb3`), one build after the `7AB4585D` the docs-refresh handoff names.
@@ -56,6 +57,42 @@ Same shape, applied at the user's request. `bounty_buildings()` rows are now
 (`from`/`to` columns). `GG.BOUNTY_PICK.build` offers a level only when the player owns one of
 its `from` levels and not the level itself. `check_bounty_data()` now fails on a level with no
 `from` (it could never be offered) or a `from` the installed game lacks.
+
+## 4. The HUD opener greys outside the player's turn (build `8E611147`, after the push)
+
+Asked for from a screenshot showing the Exchange's button greyed mid-round and ours not.
+Mirrors the Exchange (`EX.player_turn`, `EX.gate_button`, `EX.set_off`):
+`GGUI.player_turn()` asks `world:is_factions_turn_by_key` and FAILS OPEN on a throw;
+`GGUI.gate_opener(on)` is `SetDisabled` plus `set_greyscale_t0` on all states and the count
+text (SetDisabled alone draws a live-looking button - the opener has no inactive state). Called
+from `place_opener`, from the `gg_opener_place` FactionTurnStart listener DIRECTLY (placement
+bails while the top bar is still sliding in, which is exactly the player's turn start), and from
+a new `gg_opener_turn_end` listener that also ends a target pick and closes the panel. The click
+handler refuses the opener mid-round regardless. Harness block at the end of
+`_guilds_harness.lua` (an IIFE: that file's main chunk is at Lua's 200-local limit); three
+mutants, 18 in all, every one caught. `zzz_derpy_guilds_ui.lua` is CRLF - a two-line mutant
+anchor needs `\r\n`, and Git Bash's `grep -c $'\r$'` reported 0 CRs on it.
+
+Built and verified; deployed with section 5 as `33819446`.
+
+## 5. Tooltips cut to fit (build `33819446`, includes section 4; deployed to `data/`, pushed)
+
+Screenshot: a Court demand card's tooltip ran to 17 lines. Every Court card appended the whole
+801-character `court_help`. Measured, not eyeballed: a new block at the end of the fake-UI IIFE
+in `_guilds_harness.lua` loads `loc.tsv`'s real English, stands a demand (renounce, tribute,
+none), bounties and six guild standings, refreshes all six tabs x six pages, and asserts no
+tooltip draws more than 10 lines (55 characters a line, `||` breaks, markup free). `GG_TIPS=1`
+prints the ranking. Before: Court cards 16-21, Guilds rank line 17, Leaderboard rows 11-14.
+After: worst is 9.
+
+- `court_help` is gone; `court_intro` (Court rank line), `court_help_lead`, `_demand`,
+  `_no_demand`, `_patron` - one part per card. The Help tab's Court page has the full rules.
+- Leaderboard rows: the table only, no guild description (one click away on the Guilds tab).
+- Guild descriptions: the ladder says its phrase once (`_ladder()` in `gen_great_guilds.py`,
+  doctested, falls back to the long form if the phrase differs between ranks).
+- Upkeep on the Guilds rank line: "Upkeep: -12/turn. Stop earning and you slide back down."
+- A mutant putting the description back on Leaderboard rows is caught; 19 mutants in all.
+- MCT tooltips (longest 6 lines) and every other loc string (longest 8) checked and left.
 
 ## Verified
 

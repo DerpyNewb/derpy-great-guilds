@@ -21,12 +21,26 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MOD = os.path.join(ROOT, "Modding Files", "pack", "script", "campaign", "mod")
 M = os.path.join(MOD, "zzz_derpy_guilds.lua")
+U = os.path.join(MOD, "zzz_derpy_guilds_ui.lua")   # CRLF: a two-line anchor needs \r\n
 LUA = r"C:\Program Files (x86)\Lua\5.1\lua.exe"
 HARNESSES = [os.path.join(ROOT, "tools", "_guilds_harness.lua"),
              os.path.join(ROOT, "tools", "_guilds_bounty_harness.lua")]
 
 # (what it breaks, file, code as it ships, the mistake). Anchors are CODE lines.
 MUTANTS = [
+    ("a Leaderboard row's tooltip given the guild's whole description back", U,
+     b"            local tip = GGUI.table_lines(L.guild, faction)\r\n",
+     b"            local tip = GGUI.table_lines(L.guild, faction) .. \"||\""
+     b" .. GGUI.loc_guild_desc(L.guild)\r\n"),
+    ("the opener left grey when placement bails at turn start", U,
+     b"    -- stay grey for the whole turn.\r\n    GGUI.gate_opener(GGUI.player_turn())",
+     b"    -- stay grey for the whole turn."),
+    ("the opener clickable during the AI round", U,
+     b"        if not GGUI.player_turn() then return end\r\n        if GGUI.PICK then",
+     b"        if GGUI.PICK then"),
+    ("the opener not greyed at the player's turn end", U,
+     b"        GGUI.gate_opener(false)\r\n    end, true)",
+     b"    end, true)"),
     ("a research job for a tech the player cannot start", M,
      b"                if got >= need then found[#found + 1] = list[i] end",
      b"                found[#found + 1] = list[i]"),

@@ -7490,6 +7490,84 @@ end)()
     assert(vis["P/gg_lf_mine"] == false, "and hide everywhere else")
     GGUI.close()
 
+    -- ---- EVERY TOOLTIP FITS ON SCREEN, measured in the real English text ----
+    -- The Court's cards each carried the whole 801-character Court rules under their own
+    -- line (screenshot 2026-09-28): seventeen lines of tooltip over a three-line card. The
+    -- length is measured on what the panel actually writes, with loc.tsv's text, on every
+    -- tab and guild page, with a demand and a patron standing so the Court fills.
+    local LOC = {}
+    for line in io.lines("Modding Files/source/great_guilds/loc.tsv") do
+        local k, v = string.match(line, "^([^\t]+)\t([^\t]*)")
+        if k then LOC[k] = v end
+    end
+    common = {get_localised_string = function(k) return LOC[k] or "" end}
+    -- Lines as the tooltip draws them: "||" breaks, markup takes no room, ~55 characters
+    -- to a line at the tooltip's width (read off the screenshot: 17 lines for ~1,000).
+    local function drawn(s)
+        s = string.gsub(s, "%[%[[^%]]*%]%]", "")
+        local n = 0
+        for para in string.gmatch(s .. "||", "(.-)||") do
+            n = n + math.max(1, math.ceil(#para / 55))
+        end
+        return n
+    end
+    standing({brass = {150, 150}, overseers = {138, 150}, slavers = {60, 80},
+              khanate = {40, 20}, immortals = {10, 5}, daemonsmiths = {0, 0}})
+    TREASURY[ME] = 99999
+    GG.bounties[ME] = {
+        {guild = "khanate", kind = "region_take", target = "wh3_qol_r", posted = 1,
+         gold = 100, rep = 10},
+        {guild = "brass", kind = "region_take", target = "wh3_qol_r2", posted = 1,
+         taken = true, gold = 100, rep = 10},
+        {guild = "brass", kind = "job_coffers", target = "job_coffers", posted = 1,
+         amount = 6000, gold = 1500, rep = 10}}
+    local seen = {}
+    local function sweep(label, tab)
+        for key, tip in pairs(tips) do
+            local n, at = drawn(tip), key .. " @ tab " .. tab
+            if not seen[at] or n > seen[at].n then
+                seen[at] = {n = n, where = label, tip = tip}
+            end
+        end
+    end
+    for _, demand in ipairs({{guild = "overseers", kind = "renounce", amount = 80, due = 99},
+                             {guild = "slavers", kind = "tribute", amount = 900, due = 99},
+                             false}) do
+        GG.demands[ME] = demand or nil
+        for tab = 1, 6 do
+            for page = 1, 6 do
+                GGUI.TAB, GGUI.PAGE, GGUI.HELP_PAGE, GGUI.LOG_PAGE = tab, page, 1, 1
+                GGUI.close()
+                GGUI.open()
+                reset()
+                GGUI.refresh()
+                sweep("tab " .. tab .. " page " .. page, tab)
+            end
+        end
+    end
+    GGUI.close()
+    GG.demands[ME], GG.bounties[ME] = nil, nil
+    common = nil
+    local rows = {}
+    for key, v in pairs(seen) do
+        rows[#rows + 1] = {key = key, n = v.n, where = v.where, tip = v.tip}
+    end
+    table.sort(rows, function(a, b) return a.n > b.n end)
+    assert(#rows > 40, "the sweep saw only " .. #rows .. " tooltips - it measured nothing")
+    if os.getenv("GG_TIPS") then
+        for i = 1, math.min(#rows, 25) do
+            print(string.format("TIP %3d lines  %-48s %s", rows[i].n, rows[i].key,
+                                rows[i].where))
+        end
+    end
+    -- TEN LINES. The Court cards were 16 to 21 and read as a wall; the table-carrying
+    -- tooltips need about eight for five contenders and a header.
+    local TIP_LINES = 10
+    for _, r in ipairs(rows) do
+        assert(r.n <= TIP_LINES, string.format("%s is %d lines of tooltip (%s), over %d: %s",
+               r.key, r.n, r.where, TIP_LINES, string.sub(r.tip, 1, 160)))
+    end
+
     -- ---- restore ----
     find_uicomponent, is_uicomponent, core.get_ui_root = keep_g.find, keep_g.is, keep_g.root
     GG.mp_send, GG.log_entries = keep_g.send, keep_g.log
@@ -7595,5 +7673,60 @@ do
            "a job card must not offer a map click")
     common = nil
 end
+
+;(function()
+    -- A FUNCTION, not a do-block: this file's main chunk is at Lua's 200-local limit.
+    -- THE OPENER IS GREYED OUTSIDE THE PLAYER'S TURN (2026-09-28): the player's turn end
+    -- greys it and shuts the panel, an AI's turn start keeps it grey, the player's own turn
+    -- start brings it back even when placement bails, and a click mid-round opens nothing.
+    local calls, mine, opened, closed = {}, true, 0, 0
+    local btn = {
+        SetDisabled = function(_, d) calls[#calls + 1] = "disabled=" .. tostring(d) end,
+        ShaderTechniqueSet = function(_, s) calls[#calls + 1] = s end,
+        ShaderVarsSet = function() end,
+    }
+    local panel = {}
+    local prev_find, prev_is, prev_model = find_uicomponent, is_uicomponent, cm.model
+    local prev_place, prev_open, prev_close = GGUI.place_opener, GGUI.open, GGUI.close
+    find_uicomponent = function(_, name)
+        if name == GGUI.BTN then return btn end
+        if name == GGUI.PANEL and closed == 0 then return panel end
+        return nil
+    end
+    is_uicomponent = function(x) return x == btn or x == panel end
+    cm.model = function()
+        return {turn_number = function() return TURN end,
+                world = function()
+                    return {is_factions_turn_by_key = function(_, k)
+                        assert(k == "cr_me", "asked whose turn for " .. tostring(k))
+                        return mine
+                    end}
+                end}
+    end
+    GGUI.place_opener = function() end      -- placement bailing, as it does mid-slide
+    GGUI.open = function() opened = opened + 1 end
+    GGUI.close = function() closed = closed + 1 end
+    local function last() return calls[#calls - 1] .. " " .. calls[#calls] end
+
+    handlers.gg_opener_turn_end()
+    assert(last() == "disabled=true set_greyscale_t0", "turn end must grey, got " .. last())
+    assert(closed == 1, "turn end must shut an open panel")
+    mine = false
+    handlers.gg_opener_place()
+    assert(last() == "disabled=true set_greyscale_t0", "an AI turn keeps it grey: " .. last())
+    handlers.gg_clicks({string = GGUI.BTN})
+    assert(opened == 0, "a click during the AI round must open nothing")
+    mine = true
+    handlers.gg_opener_place()
+    assert(last() == "disabled=false normal_t0", "the player's turn un-greys: " .. last())
+    handlers.gg_clicks({string = GGUI.BTN})
+    assert(opened == 1, "a click on the player's turn opens the panel")
+    -- FAILS OPEN: a turn probe that throws must not lock the player out.
+    cm.model = function() error("no world") end
+    assert(GGUI.player_turn() == true, "a throwing probe must read as the player's turn")
+
+    find_uicomponent, is_uicomponent, cm.model = prev_find, prev_is, prev_model
+    GGUI.place_opener, GGUI.open, GGUI.close = prev_place, prev_open, prev_close
+end)()
 
 print("harness ok")

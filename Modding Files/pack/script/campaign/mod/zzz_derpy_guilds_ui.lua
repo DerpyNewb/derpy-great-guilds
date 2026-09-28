@@ -1261,7 +1261,9 @@ function GGUI.draw_court(faction)
         local tip = GGUI.loc_guild(d.guild) .. "  -  "
                     .. GGUI.loc("demand_desc_" .. d.kind)
         if not ok then tip = tip .. "||" .. GGUI.loc("demand_short") end
-        tip = tip .. "||" .. GGUI.loc("court_help")
+        -- ITS OWN PART OF THE RULES, not all three: the whole Court text under every card
+        -- was 17 lines of tooltip (2026-09-28). The Help tab's Court page has the rest.
+        tip = tip .. "||" .. GGUI.loc("court_help_demand")
         GGUI.write_card(1, GGUI.icon(d.guild),
                         GGUI.loc_guild(d.guild) .. "   "
                         .. GGUI.loc("demand_name_" .. d.kind),
@@ -1269,7 +1271,7 @@ function GGUI.draw_court(faction)
                         GGUI.loc("demand_pay"), ok == true, tip)
     else
         GGUI.write_card(1, nil, GGUI.loc("demand_none"), "", "", "", "", false,
-                        GGUI.loc("court_help"))
+                        GGUI.loc("court_help_no_demand"))
     end
 
     -- ------------------------------------------------------------ the patron ---
@@ -1283,7 +1285,7 @@ function GGUI.draw_court(faction)
                         .. GGUI.loc("reputation") .. "   -"
                         .. GG.FAVOUR_PATRON .. "% " .. GGUI.loc("cost_label"),
                         "", GGUI.loc("patron_dismiss"), true,
-                        GGUI.loc("court_help"))
+                        GGUI.loc("court_help_patron"))
     else
         local sel = GGUI.selected_force_cqi()
         local l2 = GGUI.loc("patron_needs_char")
@@ -1293,7 +1295,7 @@ function GGUI.draw_court(faction)
                         GGUI.loc("patron_of") .. ": " .. GGUI.loc_guild(guild),
                         GGUI.loc("patron_none"), l2, "",
                         GGUI.loc(sel and "patron_appoint" or "pick_button"), true,
-                        GGUI.loc("court_help"))
+                        GGUI.loc("court_help_patron"))
     end
 
     -- ---------------------------------------------------------- who leads it ---
@@ -1314,7 +1316,7 @@ function GGUI.draw_court(faction)
                     .. GGUI.loc("leader") .. ": " .. (who_rep or 0),
                     tostring(who_rep or 0), "", false,
                     GGUI.table_lines(guild, faction) .. "||"
-                    .. GGUI.loc("lead_hint") .. "||" .. GGUI.loc("court_help"))
+                    .. GGUI.loc("court_help_lead"))
 end
 
 function GGUI.refresh()
@@ -1441,7 +1443,8 @@ function GGUI.refresh()
         local dfrom = GG.setting("decay_from") or 0
         if drate > 0 and dfrom > 0 then
             if upkeep > 0 then
-                tip = tip .. "||" .. GGUI.loc("upkeep_on") .. " " .. upkeep .. "."
+                tip = tip .. "||" .. GGUI.loc("upkeep_on") .. " -" .. upkeep
+                      .. GGUI.loc("per_turn") .. "."
             else
                 tip = tip .. "||" .. GGUI.loc("upkeep_soon") .. " " .. dfrom .. "."
             end
@@ -1472,7 +1475,7 @@ function GGUI.refresh()
         set_named_text("gg_rank_line", GGUI.loc("hdr_court") .. "   "
                        .. GGUI.loc_guild(guild) .. "   " .. GGUI.loc_rank(rank)
                        .. "   " .. GGUI.loc("reputation") .. " " .. rep)
-        set_tooltip(comp("gg_rank_line"), GGUI.loc("court_help"))
+        set_tooltip(comp("gg_rank_line"), GGUI.loc("court_intro"))
     else
         -- A header that names the view, not a guild the view does not show. The
         -- bounty count is live because it is the one number a player wants before
@@ -2132,11 +2135,12 @@ function GGUI.draw_standings(faction)
             -- The league table is where a player decides which guild to chase, so
             -- each row carries what that guild is and what its ladder pays - and, when
             -- there is movement to explain, what the marks on it mean.
-            -- THE TABLE FIRST, then what the guild is. The row already says who
-            -- leads and where you sit; the hover is the only place with room for the
-            -- names between you, which is the whole of what a scoreboard is for.
-            local tip = GGUI.table_lines(L.guild, faction) .. "||"
-                        .. GGUI.loc_guild_desc(L.guild)
+            -- THE TABLE, and not what the guild is. The row already says who leads and
+            -- where you sit; the hover is the only place with room for the names between
+            -- you, which is the whole of what a scoreboard is for. The guild's own
+            -- description followed it and made 14 lines (2026-09-28); it is one click
+            -- away, on the Guilds tab's rank line.
+            local tip = GGUI.table_lines(L.guild, faction)
             if w.moved and w.moved[slot] then
                 tip = tip .. "||" .. GGUI.loc_guild(L.guild) .. " "
                       .. GGUI.loc("took")
@@ -2467,6 +2471,9 @@ core:add_listener("gg_clicks", "ComponentLClickUp", true, function(context)
     elseif id == "card_buy" then
         GGUI.on_buy_click(context)
     elseif id == "gg_opener" then
+        -- NOT DURING THE AI ROUND. The greyed look is the affordance, this is the guard:
+        -- it holds even on a save loaded mid-round, before anything has greyed the button.
+        if not GGUI.player_turn() then return end
         if GGUI.PICK then
             GGUI.end_pick(true)
         elseif comp(GGUI.PANEL) then
@@ -2771,6 +2778,33 @@ end
 
 GGUI.BTN      = "gg_opener"
 GGUI.BTN_SIZE = 44          -- must match OPENER_W/H in tools/gen_guilds_ui.py
+
+-- IS IT THE PLAYER'S TURN? ASKED, NOT REMEMBERED: a flag set at turn end and cleared at
+-- turn start is wrong after a load, which restores neither. Fails OPEN - a probe that
+-- throws must never be what locks the player out of the panel. The Zharr Exchange's
+-- EX.player_turn, the same call.
+function GGUI.player_turn()
+    local ok, mine = pcall(function()
+        return cm:model():world():is_factions_turn_by_key(GGUI.me())
+    end)
+    if not ok then return true end
+    return mine ~= false
+end
+
+-- GREYED WHILE IT IS NOT THE PLAYER'S TURN, like the Exchange's button beside it (asked
+-- for from a screenshot, 2026-09-28). SetDisabled only stops the click - CA: disabled
+-- components "still respond to the mouse cursor" - and the opener has no inactive state to
+-- draw, so the look is CA's set_greyscale_t0 on every state and the count text, the
+-- Exchange's EX.set_off. Not SetVisible: a button that vanishes and returns reads as a bug.
+function GGUI.gate_opener(on)
+    local b = comp(GGUI.BTN)
+    if not b then return end
+    pcall(function()
+        b:SetDisabled(not on)
+        b:ShaderTechniqueSet(on and "normal_t0" or "set_greyscale_t0", true, true)
+        if not on then b:ShaderVarsSet(1, 0.6, 0, 0, true, true) end
+    end)
+end
 
 -- WHAT THE PLAYER COULD DO RIGHT NOW. Three things count, and they are the three the panel
 -- has a button for: a service they can actually buy, a bounty offer sitting on the board,
@@ -3078,6 +3112,9 @@ function GGUI.place_opener(attempt)
     -- visible, and that difference is what the first attempt lost a round trip to.
     pcall(function() b:RegisterTopMost() end)
     GGUI.paint_opener(b)
+    -- This runs at the first tick and at EVERY faction's turn start, so an AI's greys the
+    -- button and the player's own brings it back - and a load asks rather than assumes.
+    GGUI.gate_opener(GGUI.player_turn())
 
     -- READ IT BACK. This is the check that catches a layout engine on day one
     -- instead of costing a screenshot and a wrong fix: if the position we asked for
@@ -3223,6 +3260,10 @@ cm:add_first_tick_callback(function() GGUI.place_opener(1) end)
 
 core:add_listener("gg_opener_place", "FactionTurnStart", true, function()
     GGUI.place_opener(1)
+    -- AND HERE, NOT ONLY IN place_opener: that returns early while the top bar is still
+    -- sliding back in, which is exactly when the player's turn starts, and the button would
+    -- stay grey for the whole turn.
+    GGUI.gate_opener(GGUI.player_turn())
     -- SAME LISTENER, deliberately. This fires once per faction - about 190 times a round -
     -- and both calls are idempotent and cheap: place_opener stops itself once btn_at is
     -- set, and the badge is eighteen can_buy calls against a table already in memory.
@@ -3232,3 +3273,15 @@ core:add_listener("gg_opener_place", "FactionTurnStart", true, function()
         if me then GGUI.badge(me) end
     end)
 end, true)
+
+-- THE PLAYER ENDS THEIR TURN: the button greys and the panel goes. Here and not at the next
+-- AI turn start, because the player's own turn end still answers "it is your turn". The
+-- panel and a pending target pick are shut too - a greyed button is no way to close them,
+-- and buying mid-round is what the grey is there to stop. UI only, nothing in the model.
+core:add_listener("gg_opener_turn_end", "FactionTurnEnd",
+    function(context) return context:faction():name() == GGUI.me() end,
+    function()
+        if GGUI.PICK then GGUI.end_pick(false) end
+        if comp(GGUI.PANEL) then GGUI.close() end
+        GGUI.gate_opener(false)
+    end, true)

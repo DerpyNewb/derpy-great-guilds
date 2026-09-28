@@ -3,6 +3,24 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-09-28 - build 33819446
+
+MD5 `338194468A5A5449D21A9F248BD33E16`, 32,484,829 bytes.
+
+- **The Guilds button greys out when your turn ends**, like the buttons beside it, and comes
+  back when your turn starts. Clicking it in between does nothing. Ending the turn also
+  closes the panel, and a target you were picking on the map.
+- **Tooltips are short enough to read.** Every Court card repeated the whole of the Court's
+  rules underneath its own line - seventeen lines over a three-line card. Each card now
+  says its own part: what paying or missing a demand does, what a patron gives, what leading
+  a guild gets you. The Help tab's Court page still has everything.
+- **The Guilds tab's header hover is half the length.** A guild's rank bonuses are said once
+  - "income from all buildings +3% / +6% / +10% / +15% at 100 / 300 / 700 / 1500
+  reputation" - instead of repeating the phrase at every rank, and the upkeep note is one
+  line.
+- **A Leaderboard row's hover is the standings table.** The guild's full description
+  followed it; that is on the Guilds tab.
+
 ## 2026-09-28 - build FF48368B
 
 MD5 `FF48368B75306B4FB5CD78E24ED5DE91`, 32,499,828 bytes.
