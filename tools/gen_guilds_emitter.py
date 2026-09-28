@@ -180,6 +180,9 @@ def _state(c, name, sguid, entries, target):
             # where it is the ONLY difference from the previous button.
             if lay.get("flip"):
                 out += '\t\t\t\t\t\t\tx_flipped="true"\n'
+            # Vertical, same naming: y_flipped is on 319 image elements in CA's ui packs.
+            if lay.get("vflip"):
+                out += '\t\t\t\t\t\t\ty_flipped="true"\n'
             if dock:
                 out += '\t\t\t\t\t\t\tdockpoint="%s"\n' % dock
             if lay.get("colour"):

@@ -572,7 +572,21 @@ end
 do
     -- research: a tech the player lacks, from the generated list; none left means none.
     W.reset()
-    GG.BOUNTY_TECHS[""] = {{"tech_a", 5}, {"tech_b", 6}}
+    -- The roll takes the FIRST open tech, so the deepest come first: any gating mistake
+    -- lets one of them through. tech_e needs both b and c, tech_d either, tech_c b.
+    GG.BOUNTY_TECHS[""] = {{"tech_e", 8, 2, {"tech_b", "tech_c"}},
+                           {"tech_d", 7, 1, {"tech_b", "tech_c"}}, {"tech_c", 7, 1, {"tech_b"}},
+                           {"tech_b", 6, 1, {"tech_a"}}, {"tech_a", 5, 0, {}}}
+    local function asks(techs, want, why)
+        F.me.techs = techs
+        local o2 = GG.make_offer("me", "daemonsmiths", "job_research", 1, {})
+        assert(o2 and o2.target == want, why .. ", got " .. tostring(o2 and o2.target))
+    end
+    asks({tech_a = true}, "tech_b", "only a tech whose parents are researched")
+    asks({tech_a = true, tech_b = true}, "tech_d", "one of two parents opens tech_d")
+    asks({tech_a = true, tech_b = true, tech_c = true}, "tech_e", "tech_e opens on both")
+    asks({}, "tech_a", "a root needs nothing")
+    GG.BOUNTY_TECHS[""] = {{"tech_a", 5, 0, {}}, {"tech_b", 6, 0, {}}}
     F.me.techs = {tech_a = true}
     local o = GG.make_offer("me", "daemonsmiths", "job_research", 1, {})
     assert(o and o.target == "tech_b", "research must name the tech you lack")
@@ -586,14 +600,32 @@ do
 end
 
 do
-    -- build: a level the player has nowhere; one they have is skipped.
+    -- build: an upgrade the player can make now - they own a level that upgrades into it,
+    -- and not the level itself. The roll takes the FIRST open level, so the ones that
+    -- must be refused come first: lvl_far is two steps up, lvl_have is already built.
     W.reset()
     GG.BOUNTY_BUILDINGS[""] = GG.BOUNTY_BUILDINGS[""] or {}
-    GG.BOUNTY_BUILDINGS[""].brass = {{"lvl_have", 3}, {"lvl_want", 4}}
+    GG.BOUNTY_BUILDINGS[""].brass = {{"lvl_far", 5, {"lvl_want"}},
+                                     {"lvl_have", 3, {"lvl_base"}},
+                                     {"lvl_want", 4, {"lvl_have"}}}
     F.me.regions = {"home"}
     W.region("home", {owner = "me", buildings = {lvl_have = true}})
     local o = GG.make_offer("me", "brass", "job_build", 1, {})
-    assert(o and o.target == "lvl_want", "build must skip a building you own")
+    assert(o and o.target == "lvl_want",
+           "build must ask for the next level of one you own, got "
+           .. tostring(o and o.target))
+    -- Either of two lower levels upgrades into it (Cathay's yin and yang).
+    GG.BOUNTY_BUILDINGS[""].brass = {{"lvl_yang_3", 3, {"lvl_yang_2", "lvl_yin_2"}}}
+    W.region("home", {owner = "me", buildings = {lvl_yin_2 = true}})
+    local y = GG.make_offer("me", "brass", "job_build", 1, {})
+    assert(y and y.target == "lvl_yang_3", "any level that upgrades into it will do")
+    W.region("home", {owner = "me", buildings = {}})
+    assert(GG.make_offer("me", "brass", "job_build", 1, {}) == nil,
+           "nothing to upgrade from means no building job")
+    GG.BOUNTY_BUILDINGS[""].brass = {{"lvl_far", 5, {"lvl_want"}},
+                                     {"lvl_have", 3, {"lvl_base"}},
+                                     {"lvl_want", 4, {"lvl_have"}}}
+    W.region("home", {owner = "me", buildings = {lvl_have = true}})
     R.home.buildings.lvl_want = true
     assert(not GG.bounty_still_valid("me", o), "building it withdraws the offer")
     GG.BOUNTY_BUILDINGS[""].khanate = nil

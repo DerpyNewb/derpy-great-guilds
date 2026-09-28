@@ -559,13 +559,17 @@
 					this="GG210022-D001-4000-B000000000000022"
 					uniqueguid="GG210022-D001-4000-B000000000000022"
 					imagepath="ui/skins/default/dlc23_chd_hell_forge/buttons_holder.png"/>
+				<component_image
+					this="GG210022-D003-4000-B000000000000022"
+					uniqueguid="GG210022-D003-4000-B000000000000022"
+					imagepath="ui/skins/default/dlc23_chd_hell_forge/buttons_holder.png"/>
 			</componentimages>
 			<states>
 				<standard
 					this="GG210023-D000-4000-B000000000000023"
 					name="standard"
 					width="310"
-					height="34"
+					height="40"
 					uniqueguid="GG210023-D000-4000-B000000000000023">
 					<imagemetrics>
 						<image
@@ -574,8 +578,16 @@
 							componentimage="GG210022-D001-4000-B000000000000022"
 							offset="0.00,0.00"
 							width="310"
-							height="34"
-							tile="true"
+							height="20"
+							margin="0.00,20.00,0.00,20.00"/>
+						<image
+							this="GG210022-D004-4000-B000000000000022"
+							uniqueguid="GG210022-D004-4000-B000000000000022"
+							componentimage="GG210022-D003-4000-B000000000000022"
+							offset="0.00,20.00"
+							width="310"
+							height="20"
+							y_flipped="true"
 							margin="0.00,20.00,0.00,20.00"/>
 					</imagemetrics>
 				</standard>

@@ -280,7 +280,7 @@ GGUI.PANEL_XY = {
     gg_gtab_5     = {448, 596},
     gg_gtab_6     = {496, 596},
     gg_gsel       = {256, 590},
-    gg_gbar       = {240, 598},
+    gg_gbar       = {240, 595},
     -- The Log's filters, in the band the reputation bar uses on the Guilds tab.
     gg_lf_all     = {20, 138},
     gg_lf_mine    = {140, 138},

@@ -27,6 +27,15 @@ HARNESSES = [os.path.join(ROOT, "tools", "_guilds_harness.lua"),
 
 # (what it breaks, file, code as it ships, the mistake). Anchors are CODE lines.
 MUTANTS = [
+    ("a research job for a tech the player cannot start", M,
+     b"                if got >= need then found[#found + 1] = list[i] end",
+     b"                found[#found + 1] = list[i]"),
+    ("a building job for a level the player cannot upgrade to", M,
+     b"                    if GG.player_has_building(faction, froms[j]) then",
+     b"                    if true then"),
+    ("required_parents read as all parents", M,
+     b"                if got >= need then found[#found + 1] = list[i] end",
+     b"                if got >= #ps then found[#found + 1] = list[i] end"),
     ("the front line allowed for military work", M,
      b"        local front = (not k.front_ok) and GG.front_regions(faction) or {}",
      b"        local front = {}"),
@@ -61,8 +70,8 @@ MUTANTS = [
      b"            o.done = (o.done or 0) + 1\n            GG.save_bounties(faction)",
      b"            o.done = (o.done or 0) + 1"),
     ("a researched tech still offered", M,
-     b"            if ok and not has and not used[key] then found[#found + 1] = list[i] end",
-     b"            if not used[key] then found[#found + 1] = list[i] end"),
+     b"            if not used[key] and not has(key) then",
+     b"            if not used[key] then"),
 ]
 
 

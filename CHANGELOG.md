@@ -3,6 +3,23 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-09-28 - build FF48368B
+
+MD5 `FF48368B75306B4FB5CD78E24ED5DE91`, 32,499,828 bytes.
+
+- **A research job asks for a technology you can start now.** It used to pick from the top
+  half of your tree at random, so a turn-8 Chaos Dwarf could be asked for Labour
+  Organisation, the last technology in its industry line. It now names a technology whose
+  prerequisites you have already researched. Technologies that need a building first are
+  never asked for. The deeper the technology, the more the job pays, as before.
+- **A building job asks for an upgrade you can make now.** It names the next level of a
+  building you already own, never one two steps up or in a line you have not started. Where
+  either of two buildings upgrades into it (Cathay's yin and yang), owning either will do.
+  Your settlement's level can still hold the upgrade back until you raise the settlement.
+- **The bar under the six guild buttons is whole.** CA's picture has a rim along its top
+  only, so the bottom edge looked cut off, and the buttons with it. The bar now has a rim
+  top and bottom and the buttons sit in the middle of it.
+
 ## 2026-09-28 - build 60CA7EAD
 
 MD5 `60CA7EAD2B8B631DBB25F41607FCDEF9`, 32,460,635 bytes.

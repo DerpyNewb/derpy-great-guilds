@@ -2384,11 +2384,21 @@ GG.BOUNTY_PICK = {
         if not list then list = GG.BOUNTY_TECHS and GG.BOUNTY_TECHS[GG.tag(faction)] end
         if not list then return nil end
         local f = cm:get_faction(faction)
+        local function has(key)
+            local ok, h = pcall(function() return f:has_technology(key) end)
+            return ok and h == true
+        end
+        -- ONLY WHAT THE PLAYER CAN START NOW: enough parents researched (row = tech, tier,
+        -- parents needed, parents). A random pick off the whole upper tree asked a turn-8
+        -- Chaos Dwarf for Labour Organisation, the top of the industry lane.
         local found = {}
         for i = 1, #list do
-            local key = list[i][1]
-            local ok, has = pcall(function() return f:has_technology(key) end)
-            if ok and not has and not used[key] then found[#found + 1] = list[i] end
+            local key, need, ps = list[i][1], list[i][3] or 0, list[i][4] or {}
+            if not used[key] and not has(key) then
+                local got = 0
+                for j = 1, #ps do if has(ps[j]) then got = got + 1 end end
+                if got >= need then found[#found + 1] = list[i] end
+            end
         end
         if #found == 0 then return nil end
         local pick = found[GG.roll(#found)]
@@ -2403,11 +2413,18 @@ GG.BOUNTY_PICK = {
         local per = GG.BOUNTY_BUILDINGS and GG.BOUNTY_BUILDINGS[GG.tag(faction)]
         local list = per and per[guild]
         if not list then return nil end
+        -- ONLY AN UPGRADE THE PLAYER CAN MAKE NOW: they own a level that upgrades into it
+        -- (row = level, rank, {levels that upgrade into it}). Same rule as research.
         local found = {}
         for i = 1, #list do
-            local lvl = list[i][1]
+            local lvl, froms = list[i][1], list[i][3] or {}
             if not used[lvl] and not GG.player_has_building(faction, lvl) then
-                found[#found + 1] = list[i]
+                for j = 1, #froms do
+                    if GG.player_has_building(faction, froms[j]) then
+                        found[#found + 1] = list[i]
+                        break
+                    end
+                end
             end
         end
         if #found == 0 then return nil end

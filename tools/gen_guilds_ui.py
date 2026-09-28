@@ -91,7 +91,10 @@ for _i, _name in enumerate(GUILD_BTNS):
 PANEL_LAYOUT["gg_gsel"] = (256, 590, GTAB_W, 4)
 # The Hell-Forge's bronze button bar behind the six, 16px past each end, drawn first
 # (gg_gbar sorts before gg_gtab_*) so the buttons sit on it.
-PANEL_LAYOUT["gg_gbar"] = (240, 598, 310, 34)
+# 40 TALL, CENTRED on the plates' rings (rows 2..35 of 38, so y 598..631) with 3-4px of bar
+# above and below. At 34 tall and y=598 the ring ended on the bar's last row and read as
+# sliced off; see GBAR_LAYERS for why the bar now has a bottom rim at all.
+PANEL_LAYOUT["gg_gbar"] = (240, 595, 310, 40)
 # THE LOG'S FILTERS, in the band the reputation bar and its track use on the Guilds tab -
 # both are hidden on the Log, and the first of its 21 lines starts at y=168.
 LOG_FILTERS = ["gg_lf_all", "gg_lf_mine", "gg_lf_rivals", "gg_lf_ranks"]
@@ -483,9 +486,16 @@ COST_LAYERS = [
 ]
 
 # The bronze bar the six guild buttons sit on, as the Hell-Forge's category buttons do.
+# TWO HALVES, THE LOWER ONE y_flipped. The art has a rim and angled caps along its top only:
+# CA docks it on the Hell-Forge's bottom border, which hides the open edge. Mid-panel that
+# edge read as the buttons being cut off - SEEN IN GAME 2026-09-28, twice. Each half is
+# squashed 34->20 like the tab plates, sliced left and right only.
+_GBAR_HALF = PANEL_LAYOUT["gg_gbar"][3] // 2
 GBAR_LAYERS = [
-    {"path": HF + "buttons_holder.png", "offset": (0, 0), "dw": 0, "dh": 0,
-     "margin": (0, 20, 0, 20), "tile": True, "dock": None},
+    {"path": HF + "buttons_holder.png", "offset": (0, 0), "dw": 0, "dh": -_GBAR_HALF,
+     "margin": (0, 20, 0, 20), "dock": None},
+    {"path": HF + "buttons_holder.png", "offset": (0, _GBAR_HALF), "dw": 0,
+     "dh": -_GBAR_HALF, "margin": (0, 20, 0, 20), "vflip": True, "dock": None},
 ]
 
 # THE TABS: the Hell-Forge's large square button. Sliced LEFT AND RIGHT ONLY, so it

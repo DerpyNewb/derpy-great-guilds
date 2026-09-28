@@ -3233,7 +3233,7 @@ def check_bounty_data():
     for tag, rows in per_tag.items():
         if not rows:
             out.append("flavour %r has no technology a bounty can ask for" % tag)
-        for key, _tier in rows:
+        for key, _tier, _need, _parents in rows:
             if key not in techs:
                 out.append("bounty tech %s is not in the installed game" % key)
     builds, locs = bounty_buildings()
@@ -3242,7 +3242,7 @@ def check_bounty_data():
     open_chains = chains_open_to_a_race()
     for tag, per_guild in builds.items():
         for g, rows in per_guild.items():
-            for lvl, _rank in rows:
+            for lvl, _rank, _froms in rows:
                 chain = chain_of.get(lvl, "")
                 if building_region_locked(chain, superchain):
                     out.append("bounty building %s (%s) can only be built in some "
@@ -3255,9 +3255,17 @@ def check_bounty_data():
             out.append("flavour %r: the Overseers have no building to ask for, and "
                        "building is their only job" % tag)
         for g, rows in per_guild.items():
-            for lvl, _rank in rows:
+            for lvl, _rank, froms in rows:
                 if lvl not in levels:
                     out.append("bounty building %s is not in the installed game" % lvl)
+                # NOTHING UPGRADES INTO IT means the Lua can never offer it - dead data.
+                if not froms:
+                    out.append("bounty building %s has no level that upgrades into it"
+                               % lvl)
+                for f in froms:
+                    if f not in levels:
+                        out.append("bounty building %s upgrades from %s, which is not in "
+                                   "the installed game" % (lvl, f))
                 if locs.get(lvl) not in bloc:
                     out.append("bounty building %s has no name in CA's loc (%s)"
                                % (lvl, locs.get(lvl)))
@@ -3283,25 +3291,39 @@ def _script_locked_techs():
 
 
 def bounty_techs():
-    """({tag: [(tech, tier)]}, {faction: [(tech, tier)]}) - the upper half of each tree.
+    """({tag: [(tech, tier, need, parents)]}, {faction: [...]}) - every node on each tree.
 
     One node set per culture with no faction_key; a faction with its own set (the
     Empire's Wulfhart) gets its own list. Campaign-only nodes and the sentinel tier are
-    dropped, and so is anything CA's scripts lock.
+    dropped, and so is anything CA's scripts lock or a building gates.
+
+    THE LUA ASKS ONLY FOR A TECH WHOSE PARENTS ARE RESEARCHED, so `parents` and `need`
+    ship with it. This list was the upper half of each tree, picked from at random: on
+    turn 8 a Chaos Dwarf was asked for Labour Organisation, the industry lane's top node
+    (SEEN IN GAME 2026-09-28). `need` is required_parents, where 0 means every parent -
+    it is 0 on 75 multi-parent nodes, so 0 cannot mean "none".
     """
     locked = _script_locked_techs()
+    gated = {r["technology"] for r in live_rows("technology_required_building_levels_junctions")}
     sets = live_rows("technology_node_sets")
     nodes = live_rows("technology_nodes")
+    tech_of = {n["key"]: n["technology_key"] for n in nodes}
+    parents = {}
+    for ln in live_rows("technology_node_links"):
+        if ln["parent_key"] in tech_of:
+            parents.setdefault(ln["child_key"], set()).add(tech_of[ln["parent_key"]])
 
     def upper(set_key):
-        rows = [n for n in nodes if n["technology_node_set"] == set_key
-                and not n["campaign_key"] and n["tier"] < TECH_SENTINEL_TIER
-                and n["technology_key"] not in locked]
-        if not rows:
-            return []
-        top = max(n["tier"] for n in rows)
-        cut = (top + 1) // 2
-        return sorted({(n["technology_key"], n["tier"]) for n in rows if n["tier"] >= cut})
+        out = set()
+        for n in nodes:
+            if (n["technology_node_set"] != set_key or n["campaign_key"]
+                    or n["tier"] >= TECH_SENTINEL_TIER or n["technology_key"] in locked
+                    or n["technology_key"] in gated):
+                continue
+            ps = tuple(sorted(parents.get(n["key"], ())))
+            need = n["required_parents"] or len(ps)
+            out.add((n["technology_key"], n["tier"], min(need, len(ps)), ps))
+        return sorted(out)
 
     per_tag, per_faction = {}, {}
     for tag, F in FLAVOURS.items():
@@ -3348,13 +3370,22 @@ def chains_open_to_a_race():
 
 
 def bounty_buildings():
-    """({tag: {guild: [(level, rank)]}}, {level: loc key}).
+    """({tag: {guild: [(level, rank, froms)]}}, {level: loc key}).
 
     A level qualifies when its chain is one covered race's own, the SHIPPED
     GG.guild_of_chain pays it to that guild (unmatched chains fall back to the Overseers,
     as GG.on_building pays them), it is the third or later NON-RUIN level of its chain,
     it shows in the UI, it needs no resource, and the chain is not a main settlement.
+
+    `froms` is every level that UPGRADES INTO it, out of building_upgrades_junction: the
+    Lua asks only for a level the player can upgrade to now, the way it asks only for a
+    tech whose parents are researched. Read off the upgrade edges, not level - 1, because
+    Cathay's yin and yang level 2s both upgrade into either level 3 and two Kislev chains
+    branch.
     """
+    froms = {}
+    for u in live_rows("building_upgrades_junction"):
+        froms.setdefault(u["to"], set()).add(u["from"])
     owner = covered_chains()
     levels = live_rows("building_levels")
     by_chain = {}
@@ -3389,7 +3420,8 @@ def bounty_buildings():
             v = vs[0]
             locs[lvl] = ("building_culture_variants_name_" + v["building"] + v["culture"]
                          + v["subculture"] + v["faction"])
-            out.setdefault(tag, {}).setdefault(g, []).append((lvl, rank))
+            out.setdefault(tag, {}).setdefault(g, []).append(
+                (lvl, rank, tuple(sorted(froms.get(lvl, ())))))
     return out, locs
 
 
@@ -3398,23 +3430,30 @@ def bounty_data_lua():
     per_tag, per_faction = bounty_techs()
     builds, locs = bounty_buildings()
     L = ["-- GENERATED by tools/gen_great_guilds.py --write. Do not edit.",
-         "-- What a bounty may ask for that no script call can list: the upper half of the",
-         "-- technology tree of each race, and the buildings each guild is paid for.",
+         "-- What a bounty may ask for that no script call can list: each race's technology",
+         "-- tree as {tech, tier, parents needed, {parents}}, and the buildings each guild",
+         "-- is paid for as {level, rank in chain, {levels that upgrade into it}}.",
          "GG = GG or {}",
          "GG.BOUNTY_TECHS = {"]
+
+    def techs(rows):
+        return ", ".join('{"%s", %d, %d, {%s}}' % (k, tier, need,
+                                                   ", ".join('"%s"' % p for p in ps))
+                         for k, tier, need, ps in rows)
     for tag in sorted(per_tag):
-        L.append('    [%r] = {%s},' % (tag, ", ".join('{"%s", %d}' % t for t in per_tag[tag])))
+        L.append('    [%r] = {%s},' % (tag, techs(per_tag[tag])))
     L.append("}")
     L.append("GG.BOUNTY_TECHS_FACTION = {")
     for f in sorted(per_faction):
-        L.append('    [%r] = {%s},' % (f, ", ".join('{"%s", %d}' % t for t in per_faction[f])))
+        L.append('    [%r] = {%s},' % (f, techs(per_faction[f])))
     L.append("}")
     L.append("GG.BOUNTY_BUILDINGS = {")
     for tag in sorted(builds):
         L.append("    [%r] = {" % tag)
         for g in sorted(builds[tag]):
-            L.append('        %s = {%s},' % (g, ", ".join('{"%s", %d}' % t
-                                                            for t in builds[tag][g])))
+            L.append('        %s = {%s},' % (g, ", ".join(
+                '{"%s", %d, {%s}}' % (lvl, rank, ", ".join('"%s"' % f for f in froms))
+                for lvl, rank, froms in builds[tag][g])))
         L.append("    },")
     L.append("}")
     L.append("GG.BOUNTY_BUILDING_LOC = {")
