@@ -1494,7 +1494,7 @@ def help_pages(tag=""):
         "demand asked for.",
         "#A bounty you took and failed",
         "-Handing one back costs the favour you put up to take it.",
-        "-Failing one costs that too, and what finishing it would have paid.",
+        "-Failing one costs that too, plus reputation. Each card says how much.",
     ]
 
     return [page1, page2, page3, page4, page5]
@@ -1805,6 +1805,8 @@ def _build_one(tag):
                       ("bounty_stake_tip", "Favour you put up to take this bounty. You "
                        "get it back when you finish, and lose it if you fail or hand it "
                        "back."),
+                      ("bounty_fail_tip", "Fail it and you lose the favour "
+                       "you put up and %n reputation with this guild."),
                       ("bounty_stake_short", "Needs %n favour with this guild to take. "
                        "You have %m."),
                       ("bounty_char", "Their lord or hero"),
@@ -2020,19 +2022,11 @@ def _build_one(tag):
     loc.append({"key": "message_event_text_text_derpy_gg_bounty_fail_secondary",
                 "text": "A promise in the ledger is a debt.", "tooltip": "false"})
 
+    # ONLY THE EMPTY SLOT SHOWS THIS. It used to sit under every offer as well, six lines
+    # repeating the Help tab's Bounties page; an offer now says its own terms instead.
     loc.append({"key": "derpy_gg_bounty_help",
-                "text": "A guild posts work it wants done. Take one and it becomes a "
-        "mission. Taking it puts up favour with that guild; you get it back when you "
-        "finish, and lose it if you fail or hand it back."
-        "||Guilds never ask for your front line. They name land or a lord far from your "
-        "borders, or of a faction you are at peace with - which means war, and pays "
-        "far more - or a job, a building, or work for your heroes."
-        "||BUT DO NOT TAKE ONE AND FAIL IT. A bounty you accepted and did not finish "
-        "before its deadline also costs that guild's reputation - what finishing it "
-        "would have paid."
-        "||The pay is read off the target and its distance. Each offer says whether the "
-        "guild rates the job Routine, Hard or Grim. An offer you have not taken "
-        "re-prices as the world moves; one you have taken keeps the price you agreed.",
+                "text": "A guild posts work it wants done here. Taking it turns it into a "
+                        "mission. The Help tab's Bounties page explains the rest.",
                 "tooltip": "false"})
     loc.append({"key": "derpy_gg_locked_hint",
                 "text": "Your rank with this guild is too low. Keep earning reputation.",

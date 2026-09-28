@@ -7336,6 +7336,17 @@ end)()
     GGUI.refresh()
     local card1 = "P/" .. GGUI.CARD .. "_1"
     assert(has(tips[card1], "map_tip"), "the offer says it can be shown on the map")
+    -- AN OFFER SAYS ITS OWN TERMS (2026-09-28, "tooltip too long"): the Help page's
+    -- text is gone from it, and what failing costs is a number - rep 10 at the
+    -- default rate of 100.
+    assert(not has(tips[card1], "bounty_help"), "an offer's tooltip is not the Help page")
+    common = {get_localised_string = function(k)
+        return (k == "derpy_gg_bounty_fail_tip") and "lose %n" or ""
+    end}
+    reset()
+    GGUI.refresh()
+    common = nil
+    assert(has(tips[card1], "lose 10"), "the offer names what failing it costs")
     click(GGUI.CARD .. "_1", part(GGUI.PANEL, GGUI.CARD .. "_1"))
     local p1 = pans[1]
     assert(p1 and p1.fix == true and p1.pos[1] == 111 and p1.pos[2] == 222

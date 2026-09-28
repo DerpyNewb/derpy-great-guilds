@@ -1106,12 +1106,29 @@ function GGUI.draw_bounties(faction)
                 end)
             end
 
+            -- THIS OFFER'S OWN FACTS, NOT THE RULES. The card tooltip used to append the
+            -- whole of bounty_help, which is the Help tab's Bounties page again - six
+            -- lines under every card, and reported from play as "tooltip too long". What
+            -- the card cannot show is the price of failing, so that is the line it keeps,
+            -- as a number: the rate moves with the preset and "what finishing it would
+            -- have paid" was only true on one of them.
+            local guild = GGUI.loc_guild(o.guild)
+            local desc = GGUI.loc_raw("missions_localised_description_"
+                                      .. GG.offer_mission_key(o, GGUI.me()))
+            -- The job texts already open with the guild's name; saying it twice read as
+            -- "The Daemonsmiths - The Daemonsmiths have paid...".
+            local tip = desc
+            if desc == "" then
+                tip = guild
+            elseif desc:sub(1, #guild) ~= guild then
+                tip = guild .. "  -  " .. desc
+            end
+            local lose = GG.bounty_fail_cost(o)
+            if lose > 0 then
+                tip = tip .. "||" .. GGUI.fill(GGUI.loc("bounty_fail_tip"), lose)
+            end
             -- A CLICK ON THE CARD SHOWS THE TARGET ON THE MAP - said only where there is
             -- somewhere to show, since a dead lord has no position.
-            local tip = GGUI.loc_guild(o.guild) .. "  -  "
-                        .. GGUI.loc_raw("missions_localised_description_"
-                                        .. GG.offer_mission_key(o, GGUI.me()))
-                        .. "||" .. GGUI.loc("bounty_help")
             if o.war == 1 then
                 tip = tip .. "||" .. GGUI.loc("bounty_war_tip") .. " "
                       .. GGUI.faction_name(GGUI.bounty_owner_now(o)) .. "."

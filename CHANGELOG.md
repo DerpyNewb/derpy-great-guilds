@@ -3,6 +3,18 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-09-28 - build 60CA7EAD
+
+MD5 `60CA7EAD2B8B631DBB25F41607FCDEF9`, 32,460,635 bytes.
+
+- **A bounty card's tooltip is about that bounty.** It used to repeat the whole of the Help
+  tab's Bounties page under every card. It now gives the job, then what failing it costs, as a
+  number. The war, map and not-enough-favour lines are unchanged.
+- **The guild's name is no longer printed twice** at the top of a job's tooltip.
+- **The Help tab no longer overstates what a failed bounty costs.** It said "what finishing it
+  would have paid", which is only true on the default preset. It now says each card gives the
+  amount.
+
 ## 2026-09-27 - build 7AB4585D
 
 MD5 `7AB4585DC0B61C952AA5F151A69091D8`, 32,469,435 bytes.

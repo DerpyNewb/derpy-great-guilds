@@ -2738,11 +2738,17 @@ end
 function GG.bounty_failed(faction, mission_key)
     local o = GG.take_bounty_slot(faction, mission_key)
     if not o then return nil end
-    local share = GG.setting("rate_bounty_fail")
-    if not share or share <= 0 then return o.guild, 0 end
-    local cost = math.floor((o.rep or 0) * share / 100)
+    local cost = GG.bounty_fail_cost(o)
     if cost <= 0 then return o.guild, 0 end
     return o.guild, GG.penalise(faction, o.guild, cost)
+end
+
+-- What failing an offer takes back, before the clamp to what is held. One function so
+-- the card that warns of it and the handler that charges it cannot name two numbers.
+function GG.bounty_fail_cost(o)
+    local share = GG.setting("rate_bounty_fail")
+    if not share or share <= 0 then return 0 end
+    return math.floor(((o and o.rep) or 0) * share / 100)
 end
 
 -- ITS OWN SAVED VALUE, not a third section of the standings string. GG.load splits
