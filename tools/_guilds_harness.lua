@@ -46,10 +46,14 @@ cm = {
 local gold, units, research, shroud, built, pooled = {}, {}, {}, {}, {}, {}
 cm.treasury_mod = function(_, f, n) gold[#gold + 1] = {f, n} end
 cm.grant_unit_to_character = function(_, cqi, u) units[#units + 1] = {cqi, u} end
+cm.char_lookup_str = function(_, c) return "character_cqi:" .. tostring(c) end
 cm.instantly_research_technology = function(_, f, t) research[#research + 1] = {f, t} end
 cm.make_region_visible_in_shroud = function(_, f, r) shroud[#shroud + 1] = {f, r} end
 cm.region_slot_instantly_upgrade_building = function(_, slot, bkey)
     built[#built + 1] = {slot, bkey}
+    -- The slot holds the new building afterwards, as the engine's does; the payload reads
+    -- it back to know the upgrade landed (logic audit, 2026-09-29).
+    if type(slot) == "table" and slot.set then slot.set(bkey) end
 end
 cm.faction_add_pooled_resource = function(_, f, res, fac, n)
     pooled[#pooled + 1] = {f, res, fac, n}
@@ -235,6 +239,11 @@ end
 cm.remove_effect_bundle_from_force = function(_, b, cqi)
     force_removed[#force_removed + 1] = {b, cqi}
 end
+-- The pool services' other engine calls (2026-09-29). The bounty harness asserts what
+-- they receive; here they only have to exist, or a buy that reaches one crashes the run.
+cm.apply_effect_bundle_to_region = function() end
+cm.heal_military_force = function() end
+cm.add_agent_experience = function() end
 cm.show_message_event = function(_, f, title, _primary, _secondary, _persist, idx)
     feed[#feed + 1] = {f, title, idx}
 end
@@ -242,14 +251,34 @@ end
 -- [character cqi] = the cqi of their army, or false for a lord who commands none, or
 -- nil for a lord who no longer exists. All three are real states of a patron.
 CHAR_FORCE = {}
+-- [character cqi] = the faction that owns them. GG.target_ok (2026-09-29 pools) refuses a
+-- friendly service aimed at anyone else's character, so a fixture that sells one names
+-- its owner here.
+CHAR_OWNER = {}
+-- [character cqi] = {units in the army, the army's own limit}; unset is {1, 20}, a lord
+-- alone with room. And [character cqi] = rank; unset is 1.
+CHAR_UNITS = {}
+CHAR_RANK = {}
 cm.get_character_by_cqi = function(_, cqi)
     local force = CHAR_FORCE[tostring(cqi)]
     if force == nil then return NULL() end
+    local size = CHAR_UNITS[tostring(cqi)] or {1, 20}
     return {is_null_interface = function() return false end,
+            faction = function()
+                return {is_null_interface = function() return false end,
+                        name = function() return CHAR_OWNER[tostring(cqi)] end}
+            end,
+            rank = function() return CHAR_RANK[tostring(cqi)] or 1 end,
+            has_military_force = function() return force ~= false end,
             military_force = function()
                 if force == false then return NULL() end
                 return {is_null_interface = function() return false end,
-                        command_queue_index = function() return force end}
+                        command_queue_index = function() return force end,
+                        is_armed_citizenry = function() return false end,
+                        unit_count_limit = function() return size[2] end,
+                        unit_list = function()
+                            return {num_items = function() return size[1] end}
+                        end}
             end}
 end
 
@@ -493,10 +522,13 @@ end
 cm.get_human_factions = tithe_getter
 GG.player_cultures_cache = nil
 
--- The hostile service targets the enemy, not the buyer.
+-- The hostile service targets the enemy, not the buyer - an enemy at war with it, as the
+-- card says (2026-09-29).
 GG.state["cr_khan"] = nil
 GG.grant("cr_khan", "khanate", 1500)
+AT_WAR["cr_khan"] = {cr_victim = true}
 GG.buy("cr_khan", "khans_price", "cr_victim")
+AT_WAR["cr_khan"] = nil
 assert(applied[#applied][2] == "cr_victim",
        "khans price must land on the target, got " .. tostring(applied[#applied][2]))
 
@@ -515,9 +547,11 @@ assert(#units == u_before, "no target means no unit granted")
 -- With a target it grants the verified unit key.
 GG.state["cr_target"] = nil
 GG.grant("cr_target", "immortals", 400)
+CHAR_FORCE["42"], CHAR_OWNER["42"] = 4200, "cr_target"
 GG.buy("cr_target", "hire_immortals", 42)
 assert(#units == u_before + 1, "unit granted with a target")
-assert(units[#units][1] == 42, "granted to the given cqi")
+assert(units[#units][1] == "character_cqi:42",
+       "granted through a lookup string for the given cqi, got " .. tostring(units[#units][1]))
 assert(units[#units][2] == "wh3_dlc23_chd_inf_infernal_guard_great_weapons",
        "wrong unit key: " .. tostring(units[#units][2]))
 
@@ -531,11 +565,20 @@ GG.grant("cr_build_half", "overseers", 400)
 local b_before = #built
 GG.buy("cr_build_half", "raise_ziggurat", {slot = "slot_obj"})   -- no building key
 assert(#built == b_before, "a half-specified target must not fire")
-GG.state["cr_build2"] = nil
-GG.grant("cr_build2", "overseers", 400)
-GG.buy("cr_build2", "raise_ziggurat", {slot = "slot_obj", building = "bkey"})
-assert(#built == b_before + 1, "slot plus building key fires")
-assert(built[#built][2] == "bkey", "building key passed through")
+do
+    -- A SLOT THAT HOLDS WHAT WAS BUILT: the payload reads it back, and a bare string
+    -- here made this sale refund itself unseen (logic audit, 2026-09-29).
+    local now = "bkey_1"
+    local slot = {set = function(k) now = k end}
+    function slot:building() return {name = function() return now end} end
+    GG.state["cr_build2"] = nil
+    GG.grant("cr_build2", "overseers", 400)
+    local fav0 = select(2, GG.get("cr_build2", "overseers"))
+    GG.buy("cr_build2", "raise_ziggurat", {slot = slot, building = "bkey"})
+    assert(#built == b_before + 1, "slot plus building key fires")
+    assert(built[#built][2] == "bkey", "building key passed through")
+    assert(select(2, GG.get("cr_build2", "overseers")) < fav0, "and the sale stands")
+end
 
 -- ---------------------------------------------------- plan 3, task 1 battle ---
 -- Attribution: only the winner is paid.
@@ -633,6 +676,8 @@ end
 -- pick_target routes by kind, not by guess.
 assert(GGAI.pick_target("cr_x", GG.service("writ_monopoly")) == nil,
        "a self-buff needs no target")
+-- The rivals' pick has to be one the till accepts, so the army is cr_x's own.
+CHAR_FORCE["9"], CHAR_OWNER["9"] = 900, "cr_x"
 GGAI.TEST_FORCES = {{armed_citizenry = false, cqi = 9}}
 assert(GGAI.pick_target("cr_x", GG.service("hire_immortals")) == 9,
        "the unit service targets an army")
@@ -654,6 +699,7 @@ assert(GGAI.pick_target("cr_x", GG.service("hire_immortals")) == 9,
     end
     local function slot(tag, b)
         return {tag = tag, is_null_interface = function() return false end,
+                set = function(k) b = k end,
                 has_building = function() return b ~= nil end,
                 building = function()
                     return {is_null_interface = function() return false end,
@@ -665,7 +711,10 @@ assert(GGAI.pick_target("cr_x", GG.service("hire_immortals")) == 9,
         for i, b in ipairs(others) do slots[i] = slot(key .. "/" .. i, b) end
         return {is_null_interface = function() return false end,
                 name = function() return key end,
-                owning_faction = function() return {name = function() return owner end} end,
+                owning_faction = function()
+                    return {is_null_interface = function() return false end,
+                            name = function() return owner end}
+                end,
                 settlement = function()
                     return {is_null_interface = function() return false end,
                             primary_slot = function() return slot(key .. "/primary", primary) end,
@@ -678,6 +727,8 @@ assert(GGAI.pick_target("cr_x", GG.service("hire_immortals")) == 9,
         r_side = region("r_side", F, "bld_max", {"bld_max", "bld_t1"}),
         r_max = region("r_max", F, "bld_max", {"bld_max"}),
         r_theirs = region("r_theirs", "cr_other", "bld_t1", {}),
+        -- The enemy region the shroud test reveals: the till asks who owns it (2026-09-29).
+        reg_foe_a = region("reg_foe_a", "cr_foe", "bld_max", {}),
     }
     cm.get_region = function(_, k) return REGIONS[k] or false end
     cm.get_building_level_upgrades = function(_, b) return UPG[b] or {} end
@@ -993,7 +1044,9 @@ assert(select(2, GG.get(HF, "khanate")) == before_fav,
 assert(#applied == applied_before,
        "a refused purchase must apply no bundle, got " .. (#applied - applied_before))
 
--- With a target it lands on the TARGET, never on the buyer.
+-- With a target it lands on the TARGET, never on the buyer - a target at war with the
+-- buyer, as the card says (2026-09-29).
+AT_WAR[HF] = {cr_victim = true}
 assert(GG.buy(HF, "khans_price", "cr_victim") == true, "a targeted purchase must succeed")
 local last = applied[#applied]
 assert(last[1] == "derpy_gg_svc_khans_price", "the wrong bundle was applied: " .. last[1])
@@ -1957,6 +2010,10 @@ GG.TUNE.rate_bounty = 80
 --
 -- Stubs restored first; the AI section above left random_number on math.random and
 -- model on nil, and both matter here.
+-- THE PLAIN DEMAND RULE: these tests are about the AI's court, not its race, and an AI
+-- faction here is a Chaos Dwarf, whose demands are twisted (GG.TWISTS). Restored below.
+GG.TUNE = GG.TUNE or {}
+GG.TUNE.race_differences = false
 cm.random_number = function(_, _n) return 1 end
 TURN = 60
 cm.model = function() return {turn_number = function() return TURN end} end
@@ -1974,7 +2031,7 @@ GG.grant(AIF, "slavers", 800)
 TREASURY[AIF] = 999999
 GGAI.TEST_FORCES = {{armed_citizenry = true, cqi = 11},
                     {armed_citizenry = false, cqi = 12}}
-CHAR_FORCE["12"] = 6060
+CHAR_FORCE["12"], CHAR_OWNER["12"] = 6060, AIF
 
 assert(GGAI.best_guild(AIF) == "slavers",
        "an AI serves the guild it has the most reputation with, got "
@@ -2009,7 +2066,7 @@ CHAR_FORCE["12"] = nil
 GGAI.court_step(AIF, TURN)
 assert(GG.patrons[AIF] == nil,
        "a post whose lord is gone must be vacant, and refilled only when an army exists")
-CHAR_FORCE["12"] = 6060
+CHAR_FORCE["12"], CHAR_OWNER["12"] = 6060, AIF
 GGAI.court_step(AIF, TURN)
 assert(GG.patrons[AIF] ~= nil, "and refilled once one does")
 
@@ -2042,7 +2099,7 @@ GG.demands[POOR] = nil
 GG.grant(POOR, "overseers", 900)
 TREASURY[POOR] = 0
 GGAI.TEST_FORCES = {{armed_citizenry = false, cqi = 31}}
-CHAR_FORCE["31"] = 7070
+CHAR_FORCE["31"], CHAR_OWNER["31"] = 7070, POOR
 GG.demand_last[POOR] = TURN - GG.setting("demand_every")
 GGAI.court_step(POOR, TURN)
 local d_poor = GG.demands[POOR]
@@ -2066,7 +2123,7 @@ GG.demands[RUNF] = nil
 GG.grant(RUNF, "immortals", 700)
 TREASURY[RUNF] = 999999
 GGAI.TEST_FORCES = {{armed_citizenry = false, cqi = 41}}
-CHAR_FORCE["41"] = 8080
+CHAR_FORCE["41"], CHAR_OWNER["41"] = 8080, RUNF
 GG.demand_last[RUNF] = TURN - GG.setting("demand_every")
 cm.model = function()
     return {turn_number = function() return TURN end,
@@ -2114,6 +2171,7 @@ assert(GG.patrons[OFF] == nil,
 GG.TUNE.ai_spending = true
 
 GGAI.TEST_FORCES = nil
+GG.TUNE.race_differences = nil
 
 -- ---------------------------------------------------------------------------
 -- THE AI SECTION ABOVE RE-POINTED THREE STUBS AND NEVER PUT THEM BACK: random_number
@@ -2244,13 +2302,10 @@ assert(#applied == quiet, "re-asserting an unchanged crown must apply nothing")
 -- ------------------------------------------------------------ the monopoly --
 -- The half that makes the league table a decision: the guild's dearest service is sold
 -- to its leader and to nobody else.
-local top = nil
-for i = 1, #GG.SERVICES do
-    if GG.SERVICES[i].guild == "brass" and GG.SERVICES[i].lead then
-        top = GG.SERVICES[i]
-    end
-end
-assert(top, "brass must have exactly one monopoly service")
+-- THE MONOPOLY ON TODAY'S CARD. Brass has three rank-4 services since the pools
+-- (2026-09-29); the first is the one on the card when nothing has been drawn.
+local top = GG.service(GG.default_card("brass", 4))
+assert(top and top.lead, "brass's rank-4 card is a monopoly service")
 GG.state[L1]["brass"] = {rep = 1500, fav = 9999}
 GG.state[L2]["brass"] = {rep = 2000, fav = 9999}
 GG.cooldowns[L1] = nil
@@ -2287,6 +2342,10 @@ assert(GG.penalise(XF, "overseers", 99999) == 95,
 
 -- ---------------------------------------------------------------- demands --
 -- Reputation was a ratchet. A demand is the guild asking for something back.
+-- THE PLAIN DEMAND RULE: this section is about demands, and its factions are Chaos
+-- Dwarfs, whose demands are twisted (GG.TWISTS). Restored at the section's end.
+GG.TUNE = GG.TUNE or {}
+GG.TUNE.race_differences = false
 local DF = "cr_demand"
 GG.state[DF] = nil
 GG.demands[DF] = nil
@@ -2368,12 +2427,13 @@ assert(string.find(feed[#feed][2], "demand", 1, true),
 GG.announce_demand(DF, "expired", nil)
 assert(string.find(feed[#feed][2], "_fail", 1, true),
        "an expiry must use the failure message")
+GG.TUNE.race_differences = nil
 
 -- ----------------------------------------------------------------- patron --
 local PF = "cr_patron"
 GG.state[PF] = nil
-CHAR_FORCE["777"] = 4242        -- a lord with an army
-CHAR_FORCE["778"] = false       -- a lord with none
+CHAR_FORCE["777"], CHAR_OWNER["777"] = 4242, PF   -- a lord with an army
+CHAR_FORCE["778"], CHAR_OWNER["778"] = false, PF  -- a lord with none
 local fa = #force_applied
 assert(GG.set_patron(PF, "daemonsmiths", 777) == true,
        "a lord with an army may hold the post")
@@ -2432,9 +2492,9 @@ GG.assert_patron(PF)
 assert(GG.patrons[PF] == nil, "a patron whose lord is gone must vacate the post")
 CHAR_FORCE["777"] = 4242
 
--- Round-trips, and re-asserts EXACTLY ONCE after a load - the belief table is not
--- saved, so the first turn start after loading has to put the bundle back and then
--- go quiet.
+-- Round-trips WITH ITS ARMY (logic audit, 2026-09-29): the army wearing the bundle is
+-- saved with the post, so a loaded post knows where its bundle is - the game kept it -
+-- and a turn start re-applies nothing.
 GG.set_patron(PF, "khanate", 777)
 GG.save_patron(PF)
 GG.patrons[PF] = nil
@@ -2442,11 +2502,10 @@ GG.patron_forces[PF] = nil
 GG.load_patron(PF)
 assert(GG.patrons[PF] and GG.patrons[PF].guild == "khanate",
        "the post must survive a save")
+assert(GG.patron_forces[PF] == 4242, "and so must the army wearing its bundle")
 local fa2 = #force_applied
 GG.assert_patron(PF)
-assert(#force_applied == fa2 + 1, "a loaded post must re-assert its bundle once")
-GG.assert_patron(PF)
-assert(#force_applied == fa2 + 1, "and exactly once")
+assert(#force_applied == fa2, "a loaded post re-applies nothing")
 GG.clear_patron(PF)
 assert(force_removed[#force_removed][2] == 4242,
        "dismissing must take the bundle off the army it was put on")
@@ -2529,9 +2588,10 @@ assert(GG.world.held[WBS] == RIVAL,
 assert(GG.world.moved[WBS] == true,
        "a guild that changed hands must be marked, or the panel's only way to say WHEN "
        .. "a name changed is gone")
-assert(GG.world.gain[WBS] == 650,
-       "the round's gain is the top score's movement (900 - 250), got "
-       .. tostring(GG.world.gain[WBS]))
+-- NO GAIN ACROSS THE CHANGE (logic audit, 2026-09-29): the tooltip says "Leader gained
+-- N", and 900 - 250 is two factions' scores. The row's "took" mark says it instead.
+assert(GG.world.gain[WBS] == 0,
+       "a change of hands claims no gain, got " .. tostring(GG.world.gain[WBS]))
 assert(GG.world.moved[WSS] == false,
        "a guild nobody touched must not be marked as moved")
 
@@ -2860,7 +2920,7 @@ fresh_world()
 GG.grant(WF, "immortals", 700)
 TREASURY[WF] = 999999
 GGAI.TEST_FORCES = {{armed_citizenry = false, cqi = 71}}
-CHAR_FORCE["71"] = 7171
+CHAR_FORCE["71"], CHAR_OWNER["71"] = 7171, WF
 TURN = 120
 GG.demand_last[WF] = TURN - GG.setting("demand_every")
 cm.model = function()
@@ -3143,6 +3203,15 @@ assert(GGUI.actionable(BHUMAN) == n,
        "favour without the rank must not count - can_buy is the gate, not the price")
 
 -- A BOUNTY OFFER COUNTS. It is a decision waiting on the board with a life of six turns.
+-- ONE THE BOARD SHOWS (logic audit, 2026-09-29): its view is stubbed to show every posted
+-- offer, because this fixture's region is not in this harness world and the view's own
+-- validity rules are tested with the bounties.
+PREV_VIEW = GG.bounty_view      -- a global: this chunk is at 200 locals
+GG.bounty_view = function(f)
+    local out = {}
+    for i = 1, #(GG.bounties[f] or {}) do out[i] = i end
+    return out
+end
 GG.bounties[BHUMAN] = {{guild = "brass", kind = "region_take", target = "wh3_main_x",
                         expires = 99}}
 assert(GGUI.actionable(BHUMAN) == n + 1,
@@ -3165,6 +3234,7 @@ assert(GGUI.badge(BHUMAN) == with_demand,
        "badge must return the count it drew, got " .. tostring(GGUI.badge(BHUMAN)))
 GG.bounties[BHUMAN] = nil
 GG.demands[BHUMAN] = nil
+GG.bounty_view, PREV_VIEW = PREV_VIEW, nil
 
 -- ----------------------------------------------- the first fifteen turns --
 -- The first rank lands somewhere near turn 15 in focused play, and until then the panel
@@ -3505,6 +3575,9 @@ end
     assert(hard.guild_notices == (not GG.TUNE_DEFAULTS.guild_notices),
            "but a switch the player moved must still move - a preset owning the "
            .. "checkboxes is how the Exchange left all seven of its own inert")
+    -- AND rotate_turns IS READ ON EVERY PRESET (spec §8): a number, but not a preset's.
+    assert(hard.rotate_turns == MARK,
+           "rotate_turns must be read under a named preset too, got " .. tostring(hard.rotate_turns))
 
     get_mct = real_mct
     cm.is_multiplayer = real_mp
@@ -3687,6 +3760,10 @@ end)()
 --
 -- The test is on GG.needs_target rather than on a hardcoded list of keys, so a service
 -- added later with a targeted payload is covered the day it is written.
+--
+-- EVERY TARGETED SERVICE, not only the ones on today's cards (2026-09-29): each is put on
+-- its card and the monopoly is lifted for the loop, so the 36 pool services are tested too
+-- and the count below is exact rather than a floor.
 ;(function()
     local F = "cr_no_target"
     GG.state[F] = GG.state[F] or {}
@@ -3694,16 +3771,44 @@ end)()
         GG.state[F][GG.GUILDS[i]] = {rep = 0, fav = 0}
     end
     GG.cooldowns[F] = {}
+    GG.CULTURE_OF[F] = GG.CHD_CULTURE
+    local real_setting = GG.setting
+    GG.setting = function(k)
+        if k == "lead_monopoly" then return false end
+        return real_setting(k)
+    end
+    -- A target the till accepts, per kind: the buyer's own army, its own region, an
+    -- enemy's region, a faction at war with it.
+    CHAR_FORCE["5150"], CHAR_OWNER["5150"] = 5151, F
+    REGION_OWNER["cr_nt_mine"], REGION_OWNER["cr_nt_theirs"] = F, "cr_nt_foe"
+    AT_WAR[F] = {cr_nt_foe = true}
+    local GOOD = {unit = 5150, army = 5150, ranks = 5150, settlement = "cr_nt_mine",
+                  enemy_settlement = "cr_nt_theirs", shroud = "cr_nt_theirs"}
+    local function on_card(s)
+        local keys = GG.cards_of(F)
+        for gi = 1, #GG.GUILDS do
+            for ri = 1, #GG.CARD_RANKS do
+                if GG.GUILDS[gi] == s.guild and GG.CARD_RANKS[ri] == s.rank then
+                    keys[(gi - 1) * #GG.CARD_RANKS + ri] = s.key
+                end
+            end
+        end
+        GG.cards[F] = {turn = 1, keys = keys}
+    end
 
-    local tested = 0
+    local tested, targeted = 0, 0
     for i = 1, #GG.SERVICES do
         local s = GG.SERVICES[i]
-        if GG.needs_target(s) then
+        if GG.needs_target(s) and s.race == nil then
+            targeted = targeted + 1
+            on_card(s)
             -- Enough standing to reach the rank, and enough favour to pay twice over, so
             -- the only thing that can refuse the sale is the missing target.
             GG.state[F][s.guild] = {rep = GG.RANKS[s.rank] or 0, fav = 999999}
             GG.cooldowns[F][s.key] = 0
             local ok, why = GG.can_buy(F, s.key)
+            assert(ok, s.key .. " could not be tested: can_buy refused it for "
+                   .. tostring(why) .. " before any target was asked for")
             if ok then
                 tested = tested + 1
                 local before = select(2, GG.get(F, s.guild))
@@ -3724,7 +3829,10 @@ end)()
 
                 -- AND IT STILL SELLS WHEN SOMETHING IS SELECTED. A guard that refuses
                 -- everything would pass every assertion above.
-                local sold2 = GG.buy(F, s.key, "cr_some_target")
+                -- A TARGET THE TILL ACCEPTS for this kind: GG.target_ok refuses a
+                -- character that is not the buyer's (2026-09-29 pools).
+                local good = s.hostile and "cr_nt_foe" or GOOD[s.kind] or "cr_some_target"
+                local sold2 = GG.buy(F, s.key, good)
                 assert(sold2 == true,
                        s.key .. " refused a sale WITH a target - the guard is refusing "
                        .. "everything, which passes the assertions above and breaks the "
@@ -3734,9 +3842,14 @@ end)()
             end
         end
     end
-    assert(tested >= 4,
-           "only " .. tested .. " targeted service(s) were reachable to test - there are "
-           .. "five, and a test that silently covers one proves almost nothing")
+    -- 18 is the count in GG.SERVICES on 2026-09-29; a needs_target that stopped
+    -- recognising some would shrink it and pass an equality alone.
+    assert(targeted >= 18 and tested == targeted,
+           tested .. " of " .. targeted .. " targeted services were tested")
+    GG.setting = real_setting
+    GG.cards[F] = nil
+    REGION_OWNER["cr_nt_mine"], REGION_OWNER["cr_nt_theirs"] = nil, nil
+    AT_WAR[F] = nil
 
     -- A SERVICE THAT NEEDS NOTHING SELECTED MUST STILL SELL. The guard must not spread.
     local untargeted = nil
@@ -5212,6 +5325,7 @@ end)()
     GG.CULTURES["wh_main_grn_greenskins"] = true
     GG.roster_cache = {[GG.CHD_CULTURE] = {A, B, C},
                        ["wh_main_grn_greenskins"] = {X}}
+    GG.roster_turn = GG.turn_now()      -- the cache is good for its own round only
 
     local prev_state = GG.state
     GG.state = {[A] = {brass = {rep = 500, fav = 0}},
@@ -5604,6 +5718,7 @@ do
 
     -- AND THE SERVICE THAT SPENDS IT. GG.buy refuses a targeted service with no target,
     -- so this is the difference between Hire the Immortals working and refunding nothing.
+    CHAR_FORCE["4242"], CHAR_OWNER["4242"] = 1, "cr_sel"
     assert(GGUI.pick_target(GG.service("hire_immortals"), "cr_sel") == 4242,
            "Hire the Immortals must target the selected army")
 
@@ -6257,7 +6372,7 @@ end)()
                        taken = false}}
     GG.save_bounties(H)
     GG.bounties[H] = nil
-    trig("gg1|bounty|1", 77)
+    trig("gg1|bounty|brass", 77)       -- by guild since the logic audit
     assert(#issued == n0 + 1, "the bounty op must issue the mission from the saved board")
     assert(GG.bounties[H] and GG.bounties[H][1].taken, "and mark the offer taken")
 
@@ -6275,14 +6390,14 @@ end)()
            "the demand op must load, pay and save, got " .. table.concat(calls, ","))
     calls = {}
     GG.patrons[H] = {guild = "brass", cqi = 5}
-    trig("gg1|patron|brass|5", 77)
+    trig("gg1|patron|dismiss|brass", 77)
     assert(table.concat(calls, ",") == "load_patron,clear_patron,save_patron",
-           "the sitting guild's button dismisses, got " .. table.concat(calls, ","))
+           "dismiss dismisses, got " .. table.concat(calls, ","))
     calls = {}
     GG.patrons[H] = nil
-    trig("gg1|patron|slavers|5", 77)
+    trig("gg1|patron|appoint|slavers|5", 77)
     assert(table.concat(calls, ",") == "load_patron,set_patron,save_patron",
-           "another guild's button appoints, got " .. table.concat(calls, ","))
+           "appoint appoints, got " .. table.concat(calls, ","))
     for k, fn in pairs(keep) do GG[k] = fn end
     GG.patrons[H] = nil
 
@@ -6611,7 +6726,9 @@ end)()
     local prev_getter, prev_humans = cm.get_human_factions, GG.humans
     cm.get_human_factions = function() return {P} end
     GG.humans, GG.player_cultures_cache = nil, nil
-    GG.TUNE = nil                       -- the shipped defaults, whatever earlier blocks set
+    -- The shipped defaults, whatever earlier blocks set - with the plain demand rule, since
+    -- P is a Chaos Dwarf and this block is about the ledger, not the race (GG.TWISTS).
+    GG.TUNE = {race_differences = false}
     GG.patrons[P] = nil                 -- a patron's share would change every sum below
     saved[key] = nil
     TURN = 50
@@ -7044,7 +7161,12 @@ end)()
                     return {is_null_interface = function() return false end,
                             name = function() return SEL.owner or ME end}
                 end,
-                military_force = function() return NULL() end}
+                -- SEL.army: the selected lord leads an army (the patron pick wants one).
+                military_force = function()
+                    if not SEL.army then return NULL() end
+                    return {is_null_interface = function() return false end,
+                            command_queue_index = function() return SEL.army end}
+                end}
     end
     local stolen, released = {}, {}
     cm.steal_escape_key_with_callback = function(_, name, fn)
@@ -7117,6 +7239,14 @@ end)()
     -- The badge was a number. What the number counted was a click away.
     standing({brass = {150, 150}})
     TREASURY[ME] = 99999
+    -- The board shows both (these regions are not in this harness world; the view's own
+    -- rules are tested with the bounties). The badge counts what the board shows.
+    PREV_VIEW = GG.bounty_view
+    GG.bounty_view = function(f)
+        local out = {}
+        for i = 1, #(GG.bounties[f] or {}) do out[i] = i end
+        return out
+    end
     GG.bounties[ME] = {
         {guild = "khanate", kind = "region_take", target = "wh3_qol_r", posted = 1,
          gold = 100, rep = 10},
@@ -7150,6 +7280,7 @@ end)()
            and has(otip, "opener_click") and not has(otip, "opener_none"),
            "the opener's tooltip must name what is ready, got " .. tostring(otip))
     GG.bounties[ME], GG.demands[ME] = nil, nil
+    GG.bounty_view, PREV_VIEW = PREV_VIEW, nil
     standing({})
     handlers["gg_opener_tip"]({string = GGUI.BTN})
     assert(has(tips["root/" .. GGUI.BTN], "opener_none"),
@@ -7266,6 +7397,8 @@ end)()
     assert(#sent == 0, "picking buys nothing")
     handlers["gg_pick_char"]({})
     assert(GGUI.PICK, "a selection that is not a target keeps the pick going")
+    -- Someone else's town: the reveal refuses the buyer's own region (2026-09-29).
+    REGION_OWNER["wh3_qol_region"] = "cr_qol_other"
     SEL.region = "wh3_qol_region"
     handlers["gg_pick_settlement"]({})
     assert(GGUI.PICK == nil and not find_uicomponent(ROOT, GGUI.PICK_CARD) and panel_up(),
@@ -7306,13 +7439,14 @@ end)()
            "Appoint with nobody selected offers to pick, got " .. tostring(texts[buy_key(2)]))
     click("card_buy", buy_at(2))
     assert(GGUI.PICK and GGUI.PICK.key == "patron" and #sent == 0, "a patron pick")
-    SEL.char = 5
+    -- ONE OF YOUR OWN LORDS, WITH AN ARMY (logic audit): the pick ends on nothing else.
+    SEL.char, SEL.army = 5, 5050
     handlers["gg_pick_char"]({})
     assert(GGUI.PICK == nil and GGUI.TAB == 4 and panel_up(), "back on the Court")
     assert(has(texts[buy_key(2)], "patron_appoint"), "and Appoint is live")
     click("card_buy", buy_at(2))
     assert(#sent == 1 and sent[1].op == "patron", "which appoints")
-    SEL.char = nil
+    SEL.char, SEL.army = nil, nil
     GGUI.close()
 
     -- ---- 8. A BOUNTY SHOWS ITS TARGET ON THE MAP ---------------------------------------
@@ -7578,6 +7712,51 @@ end)()
                r.key, r.n, r.where, TIP_LINES, string.sub(r.tip, 1, 160)))
     end
 
+    -- ---- LOGIC AUDIT (2026-09-29) ----------------------------------------------------
+    -- I3: THE PATRON PICK ENDS ONLY ON ONE OF YOUR OWN LORDS WITH AN ARMY.
+    SEL.char, SEL.army, SEL.owner = 5, 5050, RIVAL
+    assert(GGUI.patron_cqi(ME) == nil, "a rival's lord never ends the pick")
+    SEL.owner = nil
+    assert(GGUI.patron_cqi(ME) == 5, "your own lord with an army does")
+    SEL.army = nil
+    assert(GGUI.patron_cqi(ME) == nil, "a lord with no army does not")
+    SEL.char = nil
+
+    -- m11: TAKE SENDS THE OFFER'S GUILD, captured when the board was drawn.
+    PREV_VIEW = GG.bounty_view
+    GG.bounty_view = function(f)
+        local out = {}
+        for i = 1, #(GG.bounties[f] or {}) do out[i] = i end
+        return out
+    end
+    standing({khanate = {150, 150}, slavers = {150, 150}})
+    GG.bounties[ME] = {
+        {guild = "khanate", kind = "region_take", target = "wh3_qol_r", posted = 1,
+         gold = 100, rep = 10},
+        {guild = "slavers", kind = "region_take", target = "wh3_qol_r2", posted = 1,
+         gold = 100, rep = 10}}
+    GGUI.open()
+    GGUI.TAB = 3
+    reset()
+    GGUI.refresh()
+    clear(sent)
+    click("card_buy", buy_at(2))
+    assert(sent[1] and sent[1].op == "bounty" and sent[1].arg == "slavers",
+           "Take on the second card sends its guild, got " .. tostring(sent[1] and sent[1].arg))
+    GG.bounties[ME] = nil
+    GG.bounty_view, PREV_VIEW = PREV_VIEW, nil
+
+    -- m15: THE FOOTER'S FAVOUR IS THE GUILD ON SCREEN. The Leaderboard shows the
+    -- selected row's guild; the footer showed the Guilds tab's.
+    standing({brass = {150, 150}, khanate = {150, 77}})
+    GGUI.TAB, GGUI.PAGE = 2, page_of("brass")
+    for i, g in ipairs(GG.GUILDS) do if g == "khanate" then GGUI.STAND_GUILD = i end end
+    reset()
+    GGUI.refresh()
+    assert(has(texts["P/gg_footer"], ": 77 "),
+           "the footer shows the Khanate's favour, got " .. tostring(texts["P/gg_footer"]))
+    GGUI.close()
+
     -- ---- restore ----
     find_uicomponent, is_uicomponent, core.get_ui_root = keep_g.find, keep_g.is, keep_g.root
     GG.mp_send, GG.log_entries = keep_g.send, keep_g.log
@@ -7627,11 +7806,68 @@ end)()
     local set = {}
     local card = {SetImagePath = function(_, p, i) set[i] = p end}
     GGUI.light_card(card, true)
-    assert(set[GGUI.CARD_HEAT_INDEX] == GGUI.CARD_HEAT and set[GGUI.CARD_RIM_INDEX] == GGUI.CARD_RIM,
+    assert(set[GGUI.CARD_HEAT_INDEX] == GGUI.FRAME[""].heat
+           and set[GGUI.CARD_RIM_INDEX] == GGUI.FRAME[""].rim,
            "lit: both glows on, each at its own index")
     GGUI.light_card(card, false)
     assert(set[GGUI.CARD_HEAT_INDEX] == GGUI.CARD_OFF and set[GGUI.CARD_RIM_INDEX] == GGUI.CARD_OFF,
            "unlit: both back to the blank")
+end)()
+
+-- ------------------------------------------------ every race in its own frame ---
+-- The panel and the card are created from the READER's race's copy of the .twui.xml, and
+-- what the Lua repaints at runtime - a lit card's two glows, the open tab's plates - comes
+-- from the same race's GGUI.FRAME entry. A slip in either puts Chaos Dwarf art in an
+-- Empire frame, or asks CreateComponent for a file that does not exist and draws nothing.
+;(function()
+    local prev, who = cm.get_local_faction_name, nil
+    cm.get_local_faction_name = function() return who end
+    local R = {cr_fr_emp = "wh_main_emp_empire", cr_fr_chd = GG.CHD_CULTURE,
+               cr_fr_gen = "wh_main_grn_greenskins", cr_fr_ksl = "wh3_main_ksl_kislev"}
+    for k, c in pairs(R) do GG.CULTURE_OF[k] = c end
+
+    local base = GGUI.PATH_PANEL
+    who = "cr_fr_emp"
+    assert(GGUI.frame_path(base) == base .. "_emp", "an Empire reader gets the Empire panel")
+    who = "cr_fr_chd"
+    assert(GGUI.frame_path(base) == base, "a Chaos Dwarf reader gets the original file")
+    who = "cr_fr_gen"
+    assert(GGUI.frame_path(base) == base,
+           "a race with no frame of its own gets the original, never a file that is not there")
+    who = nil
+    assert(GGUI.frame_path(base) == base, "an unreadable reader gets the original")
+    for culture, fl in pairs(GG.FLAVOURED) do
+        assert(GGUI.FRAME[fl.tag], "every race the guilds are written for has a frame: " .. culture)
+    end
+
+    local set = {}
+    local card = {SetImagePath = function(_, p, i) set[i] = p end}
+    who = "cr_fr_emp"
+    GGUI.light_card(card, true)
+    assert(set[GGUI.CARD_HEAT_INDEX] == GGUI.FRAME._emp.heat
+           and set[GGUI.CARD_RIM_INDEX] == GGUI.FRAME._emp.rim,
+           "an Empire card lights in the Empire's glows")
+
+    -- Kislev's tab is two layers per state, so the hover state's start at index 2.
+    who = "cr_fr_ksl"
+    local img, f = {}, GGUI.FRAME._ksl
+    local tab = {SetImagePath = function(_, p, i) img[i] = p end}
+    GGUI.paint_tab(tab, true)
+    assert(img[0] == f.selected[1] and img[1] == f.selected[2]
+           and img[2] == f.selected_hover[1] and img[3] == f.selected_hover[2],
+           "the open Kislev tab: both layers of both states")
+    GGUI.paint_tab(tab, false)
+    assert(img[0] == f.active[1] and img[1] == f.active[2]
+           and img[2] == f.hover[1] and img[3] == f.hover[2],
+           "a Kislev tab that closes is put back")
+    who = "cr_fr_chd"
+    img = {}
+    GGUI.paint_tab(tab, true)
+    assert(img[0] == GGUI.FRAME[""].selected[1] and img[1] == GGUI.FRAME[""].selected_hover[1]
+           and img[2] == nil, "a one-layer tab paints images 0 and 1 and nothing else")
+
+    cm.get_local_faction_name = prev
+    for k in pairs(R) do GG.CULTURE_OF[k] = nil end
 end)()
 
 -- ------------------------------------------------- the price plate follows the price ---
@@ -7742,6 +7978,395 @@ end
 
     find_uicomponent, is_uicomponent, cm.model = prev_find, prev_is, prev_model
     GGUI.place_opener, GGUI.open, GGUI.close = prev_place, prev_open, prev_close
+end)()
+
+;(function()
+    -- RIVALS' BOUNTIES IN THE LOG (2026-09-29). With no loc a fragment reads as its key,
+    -- so the assertions read keys; the names come from the stubbed loc below.
+    local prev_fm, prev_common = cm.get_family_member_by_cqi, common
+    cm.get_family_member_by_cqi = function()
+        return {character = function()
+            return {is_null_interface = function() return false end,
+                    get_forename = function() return "names_name_7" end,
+                    get_surname = function() return "" end}
+        end}
+    end
+    common = {get_localised_string = function(k)
+        if k == "names_name_7" then return "Drazhoath" end
+        if k == "regions_onscreen_r1" then return "Zharr-Naggrund" end
+        return ""
+    end}
+    local function line(kind, a) return GGUI.log_text({turn = 3, kind = kind,
+        guild = "khanate", a = a, b = "cr_rival"}) end
+    local t, bad = line("hunted", "7")
+    assert(t and string.find(t, "log_hunted Drazhoath, log_for cr_rival", 1, true), tostring(t))
+    assert(bad, "a price on you is bad news")
+    t, bad = line("hunt_done", "r1")
+    assert(string.find(t, "cr_rival log_hunt_done Zharr-Naggrund", 1, true), t)
+    assert(bad, "a price collected is bad news")
+    cm.get_family_member_by_cqi = function() error("gone") end
+    t, bad = line("hunt_failed", "7")
+    assert(string.find(t, "cr_rival log_hunt_failed log_your_char, log_hunt_lost", 1, true), t)
+    assert(not bad, "a hunt that failed is not bad news for you")
+    t = line("hunt_void", "r1")
+    assert(string.find(t, "log_hunt_void Zharr-Naggrund", 1, true), t)
+    t = line("ai_bounty", "80")
+    assert(string.find(t, "cr_rival log_ai_bounty 80 reputation", 1, true), t)
+    for _, kind in ipairs({"hunted", "hunt_done", "hunt_failed", "hunt_void", "ai_bounty"}) do
+        assert(GGUI.LOG_FILTERS.rivals[kind], kind .. " must show under Rivals")
+    end
+    cm.get_family_member_by_cqi, common = prev_fm, prev_common
+end)()
+
+-- THE ROTATION LOG LINE (2026-09-29 pools): no guild, not bad news, under Mine.
+;(function()
+    local line, bad = GGUI.log_text({turn = 12, kind = "rotation", guild = "", a = "", b = ""})
+    assert(type(line) == "string" and line:find(GGUI.loc("log_rotation"), 1, true),
+           "the rotation Log line says so, got " .. tostring(line))
+    assert(not bad, "a rotation is not bad news")
+    assert(GGUI.LOG_FILTERS.mine.rotation, "it is under the Mine filter")
+end)()
+
+;(function()
+    -- PAID FOR AND NOTHING DELIVERED (2026-09-29). Each case below took the favour,
+    -- started the cooldown and handed the player nothing.
+    local function has(s, sub) return s ~= nil and string.find(s, sub, 1, true) ~= nil end
+    local F = "cr_safe"
+    GG.CULTURE_OF[F] = GG.CHD_CULTURE
+    local hire, honour = GG.service("hire_immortals"), GG.service("warlords_honour")
+    CHAR_FORCE["8801"], CHAR_OWNER["8801"] = 8811, F
+    CHAR_FORCE["8802"], CHAR_OWNER["8802"] = 8822, F
+
+    -- A FULL ARMY. CA: grant_unit_to_character's unit "will only be created if there is
+    -- room for it in the force".
+    CHAR_UNITS["8801"] = {20, 20}
+    assert(not GG.target_ok(F, hire, 8801), "a full army is no target for a regiment")
+    CHAR_UNITS["8801"] = {19, 20}
+    assert(GG.target_ok(F, hire, 8801), "an army with one place left is")
+    -- The force's OWN limit, as CA's caravans read it, not a typed 20.
+    CHAR_UNITS["8801"] = {20, 40}
+    assert(GG.target_ok(F, hire, 8801), "a raised unit limit is honoured")
+    -- Room is Hire's question only: a bundle on a full army still lands.
+    CHAR_UNITS["8801"] = {20, 20}
+    assert(GG.target_ok(F, GG.service("forced_march"), 8801),
+           "a full army still takes an army service")
+    assert(GGUI.target_hint(hire) == "needs_army_room",
+           "the hint says the army needs room, got " .. tostring(GGUI.target_hint(hire)))
+    assert(GGUI.target_hint(GG.service("forced_march")) == "needs_army",
+           "an army service does not ask for room")
+
+    -- THE TOP RANK. level_up_agent_rank has nowhere to go, and CA's own table of levels
+    -- is where the top is.
+    local had = cm.character_xp_per_level
+    cm.character_xp_per_level = {}
+    for i = 1, 50 do cm.character_xp_per_level[i] = i end
+    CHAR_RANK["8801"] = 50
+    assert(not GG.target_ok(F, honour, 8801), "a character at the top rank is no target")
+    CHAR_RANK["8801"] = 49
+    assert(GG.target_ok(F, honour, 8801), "one below the top is")
+    -- No table, no known top: nobody is refused on a guess.
+    cm.character_xp_per_level = nil
+    CHAR_RANK["8801"] = 50
+    assert(GG.target_ok(F, honour, 8801), "an unknown top rank refuses nobody")
+    cm.character_xp_per_level = had
+    CHAR_RANK["8801"] = nil
+
+    -- THE RIVALS PICK AN ARMY THE TILL ACCEPTS. The first field army used to be the pick
+    -- whatever it held, so a rival whose first army was full never hired again.
+    CHAR_UNITS["8801"], CHAR_UNITS["8802"] = {20, 20}, {5, 20}
+    local prev = GGAI.TEST_FORCES
+    GGAI.TEST_FORCES = {{armed_citizenry = false, cqi = 8801},
+                        {armed_citizenry = false, cqi = 8802}}
+    assert(GGAI.pick_target(F, hire) == 8802,
+           "the rivals skip a full army, got " .. tostring(GGAI.pick_target(F, hire)))
+    CHAR_UNITS["8802"] = {20, 20}
+    assert(GGAI.pick_target(F, hire) == nil, "no army with room, no pick")
+    GGAI.TEST_FORCES = prev
+
+    -- A PAYLOAD THAT THROWS IS REFUNDED, and the error stops here. It used to escape
+    -- into whoever called GG.buy - the click handler, the multiplayer handler, or the
+    -- rivals' turn loop, which then skipped every faction after this one.
+    GG.state[F] = nil
+    GG.cooldowns[F] = nil
+    GG.grant(F, "immortals", 400)
+    CHAR_UNITS["8801"] = {5, 20}
+    local fav0 = select(2, GG.get(F, "immortals"))
+    local real = cm.grant_unit_to_character
+    cm.grant_unit_to_character = function() error("the engine said no") end
+    local okb, why = GG.buy(F, "hire_immortals", 8801)
+    cm.grant_unit_to_character = real
+    assert(okb == false and why == "failed",
+           "a payload that throws is a failed sale, got " .. tostring(okb) .. "/"
+           .. tostring(why))
+    assert(select(2, GG.get(F, "immortals")) == fav0, "the favour came back")
+    assert(GG.cooldown_left(F, "hire_immortals") == 0, "the cooldown did not start")
+    -- AND THE REFUND IS SAVED: GG.buy wrote the spend to the save before the payload ran,
+    -- so a refund held only in memory is undone by the next listener's GG.load.
+    GG.load(F)
+    assert(select(2, GG.get(F, "immortals")) == fav0, "the refund is in the save")
+    assert(GG.cooldown_left(F, "hire_immortals") == 0, "the cleared cooldown is in the save")
+    -- A payload that works is still a sale.
+    local okc = GG.buy(F, "hire_immortals", 8801)
+    assert(okc == true and select(2, GG.get(F, "immortals")) < fav0,
+           "a payload that works still charges")
+
+    -- THE PLAYER IS TOLD, in the Log, as bad news under Yours.
+    local body, bad = GGUI.log_text({turn = 7, kind = "refund", guild = "immortals",
+                                     a = "hire_immortals", b = "150"})
+    assert(body and has(body, "log_refunded") and bad == true,
+           "a refund is a Log line and bad news, got " .. tostring(body))
+    assert(GGUI.LOG_FILTERS.mine.refund, "it is under the Yours filter")
+    CHAR_UNITS["8801"], CHAR_UNITS["8802"] = nil, nil
+end)()
+
+;(function()
+    -- THE STAGE 1 GAPS AND DEFERRED ISSUES (2026-09-29).
+    local function has(s, sub) return s ~= nil and string.find(s, sub, 1, true) ~= nil end
+    local F = "cr_gap"
+    GG.CULTURE_OF[F] = GG.CHD_CULTURE
+    AT_WAR[F] = {cr_gap_foe = true}
+    local khan, eyes = GG.service("khans_price"), GG.service("hobgoblin_eyes")
+
+    -- A HOSTILE SERVICE ONLY ON A FACTION AT WAR WITH THE BUYER. The card says so; the till
+    -- took any faction that was not the buyer's, allies included.
+    assert(GG.target_ok(F, khan, "cr_gap_foe"), "an enemy at war is a target")
+    assert(not GG.target_ok(F, khan, "cr_gap_friend"), "a faction at peace is not")
+    assert(not GG.target_ok(F, khan, F), "the buyer is not")
+    -- The map pick asks the same question, so the pick card waits on a friend.
+    local prev_sel, prev_region = GGUI.selected_force_cqi, GGUI.selected_region
+    CHAR_FORCE["6601"], CHAR_OWNER["6601"] = 6611, "cr_gap_friend"
+    GGUI.selected_force_cqi = function() return 6601 end
+    assert(GGUI.pick_target(khan, F) == nil, "a friend selected is no pick")
+    CHAR_OWNER["6601"] = "cr_gap_foe"
+    assert(GGUI.pick_target(khan, F) == "cr_gap_foe", "an enemy at war selected is")
+
+    -- THE MAP REVEAL NOT ON THE BUYER'S OWN REGION, which it can already see.
+    REGION_OWNER["cr_gap_mine"], REGION_OWNER["cr_gap_theirs"] = F, "cr_gap_foe"
+    assert(not GG.target_ok(F, eyes, "cr_gap_mine"), "your own region is no reveal")
+    assert(GG.target_ok(F, eyes, "cr_gap_theirs"), "another faction's region is")
+    GGUI.selected_region = function() return "cr_gap_mine" end
+    assert(GGUI.pick_target(eyes, F) == nil, "your own settlement selected is no pick")
+    GGUI.selected_region = function() return "cr_gap_theirs" end
+    assert(GGUI.pick_target(eyes, F) == "cr_gap_theirs", "another's settlement is")
+    GGUI.selected_force_cqi, GGUI.selected_region = prev_sel, prev_region
+    REGION_OWNER["cr_gap_mine"], REGION_OWNER["cr_gap_theirs"] = nil, nil
+    CHAR_FORCE["6601"], CHAR_OWNER["6601"] = nil, nil
+
+    -- THE FIRST DRAW. With every roll 1, a draw that may keep a card's service picks each
+    -- pool's first row - the original 18 - and one that may not picks the second.
+    local defaults = {}
+    for gi = 1, #GG.GUILDS do
+        for ri = 1, #GG.CARD_RANKS do
+            defaults[#defaults + 1] = GG.default_card(GG.GUILDS[gi], GG.CARD_RANKS[ri])
+        end
+    end
+    local function same(a, b)
+        for i = 1, math.max(#a, #b) do if a[i] ~= b[i] then return false end end
+        return true
+    end
+    local prev_roll, prev_announce = GG.roll, GG.announce_rotation
+    local told = 0
+    GG.roll = function() return 1 end
+    -- THE PLAIN DRAW: this is the first-draw rule, and F is a Chaos Dwarf, whose pool
+    -- now holds Labour Gangs - which rule 2 of the draw would put on show (stage 2).
+    local prev_tune = GG.TUNE
+    GG.TUNE = GG.TUNE or {}
+    GG.TUNE.race_differences = false
+    GG.announce_rotation = function() told = told + 1 end
+    -- A new campaign draws from the whole pool, the original 18 included.
+    GG.cards[F] = nil
+    GG.rotate_cards(F, 1)
+    assert(same(GG.cards_of(F), defaults),
+           "a new campaign's first draw may keep the original services")
+    assert(told == 0, "no notice on a new campaign's first draw")
+    -- A save that never drew keeps what it showed until the period ends, then changes
+    -- with the notice - not at the next turn start while the countdown still ran.
+    local n = GG.rotation_turns()
+    GG.cards[F] = nil
+    GG.rotate_cards(F, 2 * n + 3)
+    assert(same(GG.cards_of(F), defaults), "an old save keeps its cards to the period end")
+    assert(GG.cards[F] and GG.cards[F].turn == 2 * n + 3, "and records them as this period's")
+    assert(told == 0, "with no notice, because nothing changed")
+    GG.rotate_cards(F, 3 * n - 1)
+    assert(same(GG.cards_of(F), defaults), "still the same period")
+    GG.rotate_cards(F, 3 * n)
+    assert(not same(GG.cards_of(F), defaults), "the next period draws")
+    assert(told == 1, "and says so")
+    GG.roll, GG.announce_rotation = prev_roll, prev_announce
+    GG.cards[F] = nil
+    GG.TUNE.race_differences = nil
+    GG.TUNE = prev_tune
+
+    -- "NEW SERVICES IN 1 TURNS".
+    assert(has(GGUI.countdown(1), "next_services_1"), "one turn left has its own line")
+    assert(has(GGUI.countdown(4), "next_services") and not has(GGUI.countdown(4),
+           "next_services_1"), "more than one uses the counted line")
+
+    -- A SERVICE THAT CARRIES A BUNDLE LIGHTS WHILE THE BUNDLE RUNS (the Guild Loan's
+    -- drawback, The Great Work).
+    local HAS, prev_gf = {}, cm.get_faction
+    cm.get_faction = function(_, k)
+        return {is_null_interface = function() return false end,
+                name = function() return k end,
+                has_effect_bundle = function(_, b) return HAS[b] == true end}
+    end
+    local loan = GG.service("guild_loan")
+    assert(GGUI.service_running(F, loan) == false, "the loan is dark before it is taken")
+    HAS["derpy_gg_svc_guild_loan"] = true
+    assert(GGUI.service_running(F, loan) == true, "and lit while its bundle runs")
+    cm.get_faction = prev_gf
+    AT_WAR[F] = nil
+end)()
+
+;(function()
+    -- RACE ARMY SERVICES ON THE PANEL (2026-09-29 stage 2): the hint names what is needed,
+    -- and the pick takes the selected army through the till's own test.
+    assert(GGUI.target_hint({kind = "race_army", room = true}) == "needs_army_room",
+           "a race army service that needs room says so")
+    assert(GGUI.target_hint({kind = "race_army"}) == "needs_army", "and one that does not")
+    local prev_sel, prev_ok = GGUI.selected_force_cqi, GG.target_ok
+    GGUI.selected_force_cqi = function() return 77 end
+    GG.target_ok = function() return true end
+    local got = GGUI.pick_target({key = "t_race", kind = "race_army"}, "x")
+    GGUI.selected_force_cqi, GG.target_ok = prev_sel, prev_ok
+    assert(got == 77, "the pick takes the selected army for a race army service, got "
+           .. tostring(got))
+end)()
+
+;(function()
+    -- A RACE EARNING IN THE LOG (2026-09-29 stage 2): what happened and what it paid,
+    -- good news, under Yours.
+    local line, bad = GGUI.log_text({turn = 9, kind = "earn", guild = "brass",
+                                     a = "caravan", b = "60"})
+    assert(type(line) == "string" and line:find("log_earn_caravan", 1, true)
+           and line:find("60", 1, true), "the earn line names the route and the 60, got "
+           .. tostring(line))
+    assert(not bad, "an earning is good news")
+    assert(GGUI.LOG_FILTERS.mine.earn, "it is under the Yours filter")
+end)()
+
+;(function()
+    -- A RACE'S OWN SERVICE SAYS SO ON ITS CARD (spec §9), ahead of what it does; a shared
+    -- one does not.
+    local tip = "Adds 40 Conclave Influence.||Costs 50 favour."
+    local body = GGUI.card_body({key = "conclave_favour", race = "wh3_dlc23_chd_chaos_dwarfs"}, tip)
+    assert(body:find("race_label", 1, true) and body:find("Adds 40 Conclave Influence.", 1, true)
+           and not body:find("Costs", 1, true), "the race label, then the body, got " .. body)
+    assert(GGUI.card_body({key = "forge_rite"}, tip) == "Adds 40 Conclave Influence.",
+           "a shared service has no label")
+    assert(GGUI.HELP_PAGES == 6, "the Help tab has the race page")
+end)()
+
+;(function()
+    -- I11: RAISE THE ZIGGURAT KEEPS A BUILDING'S BRANCH, AND A REFUSED UPGRADE IS REFUNDED
+    -- (logic audit, 2026-09-29). Cathay's yin_1 upgrades to yang_2 or yin_2, and the first
+    -- was always taken; and the engine's answer was never read, so a refusal kept the
+    -- favour and the cooldown.
+    local F = "cr_zig"
+    local prev_region, prev_upg = cm.get_region, cm.get_building_level_upgrades
+    local refuse = false
+    local b = "wh3_main_cth_order_yin_1"
+    local prim = {is_null_interface = function() return false end,
+                  has_building = function() return true end,
+                  set = function(k) if not refuse then b = k end end,
+                  building = function()
+                      return {is_null_interface = function() return false end,
+                              name = function() return b end}
+                  end}
+    local reg = {is_null_interface = function() return false end,
+                 name = function() return "r_zig" end,
+                 owning_faction = function()
+                     return {is_null_interface = function() return false end,
+                             name = function() return F end}
+                 end,
+                 settlement = function()
+                     return {is_null_interface = function() return false end,
+                             primary_slot = function() return prim end,
+                             slot_list = function() return LIST({}) end}
+                 end}
+    cm.get_region = function(_, k) return k == "r_zig" and reg or false end
+    cm.get_building_level_upgrades = function(_, k)
+        if k == "wh3_main_cth_order_yin_1" then
+            return {"wh3_main_cth_order_yang_2", "wh3_main_cth_order_yin_2"}
+        end
+        return {}
+    end
+    local t = GG.upgrade_target(F, "r_zig")
+    assert(t and t.building == "wh3_main_cth_order_yin_2",
+           "the building's own branch is upgraded, got " .. tostring(t and t.building))
+    assert(pcall(GG.payload, F, GG.service("raise_ziggurat"), t), "an upgrade that lands is sold")
+    b, refuse = "wh3_main_cth_order_yin_1", true
+    t = GG.upgrade_target(F, "r_zig")
+    assert(not pcall(GG.payload, F, GG.service("raise_ziggurat"), t),
+           "an upgrade the engine refused throws, so GG.buy refunds it")
+    cm.get_region, cm.get_building_level_upgrades = prev_region, prev_upg
+end)()
+
+;(function()
+    -- LOGIC AUDIT (2026-09-29): the panel's own rules.
+    -- m9: A DEMAND'S LAST PAYABLE TURN COUNTS AS ONE LEFT. It expires when the turn passes
+    -- its due turn, and "0 turns to pay" on the due turn read as already lost.
+    assert(GGUI.demand_left({due = 10}, 10) == 1, "the due turn is one turn left")
+    assert(GGUI.demand_left({due = 10}, 11) == 0, "and the turn after, none")
+
+    -- m14: THE TWO RACE ARMY SERVICES WITH A RULE OF THEIR OWN SAY IT.
+    assert(GGUI.target_hint(GG.service("bought_loyalty")) == "needs_army_not_leader",
+           "Bought Loyalty says not the faction leader")
+    assert(GGUI.target_hint(GG.service("ladys_blessing")) == "needs_army_unblessed",
+           "The Lady's Blessing says an army not yet blessed")
+
+    -- m16: NO "UPKEEP BEGINS ON TURN 25" ONCE IT HAS BEGUN. A guild at 0 reputation owes
+    -- no upkeep, and that 0 fell into the not-yet branch.
+    local prev_from, prev_rate = GG.TUNE.decay_from, GG.TUNE.rate_decay
+    GG.TUNE.decay_from, GG.TUNE.rate_decay = 25, 100
+    assert(not string.find(GGUI.upkeep_tip(0, 40), "upkeep_soon", 1, true),
+           "after turn 25 at 0 reputation, no 'begins on turn 25'")
+    assert(string.find(GGUI.upkeep_tip(0, 10), "upkeep_soon", 1, true), "before it, yes")
+    assert(string.find(GGUI.upkeep_tip(3, 40), "upkeep_on", 1, true), "and the charge when due")
+    GG.TUNE.decay_from, GG.TUNE.rate_decay = prev_from, prev_rate
+
+    -- m13: A HELD LEAD IS EXPLAINED. The top of the table is not the leader while the
+    -- holder is within the margin, and nothing on screen said why.
+    local pc, pl = GG.contenders, GG.leader_of
+    GG.contenders = function() return {{faction = "cr_a", rep = 302}, {faction = "cr_b", rep = 300}} end
+    GG.leader_of = function() return "cr_b" end
+    assert(GGUI.lead_note("brass", "cr_a") == "lead_held", "the holder's margin is explained")
+    GG.leader_of = function() return "cr_a" end
+    assert(GGUI.lead_note("brass", "cr_a") == "", "and nothing when the top row leads")
+    GG.contenders, GG.leader_of = pc, pl
+
+    -- m12: THE BADGE COUNTS WHAT THE BOARD SHOWS. An offer gone invalid mid-turn was
+    -- counted though the board hid it.
+    local F = "cr_badge"
+    GG.state[F] = {}
+    for _, g in ipairs(GG.GUILDS) do GG.state[F][g] = {rep = 0, fav = 999} end
+    local prev_view, prev_list = GG.bounty_view, GG.bounties[F]
+    GG.bounties[F] = {{guild = "brass", stake = 0}}
+    GG.bounty_view = function() return {} end
+    local n = 0
+    for _, it in ipairs(GGUI.actionable_items(F)) do if it.kind == "bounty" then n = n + 1 end end
+    GG.bounty_view, GG.bounties[F], GG.state[F] = prev_view, prev_list, nil
+    assert(n == 0, "an offer the board hides is not counted, got " .. n)
+
+    -- m7: A LEAD THAT LAPSED TO NOBODY names nobody.
+    local body = GGUI.log_text({turn = 3, kind = "lead_lost", guild = "brass", a = ""})
+    assert(body and string.find(body, "log_lead_lapsed", 1, true),
+           "the Log says nobody leads it, got " .. tostring(body))
+
+    -- I10: A SELECTION CHANGE REDRAWS AN OPEN PANEL AND DROPS A PENDING CONFIRM. The click
+    -- re-read the selection, so a card drawn "Select" bought at once and a Confirm landed
+    -- on whatever was selected at the second click.
+    assert(handlers["gg_sel_char"], "a selection listener is registered")
+    local prev_find, prev_is, prev_cb = find_uicomponent, is_uicomponent, cm.callback
+    find_uicomponent = function(_, name) if name == GGUI.PANEL then return {} end end
+    is_uicomponent = function(x) return type(x) == "table" end
+    local queued = 0
+    cm.callback = function() queued = queued + 1 end
+    GGUI.CONFIRM, GGUI.PICK = "caravan_levy", nil
+    handlers["gg_sel_char"]()
+    find_uicomponent, is_uicomponent, cm.callback = prev_find, prev_is, prev_cb
+    assert(GGUI.CONFIRM == nil, "a pending Confirm is dropped")
+    assert(queued == 1, "and the panel is redrawn")
 end)()
 
 print("harness ok")

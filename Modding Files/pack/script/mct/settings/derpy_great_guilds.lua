@@ -50,10 +50,10 @@ o_preset:set_tooltip_text("How fast reputation is earned and how hard the Court 
     .. "a new one. The switches under Systems are yours on every difficulty.")
 o_preset:set_assigned_section("preset")
 o_preset:add_dropdown_value("easy", "Easy",
-    "A faster climb and a gentler Court. About a third more reputation per event with "
-    .. "higher limits per turn, demands half as often with twice as long to answer and "
-    .. "half the sting for missing one, and rivalry costing half as much so courting a "
-    .. "wide spread of guilds stays viable.", false)
+    "A faster climb and a gentler Court. About half again as much reputation per event "
+    .. "with higher limits per turn, demands a third less often with half again as long "
+    .. "to answer and half the sting for missing one, and rivalry costing half as much so "
+    .. "courting a wide spread of guilds stays viable.", false)
 o_preset:add_dropdown_value("default", "Default",
     "The Guilds as designed, and as every build so far has played.", true)
 o_preset:add_dropdown_value("hard", "Hard",
@@ -64,8 +64,8 @@ o_preset:add_dropdown_value("ultra", "Cutthroat",
     "Reputation comes at roughly half the Default rate with limits to match, "
     .. "rivalry costs more than double, and the Court asks every six turns with five "
     .. "to answer and a penalty larger than its own reward - so a demand you cannot pay "
-    .. "is a rank lost rather than a delay. Specialising stops being a style and becomes "
-    .. "the way through.", false)
+    .. "costs more than paying it would have earned. Specialising stops being a style and "
+    .. "becomes the way through.", false)
 o_preset:add_dropdown_value("custom", "Custom",
     "Every rate, limit and Court value below can be changed. Set them before you start a "
     .. "campaign; they are fixed once one is running.", false)
@@ -81,22 +81,58 @@ o_ai:set_tooltip_text("Rival factions earn their own reputation and use it the w
     .. "earn - so the leaderboard still means something - but never act on it.")
 o_ai:set_default_value(true)
 o_ai:set_assigned_section("systems")
+-- LOCKED IN A CAMPAIGN like every other setting: all five switches below are frozen into
+-- the save at the first tick, so a box ticked mid-campaign changed nothing and said
+-- nothing (logic audit, 2026-09-29).
+if IN_CAMPAIGN then o_ai:set_locked(true, LOCK_REASON) end
+
+local o_aib = m:add_new_option("ai_bounties", "checkbox")
+o_aib:set_text("Rivals take bounties")
+o_aib:set_tooltip_text("Rival factions of your race take the guilds' bounties too, and "
+    .. "earn reputation when they finish one. A rival at war with you may be paid to take "
+    .. "your settlements or kill your lords - you are told when, and by whom. Needs "
+    .. "\"Rival factions use the guilds\" on.")
+o_aib:set_default_value(true)
+o_aib:set_assigned_section("systems")
+if IN_CAMPAIGN then o_aib:set_locked(true, LOCK_REASON) end
+
+local o_rot = m:add_new_option("rotate_turns", "slider")
+o_rot:set_text("Services change every")
+o_rot:set_tooltip_text("The guilds change the services they offer every this many turns. "
+    .. "Each guild still offers three at a time, drawn from a larger set.")
+o_rot:slider_set_min_max(5, 30)
+o_rot:slider_set_step_size(1)
+o_rot:set_default_value(10)
+o_rot:set_assigned_section("systems")
+if IN_CAMPAIGN then o_rot:set_locked(true, LOCK_REASON) end
+
+local o_race = m:add_new_option("race_differences", "checkbox")
+o_race:set_text("Race differences")
+o_race:set_tooltip_text("Each race's guilds offer services of their own, earn from something "
+    .. "only that race does, and bend one rule. Off: every race plays alike, and still gets "
+    .. "the changing services.")
+o_race:set_default_value(true)
+o_race:set_assigned_section("systems")
+if IN_CAMPAIGN then o_race:set_locked(true, LOCK_REASON) end
 
 local o_hostile = m:add_new_option("hostile_services", "checkbox")
 o_hostile:set_text("Guilds can be turned on you")
-o_hostile:set_tooltip_text("The Khan's Price, the one service that targets another "
-    .. "faction. Off, no faction may buy it - you included.")
+o_hostile:set_tooltip_text("Services aimed at another faction: The Khan's Price, and the "
+    .. "services that strike an enemy settlement. Off, no faction may buy them - you included.")
 o_hostile:set_default_value(true)
 o_hostile:set_assigned_section("systems")
+if IN_CAMPAIGN then o_hostile:set_locked(true, LOCK_REASON) end
 
 local o_notices = m:add_new_option("guild_notices", "checkbox")
 o_notices:set_default_value(true)
 o_notices:set_text("Guild notices")
-o_notices:set_tooltip_text("Announce a rank gained, and the first time a guild takes "
-                           .. "notice of you, on the event feed. Bad news - demands, a "
+o_notices:set_tooltip_text("Announce a rank gained, the first time a guild takes "
+                           .. "notice of you, and the guilds changing the services they "
+                           .. "offer, on the event feed. Bad news - demands, a "
                            .. "guild lost, a rival's service landing on you - is always "
                            .. "announced and is not covered by this switch.")
 o_notices:set_assigned_section("systems")
+if IN_CAMPAIGN then o_notices:set_locked(true, LOCK_REASON) end
 
 local o_mono = m:add_new_option("lead_monopoly", "checkbox")
 o_mono:set_text("Only the leader buys the finest service")
@@ -105,6 +141,7 @@ o_mono:set_tooltip_text("Each guild's dearest service is sold only to the factio
     .. "still applies, and anyone with the rank can buy the service.")
 o_mono:set_default_value(true)
 o_mono:set_assigned_section("systems")
+if IN_CAMPAIGN then o_mono:set_locked(true, LOCK_REASON) end
 
 -- ------------------------------------------------------------------- court --
 -- The demands, the patron, and the upkeep. These are the things that can take reputation
@@ -128,7 +165,8 @@ local COURT = {
      "What reputation costs to hold. Every guild you have reputation with charges some "
      .. "back each turn, scaled by the rank you hold there - 100 means one point a turn "
      .. "at Unmarked and five at Exalted, so the top of the ladder is the dearest seat. "
-     .. "0 switches it off and reputation only ever falls to a rival or a demand."},
+     .. "0 switches it off and reputation only ever falls to a rival, a demand or a "
+     .. "failed bounty."},
     {"decay_from", "Upkeep begins on turn", 25, 0, 200,
      "The grace period. Nothing is charged before this turn, so the opening of a "
      .. "campaign is yours. 0 switches the upkeep off entirely."},
@@ -175,7 +213,7 @@ local RATES = {
      "Points per building level completed, paid to whichever guild the building "
      .. "belongs to - its card names the guild."},
     {"rate_slavers", "The Raiders' Guild", 25, 1, 100,
-     "Points per settlement sacked. A raze pays this plus half again."},
+     "Points per settlement sacked. A raze pays 60% more."},
     -- Not a guild: the one signal that pays ALL SIX. Each guild's own per-turn cap
     -- still applies, so this cannot be used to outrun them.
     {"rate_missions", "Missions (every guild)", 10, 0, 60,
@@ -287,7 +325,10 @@ local PRESET_OWNED = {
     "demand_every", "demand_turns", "demand_reward", "demand_penalty",
     "rate_decay", "decay_from", "rate_bounty_fail", "rate_bounty_stake",
 }
-local CUSTOM_ONLY = "Set by the difficulty above. Choose Custom to edit it."
+-- SAYS THE NUMBER IS NOT THE ONE USED: a greyed slider keeps showing its Default (or an
+-- earlier Custom) value while the preset plays its own (logic audit, 2026-09-29).
+local CUSTOM_ONLY = "Set by the difficulty above - the number shown here is not the one "
+    .. "used. Choose Custom to edit it."
 
 local function relock()
     local custom = o_preset:get_finalized_setting() == "custom"

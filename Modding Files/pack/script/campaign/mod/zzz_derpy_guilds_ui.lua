@@ -221,12 +221,10 @@ function GGUI.paint_opener(b)
     end)
 end
 
-function GGUI.services_of(guild)
-    local out = {}
-    for i = 1, #GG.SERVICES do
-        if GG.SERVICES[i].guild == guild then out[#out + 1] = GG.SERVICES[i] end
-    end
-    return out
+-- THE FACTION'S THREE CARDS for this guild (spec 2026-09-29 pools §4), never the whole
+-- catalogue: a guild now holds more services than it has cards.
+function GGUI.services_of(guild, faction)
+    return GG.guild_cards(faction or GGUI.me(), guild)
 end
 
 -- ---------------------------------------------------------------- layout ---
@@ -358,14 +356,99 @@ GGUI.RANK_ICON_INDEX = 1
 GGUI.CARD_HEAT_INDEX = 1
 GGUI.CARD_RIM_INDEX = 2
 GGUI.CARD_OFF = "ui/campaign ui/derpy_gg_icons/clear.png"
-GGUI.CARD_HEAT = "ui/skins/default/dlc23_chd_hell_forge/heat_glow.png"
-GGUI.CARD_RIM = "ui/skins/default/dlc23_tower_of_zharr/district_complete_glow_02.png"
+
+-- EVERY RACE IN ITS OWN FRAME (2026-09-29). The panel and the card are created from the
+-- reader's race's copy of the .twui.xml - derpy_gg_panel_emp for an Empire player - and
+-- what this file repaints at runtime comes from the same race here: the lit card's two
+-- glows, and the tab plates by state. A tab state is a LIST, one path per image layer:
+-- Kislev's and Bretonnia's tabs are two layers, so their hover layers start at image 2.
+-- Mirrors FRAMES in tools/gen_guilds_ui.py, which check() pins entry by entry.
+GGUI.FRAME = {
+    [""] = {
+        heat = "ui/skins/default/dlc23_chd_hell_forge/heat_glow.png",
+        rim = "ui/skins/default/dlc23_tower_of_zharr/district_complete_glow_02.png",
+        active = {"ui/skins/default/dlc23_chd_hell_forge/button_square_extra_large_active.png"},
+        hover = {"ui/skins/default/dlc23_chd_hell_forge/button_square_extra_large_hover.png"},
+        selected = {"ui/skins/default/dlc23_chd_hell_forge/button_square_extra_large_selected.png"},
+        selected_hover = {"ui/skins/default/dlc23_chd_hell_forge/button_square_extra_large_selected_hover.png"},
+    },
+    _brt = {
+        heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
+        rim = "ui/skins/default/tutglow_square.png",
+        active = {"ui/skins/default/bret_vows_titel.png", "ui/campaign ui/derpy_gg_icons/clear.png"},
+        hover = {"ui/skins/default/bret_vows_titel.png", "ui/campaign ui/derpy_gg_icons/clear.png"},
+        selected = {"ui/skins/default/bret_vows_titel.png", "ui/skins/default/chivalry_bar_frame.png"},
+        selected_hover = {"ui/skins/default/bret_vows_titel.png", "ui/skins/default/chivalry_bar_frame.png"},
+    },
+    _cth = {
+        heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
+        rim = "ui/skins/default/tutglow_square.png",
+        active = {"ui/skins/default/cp1_cth_tiger_court/button_decrees_active.png"},
+        hover = {"ui/skins/default/cp1_cth_tiger_court/button_decrees_active.png"},
+        selected = {"ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"},
+        selected_hover = {"ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"},
+    },
+    _def = {
+        heat = "ui/skins/warhammer2/rite_def_text_holder.png",
+        rim = "ui/skins/default/tutglow_square.png",
+        active = {"ui/skins/warhammer2/malus_parchment_button_square_active.png"},
+        hover = {"ui/skins/warhammer2/malus_parchment_button_square_hover.png"},
+        selected = {"ui/skins/warhammer2/malus_parchment_button_square_pressed.png"},
+        selected_hover = {"ui/skins/warhammer2/malus_parchment_button_square_pressed.png"},
+    },
+    _dwf = {
+        heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
+        rim = "ui/skins/default/dlc25_malakais_adventures/tab_hover_glow.png",
+        active = {"ui/skins/default/dlc25_book_of_grudges/tab_button_confederation_active.png"},
+        hover = {"ui/skins/default/dlc25_book_of_grudges/tab_button_confederation_selected.png"},
+        selected = {"ui/skins/default/dlc25_book_of_grudges/tab_button_unit_pack_active.png"},
+        selected_hover = {"ui/skins/default/dlc25_book_of_grudges/tab_button_unit_pack_selected.png"},
+    },
+    _emp = {
+        heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
+        rim = "ui/skins/default/dlc25_gunnery_school/frame_unit_card_selected.png",
+        active = {"ui/skins/default/dlc25_gardens_of_morr/don_square_button_default.png"},
+        hover = {"ui/skins/default/dlc25_gardens_of_morr/don_square_button_hover.png"},
+        selected = {"ui/skins/default/dlc25_gardens_of_morr/don_square_button_selected.png"},
+        selected_hover = {"ui/skins/default/dlc25_gardens_of_morr/don_square_button_selected_hover.png"},
+    },
+    _hef = {
+        heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
+        rim = "ui/skins/default/tutglow_square.png",
+        active = {"ui/skins/default/dlc27_hef_intrigue_court/button_basic_active.png"},
+        hover = {"ui/skins/default/dlc27_hef_intrigue_court/button_basic_hover.png"},
+        selected = {"ui/skins/default/dlc27_hef_intrigue_court/button_basic_pressed.png"},
+        selected_hover = {"ui/skins/default/dlc27_hef_intrigue_court/button_basic_pressed.png"},
+    },
+    _ksl = {
+        heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
+        rim = "ui/skins/default/wh3_main_court_orthodoxy/court_completed_btn_ornaments.png",
+        active = {"ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png", "ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png"},
+        hover = {"ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png", "ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png"},
+        selected = {"ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png", "ui/skins/default/wh3_main_court_orthodoxy/court_completed_btn_ornaments.png"},
+        selected_hover = {"ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png", "ui/skins/default/wh3_main_court_orthodoxy/court_completed_btn_ornaments.png"},
+    },
+}
+
+function GGUI.frame()
+    return GGUI.FRAME[GGUI.tag()] or GGUI.FRAME[""]
+end
+
+-- THE FILE A PANEL OR CARD IS CREATED FROM: the reader's race's copy, and the original
+-- for a race with no frame of its own. CreateComponent on a path that does not exist
+-- draws nothing and says nothing, so an unknown tag must never be appended.
+function GGUI.frame_path(base)
+    local tag = GGUI.tag()
+    if tag ~= "" and GGUI.FRAME[tag] then return base .. tag end
+    return base
+end
 
 function GGUI.light_card(card, lit)
     if not card then return end
+    local f = GGUI.frame()
     pcall(function()
-        card:SetImagePath(lit and GGUI.CARD_HEAT or GGUI.CARD_OFF, GGUI.CARD_HEAT_INDEX)
-        card:SetImagePath(lit and GGUI.CARD_RIM or GGUI.CARD_OFF, GGUI.CARD_RIM_INDEX)
+        card:SetImagePath(lit and f.heat or GGUI.CARD_OFF, GGUI.CARD_HEAT_INDEX)
+        card:SetImagePath(lit and f.rim or GGUI.CARD_OFF, GGUI.CARD_RIM_INDEX)
     end)
 end
 
@@ -383,8 +466,11 @@ end
 
 -- WHETHER A SERVICE IS IN EFFECT ON THIS FACTION: its bundle is on the faction now. Only a
 -- bundle service can be; a hostile one sits on its victim, not on the buyer.
+-- A gold or research service that carries a bundle (the Guild Loan's drawback, The Great
+-- Work) lights while that bundle runs too; it went on the faction unlit (2026-09-29).
 function GGUI.service_running(faction, s)
-    if not s or s.kind ~= "bundle" or s.hostile then return false end
+    if not s or s.hostile then return false end
+    if s.kind ~= "bundle" and not s.with_bundle then return false end
     local ok, on = pcall(function()
         local f = cm:get_faction(faction)
         if not f or f:is_null_interface() then return false end
@@ -393,10 +479,19 @@ function GGUI.service_running(faction, s)
     return ok and on == true
 end
 
--- THE TAB PLATE, in the Hell-Forge's large square button. The open tab wears the
--- _selected pair, so the strip says which view is up in the art as well as the colour.
--- Mirrors TAB_PLATE in tools/gen_guilds_ui.py, which check() pins.
-GGUI.TAB_PLATE = "ui/skins/default/dlc23_chd_hell_forge/button_square_extra_large_%s.png"
+-- THE TAB PLATE, in the reader's race's frame. The open tab wears the selected pair, so
+-- the strip says which view is up in the art as well as the colour. The file lists the
+-- standard state's layers and then the hover state's, so with n layers per state the
+-- hover ones are images n..2n-1.
+function GGUI.paint_tab(t, sel)
+    local f = GGUI.frame()
+    local std = sel and f.selected or f.active
+    local hov = sel and f.selected_hover or f.hover
+    pcall(function()
+        for k = 1, #std do t:SetImagePath(std[k], k - 1) end
+        for k = 1, #hov do t:SetImagePath(hov[k], #std + k - 1) end
+    end)
+end
 
 -- THE PANEL GROUND, ONE PICTURE PER GUILD. The panel component carries FOUR images in
 -- this order - the plain tile, the art, the scrim over it, the frame around it - and
@@ -645,7 +740,7 @@ function GGUI.open()
     if comp(GGUI.PANEL) then GGUI.refresh(); return end
     local ok = pcall(function()
         local r = root()
-        r:CreateComponent(GGUI.PANEL, GGUI.PATH_PANEL)
+        r:CreateComponent(GGUI.PANEL, GGUI.frame_path(GGUI.PATH_PANEL))
         local panel = comp(GGUI.PANEL)
         if not panel then return end
         -- Dimensions(), not Bounds(): Bounds() includes children. Read on every open,
@@ -679,7 +774,7 @@ function GGUI.open()
         -- GGUI.CARD_XY and every row below is panel-relative by design, so the
         -- panel's own origin has to be added back on.
         for i = 1, #GGUI.CARD_XY do
-            panel:CreateComponent(GGUI.CARD .. "_" .. i, GGUI.PATH_CARD)
+            panel:CreateComponent(GGUI.CARD .. "_" .. i, GGUI.frame_path(GGUI.PATH_CARD))
         end
         -- One standings row per guild, stacked under the header. Created once and
         -- hidden with el.hidden-style visibility on the tabs that do not use them.
@@ -811,6 +906,8 @@ function GGUI.draw_card(faction, i, s)
         label = label .. "  " .. GG.cooldown_left(faction, s.key) .. "t"
     elseif not ok and why == "target" then
         label = label .. "  [[col:red]]" .. GGUI.loc("needs_target_short") .. "[[/col]]"
+    elseif not ok and why == "unavailable" then
+        label = label .. "  [[col:red]]" .. GGUI.loc("unavailable_short") .. "[[/col]]"
     end
     set_text(comp("card_name", card), label)
 
@@ -842,7 +939,7 @@ function GGUI.draw_card(faction, i, s)
     -- what it does, what the number is, how long it lasts, why it is greyed -
     -- lives in the tooltip, so it is built here rather than left implicit.
     local tip = GGUI.loc_service_desc(s.key)
-    local body = tip:match("^(.-)||") or tip
+    local body = GGUI.card_body(s, tip)
     local d1 = comp("card_desc_1", card)
     local lines = GGUI.wrap(d1, body, 2)
     set_text(d1, lines[1] or "")
@@ -873,6 +970,8 @@ function GGUI.draw_card(faction, i, s)
         -- Every culture in the campaign runs guilds; only the flavoured ones have a
         -- regiment mapped. Said in words rather than left as a dead button.
         tip = tip .. "||" .. GGUI.loc("no_unit")
+    elseif not ok and why == "unavailable" then
+        tip = tip .. "||" .. GGUI.loc("unavailable")
     end
     local asking = ok and GGUI.CONFIRM == s.key
     if asking then tip = tip .. "||" .. GGUI.loc("confirm_tip") end
@@ -913,6 +1012,17 @@ end
 --
 -- GG.needs_target, not s.hostile: four more services read a target and did nothing
 -- without one, and this card showed all four as buyable.
+-- THE CARD'S TWO LINES: what the service does, the tooltip's first paragraph. A race's own
+-- service says so first (spec §9), in yellow, so the one card no other race sees is found
+-- at a glance.
+function GGUI.card_body(s, tip)
+    local body = tip:match("^(.-)||") or tip
+    if s.race then
+        body = "[[col:yellow]]" .. GGUI.loc("race_label") .. "[[/col]]  " .. body
+    end
+    return body
+end
+
 function GGUI.card_state(faction, s)
     local ok, why = GG.can_buy(faction, s.key)
     if ok and GG.needs_target(s) and not GGUI.pick_target(s, faction) then
@@ -929,6 +1039,7 @@ GGUI.CONFIRM = nil
 function GGUI.needs_confirm(faction, s)
     if not s then return false end
     if s.hostile then return true end
+    if s.kind == "enemy_settlement" then return true end
     local cost = GG.service_cost(faction, s.key)
     local _, fav = GG.get(faction, s.guild)
     return (cost or 0) * 2 >= (fav or 0)
@@ -947,6 +1058,13 @@ end
 -- sentence with the number in the middle is easier to translate than one built in pieces.
 function GGUI.fill(s, n)
     return (string.gsub(s, "%%n", tostring(n)))
+end
+
+-- The footer's countdown to the next services. One turn left has its own words: the
+-- counted line read "New services in 1 turns".
+function GGUI.countdown(n)
+    if n == 1 then return GGUI.loc("next_services_1") end
+    return GGUI.fill(GGUI.loc("next_services"), n)
 end
 
 function GGUI.bounty_title(o)
@@ -1054,6 +1172,9 @@ end
 --
 -- GGUI.BOUNTY_AT[card] is the board index that card shows, which is what a click sends.
 GGUI.BOUNTY_AT = {}
+-- AND ITS GUILD, which is what Take sends: an index named another offer once the board
+-- shifted under an open panel (logic audit, 2026-09-29).
+GGUI.BOUNTY_GUILD = {}
 
 function GGUI.draw_bounties(faction)
     local turn = GG.turn_now()
@@ -1061,9 +1182,11 @@ function GGUI.draw_bounties(faction)
     local view = {}
     pcall(function() view = GG.bounty_view(faction) end)
     GGUI.BOUNTY_AT = view
+    GGUI.BOUNTY_GUILD = {}
     for i = 1, #GGUI.CARD_XY do
         local card = GGUI.card(i)
         local o = view[i] and list[view[i]]
+        GGUI.BOUNTY_GUILD[i] = o and o.guild
         if card and not o then
             -- An empty slot says so, rather than leaving the previous tab's service
             -- text sitting on a card that no longer means it.
@@ -1123,7 +1246,7 @@ function GGUI.draw_bounties(faction)
             elseif desc:sub(1, #guild) ~= guild then
                 tip = guild .. "  -  " .. desc
             end
-            local lose = GG.bounty_fail_cost(o)
+            local lose = GG.bounty_fail_cost(o, faction)
             if lose > 0 then
                 tip = tip .. "||" .. GGUI.fill(GGUI.loc("bounty_fail_tip"), lose)
             end
@@ -1227,20 +1350,22 @@ end
 --
 -- Cards 2 and 3 are per-guild, which is why the pager stays live on this tab - the
 -- patron is appointed TO a guild, so the panel has to be showing one.
+-- TURNS LEFT TO PAY, COUNTING THIS ONE: GG.demand_tick expires a demand only once the turn
+-- passes its due turn, and "0 turns to pay" on the due turn read as already lost while Pay
+-- still worked (logic audit, 2026-09-29).
+function GGUI.demand_left(d, turn)
+    local left = (d.due or 0) - turn + 1
+    if left < 0 then left = 0 end
+    return left
+end
+
 function GGUI.draw_court(faction)
     local guild = GGUI.current_guild()
     local turn = GG.turn_now()
 
-    -- Same read-the-save-on-first-draw rule the bounty board uses: a reload mid-turn
-    -- leaves these tables empty until the next turn start, and an empty table here
-    -- would read as "there is no demand" rather than "nothing has been loaded".
-    if GGUI.court_read ~= faction then
-        GGUI.court_read = faction
-        pcall(function()
-            GG.load_demand(faction)
-            GG.load_patron(faction)
-        end)
-    end
+    -- NO LOAD HERE. The panel draws on one machine, and a patron it read back from the
+    -- save changed the till's price on that machine only - a multiplayer desync. The
+    -- model restores every record at the first tick (GG.load_all).
 
     -- ------------------------------------------------------------ the demand ---
     local d = GG.demands[faction]
@@ -1248,8 +1373,7 @@ function GGUI.draw_court(faction)
         local ok = GG.demand_payable(faction)
         local unit = (d.kind == "tribute") and GGUI.loc("demand_gold")
                      or GGUI.loc("demand_favour")
-        local left = (d.due or 0) - turn
-        if left < 0 then left = 0 end
+        local left = GGUI.demand_left(d, turn)
         local l1 = GGUI.loc("demand_owed") .. " " .. (d.amount or 0) .. " " .. unit
         if d.kind == "renounce" and GG.RIVALS[d.guild] then
             l1 = l1 .. "  (" .. GGUI.loc_guild(GG.RIVALS[d.guild]) .. ")"
@@ -1287,7 +1411,7 @@ function GGUI.draw_court(faction)
                         "", GGUI.loc("patron_dismiss"), true,
                         GGUI.loc("court_help_patron"))
     else
-        local sel = GGUI.selected_force_cqi()
+        local sel = GGUI.patron_cqi(faction)
         local l2 = GGUI.loc("patron_needs_char")
         if p then l2 = GGUI.loc("patron_elsewhere") end
         -- NOBODY SELECTED: the button picks a lord instead of sitting greyed out.
@@ -1319,6 +1443,35 @@ function GGUI.draw_court(faction)
                     .. GGUI.loc("court_help_lead"))
 end
 
+-- THE UPKEEP LINE of the rank hover: the charge when there is one, the turn it begins
+-- only while it has not (a guild at 0 reputation owes nothing, and that 0 said "begins on
+-- turn 25" at turn 40 - logic audit, 2026-09-29), and the rule either way.
+function GGUI.upkeep_tip(upkeep, turn)
+    local drate = GG.setting("rate_decay") or 0
+    local dfrom = GG.setting("decay_from") or 0
+    if drate <= 0 or dfrom <= 0 then return "" end
+    if upkeep > 0 then
+        return "||" .. GGUI.loc("upkeep_on") .. " -" .. upkeep .. GGUI.loc("per_turn")
+               .. ". " .. GGUI.loc("upkeep_help")
+    elseif not GG.decay_due(turn) then
+        return "||" .. GGUI.loc("upkeep_soon") .. " " .. dfrom .. ". "
+               .. GGUI.loc("upkeep_help")
+    end
+    return "||" .. GGUI.loc("upkeep_help")
+end
+
+-- WHY THE TOP OF THE TABLE IS NOT THE LEADER: the holder keeps a guild until out-earned
+-- by more than a turn's movement, and the table showed a rival first under a leader's
+-- name with nothing to say why (logic audit, 2026-09-29). A loc key, or "".
+function GGUI.lead_note(guild, faction)
+    local culture = GG.culture_of(faction)
+    local rows = GG.contenders(guild, culture) or {}
+    local top = rows[1] and rows[1].faction
+    local who = GG.leader_of(guild, culture)
+    if top and who and top ~= who then return "lead_held" end
+    return ""
+end
+
 function GGUI.refresh()
     -- Forced local-faction read. An unforced get_local_faction_name THROWS in
     -- multiplayer, and a local-faction call at script root CTDs uncatchably.
@@ -1326,12 +1479,8 @@ function GGUI.refresh()
     if not ok or not faction then return end
     if not comp(GGUI.PANEL) then return end
 
-    -- WHAT THE RIVALS DID. GGAI writes this into the same Lua state the panel runs in,
-    -- so in a live session it is already here; the read matters after a save and
-    -- reload, when GG.world is back to its zeroed declaration and the Standings tab
-    -- would otherwise say the world had never moved. Same idiom as the bounties, the
-    -- demand and the patron, all of which the panel re-reads here.
-    pcall(function() GG.load_world() end)
+    -- WHAT THE RIVALS DID is restored by the model at the first tick (GG.load_all), on
+    -- every machine; the panel reads it and loads nothing (logic audit, 2026-09-29).
 
     GGUI.layout()
     -- The ground follows whichever guild the panel is showing, so paging the Guilds tab
@@ -1360,16 +1509,8 @@ function GGUI.refresh()
             label = "[[col:yellow]]" .. label .. "[[/col]]"
         end
         set_named_text(tabs[i], label)
-        -- Image 0 is the standard state's plate and 1 the hover state's.
         local t = comp(tabs[i])
-        if t then
-            local sel = (i == GGUI.TAB)
-            pcall(function()
-                t:SetImagePath(string.format(GGUI.TAB_PLATE, sel and "selected" or "active"), 0)
-                t:SetImagePath(string.format(GGUI.TAB_PLATE,
-                                             sel and "selected_hover" or "hover"), 1)
-            end)
-        end
+        if t then GGUI.paint_tab(t, i == GGUI.TAB) end
     end
     set_named_text("gg_prev", GGUI.loc("prev"))
     set_named_text("gg_next", GGUI.loc("next"))
@@ -1422,7 +1563,7 @@ function GGUI.refresh()
         -- wraps and has no ceiling.
         local upkeep = 0
         if rep > 0 and GG.decay_due(GG.turn_now()) then
-            upkeep = GG.decay_amount(rank)
+            upkeep = GG.decay_amount(rank, faction)
         end
         if upkeep > 0 then
             line = line .. "   [[col:red]]-" .. upkeep .. GGUI.loc("per_turn")
@@ -1439,17 +1580,7 @@ function GGUI.refresh()
         -- even before it bites, so a player reads the rule in the first twenty turns
         -- rather than discovering it as a rank quietly going backwards on turn 26.
         local tip = GGUI.loc_guild_desc(guild)
-        local drate = GG.setting("rate_decay") or 0
-        local dfrom = GG.setting("decay_from") or 0
-        if drate > 0 and dfrom > 0 then
-            if upkeep > 0 then
-                tip = tip .. "||" .. GGUI.loc("upkeep_on") .. " -" .. upkeep
-                      .. GGUI.loc("per_turn") .. "."
-            else
-                tip = tip .. "||" .. GGUI.loc("upkeep_soon") .. " " .. dfrom .. "."
-            end
-            tip = tip .. " " .. GGUI.loc("upkeep_help")
-        end
+        tip = tip .. GGUI.upkeep_tip(upkeep, GG.turn_now())
         set_tooltip(comp("gg_rank_line"), tip)
         -- WHAT THIS GUILD PAID, AND FOR WHAT. See GGUI.earned_line.
         local now, last = GG.earned(faction)
@@ -1502,7 +1633,13 @@ function GGUI.refresh()
         set_tooltip(comp("gg_rank_line"),
                     GGUI.loc(GGUI.TAB == 2 and "rivals_help" or "standing_help"))
     end
-    set_named_text("gg_footer", GGUI.loc("favour") .. ": " .. fav)
+    -- THE COUNTDOWN (spec §9), here because the footer carries one short number on a
+    -- 750px line; the rank and earned lines are full.
+    local every = GG.rotation_turns()
+    -- THE GUILD ON SCREEN: the Leaderboard shows the selected row's (logic audit).
+    local shown_fav = select(2, GG.get(faction, GGUI.ground_guild()))
+    set_named_text("gg_footer", GGUI.loc("favour") .. ": " .. shown_fav .. "   "
+                   .. GGUI.countdown(every - GG.turn_now() % every))
     set_tooltip(comp("gg_footer"), GGUI.loc("standing_help"))
 
     -- The bar is the rank line's picture, so it must agree with it. SetCanResizeWidth
@@ -1563,7 +1700,7 @@ function GGUI.refresh()
     end
 
     if GGUI.TAB == 1 then
-        local mine = GGUI.services_of(guild)
+        local mine = GGUI.services_of(guild, faction)
         for i = 1, #GGUI.CARD_XY do
             GGUI.draw_card(faction, i, mine[i])
         end
@@ -1610,7 +1747,7 @@ end
 --
 -- tools/gen_great_guilds.py owns the text and check_help_pages() proves every page fits
 -- in HELP_SLOTS and that GGUI.HELP_PAGES below matches the number of pages it writes.
-GGUI.HELP_PAGES  = 5
+GGUI.HELP_PAGES  = 6
 GGUI.HELP_PAGE   = 1
 GGUI.HELP_BULLET = "  -  "
 GGUI.HELP_HANG   = "     "
@@ -1667,6 +1804,26 @@ end
 -- the only place they become words. Newest first, a page of the Help tab's slots at a time.
 GGUI.LOG_PAGE = 1
 
+-- WHAT A BOUNTY ON YOU NAMED, at draw time (2026-09-29). A number is a character, named
+-- off its own name keys while it can still be read; anything else is a region.
+function GGUI.hunt_target(a)
+    if tonumber(a) then
+        local name = ""
+        pcall(function()
+            local c = cm:get_family_member_by_cqi(tonumber(a)):character()
+            if not c or c:is_null_interface() then return end
+            name = GGUI.loc_raw(c:get_forename())
+            local sn = GGUI.loc_raw(c:get_surname())
+            if sn ~= "" then name = (name ~= "" and (name .. " ") or "") .. sn end
+        end)
+        if name ~= "" then return name end
+        return GGUI.loc("log_your_char")
+    end
+    local r = GGUI.loc_raw("regions_onscreen_" .. tostring(a))
+    if r ~= "" then return r end
+    return tostring(a)
+end
+
 -- One entry as plain text, and whether it is bad news. nil for a kind this build does not
 -- know, so an entry written by a later version is skipped rather than drawn as keys.
 function GGUI.log_text(e)
@@ -1677,6 +1834,11 @@ function GGUI.log_text(e)
         body = GGUI.loc(bad and "log_fell" or "log_rose") .. " " .. GGUI.loc_rank(now)
     elseif k == "buy" then
         body = GGUI.loc("log_bought") .. " " .. GGUI.loc_service(e.a) .. " (" .. e.b
+               .. " " .. GGUI.loc("favour") .. ")"
+    elseif k == "refund" then
+        -- GG.refund_purchase: the service could not be delivered and the favour went back.
+        bad = true
+        body = GGUI.loc_service(e.a) .. " " .. GGUI.loc("log_refunded") .. " (" .. e.b
                .. " " .. GGUI.loc("favour") .. ")"
     elseif k == "ai_buy" then
         body = GGUI.faction_name(e.b) .. " " .. GGUI.loc("log_ai_bought") .. " "
@@ -1692,7 +1854,38 @@ function GGUI.log_text(e)
         end
     elseif k == "lead_lost" then
         bad = true
-        body = GGUI.loc("log_lead_lost") .. " " .. GGUI.faction_name(e.a)
+        -- NOBODY TOOK IT: the reputation drained away (logic audit, 2026-09-29).
+        if e.a == "" then
+            body = GGUI.loc("log_lead_lapsed")
+        else
+            body = GGUI.loc("log_lead_lost") .. " " .. GGUI.faction_name(e.a)
+        end
+    -- RIVALS' BOUNTIES (2026-09-29). A price put on you, or collected, is bad news; one
+    -- that failed or was withdrawn is not.
+    elseif k == "hunted" then
+        bad = true
+        body = GGUI.loc("log_hunted") .. " " .. GGUI.hunt_target(e.a) .. ", "
+               .. GGUI.loc("log_for") .. " " .. GGUI.faction_name(e.b)
+    elseif k == "hunt_done" then
+        bad = true
+        body = GGUI.faction_name(e.b) .. " " .. GGUI.loc("log_hunt_done") .. " "
+               .. GGUI.hunt_target(e.a)
+    elseif k == "hunt_failed" then
+        body = GGUI.faction_name(e.b) .. " " .. GGUI.loc("log_hunt_failed") .. " "
+               .. GGUI.hunt_target(e.a) .. ", " .. GGUI.loc("log_hunt_lost")
+    elseif k == "hunt_void" then
+        body = GGUI.loc("log_hunt_void") .. " " .. GGUI.hunt_target(e.a)
+    elseif k == "ai_bounty" then
+        body = GGUI.faction_name(e.b) .. " " .. GGUI.loc("log_ai_bounty") .. " " .. e.a
+               .. " " .. GGUI.loc("reputation")
+    elseif k == "earn" then
+        -- A RACE EARNING (stage 2): what the race did and what the guild gained for it.
+        body = GGUI.loc("log_earn_" .. e.a) .. " (+" .. e.b .. " " .. GGUI.loc("reputation")
+               .. ")"
+    elseif k == "rotation" then
+        -- NO GUILD: every guild's services changed at once, so no guild prefix.
+        return GGUI.loc("log_turn") .. " " .. e.turn .. "   " .. GGUI.loc("log_rotation")
+               .. ".", false
     else
         return nil
     end
@@ -1709,8 +1902,9 @@ GGUI.LOG_FILTER = "all"
 GGUI.LOG_FILTER_BTN = "gg_lf_"
 GGUI.LOG_FILTER_ORDER = {"all", "mine", "rivals", "ranks"}
 GGUI.LOG_FILTERS = {
-    mine   = {buy = true, rank = true, lead_won = true},
-    rivals = {ai_buy = true, hit = true, lead_lost = true},
+    mine   = {buy = true, refund = true, rank = true, lead_won = true, rotation = true, earn = true},
+    rivals = {ai_buy = true, hit = true, lead_lost = true, hunted = true, hunt_done = true,
+              hunt_failed = true, hunt_void = true, ai_bounty = true},
     ranks  = {rank = true, lead_won = true, lead_lost = true},
 }
 
@@ -2141,6 +2335,8 @@ function GGUI.draw_standings(faction)
             -- description followed it and made 14 lines (2026-09-28); it is one click
             -- away, on the Guilds tab's rank line.
             local tip = GGUI.table_lines(L.guild, faction)
+            local note = GGUI.lead_note(L.guild, faction)
+            if note ~= "" then tip = tip .. "||" .. GGUI.loc(note) end
             if w.moved and w.moved[slot] then
                 tip = tip .. "||" .. GGUI.loc_guild(L.guild) .. " "
                       .. GGUI.loc("took")
@@ -2205,7 +2401,7 @@ end
 
 -- HOW MANY OF A GUILD'S SERVICES CAN BE BOUGHT NOW, by the same gate as the badge.
 function GGUI.ready_in(faction, guild)
-    local n, mine = 0, GGUI.services_of(guild)
+    local n, mine = 0, GGUI.services_of(guild, faction)
     for i = 1, #mine do
         local ok, can = pcall(function() return GG.can_buy(faction, mine[i].key) end)
         if ok and can then n = n + 1 end
@@ -2294,7 +2490,16 @@ end
 function GGUI.target_hint(s)
     if not s then return "needs_target" end
     if s.hostile then return "needs_target" end
-    if s.kind == "unit" then return "needs_army" end
+    -- A full army is refused for a regiment (GG.target_ok), so the hint says so.
+    if s.kind == "unit" then return "needs_army_room" end
+    if s.kind == "army" then return "needs_army" end
+    -- THEIR OWN RULE, SAID (logic audit): not the faction leader; an army not yet blessed.
+    if s.key == "bought_loyalty" then return "needs_army_not_leader" end
+    if s.key == "ladys_blessing" then return "needs_army_unblessed" end
+    if s.kind == "race_army" then return s.room and "needs_army_room" or "needs_army" end
+    if s.kind == "ranks" then return "needs_char" end
+    if s.kind == "settlement" then return "needs_settlement_own" end
+    if s.kind == "enemy_settlement" then return "needs_region_enemy" end
     if s.kind == "shroud" then return "needs_region_any" end
     if s.kind == "building" then return "needs_region_own" end
     if s.kind == "research" then return "needs_research" end
@@ -2313,12 +2518,34 @@ end
 
 function GGUI.pick_target(s, faction)
     if not s then return nil end
-    if s.hostile then return GGUI.selected_enemy_faction() end
-    if s.kind == "unit" then return GGUI.selected_force_cqi() end
+    -- THROUGH THE TILL'S OWN TEST, so the pick card waits on an ally or a faction at peace
+    -- rather than bringing the panel back to a refusal (2026-09-29).
+    if s.hostile then
+        local f = GGUI.selected_enemy_faction()
+        if f and GG.target_ok(faction, s, f) then return f end
+        return nil
+    end
+    -- A SELECTION THAT FAILS GG.target_ok IS NO SELECTION: the card keeps waiting, and a
+    -- friendly service can never be pointed at an enemy army or town.
+    if GG.CHAR_KINDS[s.kind] then
+        local c = GGUI.selected_force_cqi()
+        if c and GG.target_ok(faction, s, c) then return c end
+        return nil
+    end
+    if s.kind == "settlement" or s.kind == "enemy_settlement" then
+        local r = GGUI.selected_region()
+        if r and GG.target_ok(faction, s, r) then return r end
+        return nil
+    end
     -- WHATEVER SETTLEMENT IS SELECTED. cm:get_campaign_ui_manager() documents
     -- get_selected_settlement_region(), so the shroud service has a real target source
     -- and the map's own selection is the picker - the same idiom the two above use.
-    if s.kind == "shroud" then return GGUI.selected_region() end
+    -- Not the buyer's own region, which it already sees (GG.target_ok).
+    if s.kind == "shroud" then
+        local r = GGUI.selected_region()
+        if r and GG.target_ok(faction, s, r) then return r end
+        return nil
+    end
     -- WHAT THE FACTION IS ALREADY RESEARCHING. No member of the faction interface names
     -- the subject, but ResearchStarted's context carries the key and the model records
     -- it - so the player picks the technology the ordinary way, in the tech tree, and
@@ -2376,6 +2603,15 @@ function GGUI.selected_force_cqi()
         return c
     end)
     if ok then return cqi end
+    return nil
+end
+
+-- THE SELECTED LORD, IF THEY CAN BE A PATRON: one of `faction`'s own, with an army. The
+-- selection lands on anyone, and Appoint once made an enemy army the patron's; a hero
+-- ended the pick on a live button that did nothing (logic audit, 2026-09-29).
+function GGUI.patron_cqi(faction)
+    local cqi = GGUI.selected_force_cqi()
+    if cqi and GG.force_cqi_of(cqi, faction) then return cqi end
     return nil
 end
 
@@ -2518,8 +2754,8 @@ function GGUI.on_buy_click(context)
     -- multiplayer the refresh here shows the state before the change; GG.after_mp
     -- redraws when it lands.
     if is_bounty then
-        local n = GGUI.BOUNTY_AT[slot]
-        if n then GG.mp_send(faction, "bounty", n) end
+        local g = GGUI.BOUNTY_GUILD[slot]
+        if g then GG.mp_send(faction, "bounty", g) end
         GGUI.refresh()
         return
     end
@@ -2532,17 +2768,23 @@ function GGUI.on_buy_click(context)
             -- APPOINTING WITH NOBODY SELECTED picks a lord first. Dismissing needs no one.
             local p = GG.patrons[faction]
             local holds_this = p ~= nil and p.guild == GGUI.current_guild()
-            if not holds_this and not GGUI.selected_force_cqi() then
+            if not holds_this and not GGUI.patron_cqi(faction) then
                 GGUI.start_pick("patron")
                 return
             end
-            GG.mp_send(faction, "patron", GGUI.current_guild() .. "|"
-                                          .. tostring(GGUI.selected_force_cqi() or ""))
+            -- THE VERB IS SENT: a second press before the first comes back must not undo
+            -- it (logic audit, 2026-09-29).
+            if holds_this then
+                GG.mp_send(faction, "patron", "dismiss|" .. GGUI.current_guild())
+            else
+                GG.mp_send(faction, "patron", "appoint|" .. GGUI.current_guild() .. "|"
+                                              .. tostring(GGUI.patron_cqi(faction)))
+            end
         end
         GGUI.refresh()
         return
     end
-    local mine = GGUI.services_of(GGUI.current_guild())
+    local mine = GGUI.services_of(GGUI.current_guild(), faction)
     local s = mine[slot]
     if not s then return end
     local can, why = GGUI.card_state(faction, s)
@@ -2669,7 +2911,7 @@ function GGUI.start_pick(key)
     end
     pcall(function()
         local r = root()
-        r:CreateComponent(GGUI.PICK_CARD, GGUI.PATH_CARD)
+        r:CreateComponent(GGUI.PICK_CARD, GGUI.frame_path(GGUI.PATH_CARD))
         local card = comp(GGUI.PICK_CARD)
         if not card then return end
         card:PropagatePriority(60)
@@ -2703,7 +2945,7 @@ end
 function GGUI.pick_ready()
     local p = GGUI.PICK
     if not p then return false end
-    if p.key == "patron" then return GGUI.selected_force_cqi() ~= nil end
+    if p.key == "patron" then return GGUI.patron_cqi(GGUI.me()) ~= nil end
     local s = GG.service(p.key)
     return s ~= nil and GGUI.pick_target(s, GGUI.me()) ~= nil
 end
@@ -2718,6 +2960,21 @@ for name, event in pairs({gg_pick_char = "CharacterSelected",
                           gg_pick_settlement = "SettlementSelected"}) do
     core:add_listener(name, event, true, function()
         if GGUI.PICK then cm:callback(GGUI.pick_check, 0.1) end
+    end, true)
+end
+
+-- AN OPEN PANEL REDRAWS ON A SELECTION CHANGE, and a pending Confirm is dropped (logic
+-- audit, 2026-09-29). The click re-reads the selection, so a card drawn "Select" bought at
+-- once when an army had been clicked in between, and a Confirm landed on whatever was
+-- selected at the second click. A tenth of a second late, for the reason above. UI only.
+for name, event in pairs({gg_sel_char = "CharacterSelected",
+                          gg_sel_settlement = "SettlementSelected",
+                          gg_desel_char = "CharacterDeselected",
+                          gg_desel_settlement = "SettlementDeselected"}) do
+    core:add_listener(name, event, true, function()
+        if GGUI.PICK or not comp(GGUI.PANEL) then return end
+        GGUI.CONFIRM = nil
+        cm:callback(function() GGUI.refresh() end, 0.1)
     end, true)
 end
 
@@ -2828,11 +3085,16 @@ function GGUI.actionable_items(faction)
         local ok, can = pcall(function() return GG.can_buy(faction, s.key) end)
         if ok and can then out[#out + 1] = {kind = "service", key = s.key, guild = s.guild} end
     end
+    -- ONLY WHAT THE BOARD SHOWS (logic audit, 2026-09-29): an offer that stopped being
+    -- true mid-turn is hidden there by GG.bounty_view, and was still counted here.
     local offers = (GG.bounties and GG.bounties[faction]) or {}
-    for i = 1, #offers do
+    local view = {}
+    pcall(function() view = GG.bounty_view(faction) end)
+    for _, i in ipairs(view) do
+        local o = offers[i]
         -- ONLY ONE THE PLAYER CAN TAKE: an offer short of favour has a dead Take button.
-        if not offers[i].taken and GG.stake_affordable(faction, offers[i]) then
-            out[#out + 1] = {kind = "bounty", guild = offers[i].guild}
+        if o and not o.taken and GG.stake_affordable(faction, o) then
+            out[#out + 1] = {kind = "bounty", guild = o.guild}
         end
     end
     local d = GG.demands and GG.demands[faction]

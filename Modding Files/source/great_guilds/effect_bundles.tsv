@@ -43,6 +43,40 @@ derpy_gg_svc_lash_the_gangs		Lash the Gangs	faction	1	derpy_gg_overseers.png	tru
 derpy_gg_svc_works_of_zharr		Works of Zharr	faction	1	derpy_gg_overseers.png	true	false	true
 derpy_gg_svc_coffle_drive		Coffle Drive	faction	1	derpy_gg_slavers.png	true	false	true
 derpy_gg_svc_great_coffle		The Great Coffle	faction	1	derpy_gg_slavers.png	true	false	true
+derpy_gg_svc_alms_and_bribes		Temple Bribes	faction	1	derpy_gg_brass.png	true	false	true
+derpy_gg_svc_mercenary_contract		Hobgoblin Contracts	faction	1	derpy_gg_brass.png	true	false	true
+derpy_gg_svc_guild_loan		Brass Loan	faction	1	derpy_gg_brass.png	true	false	true
+derpy_gg_svc_industry_charter		Furnace Charter	faction	1	derpy_gg_brass.png	true	false	true
+derpy_gg_svc_treasury_seal		The Tablet Seal	faction	1	derpy_gg_brass.png	true	false	true
+derpy_gg_svc_bought_peace		Bought Obedience	faction	1	derpy_gg_brass.png	true	false	true
+derpy_gg_svc_forced_march		Forced March	force	1	derpy_gg_immortals.png	true	false	true
+derpy_gg_svc_drillmasters		Drillmasters	faction	1	derpy_gg_immortals.png	true	false	true
+derpy_gg_svc_battle_standard		Bull Standard	force	1	derpy_gg_immortals.png	true	false	true
+derpy_gg_svc_field_surgeons		Flesh-Menders	force	1	derpy_gg_immortals.png	true	false	true
+derpy_gg_svc_veteran_cadre		Blooded Cadre	faction	1	derpy_gg_immortals.png	true	false	true
+derpy_gg_svc_ward_runes		Daemonic Wards	force	1	derpy_gg_daemonsmiths.png	true	false	true
+derpy_gg_svc_spirit_siphon		Siphon the Winds	faction	1	derpy_gg_daemonsmiths.png	true	false	true
+derpy_gg_svc_forged_arms		Daemon-Forged Arms	faction	1	derpy_gg_daemonsmiths.png	true	false	true
+derpy_gg_svc_master_gunners		Gunnery Masters	faction	1	derpy_gg_daemonsmiths.png	true	false	true
+derpy_gg_svc_great_work		The Great Work	faction	1	derpy_gg_daemonsmiths.png	true	false	true
+derpy_gg_svc_arsenal		Arsenal of Zharr	faction	1	derpy_gg_daemonsmiths.png	true	false	true
+derpy_gg_svc_bribed_guards		Bribed Guards	faction	1	derpy_gg_khanate.png	true	false	true
+derpy_gg_svc_blooded_agents		Blooded Agents	faction	1	derpy_gg_khanate.png	true	false	true
+derpy_gg_svc_sow_discord		Sow Discord	region	1	derpy_gg_khanate.png	true	false	true
+derpy_gg_svc_web_of_whispers		Web of Whispers	faction	1	derpy_gg_khanate.png	true	false	true
+derpy_gg_svc_poisoned_wells		Poisoned Wells	region	1	derpy_gg_khanate.png	true	false	true
+derpy_gg_svc_granaries		Fattened Herds	region	1	derpy_gg_overseers.png	true	false	true
+derpy_gg_svc_road_gangs		Road Gangs	faction	1	derpy_gg_overseers.png	true	false	true
+derpy_gg_svc_enforcers		Overseer Enforcers	region	1	derpy_gg_overseers.png	true	false	true
+derpy_gg_svc_fortify		Fortify the Walls	region	1	derpy_gg_overseers.png	true	false	true
+derpy_gg_svc_master_builders		Master Builders	faction	1	derpy_gg_overseers.png	true	false	true
+derpy_gg_svc_public_works		Monuments to Hashut	faction	1	derpy_gg_overseers.png	true	false	true
+derpy_gg_svc_raiding_parties		Raiding Parties	faction	1	derpy_gg_slavers.png	true	false	true
+derpy_gg_svc_captive_markets		Captive Markets	faction	1	derpy_gg_slavers.png	true	false	true
+derpy_gg_svc_slave_levy		Slave Levy	faction	1	derpy_gg_slavers.png	true	false	true
+derpy_gg_svc_pit_fights		Pit Fights	faction	1	derpy_gg_slavers.png	true	false	true
+derpy_gg_svc_great_hunt		The Great Hunt	faction	1	derpy_gg_slavers.png	true	false	true
+derpy_gg_svc_scorched_earth		Scorched Earth	region	1	derpy_gg_slavers.png	true	false	true
 derpy_gg_rank_brass_2_emp		The Merchant Guilds - Apprentice	faction	1	derpy_gg_brass_emp.png	true	false	true
 derpy_gg_rank_brass_3_emp		The Merchant Guilds - Journeyman	faction	1	derpy_gg_brass_emp.png	true	false	true
 derpy_gg_rank_brass_4_emp		The Merchant Guilds - Master	faction	1	derpy_gg_brass_emp.png	true	false	true
@@ -85,6 +119,42 @@ derpy_gg_svc_lash_the_gangs_emp		Overtime Wages	faction	1	derpy_gg_overseers_emp
 derpy_gg_svc_works_of_zharr_emp		The Emperor's Works	faction	1	derpy_gg_overseers_emp.png	true	false	true
 derpy_gg_svc_coffle_drive_emp		Plunder Rights	faction	1	derpy_gg_slavers_emp.png	true	false	true
 derpy_gg_svc_great_coffle_emp		The Grand Pillage	faction	1	derpy_gg_slavers_emp.png	true	false	true
+derpy_gg_svc_alms_and_bribes_emp		Alms to the Temples	faction	1	derpy_gg_brass_emp.png	true	false	true
+derpy_gg_svc_mercenary_contract_emp		Sell-Sword Contracts	faction	1	derpy_gg_brass_emp.png	true	false	true
+derpy_gg_svc_guild_loan_emp		A Loan from Marienburg	faction	1	derpy_gg_brass_emp.png	true	false	true
+derpy_gg_svc_industry_charter_emp		Guild Charter of Nuln	faction	1	derpy_gg_brass_emp.png	true	false	true
+derpy_gg_svc_treasury_seal_emp		The Imperial Seal	faction	1	derpy_gg_brass_emp.png	true	false	true
+derpy_gg_svc_bought_peace_emp		Bread and Circuses	faction	1	derpy_gg_brass_emp.png	true	false	true
+derpy_gg_svc_forced_march_emp		Forced March	force	1	derpy_gg_immortals_emp.png	true	false	true
+derpy_gg_svc_drillmasters_emp		Drill Sergeants	faction	1	derpy_gg_immortals_emp.png	true	false	true
+derpy_gg_svc_battle_standard_emp		The Regimental Colours	force	1	derpy_gg_immortals_emp.png	true	false	true
+derpy_gg_svc_field_surgeons_emp		Barber-Surgeons	force	1	derpy_gg_immortals_emp.png	true	false	true
+derpy_gg_svc_veteran_cadre_emp		Old Soldiers	faction	1	derpy_gg_immortals_emp.png	true	false	true
+derpy_gg_svc_ward_runes_emp		Blessed Wards	force	1	derpy_gg_daemonsmiths_emp.png	true	false	true
+derpy_gg_svc_spirit_siphon_emp		The Colleges' Tithe	faction	1	derpy_gg_daemonsmiths_emp.png	true	false	true
+derpy_gg_svc_forged_arms_emp		Nuln Steel	faction	1	derpy_gg_daemonsmiths_emp.png	true	false	true
+derpy_gg_svc_master_gunners_emp		Master Gunners	faction	1	derpy_gg_daemonsmiths_emp.png	true	false	true
+derpy_gg_svc_great_work_emp		The Grand Treatise	faction	1	derpy_gg_daemonsmiths_emp.png	true	false	true
+derpy_gg_svc_arsenal_emp		The Imperial Arsenal	faction	1	derpy_gg_daemonsmiths_emp.png	true	false	true
+derpy_gg_svc_bribed_guards_emp		Bribed Watchmen	faction	1	derpy_gg_khanate_emp.png	true	false	true
+derpy_gg_svc_blooded_agents_emp		Seasoned Agents	faction	1	derpy_gg_khanate_emp.png	true	false	true
+derpy_gg_svc_sow_discord_emp		Rumours in the Taverns	region	1	derpy_gg_khanate_emp.png	true	false	true
+derpy_gg_svc_web_of_whispers_emp		Every Street Corner	faction	1	derpy_gg_khanate_emp.png	true	false	true
+derpy_gg_svc_poisoned_wells_emp		Bad Water	region	1	derpy_gg_khanate_emp.png	true	false	true
+derpy_gg_svc_granaries_emp		Full Granaries	region	1	derpy_gg_overseers_emp.png	true	false	true
+derpy_gg_svc_road_gangs_emp		Road Wardens	faction	1	derpy_gg_overseers_emp.png	true	false	true
+derpy_gg_svc_enforcers_emp		The Watch	region	1	derpy_gg_overseers_emp.png	true	false	true
+derpy_gg_svc_fortify_emp		Shore Up the Walls	region	1	derpy_gg_overseers_emp.png	true	false	true
+derpy_gg_svc_master_builders_emp		Master Masons	faction	1	derpy_gg_overseers_emp.png	true	false	true
+derpy_gg_svc_public_works_emp		Civic Works	faction	1	derpy_gg_overseers_emp.png	true	false	true
+derpy_gg_svc_raiding_parties_emp		Foraging Parties	faction	1	derpy_gg_slavers_emp.png	true	false	true
+derpy_gg_svc_captive_markets_emp		Ransom Brokers	faction	1	derpy_gg_slavers_emp.png	true	false	true
+derpy_gg_svc_slave_levy_emp		Press Gangs	faction	1	derpy_gg_slavers_emp.png	true	false	true
+derpy_gg_svc_pit_fights_emp		Tourney Grounds	faction	1	derpy_gg_slavers_emp.png	true	false	true
+derpy_gg_svc_great_hunt_emp		The Long Ride	faction	1	derpy_gg_slavers_emp.png	true	false	true
+derpy_gg_svc_scorched_earth_emp		Burn the Fields	region	1	derpy_gg_slavers_emp.png	true	false	true
+derpy_gg_svc_witch_hunters_warrant_emp		Witch Hunters' Warrant	region	1	derpy_gg_overseers_emp.png	true	false	true
+derpy_gg_svc_unity_of_empire_emp		Unity of the Empire	faction	1	derpy_gg_brass_emp.png	true	false	true
 derpy_gg_rank_brass_2_dwf		The Merchant Clans - Beardling	faction	1	derpy_gg_brass_dwf.png	true	false	true
 derpy_gg_rank_brass_3_dwf		The Merchant Clans - Oathsworn	faction	1	derpy_gg_brass_dwf.png	true	false	true
 derpy_gg_rank_brass_4_dwf		The Merchant Clans - Longbeard	faction	1	derpy_gg_brass_dwf.png	true	false	true
@@ -127,6 +197,40 @@ derpy_gg_svc_lash_the_gangs_dwf		Double Shift	faction	1	derpy_gg_overseers_dwf.p
 derpy_gg_svc_works_of_zharr_dwf		Works of Grungni	faction	1	derpy_gg_overseers_dwf.png	true	false	true
 derpy_gg_svc_coffle_drive_dwf		Settle the Account	faction	1	derpy_gg_slavers_dwf.png	true	false	true
 derpy_gg_svc_great_coffle_dwf		The Great Reckoning	faction	1	derpy_gg_slavers_dwf.png	true	false	true
+derpy_gg_svc_alms_and_bribes_dwf		Ancestor Offerings	faction	1	derpy_gg_brass_dwf.png	true	false	true
+derpy_gg_svc_mercenary_contract_dwf		Clan Contracts	faction	1	derpy_gg_brass_dwf.png	true	false	true
+derpy_gg_svc_guild_loan_dwf		A Loan in Gold	faction	1	derpy_gg_brass_dwf.png	true	false	true
+derpy_gg_svc_industry_charter_dwf		Forge Charter	faction	1	derpy_gg_brass_dwf.png	true	false	true
+derpy_gg_svc_treasury_seal_dwf		The Hold's Seal	faction	1	derpy_gg_brass_dwf.png	true	false	true
+derpy_gg_svc_bought_peace_dwf		Ale for the Hold	faction	1	derpy_gg_brass_dwf.png	true	false	true
+derpy_gg_svc_forced_march_dwf		Long March	force	1	derpy_gg_immortals_dwf.png	true	false	true
+derpy_gg_svc_drillmasters_dwf		Shieldwall Drill	faction	1	derpy_gg_immortals_dwf.png	true	false	true
+derpy_gg_svc_battle_standard_dwf		The Clan Banner	force	1	derpy_gg_immortals_dwf.png	true	false	true
+derpy_gg_svc_field_surgeons_dwf		Hold Healers	force	1	derpy_gg_immortals_dwf.png	true	false	true
+derpy_gg_svc_veteran_cadre_dwf		Longbeard Mentors	faction	1	derpy_gg_immortals_dwf.png	true	false	true
+derpy_gg_svc_ward_runes_dwf		Runes of Warding	force	1	derpy_gg_daemonsmiths_dwf.png	true	false	true
+derpy_gg_svc_spirit_siphon_dwf		Runelord's Anvil	faction	1	derpy_gg_daemonsmiths_dwf.png	true	false	true
+derpy_gg_svc_forged_arms_dwf		Gromril Edges	faction	1	derpy_gg_daemonsmiths_dwf.png	true	false	true
+derpy_gg_svc_master_gunners_dwf		Master Engineers	faction	1	derpy_gg_daemonsmiths_dwf.png	true	false	true
+derpy_gg_svc_great_work_dwf		The Engineers' Masterwork	faction	1	derpy_gg_daemonsmiths_dwf.png	true	false	true
+derpy_gg_svc_arsenal_dwf		Hold Arsenal	faction	1	derpy_gg_daemonsmiths_dwf.png	true	false	true
+derpy_gg_svc_bribed_guards_dwf		Paid Guides	faction	1	derpy_gg_khanate_dwf.png	true	false	true
+derpy_gg_svc_blooded_agents_dwf		Seasoned Rangers	faction	1	derpy_gg_khanate_dwf.png	true	false	true
+derpy_gg_svc_sow_discord_dwf		Stir the Grudges	region	1	derpy_gg_khanate_dwf.png	true	false	true
+derpy_gg_svc_web_of_whispers_dwf		Paths Under the Mountain	faction	1	derpy_gg_khanate_dwf.png	true	false	true
+derpy_gg_svc_poisoned_wells_dwf		Foul the Springs	region	1	derpy_gg_khanate_dwf.png	true	false	true
+derpy_gg_svc_granaries_dwf		Brewhouse Stores	region	1	derpy_gg_overseers_dwf.png	true	false	true
+derpy_gg_svc_road_gangs_dwf		Underway Tunnels	faction	1	derpy_gg_overseers_dwf.png	true	false	true
+derpy_gg_svc_enforcers_dwf		Hold Wardens	region	1	derpy_gg_overseers_dwf.png	true	false	true
+derpy_gg_svc_fortify_dwf		Reinforce the Gates	region	1	derpy_gg_overseers_dwf.png	true	false	true
+derpy_gg_svc_master_builders_dwf		Master Stonemasons	faction	1	derpy_gg_overseers_dwf.png	true	false	true
+derpy_gg_svc_public_works_dwf		Carved Halls	faction	1	derpy_gg_overseers_dwf.png	true	false	true
+derpy_gg_svc_raiding_parties_dwf		Reclaiming Parties	faction	1	derpy_gg_slavers_dwf.png	true	false	true
+derpy_gg_svc_captive_markets_dwf		Salvage Rights	faction	1	derpy_gg_slavers_dwf.png	true	false	true
+derpy_gg_svc_slave_levy_dwf		Clan Muster	faction	1	derpy_gg_slavers_dwf.png	true	false	true
+derpy_gg_svc_pit_fights_dwf		Trial of Axes	faction	1	derpy_gg_slavers_dwf.png	true	false	true
+derpy_gg_svc_great_hunt_dwf		The Great Reclaiming	faction	1	derpy_gg_slavers_dwf.png	true	false	true
+derpy_gg_svc_scorched_earth_dwf		Collapse the Mines	region	1	derpy_gg_slavers_dwf.png	true	false	true
 derpy_gg_rank_brass_2_brt		The Wine Merchants - Yeoman	faction	1	derpy_gg_brass_brt.png	true	false	true
 derpy_gg_rank_brass_3_brt		The Wine Merchants - Squire	faction	1	derpy_gg_brass_brt.png	true	false	true
 derpy_gg_rank_brass_4_brt		The Wine Merchants - Knight	faction	1	derpy_gg_brass_brt.png	true	false	true
@@ -169,6 +273,41 @@ derpy_gg_svc_lash_the_gangs_brt		Feudal Labour	faction	1	derpy_gg_overseers_brt.
 derpy_gg_svc_works_of_zharr_brt		The Duke's Works	faction	1	derpy_gg_overseers_brt.png	true	false	true
 derpy_gg_svc_coffle_drive_brt		Spoils of Crusade	faction	1	derpy_gg_slavers_brt.png	true	false	true
 derpy_gg_svc_great_coffle_brt		The Errantry War	faction	1	derpy_gg_slavers_brt.png	true	false	true
+derpy_gg_svc_alms_and_bribes_brt		Alms for the Grail Chapels	faction	1	derpy_gg_brass_brt.png	true	false	true
+derpy_gg_svc_mercenary_contract_brt		Hired Men-at-Arms	faction	1	derpy_gg_brass_brt.png	true	false	true
+derpy_gg_svc_guild_loan_brt		A Merchant's Loan	faction	1	derpy_gg_brass_brt.png	true	false	true
+derpy_gg_svc_industry_charter_brt		Vintners' Charter	faction	1	derpy_gg_brass_brt.png	true	false	true
+derpy_gg_svc_treasury_seal_brt		The Duke's Seal	faction	1	derpy_gg_brass_brt.png	true	false	true
+derpy_gg_svc_bought_peace_brt		Feast Days	faction	1	derpy_gg_brass_brt.png	true	false	true
+derpy_gg_svc_forced_march_brt		Ride Through the Night	force	1	derpy_gg_immortals_brt.png	true	false	true
+derpy_gg_svc_drillmasters_brt		Squires' Training	faction	1	derpy_gg_immortals_brt.png	true	false	true
+derpy_gg_svc_battle_standard_brt		The Lady's Pennant	force	1	derpy_gg_immortals_brt.png	true	false	true
+derpy_gg_svc_field_surgeons_brt		Chapel Healers	force	1	derpy_gg_immortals_brt.png	true	false	true
+derpy_gg_svc_veteran_cadre_brt		Knights of the Realm	faction	1	derpy_gg_immortals_brt.png	true	false	true
+derpy_gg_svc_ward_runes_brt		The Lady's Grace	force	1	derpy_gg_daemonsmiths_brt.png	true	false	true
+derpy_gg_svc_spirit_siphon_brt		Waters of the Grail	faction	1	derpy_gg_daemonsmiths_brt.png	true	false	true
+derpy_gg_svc_forged_arms_brt		Castle Smiths	faction	1	derpy_gg_daemonsmiths_brt.png	true	false	true
+derpy_gg_svc_master_gunners_brt		Trebuchet Masters	faction	1	derpy_gg_daemonsmiths_brt.png	true	false	true
+derpy_gg_svc_great_work_brt		Wisdom of the Damsels	faction	1	derpy_gg_daemonsmiths_brt.png	true	false	true
+derpy_gg_svc_arsenal_brt		Bowyers' Guild	faction	1	derpy_gg_daemonsmiths_brt.png	true	false	true
+derpy_gg_svc_bribed_guards_brt		Paid Poachers	faction	1	derpy_gg_khanate_brt.png	true	false	true
+derpy_gg_svc_blooded_agents_brt		Hardened Paladins	faction	1	derpy_gg_khanate_brt.png	true	false	true
+derpy_gg_svc_sow_discord_brt		Outlaw Mischief	region	1	derpy_gg_khanate_brt.png	true	false	true
+derpy_gg_svc_web_of_whispers_brt		Friends in the Greenwood	faction	1	derpy_gg_khanate_brt.png	true	false	true
+derpy_gg_svc_poisoned_wells_brt		Blight the Fields	region	1	derpy_gg_khanate_brt.png	true	false	true
+derpy_gg_svc_granaries_brt		Harvest Tithe	region	1	derpy_gg_overseers_brt.png	true	false	true
+derpy_gg_svc_road_gangs_brt		The King's Roads	faction	1	derpy_gg_overseers_brt.png	true	false	true
+derpy_gg_svc_enforcers_brt		The Sheriff's Men	region	1	derpy_gg_overseers_brt.png	true	false	true
+derpy_gg_svc_fortify_brt		Raise the Palisades	region	1	derpy_gg_overseers_brt.png	true	false	true
+derpy_gg_svc_master_builders_brt		Master Castle-Wrights	faction	1	derpy_gg_overseers_brt.png	true	false	true
+derpy_gg_svc_public_works_brt		Grail Chapels	faction	1	derpy_gg_overseers_brt.png	true	false	true
+derpy_gg_svc_raiding_parties_brt		Foraging Knights	faction	1	derpy_gg_slavers_brt.png	true	false	true
+derpy_gg_svc_captive_markets_brt		Ransom of Nobles	faction	1	derpy_gg_slavers_brt.png	true	false	true
+derpy_gg_svc_slave_levy_brt		Peasant Muster	faction	1	derpy_gg_slavers_brt.png	true	false	true
+derpy_gg_svc_pit_fights_brt		The Joust	faction	1	derpy_gg_slavers_brt.png	true	false	true
+derpy_gg_svc_great_hunt_brt		The Grand Crusade	faction	1	derpy_gg_slavers_brt.png	true	false	true
+derpy_gg_svc_scorched_earth_brt		Salt the Earth	region	1	derpy_gg_slavers_brt.png	true	false	true
+derpy_gg_svc_peasant_levies_brt		Peasant Levies	faction	1	derpy_gg_brass_brt.png	true	false	true
 derpy_gg_rank_brass_2_cth		The Caravan Masters - Scholar	faction	1	derpy_gg_brass_cth.png	true	false	true
 derpy_gg_rank_brass_3_cth		The Caravan Masters - Official	faction	1	derpy_gg_brass_cth.png	true	false	true
 derpy_gg_rank_brass_4_cth		The Caravan Masters - Magistrate	faction	1	derpy_gg_brass_cth.png	true	false	true
@@ -211,6 +350,41 @@ derpy_gg_svc_lash_the_gangs_cth		Conscript Labour	faction	1	derpy_gg_overseers_c
 derpy_gg_svc_works_of_zharr_cth		Works of the Bastion	faction	1	derpy_gg_overseers_cth.png	true	false	true
 derpy_gg_svc_coffle_drive_cth		Punitive Raids	faction	1	derpy_gg_slavers_cth.png	true	false	true
 derpy_gg_svc_great_coffle_cth		The Great Expedition	faction	1	derpy_gg_slavers_cth.png	true	false	true
+derpy_gg_svc_alms_and_bribes_cth		Temple Offerings	faction	1	derpy_gg_brass_cth.png	true	false	true
+derpy_gg_svc_mercenary_contract_cth		Bought Levies	faction	1	derpy_gg_brass_cth.png	true	false	true
+derpy_gg_svc_guild_loan_cth		Jade Loan	faction	1	derpy_gg_brass_cth.png	true	false	true
+derpy_gg_svc_industry_charter_cth		Workshop Mandate	faction	1	derpy_gg_brass_cth.png	true	false	true
+derpy_gg_svc_treasury_seal_cth		The Celestial Seal	faction	1	derpy_gg_brass_cth.png	true	false	true
+derpy_gg_svc_bought_peace_cth		Festival of Lanterns	faction	1	derpy_gg_brass_cth.png	true	false	true
+derpy_gg_svc_forced_march_cth		Swift Columns	force	1	derpy_gg_immortals_cth.png	true	false	true
+derpy_gg_svc_drillmasters_cth		Drill Masters	faction	1	derpy_gg_immortals_cth.png	true	false	true
+derpy_gg_svc_battle_standard_cth		Dragon Banner	force	1	derpy_gg_immortals_cth.png	true	false	true
+derpy_gg_svc_field_surgeons_cth		Jade Physicians	force	1	derpy_gg_immortals_cth.png	true	false	true
+derpy_gg_svc_veteran_cadre_cth		Veteran Officers	faction	1	derpy_gg_immortals_cth.png	true	false	true
+derpy_gg_svc_ward_runes_cth		Jade Wards	force	1	derpy_gg_daemonsmiths_cth.png	true	false	true
+derpy_gg_svc_spirit_siphon_cth		Wind Channelling	faction	1	derpy_gg_daemonsmiths_cth.png	true	false	true
+derpy_gg_svc_forged_arms_cth		Celestial Steel	faction	1	derpy_gg_daemonsmiths_cth.png	true	false	true
+derpy_gg_svc_master_gunners_cth		Master Gunners	faction	1	derpy_gg_daemonsmiths_cth.png	true	false	true
+derpy_gg_svc_great_work_cth		The Academy's Treatise	faction	1	derpy_gg_daemonsmiths_cth.png	true	false	true
+derpy_gg_svc_arsenal_cth		Imperial Arsenal	faction	1	derpy_gg_daemonsmiths_cth.png	true	false	true
+derpy_gg_svc_bribed_guards_cth		Paid Informers	faction	1	derpy_gg_khanate_cth.png	true	false	true
+derpy_gg_svc_blooded_agents_cth		Seasoned Agents	faction	1	derpy_gg_khanate_cth.png	true	false	true
+derpy_gg_svc_sow_discord_cth		Whispered Slanders	region	1	derpy_gg_khanate_cth.png	true	false	true
+derpy_gg_svc_web_of_whispers_cth		A Thousand Crows	faction	1	derpy_gg_khanate_cth.png	true	false	true
+derpy_gg_svc_poisoned_wells_cth		Poisoned Wells	region	1	derpy_gg_khanate_cth.png	true	false	true
+derpy_gg_svc_granaries_cth		Rice Stores	region	1	derpy_gg_overseers_cth.png	true	false	true
+derpy_gg_svc_road_gangs_cth		Ivory Road Wardens	faction	1	derpy_gg_overseers_cth.png	true	false	true
+derpy_gg_svc_enforcers_cth		Magistrates	region	1	derpy_gg_overseers_cth.png	true	false	true
+derpy_gg_svc_fortify_cth		Raise the Ramparts	region	1	derpy_gg_overseers_cth.png	true	false	true
+derpy_gg_svc_master_builders_cth		Master Builders	faction	1	derpy_gg_overseers_cth.png	true	false	true
+derpy_gg_svc_public_works_cth		Temples and Canals	faction	1	derpy_gg_overseers_cth.png	true	false	true
+derpy_gg_svc_raiding_parties_cth		Foraging Columns	faction	1	derpy_gg_slavers_cth.png	true	false	true
+derpy_gg_svc_captive_markets_cth		Tribute of the Defeated	faction	1	derpy_gg_slavers_cth.png	true	false	true
+derpy_gg_svc_slave_levy_cth		Conscription	faction	1	derpy_gg_slavers_cth.png	true	false	true
+derpy_gg_svc_pit_fights_cth		Martial Trials	faction	1	derpy_gg_slavers_cth.png	true	false	true
+derpy_gg_svc_great_hunt_cth		The Long Pursuit	faction	1	derpy_gg_slavers_cth.png	true	false	true
+derpy_gg_svc_scorched_earth_cth		Scorched Earth	region	1	derpy_gg_slavers_cth.png	true	false	true
+derpy_gg_svc_mandate_of_heaven_cth		Mandate of Heaven	faction	1	derpy_gg_overseers_cth.png	true	false	true
 derpy_gg_rank_brass_2_ksl		The Erengrad Merchants - Kossar	faction	1	derpy_gg_brass_ksl.png	true	false	true
 derpy_gg_rank_brass_3_ksl		The Erengrad Merchants - Druzhina	faction	1	derpy_gg_brass_ksl.png	true	false	true
 derpy_gg_rank_brass_4_ksl		The Erengrad Merchants - Boyar	faction	1	derpy_gg_brass_ksl.png	true	false	true
@@ -253,6 +427,40 @@ derpy_gg_svc_lash_the_gangs_ksl		Before the Thaw	faction	1	derpy_gg_overseers_ks
 derpy_gg_svc_works_of_zharr_ksl		Walls Against Chaos	faction	1	derpy_gg_overseers_ksl.png	true	false	true
 derpy_gg_svc_coffle_drive_ksl		Steppe Plunder	faction	1	derpy_gg_slavers_ksl.png	true	false	true
 derpy_gg_svc_great_coffle_ksl		The Long Raid	faction	1	derpy_gg_slavers_ksl.png	true	false	true
+derpy_gg_svc_alms_and_bribes_ksl		Offerings to the Gods	faction	1	derpy_gg_brass_ksl.png	true	false	true
+derpy_gg_svc_mercenary_contract_ksl		Hired Kossars	faction	1	derpy_gg_brass_ksl.png	true	false	true
+derpy_gg_svc_guild_loan_ksl		An Erengrad Loan	faction	1	derpy_gg_brass_ksl.png	true	false	true
+derpy_gg_svc_industry_charter_ksl		Workshop Charter	faction	1	derpy_gg_brass_ksl.png	true	false	true
+derpy_gg_svc_treasury_seal_ksl		The Tzarina's Seal	faction	1	derpy_gg_brass_ksl.png	true	false	true
+derpy_gg_svc_bought_peace_ksl		Kvas for the People	faction	1	derpy_gg_brass_ksl.png	true	false	true
+derpy_gg_svc_forced_march_ksl		Sledge March	force	1	derpy_gg_immortals_ksl.png	true	false	true
+derpy_gg_svc_drillmasters_ksl		Kossar Drill	faction	1	derpy_gg_immortals_ksl.png	true	false	true
+derpy_gg_svc_battle_standard_ksl		The Bear Standard	force	1	derpy_gg_immortals_ksl.png	true	false	true
+derpy_gg_svc_field_surgeons_ksl		Village Healers	force	1	derpy_gg_immortals_ksl.png	true	false	true
+derpy_gg_svc_veteran_cadre_ksl		Veteran Streltsi	faction	1	derpy_gg_immortals_ksl.png	true	false	true
+derpy_gg_svc_ward_runes_ksl		Frost Wards	force	1	derpy_gg_daemonsmiths_ksl.png	true	false	true
+derpy_gg_svc_spirit_siphon_ksl		Draw on the Ice	faction	1	derpy_gg_daemonsmiths_ksl.png	true	false	true
+derpy_gg_svc_forged_arms_ksl		Frost-Tempered Steel	faction	1	derpy_gg_daemonsmiths_ksl.png	true	false	true
+derpy_gg_svc_master_gunners_ksl		Master Gunners	faction	1	derpy_gg_daemonsmiths_ksl.png	true	false	true
+derpy_gg_svc_great_work_ksl		The Frost Maiden's Lore	faction	1	derpy_gg_daemonsmiths_ksl.png	true	false	true
+derpy_gg_svc_arsenal_ksl		Streltsi Armoury	faction	1	derpy_gg_daemonsmiths_ksl.png	true	false	true
+derpy_gg_svc_bribed_guards_ksl		Paid Border Guards	faction	1	derpy_gg_khanate_ksl.png	true	false	true
+derpy_gg_svc_blooded_agents_ksl		Hardened Agents	faction	1	derpy_gg_khanate_ksl.png	true	false	true
+derpy_gg_svc_sow_discord_ksl		Stir the Oblast	region	1	derpy_gg_khanate_ksl.png	true	false	true
+derpy_gg_svc_web_of_whispers_ksl		Every Road North	faction	1	derpy_gg_khanate_ksl.png	true	false	true
+derpy_gg_svc_poisoned_wells_ksl		Frozen Wells	region	1	derpy_gg_khanate_ksl.png	true	false	true
+derpy_gg_svc_granaries_ksl		Winter Stores	region	1	derpy_gg_overseers_ksl.png	true	false	true
+derpy_gg_svc_road_gangs_ksl		Sledge Roads	faction	1	derpy_gg_overseers_ksl.png	true	false	true
+derpy_gg_svc_enforcers_ksl		The Tzar's Wardens	region	1	derpy_gg_overseers_ksl.png	true	false	true
+derpy_gg_svc_fortify_ksl		Ice Walls	region	1	derpy_gg_overseers_ksl.png	true	false	true
+derpy_gg_svc_master_builders_ksl		Master Builders	faction	1	derpy_gg_overseers_ksl.png	true	false	true
+derpy_gg_svc_public_works_ksl		Stanitsa Works	faction	1	derpy_gg_overseers_ksl.png	true	false	true
+derpy_gg_svc_raiding_parties_ksl		Steppe Riders	faction	1	derpy_gg_slavers_ksl.png	true	false	true
+derpy_gg_svc_captive_markets_ksl		Ransom Market	faction	1	derpy_gg_slavers_ksl.png	true	false	true
+derpy_gg_svc_slave_levy_ksl		Village Muster	faction	1	derpy_gg_slavers_ksl.png	true	false	true
+derpy_gg_svc_pit_fights_ksl		Bear Pits	faction	1	derpy_gg_slavers_ksl.png	true	false	true
+derpy_gg_svc_great_hunt_ksl		The Great Ride	faction	1	derpy_gg_slavers_ksl.png	true	false	true
+derpy_gg_svc_scorched_earth_ksl		Scorch the Steppe	region	1	derpy_gg_slavers_ksl.png	true	false	true
 derpy_gg_rank_brass_2_def		The Karond Kar Traders - Corsair	faction	1	derpy_gg_brass_def.png	true	false	true
 derpy_gg_rank_brass_3_def		The Karond Kar Traders - Highborn	faction	1	derpy_gg_brass_def.png	true	false	true
 derpy_gg_rank_brass_4_def		The Karond Kar Traders - Dreadlord	faction	1	derpy_gg_brass_def.png	true	false	true
@@ -295,6 +503,41 @@ derpy_gg_svc_lash_the_gangs_def		Drive the Thralls	faction	1	derpy_gg_overseers_
 derpy_gg_svc_works_of_zharr_def		Works of Naggarond	faction	1	derpy_gg_overseers_def.png	true	false	true
 derpy_gg_svc_coffle_drive_def		Corsair Raids	faction	1	derpy_gg_slavers_def.png	true	false	true
 derpy_gg_svc_great_coffle_def		The Black Ark Raid	faction	1	derpy_gg_slavers_def.png	true	false	true
+derpy_gg_svc_alms_and_bribes_def		Tithes to Khaine	faction	1	derpy_gg_brass_def.png	true	false	true
+derpy_gg_svc_mercenary_contract_def		Bought Blades	faction	1	derpy_gg_brass_def.png	true	false	true
+derpy_gg_svc_guild_loan_def		A Corsair's Loan	faction	1	derpy_gg_brass_def.png	true	false	true
+derpy_gg_svc_industry_charter_def		Forge Charter	faction	1	derpy_gg_brass_def.png	true	false	true
+derpy_gg_svc_treasury_seal_def		The Drachau's Seal	faction	1	derpy_gg_brass_def.png	true	false	true
+derpy_gg_svc_bought_peace_def		Public Executions	faction	1	derpy_gg_brass_def.png	true	false	true
+derpy_gg_svc_forced_march_def		Driven March	force	1	derpy_gg_immortals_def.png	true	false	true
+derpy_gg_svc_drillmasters_def		Black Guard Drill	faction	1	derpy_gg_immortals_def.png	true	false	true
+derpy_gg_svc_battle_standard_def		The Dread Banner	force	1	derpy_gg_immortals_def.png	true	false	true
+derpy_gg_svc_field_surgeons_def		Flesh-Stitchers	force	1	derpy_gg_immortals_def.png	true	false	true
+derpy_gg_svc_veteran_cadre_def		Blooded Veterans	faction	1	derpy_gg_immortals_def.png	true	false	true
+derpy_gg_svc_ward_runes_def		Dark Wards	force	1	derpy_gg_daemonsmiths_def.png	true	false	true
+derpy_gg_svc_spirit_siphon_def		Drain the Winds	faction	1	derpy_gg_daemonsmiths_def.png	true	false	true
+derpy_gg_svc_forged_arms_def		Har Ganeth Steel	faction	1	derpy_gg_daemonsmiths_def.png	true	false	true
+derpy_gg_svc_master_gunners_def		Reaper Crews	faction	1	derpy_gg_daemonsmiths_def.png	true	false	true
+derpy_gg_svc_great_work_def		Hag Graef's Masterwork	faction	1	derpy_gg_daemonsmiths_def.png	true	false	true
+derpy_gg_svc_arsenal_def		The Black Armoury	faction	1	derpy_gg_daemonsmiths_def.png	true	false	true
+derpy_gg_svc_bribed_guards_def		Paid Traitors	faction	1	derpy_gg_khanate_def.png	true	false	true
+derpy_gg_svc_blooded_agents_def		Blooded Assassins	faction	1	derpy_gg_khanate_def.png	true	false	true
+derpy_gg_svc_sow_discord_def		Seeds of Betrayal	region	1	derpy_gg_khanate_def.png	true	false	true
+derpy_gg_svc_web_of_whispers_def		Knives Everywhere	faction	1	derpy_gg_khanate_def.png	true	false	true
+derpy_gg_svc_poisoned_wells_def		Poisoned Wells	region	1	derpy_gg_khanate_def.png	true	false	true
+derpy_gg_svc_granaries_def		Thrall Rations	region	1	derpy_gg_overseers_def.png	true	false	true
+derpy_gg_svc_road_gangs_def		Thrall Roads	faction	1	derpy_gg_overseers_def.png	true	false	true
+derpy_gg_svc_enforcers_def		Dreadspear Patrols	region	1	derpy_gg_overseers_def.png	true	false	true
+derpy_gg_svc_fortify_def		Raise the Spikes	region	1	derpy_gg_overseers_def.png	true	false	true
+derpy_gg_svc_master_builders_def		Master Builders	faction	1	derpy_gg_overseers_def.png	true	false	true
+derpy_gg_svc_public_works_def		Towers of Naggarond	faction	1	derpy_gg_overseers_def.png	true	false	true
+derpy_gg_svc_raiding_parties_def		Dark Rider Raids	faction	1	derpy_gg_slavers_def.png	true	false	true
+derpy_gg_svc_captive_markets_def		Thrall Markets	faction	1	derpy_gg_slavers_def.png	true	false	true
+derpy_gg_svc_slave_levy_def		Thrall Levy	faction	1	derpy_gg_slavers_def.png	true	false	true
+derpy_gg_svc_pit_fights_def		Arena of Khaine	faction	1	derpy_gg_slavers_def.png	true	false	true
+derpy_gg_svc_great_hunt_def		The Great Harvest	faction	1	derpy_gg_slavers_def.png	true	false	true
+derpy_gg_svc_scorched_earth_def		Leave Nothing Standing	region	1	derpy_gg_slavers_def.png	true	false	true
+derpy_gg_svc_black_ark_tithe_def		Black Ark Tithe	faction	1	derpy_gg_slavers_def.png	true	false	true
 derpy_gg_rank_brass_2_hef		The Lothern Merchants - Warden	faction	1	derpy_gg_brass_hef.png	true	false	true
 derpy_gg_rank_brass_3_hef		The Lothern Merchants - Noble	faction	1	derpy_gg_brass_hef.png	true	false	true
 derpy_gg_rank_brass_4_hef		The Lothern Merchants - Prince	faction	1	derpy_gg_brass_hef.png	true	false	true
@@ -337,6 +580,40 @@ derpy_gg_svc_lash_the_gangs_hef		Citizen Labour	faction	1	derpy_gg_overseers_hef
 derpy_gg_svc_works_of_zharr_hef		Works of Ulthuan	faction	1	derpy_gg_overseers_hef.png	true	false	true
 derpy_gg_svc_coffle_drive_hef		Reaver Raids	faction	1	derpy_gg_slavers_hef.png	true	false	true
 derpy_gg_svc_great_coffle_hef		Ulthuan's Vengeance	faction	1	derpy_gg_slavers_hef.png	true	false	true
+derpy_gg_svc_alms_and_bribes_hef		Offerings to Asuryan	faction	1	derpy_gg_brass_hef.png	true	false	true
+derpy_gg_svc_mercenary_contract_hef		Hired Sea Guard	faction	1	derpy_gg_brass_hef.png	true	false	true
+derpy_gg_svc_guild_loan_hef		A Lothern Loan	faction	1	derpy_gg_brass_hef.png	true	false	true
+derpy_gg_svc_industry_charter_hef		Artisans' Charter	faction	1	derpy_gg_brass_hef.png	true	false	true
+derpy_gg_svc_treasury_seal_hef		The Phoenix Seal	faction	1	derpy_gg_brass_hef.png	true	false	true
+derpy_gg_svc_bought_peace_hef		Festivals of Ulthuan	faction	1	derpy_gg_brass_hef.png	true	false	true
+derpy_gg_svc_forced_march_hef		Swift March	force	1	derpy_gg_immortals_hef.png	true	false	true
+derpy_gg_svc_drillmasters_hef		Citizen Drill	faction	1	derpy_gg_immortals_hef.png	true	false	true
+derpy_gg_svc_battle_standard_hef		The Phoenix Banner	force	1	derpy_gg_immortals_hef.png	true	false	true
+derpy_gg_svc_field_surgeons_hef		Healers of Isha	force	1	derpy_gg_immortals_hef.png	true	false	true
+derpy_gg_svc_veteran_cadre_hef		Veteran Wardens	faction	1	derpy_gg_immortals_hef.png	true	false	true
+derpy_gg_svc_ward_runes_hef		Wards of Hoeth	force	1	derpy_gg_daemonsmiths_hef.png	true	false	true
+derpy_gg_svc_spirit_siphon_hef		The Vortex's Tide	faction	1	derpy_gg_daemonsmiths_hef.png	true	false	true
+derpy_gg_svc_forged_arms_hef		Ithilmar Blades	faction	1	derpy_gg_daemonsmiths_hef.png	true	false	true
+derpy_gg_svc_master_gunners_hef		Bolt Thrower Crews	faction	1	derpy_gg_daemonsmiths_hef.png	true	false	true
+derpy_gg_svc_great_work_hef		The White Tower's Lore	faction	1	derpy_gg_daemonsmiths_hef.png	true	false	true
+derpy_gg_svc_arsenal_hef		Lothern Armoury	faction	1	derpy_gg_daemonsmiths_hef.png	true	false	true
+derpy_gg_svc_bribed_guards_hef		Paid Watchers	faction	1	derpy_gg_khanate_hef.png	true	false	true
+derpy_gg_svc_blooded_agents_hef		Seasoned Agents	faction	1	derpy_gg_khanate_hef.png	true	false	true
+derpy_gg_svc_sow_discord_hef		Whispers of Doubt	region	1	derpy_gg_khanate_hef.png	true	false	true
+derpy_gg_svc_web_of_whispers_hef		Shadows in Every Court	faction	1	derpy_gg_khanate_hef.png	true	false	true
+derpy_gg_svc_poisoned_wells_hef		Poisoned Wells	region	1	derpy_gg_khanate_hef.png	true	false	true
+derpy_gg_svc_granaries_hef		Harvest of Ulthuan	region	1	derpy_gg_overseers_hef.png	true	false	true
+derpy_gg_svc_road_gangs_hef		Elven Roads	faction	1	derpy_gg_overseers_hef.png	true	false	true
+derpy_gg_svc_enforcers_hef		City Wardens	region	1	derpy_gg_overseers_hef.png	true	false	true
+derpy_gg_svc_fortify_hef		Raise the Wards	region	1	derpy_gg_overseers_hef.png	true	false	true
+derpy_gg_svc_master_builders_hef		Master Masons	faction	1	derpy_gg_overseers_hef.png	true	false	true
+derpy_gg_svc_public_works_hef		Shrines of Ulthuan	faction	1	derpy_gg_overseers_hef.png	true	false	true
+derpy_gg_svc_raiding_parties_hef		Reaver Scouts	faction	1	derpy_gg_slavers_hef.png	true	false	true
+derpy_gg_svc_captive_markets_hef		Spoils of Victory	faction	1	derpy_gg_slavers_hef.png	true	false	true
+derpy_gg_svc_slave_levy_hef		Levy of the Isles	faction	1	derpy_gg_slavers_hef.png	true	false	true
+derpy_gg_svc_pit_fights_hef		Martial Contests	faction	1	derpy_gg_slavers_hef.png	true	false	true
+derpy_gg_svc_great_hunt_hef		The Long Ride	faction	1	derpy_gg_slavers_hef.png	true	false	true
+derpy_gg_svc_scorched_earth_hef		Burn the Stores	region	1	derpy_gg_slavers_hef.png	true	false	true
 derpy_gg_rank_brass_2_gen		The Merchant Houses - Known	faction	1	derpy_gg_brass_gen.png	true	false	true
 derpy_gg_rank_brass_3_gen		The Merchant Houses - Trusted	faction	1	derpy_gg_brass_gen.png	true	false	true
 derpy_gg_rank_brass_4_gen		The Merchant Houses - Honoured	faction	1	derpy_gg_brass_gen.png	true	false	true
@@ -379,3 +656,37 @@ derpy_gg_svc_lash_the_gangs_gen		Work Through the Night	faction	1	derpy_gg_overs
 derpy_gg_svc_works_of_zharr_gen		The Great Works	faction	1	derpy_gg_overseers_gen.png	true	false	true
 derpy_gg_svc_coffle_drive_gen		Raiding Rights	faction	1	derpy_gg_slavers_gen.png	true	false	true
 derpy_gg_svc_great_coffle_gen		The Great Raid	faction	1	derpy_gg_slavers_gen.png	true	false	true
+derpy_gg_svc_alms_and_bribes_gen		Alms and Bribes	faction	1	derpy_gg_brass_gen.png	true	false	true
+derpy_gg_svc_mercenary_contract_gen		Mercenary Contract	faction	1	derpy_gg_brass_gen.png	true	false	true
+derpy_gg_svc_guild_loan_gen		Guild Loan	faction	1	derpy_gg_brass_gen.png	true	false	true
+derpy_gg_svc_industry_charter_gen		Industry Charter	faction	1	derpy_gg_brass_gen.png	true	false	true
+derpy_gg_svc_treasury_seal_gen		Treasury Seal	faction	1	derpy_gg_brass_gen.png	true	false	true
+derpy_gg_svc_bought_peace_gen		Bought Peace	faction	1	derpy_gg_brass_gen.png	true	false	true
+derpy_gg_svc_forced_march_gen		Forced March	force	1	derpy_gg_immortals_gen.png	true	false	true
+derpy_gg_svc_drillmasters_gen		Drillmasters	faction	1	derpy_gg_immortals_gen.png	true	false	true
+derpy_gg_svc_battle_standard_gen		Battle Standard	force	1	derpy_gg_immortals_gen.png	true	false	true
+derpy_gg_svc_field_surgeons_gen		Field Surgeons	force	1	derpy_gg_immortals_gen.png	true	false	true
+derpy_gg_svc_veteran_cadre_gen		Veteran Cadre	faction	1	derpy_gg_immortals_gen.png	true	false	true
+derpy_gg_svc_ward_runes_gen		Ward Runes	force	1	derpy_gg_daemonsmiths_gen.png	true	false	true
+derpy_gg_svc_spirit_siphon_gen		Spirit Siphon	faction	1	derpy_gg_daemonsmiths_gen.png	true	false	true
+derpy_gg_svc_forged_arms_gen		Forged Arms	faction	1	derpy_gg_daemonsmiths_gen.png	true	false	true
+derpy_gg_svc_master_gunners_gen		Master Gunners	faction	1	derpy_gg_daemonsmiths_gen.png	true	false	true
+derpy_gg_svc_great_work_gen		The Great Work	faction	1	derpy_gg_daemonsmiths_gen.png	true	false	true
+derpy_gg_svc_arsenal_gen		Arsenal	faction	1	derpy_gg_daemonsmiths_gen.png	true	false	true
+derpy_gg_svc_bribed_guards_gen		Bribed Guards	faction	1	derpy_gg_khanate_gen.png	true	false	true
+derpy_gg_svc_blooded_agents_gen		Blooded Agents	faction	1	derpy_gg_khanate_gen.png	true	false	true
+derpy_gg_svc_sow_discord_gen		Sow Discord	region	1	derpy_gg_khanate_gen.png	true	false	true
+derpy_gg_svc_web_of_whispers_gen		Web of Whispers	faction	1	derpy_gg_khanate_gen.png	true	false	true
+derpy_gg_svc_poisoned_wells_gen		Poisoned Wells	region	1	derpy_gg_khanate_gen.png	true	false	true
+derpy_gg_svc_granaries_gen		Granaries	region	1	derpy_gg_overseers_gen.png	true	false	true
+derpy_gg_svc_road_gangs_gen		Road Gangs	faction	1	derpy_gg_overseers_gen.png	true	false	true
+derpy_gg_svc_enforcers_gen		Enforcers	region	1	derpy_gg_overseers_gen.png	true	false	true
+derpy_gg_svc_fortify_gen		Fortify	region	1	derpy_gg_overseers_gen.png	true	false	true
+derpy_gg_svc_master_builders_gen		Master Builders	faction	1	derpy_gg_overseers_gen.png	true	false	true
+derpy_gg_svc_public_works_gen		Public Works	faction	1	derpy_gg_overseers_gen.png	true	false	true
+derpy_gg_svc_raiding_parties_gen		Raiding Parties	faction	1	derpy_gg_slavers_gen.png	true	false	true
+derpy_gg_svc_captive_markets_gen		Captive Markets	faction	1	derpy_gg_slavers_gen.png	true	false	true
+derpy_gg_svc_slave_levy_gen		Extra Levies	faction	1	derpy_gg_slavers_gen.png	true	false	true
+derpy_gg_svc_pit_fights_gen		Pit Fights	faction	1	derpy_gg_slavers_gen.png	true	false	true
+derpy_gg_svc_great_hunt_gen		The Great Hunt	faction	1	derpy_gg_slavers_gen.png	true	false	true
+derpy_gg_svc_scorched_earth_gen		Scorched Earth	region	1	derpy_gg_slavers_gen.png	true	false	true

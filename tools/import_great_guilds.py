@@ -35,7 +35,10 @@ UI_FILES = [
     "Modding Files/pack/ui/campaign ui/derpy_gg_list.twui.xml",
     "Modding Files/pack/ui/campaign ui/derpy_gg_frow.twui.xml",
     "Modding Files/pack/ui/campaign ui/derpy_gg_opener.twui.xml",
-]
+    # Each race's own panel and card (gen_guilds_ui.FRAMES); GGUI.frame_path creates them.
+] + ["Modding Files/pack/ui/campaign ui/derpy_gg_%s_%s.twui.xml" % (kind, race)
+     for race in ("brt", "cth", "def", "dwf", "emp", "hef", "ksl")
+     for kind in ("panel", "card")]
 MCT_FILE = "Modding Files/pack/script/mct/settings/derpy_great_guilds.lua"
 MODEL_LUA = SCRIPTS[0]
 
@@ -94,11 +97,15 @@ def _check_ui_file_list():
     still named four; the pack built, verified, reported "4 ui file(s)" and was correct
     about every row it checked. The panel would have created a component from a file that
     was not in the pack - which is a silent non-draw, the same failure as a bad GUID.
+
+    AND AGAIN, 2026-09-29: the race frames added fourteen files through frame_files(), and
+    this compared against FILES, which is only the six the Chaos Dwarfs use. It passed, and
+    every other race's panel would have opened onto nothing.
     """
     import sys as _sys
     _sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__))))
     import gen_guilds_ui as _UI
-    want = {n for n, _b, _c in _UI.FILES}
+    want = {n for n, _b, _c in _UI.frame_files()}
     got = {os.path.basename(p) for p in UI_FILES}
     missing = sorted(want - got)
     extra = sorted(got - want)
@@ -125,7 +132,7 @@ LOC_DEST = "text/db/derpy_great_guilds.loc"
 
 for _t in ("campaign_groups", "campaign_group_members",
            "campaign_group_member_criteria_values", "event_feed_message_events",
-           "effects", "building_effects_junction"):
+           "effects", "building_effects_junction", "effect_bonus_value_ids_unit_sets"):
     DB_DEST[_t] = "db/%s_tables/derpy_great_guilds" % _t
 
 

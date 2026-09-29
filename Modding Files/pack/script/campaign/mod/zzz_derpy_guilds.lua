@@ -129,8 +129,9 @@ GG.RIVALS = {
 -- and applies the new whichever direction the move is - so a demotion takes the ladder
 -- buff away exactly as a promotion granted it.
 -- Floor of 1, so a small gain still costs something rather than rounding to free.
-function GG.rival_loss(amount)
-    local share = GG.setting("rate_rivalry")
+-- `faction` is whose rivalry it is: each race bends the share (GG.setting_for).
+function GG.rival_loss(amount, faction)
+    local share = GG.setting_for(faction, "rate_rivalry")
     if not share or share <= 0 or not amount or amount <= 0 then return 0 end
     local loss = math.floor(amount * share / 100)
     if loss < 1 then loss = 1 end
@@ -140,14 +141,14 @@ end
 function GG.rival_cost(faction, guild, amount)
     local rival = GG.RIVALS[guild]
     if not rival or not amount or amount <= 0 then return 0 end
-    local share = GG.setting("rate_rivalry")
+    local share = GG.setting_for(faction, "rate_rivalry")
     if not share or share <= 0 then return 0 end
 
     local tracks = GG.state[faction]
     local t = tracks and tracks[rival]
     if not t or t.rep <= 0 then return 0 end
 
-    local loss = GG.rival_loss(amount)
+    local loss = GG.rival_loss(amount, faction)
 
     -- NEVER BELOW THE RANK ALREADY REACHED.
     --
@@ -183,7 +184,7 @@ function GG.rival_cost(faction, guild, amount)
     -- next turn start's upkeep to finish the job: pinned at 100, charged 2, demoted at 98,
     -- then re-promoted by the next earn with a second popup (Azeros, turns 31-33, 2026-09-23).
     local rank = GG.rank_of(t.rep)
-    local floor_at = (GG.RANKS[rank] or 0) + GG.decay_amount(rank)
+    local floor_at = (GG.RANKS[rank] or 0) + GG.decay_amount(rank, faction)
     if t.rep <= floor_at then return 0 end
     if loss > t.rep - floor_at then loss = t.rep - floor_at end
     return GG.penalise(faction, rival, loss)
@@ -228,8 +229,8 @@ end
 -- REPUTATION ONLY, NEVER FAVOUR. Favour is the currency and it is already capped at twice
 -- the rank threshold, which is its own pressure to spend; charging upkeep against it would
 -- punish the same turn twice and make a saved-up purchase impossible rather than costly.
-function GG.decay_amount(rank)
-    local share = GG.setting("rate_decay")
+function GG.decay_amount(rank, faction)
+    local share = GG.setting_for(faction, "rate_decay")
     if not share or share <= 0 then return 0 end
     if not rank or rank < 1 then return 0 end
     local n = math.floor(rank * share / 100)
@@ -267,7 +268,7 @@ function GG.decay(faction, turn)
         if t and t.rep > 0 then
             -- Read the rank BEFORE the charge. GG.penalise floors at the reputation held
             -- and handles the demotion, so a guild at 2 reputation loses 2 and not 5.
-            took = took + GG.penalise(faction, guild, GG.decay_amount(GG.rank_of(t.rep)))
+            took = took + GG.penalise(faction, guild, GG.decay_amount(GG.rank_of(t.rep), faction))
         end
     end
     return took
@@ -289,8 +290,11 @@ function GG.grant(faction, guild, amount, source)
     -- floor keeps a brand new faction able to hold a tier-1 service price.
     local cap = GG.RANKS[after] * 2
     if cap < 200 then cap = 200 end
-    g.fav = g.fav + amount
-    if g.fav > cap then g.fav = cap end
+    -- The High Elves' ancient houses hold more (GG.TWISTS favour_cap).
+    cap = math.floor(cap * GG.twist(faction, "favour_cap") / 100)
+    -- THE CAP STOPS THE GAIN, NEVER TAKES: favour held above it after a demotion stays,
+    -- where capping the total made one point earned cost 700 favour (logic audit).
+    if g.fav < cap then g.fav = math.min(g.fav + amount, cap) end
     GG.apply_rank(faction, guild, before, after)
     -- AFTER apply_rank, so the bundle the message promises is already on the faction when
     -- the player clicks through to look. Before rival_cost, which can only subtract and
@@ -340,8 +344,33 @@ end
 GG.CAP = {brass = 40, immortals = 60, daemonsmiths = 0,
           khanate = 40, overseers = 40, slavers = 80}
 
+-- WHAT EACH GUILD HAS PAID THIS FACTION SINCE ITS LAST TURN START, saved as it changes
+-- ("guild=n,..."). Session memory alone let a player at a limit save, reload and earn it
+-- again (logic audit, 2026-09-29). Read back where it is used, when memory has none.
+local function gain_key(faction) return "derpy_gg_gain_" .. faction end
+
+function GG.save_gain(faction)
+    local parts = {}
+    for i = 1, #GG.GUILDS do
+        local n = (GG.turn_gain[faction] or {})[GG.GUILDS[i]]
+        if n and n > 0 then parts[#parts + 1] = GG.GUILDS[i] .. "=" .. n end
+    end
+    cm:set_saved_value(gain_key(faction), table.concat(parts, ","))
+end
+
+function GG.load_gain(faction)
+    local t = {}
+    local packed = cm:get_saved_value(gain_key(faction))
+    for g, n in string.gmatch(type(packed) == "string" and packed or "", "([%w_]+)=(%d+)") do
+        t[g] = tonumber(n)
+    end
+    return t
+end
+
 function GG.reset_turn(faction)
     GG.turn_gain[faction] = {}
+    local packed = cm:get_saved_value(gain_key(faction))
+    if packed and packed ~= "" then cm:set_saved_value(gain_key(faction), "") end
 end
 
 -- READ LIVE FROM MCT, not through GG.setting. Every other setting is frozen into the
@@ -392,7 +421,7 @@ function GG.capped_grant(faction, guild, amount, source)
     amount = GG.with_patron(faction, guild, amount)
     local cap = GG.guild_cap(guild)
     if cap > 0 then
-        GG.turn_gain[faction] = GG.turn_gain[faction] or {}
+        if not GG.turn_gain[faction] then GG.turn_gain[faction] = GG.load_gain(faction) end
         local so_far = GG.turn_gain[faction][guild] or 0
         -- WHAT THE CAP KEPT BACK IS WRITTEN DOWN. Without it a market finished on a turn
         -- the income already filled the Brass cap pays nothing and says nothing.
@@ -405,6 +434,7 @@ function GG.capped_grant(faction, guild, amount, source)
             amount = cap - so_far
         end
         GG.turn_gain[faction][guild] = so_far + amount
+        GG.save_gain(faction)
     end
     GG.grant(faction, guild, amount, source)
     -- The line the MCT's debug checkbox promises. Behind GG.logging() because it is one
@@ -450,7 +480,7 @@ end
 -- hold a little stickier.
 function GG.turn_start_charge(faction, guild)
     if GG.RIVALS[guild] ~= "brass" then return 0 end
-    return GG.rival_loss(GG.turn_start_pay(faction, "brass"))
+    return GG.rival_loss(GG.turn_start_pay(faction, "brass"), faction)
 end
 
 function GG.on_battle(faction, outnumbered)
@@ -959,6 +989,18 @@ end
 -- sitting high looks ahead of the holder.
 function GG.hold_lead(guild, culture, rows, top, top_rep)
     local held = GG.leaders_now[GG.lead_slot(guild, culture)]
+    -- NOT LOOKED YET THIS SESSION (nil; nobody-leads is false): the holder is whoever
+    -- wears the lead bundle, which the save kept. Without this, a load handed a guild
+    -- held within the margin to the rival, silently (logic audit, 2026-09-29).
+    if held == nil then
+        local key = GG.lead_key(guild, culture)
+        for i = 1, #rows do
+            local okb, has = pcall(function()
+                return cm:get_faction(rows[i].faction):has_effect_bundle(key)
+            end)
+            if okb and has then held = rows[i].faction; break end
+        end
+    end
     -- Nobody held it, or the holder IS the top row: nothing to hold against. `false`
     -- is what GG.reassert_leaders stores for "nobody leads this", so it is not a key.
     if not held or held == top then return top, top_rep end
@@ -969,8 +1011,8 @@ function GG.hold_lead(guild, culture, rows, top, top_rep)
             -- the rows entirely - dead, drained to zero, out of this culture - never
             -- reaches here and the top row takes it, which is correct.
             if GG.faction_dead(held) then return top, top_rep end
-            local margin = math.max(GG.decay_amount(GG.rank_of(top_rep)),
-                                    GG.decay_amount(GG.rank_of(rows[i].rep)),
+            local margin = math.max(GG.decay_amount(GG.rank_of(top_rep), top),
+                                    GG.decay_amount(GG.rank_of(rows[i].rep), held),
                                     GG.turn_start_pay(held, guild),
                                     GG.turn_start_charge(top, guild))
             if top_rep - rows[i].rep <= margin then return held, rows[i].rep end
@@ -1039,8 +1081,11 @@ end
 -- CACHED FOR THE SESSION. A faction's culture does not change and the campaign's faction
 -- list does not grow. Death is handled by the GG.dead filter at the point of use rather
 -- than by rebuilding, so a faction wiped out mid-campaign leaves without this being redone.
+-- ONE ROUND, NOT THE SESSION (logic audit, 2026-09-29): cultures do not change, but who is
+-- PRESENT does - an invasion faction appears, a rebellion takes a town - and such a faction
+-- earned unseen until the next load. The round is the same number on every machine.
 function GG.scan_world()
-    if GG.roster_cache then return GG.roster_cache end
+    if GG.roster_cache and GG.roster_turn == GG.turn_now() then return GG.roster_cache end
     local buckets, seen = {}, false
     local ok = pcall(function()
         local fl = cm:model():world():faction_list()
@@ -1075,7 +1120,7 @@ function GG.scan_world()
     -- nothing there would leave every table empty for the rest of the session.
     if not ok or not seen then return {} end
     for _, list in pairs(buckets) do table.sort(list) end
-    GG.roster_cache = buckets
+    GG.roster_cache, GG.roster_turn = buckets, GG.turn_now()
     return buckets
 end
 
@@ -1356,8 +1401,12 @@ function GG.snapshot_world(turn, bought, demands, patrons)
             local g = GG.lead_slot(GG.GUILDS[i], culture)
             local who, rep = GG.leader_of(GG.GUILDS[i], culture)
             who, rep = who or "", rep or 0
-            GG.world.gain[g] = (not first) and (rep - (GG.world.rep[g] or 0)) or 0
             GG.world.moved[g] = (not first) and ((GG.world.held[g] or "") ~= who) or false
+            -- NO GAIN ACROSS A CHANGE OF HANDS: the record holds the OLD leader's
+            -- reputation, and the new leader's less it is two factions' numbers - "+5"
+            -- for a rise of 55, or a loss when the old leader died (logic audit).
+            GG.world.gain[g] = (not first and not GG.world.moved[g])
+                               and (rep - (GG.world.rep[g] or 0)) or 0
             GG.world.rep[g], GG.world.held[g] = rep, who
         end
     end
@@ -1389,11 +1438,14 @@ function GG.is_guild(key)
 end
 
 -- A character cqi to their army's cqi, or nil. A lord with no army cannot carry this.
-function GG.force_cqi_of(char_cqi)
+-- With `faction`, only that faction's own lord: the map's selection lands on anyone, and
+-- an enemy army was given the patron's bundle for good (logic audit, 2026-09-29).
+function GG.force_cqi_of(char_cqi, faction)
     if not char_cqi then return nil end
     local ok, cqi = pcall(function()
         local c = cm:get_character_by_cqi(char_cqi)
         if not c or c:is_null_interface() then return nil end
+        if faction and c:faction():name() ~= faction then return nil end
         local mf = c:military_force()
         if not mf or mf:is_null_interface() then return nil end
         return mf:command_queue_index()
@@ -1404,7 +1456,7 @@ end
 
 function GG.set_patron(faction, guild, char_cqi)
     if not GG.is_guild(guild) then return false, "guild" end
-    local force = GG.force_cqi_of(char_cqi)
+    local force = GG.force_cqi_of(char_cqi, faction)
     -- Refused, not applied blind. A patron with no army would hold the post, take the
     -- discount and show a bundle nothing carries.
     if not force then return false, "army" end
@@ -1430,8 +1482,13 @@ end
 function GG.assert_patron(faction)
     local p = GG.patrons[faction]
     if not p then return end
-    local force = GG.force_cqi_of(p.cqi)
+    local force = GG.force_cqi_of(p.cqi, faction)
     if not force then
+        -- THE ARMY KEEPS NOTHING. A lord who died, lost the army or left the faction
+        -- leaves an army that may well live on under someone else.
+        if GG.patron_forces[faction] then
+            cm:remove_effect_bundle_from_force(GG.PATRON_BUNDLE, GG.patron_forces[faction])
+        end
         GG.patrons[faction] = nil
         GG.patron_forces[faction] = nil
         return
@@ -1562,6 +1619,15 @@ function GG.upgrade_target(faction, key)
                     -- that names no building returns nothing at all - so the type is
                     -- checked before the index.
                     if type(ups) == "table" and type(ups[1]) == "string" then
+                        -- THE BUILDING'S OWN BRANCH FIRST (logic audit, 2026-09-29):
+                        -- Cathay's yin_1 upgrades to yang_2 or yin_2, and taking the
+                        -- first turned one into the other. Same key less its level.
+                        local stem = string.gsub(b:name(), "_%d+$", "")
+                        for j = 1, #ups do
+                            if string.gsub(ups[j], "_%d+$", "") == stem then
+                                return {slot = sl, building = ups[j]}
+                            end
+                        end
                         return {slot = sl, building = ups[1]}
                     end
                 end
@@ -1573,10 +1639,14 @@ function GG.upgrade_target(faction, key)
     return nil
 end
 
+-- "guild,cqi,force": THE ARMY WEARING THE BUNDLE is saved with the post. It was session
+-- memory, so a patron dismissed or moved after a load could not find the army to take the
+-- bundle off, and it stayed there for good. An older save has no third field.
 function GG.save_patron(faction)
     local p = GG.patrons[faction]
+    local force = GG.patron_forces[faction]
     cm:set_saved_value("derpy_gg_patron_" .. faction,
-                       p and (p.guild .. "," .. p.cqi) or "")
+                       p and (p.guild .. "," .. p.cqi .. "," .. (force or "")) or "")
 end
 
 function GG.load_patron(faction)
@@ -1585,11 +1655,14 @@ function GG.load_patron(faction)
         GG.patrons[faction] = nil
         return
     end
-    local guild, cqi = string.match(packed, "^([^,]*),(%-?%d+)$")
+    local guild, cqi, force = string.match(packed, "^([^,]*),(%-?%d+),?(%-?%d*)$")
     if guild and cqi and GG.is_guild(guild) then
         GG.patrons[faction] = {guild = guild, cqi = tonumber(cqi)}
+        -- An older save has no army: the lord's own is the one the bundle went on.
+        GG.patron_forces[faction] = tonumber(force) or GG.force_cqi_of(tonumber(cqi))
     else
         GG.patrons[faction] = nil
+        GG.patron_forces[faction] = nil
     end
 end
 
@@ -1652,13 +1725,13 @@ function GG.demand_tick(faction, turn)
     local d = GG.demands[faction]
     if d then
         if turn > d.due then
-            GG.penalise(faction, d.guild, GG.setting("demand_penalty") or 0)
+            GG.penalise(faction, d.guild, GG.setting_for(faction, "demand_penalty") or 0)
             GG.demands[faction] = nil
             return "expired", d
         end
         return nil
     end
-    local every = GG.setting("demand_every") or 0
+    local every = GG.setting_for(faction, "demand_every") or 0
     if every <= 0 then return nil end
     if turn - (GG.demand_last[faction] or 0) < every then return nil end
     local new = GG.roll_demand(faction, turn)
@@ -1703,7 +1776,7 @@ function GG.pay_demand(faction)
     end
     -- Through GG.grant, so the reward climbs ranks and drains the rival exactly as any
     -- other earning does. A paid demand is a large, chosen, one-off earn.
-    GG.grant(faction, d.guild, GG.setting("demand_reward") or 0, "demands")
+    GG.grant(faction, d.guild, GG.setting_for(faction, "demand_reward") or 0, "demands")
     GG.demands[faction] = nil
     return true, nil
 end
@@ -1789,9 +1862,12 @@ end
 GG.BOUNTY_BLOCK_BUNDLES = {"wh3_main_bundle_realm_factions",
                            "wh3_main_bundle_rift_factions"}
 
-function GG.bounty_rival_ok(pf, e)
+function GG.bounty_rival_ok(pf, e, human_ok)
     local ok, yes = pcall(function()
-        if e:is_dead() or e:is_human() or e:name() == pf:name() then return false end
+        -- human_ok: a RIVAL's bounty may name a human (2026-09-29); the player's never does.
+        if e:is_dead() or (e:is_human() and not human_ok) or e:name() == pf:name() then
+            return false
+        end
         if pf:military_allies_with(e) or pf:defensive_allies_with(e) then return false end
         if pf:non_aggression_pact_with(e) then return false end
         if pf:is_vassal_of(e) or e:is_vassal_of(pf) then return false end
@@ -1807,7 +1883,7 @@ end
 
 -- war = false: the enemies you already fight (a FAR ENEMY offer).
 -- war = true: factions you have met and are at peace with (a NEW WAR offer).
-function GG.bounty_pool(faction, war)
+function GG.bounty_pool(faction, war, human_ok)
     local out = {}
     pcall(function()
         local pf = cm:get_faction(faction)
@@ -1815,7 +1891,7 @@ function GG.bounty_pool(faction, war)
         local list = war and pf:factions_met() or pf:factions_at_war_with()
         for i = 0, list:num_items() - 1 do
             local e = list:item_at(i)
-            if (not war or not pf:at_war_with(e)) and GG.bounty_rival_ok(pf, e) then
+            if (not war or not pf:at_war_with(e)) and GG.bounty_rival_ok(pf, e, human_ok) then
                 out[#out + 1] = e
             end
         end
@@ -1908,20 +1984,25 @@ end
 -- Every candidate is gathered before one is picked, rather than stopping at the first
 -- hit of the first enemy. That is what makes the dedupe possible at all, and it also
 -- lets the board name several enemy factions instead of always the same one.
-function GG.bounty_target(faction, kind, used, war, guild)
+function GG.bounty_target(faction, kind, used, war, guild, ai)
     local k = GG.BOUNTY_KINDS[kind]
     if not k then return nil end
     used = used or {}
     if k.pick then return GG.BOUNTY_PICK[k.pick](faction, kind, used, guild) end
     local why = "walk never started"
     local ok, target, owner = pcall(function()
-        local pool = GG.bounty_pool(faction, war == true)
+        -- A RIVAL (ai) fights only the wars it has and may name a human.
+        local pool = GG.bounty_pool(faction, war == true and not ai, ai)
         if #pool == 0 then
             why = war and "nobody met and at peace" or "at war with nobody eligible"
             return nil
         end
-        -- The front is never military work; hero work may be done there (spec 5.5).
-        local front = (not k.front_ok) and GG.front_regions(faction) or {}
+        -- The front is never the player's military work; hero work may be done there
+        -- (spec 5.5). A RIVAL'S TARGET IS ALWAYS ON ITS FRONT (final review, 2026-09-29):
+        -- one across the map is one it never reaches, and at the default failure cost a
+        -- rival finishing under 56% of its bounties loses Reputation by taking them.
+        local front = (ai or not k.front_ok) and GG.front_regions(faction) or {}
+        local function keep(on) if ai then return on end return not on end
         local found = {}
         for i = 1, #pool do
             local e = pool[i]
@@ -1930,7 +2011,7 @@ function GG.bounty_target(faction, kind, used, war, guild)
                 local rl = e:region_list()
                 for j = 0, rl:num_items() - 1 do
                     local key = rl:item_at(j):name()
-                    if key and not used[key] and not front[key] then
+                    if key and not used[key] and keep(front[key] == true) then
                         found[#found + 1] = {key, ename}
                     end
                 end
@@ -1945,7 +2026,8 @@ function GG.bounty_target(faction, kind, used, war, guild)
                         local cqi = tostring(gen:family_member():command_queue_index())
                         seen[cqi] = true
                         if gen:has_region() and not used[cqi]
-                           and (k.front_ok or not GG.char_on_front(faction, gen)) then
+                           and ((k.front_ok and not ai)
+                                or keep(GG.char_on_front(faction, gen))) then
                             found[#found + 1] = {cqi, ename}
                         end
                     end
@@ -1957,7 +2039,8 @@ function GG.bounty_target(faction, kind, used, war, guild)
                         local cqi = tostring(c:family_member():command_queue_index())
                         if not seen[cqi] and not used[cqi] and c:has_region()
                            and not c:character_type("general")
-                           and not c:character_type("colonel") then
+                           and not c:character_type("colonel")
+                           and (not ai or GG.char_on_front(faction, c)) then
                             found[#found + 1] = {cqi, ename}
                         end
                     end
@@ -2308,11 +2391,12 @@ end
 -- THE WAR ROLL (spec 3.3): a 3 on a d3 asks for a new war, anything else a far enemy,
 -- and each falls back to the other. A 3 rather than a 1 because a campaign with no
 -- random source rolls 1 (GG.roll), and that must keep meaning "the war you are in".
-function GG.make_offer(faction, guild, kind, turn, used)
+-- ai: a RIVAL's offer (2026-09-29) - no war roll, never a new war.
+function GG.make_offer(faction, guild, kind, turn, used, ai)
     local k = GG.BOUNTY_KINDS[kind]
     if not k then return nil end
     local target, owner, amount, war = nil, nil, nil, 0
-    if k.military then
+    if k.military and not ai then
         local first = (GG.roll(3) == 3)
         target, owner = GG.bounty_target(faction, kind, used, first)
         war = first and 1 or 0
@@ -2321,7 +2405,7 @@ function GG.make_offer(faction, guild, kind, turn, used)
             war = first and 0 or 1
         end
     else
-        target, owner, amount = GG.bounty_target(faction, kind, used, false, guild)
+        target, owner, amount = GG.bounty_target(faction, kind, used, false, guild, ai)
     end
     if not target then return nil end
     -- Hero work counts successes toward a fixed number (spec 5.5).
@@ -2811,15 +2895,15 @@ end
 function GG.bounty_failed(faction, mission_key)
     local o = GG.take_bounty_slot(faction, mission_key)
     if not o then return nil end
-    local cost = GG.bounty_fail_cost(o)
+    local cost = GG.bounty_fail_cost(o, faction)
     if cost <= 0 then return o.guild, 0 end
     return o.guild, GG.penalise(faction, o.guild, cost)
 end
 
 -- What failing an offer takes back, before the clamp to what is held. One function so
 -- the card that warns of it and the handler that charges it cannot name two numbers.
-function GG.bounty_fail_cost(o)
-    local share = GG.setting("rate_bounty_fail")
+function GG.bounty_fail_cost(o, faction)
+    local share = GG.setting_for(faction, "rate_bounty_fail")
     if not share or share <= 0 then return 0 end
     return math.floor(((o and o.rep) or 0) * share / 100)
 end
@@ -2830,24 +2914,40 @@ end
 --
 -- Every field is a key or a number. No display text is stored, so no delimiter in the
 -- data can ever collide with the "," and ";" used here.
+-- ONE OFFER, packed. Shared by the player's board and a rival's single bounty
+-- (2026-09-29), so the two formats cannot drift apart.
+function GG.pack_offer(o)
+    -- APPENDED, like every other packed field in this mod. unpack_offer walks these
+    -- positionally, so diff goes on the END and a save written before it existed reads
+    -- back with diff zero - which prices at base until the next purge re-reads the
+    -- target, which is the right answer anyway.
+    return table.concat({o.guild, o.kind, o.target, o.owner or "",
+                         o.gold, o.rep, o.posted,
+                         o.taken and 1 or 0, o.diff or 0,
+                         -- v2, APPENDED (2026-09-27): a save from before reads these
+                         -- five as zero.
+                         o.war or 0, o.stake or 0, o.amount or 0,
+                         o.done or 0, o.void and 1 or 0}, ",")
+end
+
+-- nil for a kind this build does not know, so an old or foreign offer is dropped.
+function GG.unpack_offer(chunk)
+    local f = {}
+    for field in string.gmatch(chunk .. ",", "([^,]*),") do f[#f + 1] = field end
+    if not (f[1] and GG.BOUNTY_KINDS[f[2]]) then return nil end
+    return {guild = f[1], kind = f[2], target = f[3], owner = f[4] or "",
+            gold = tonumber(f[5]) or 0, rep = tonumber(f[6]) or 0,
+            posted = tonumber(f[7]) or 0, taken = f[8] == "1",
+            diff = tonumber(f[9]) or 0, war = tonumber(f[10]) or 0,
+            stake = tonumber(f[11]) or 0, amount = tonumber(f[12]) or 0,
+            done = tonumber(f[13]) or 0, void = f[14] == "1"}
+end
+
 function GG.save_bounties(faction)
     local list = GG.bounties[faction]
     if not list then return end
     local parts = {}
-    for i = 1, #list do
-        local o = list[i]
-        -- APPENDED, like every other packed field in this mod. load_bounties walks
-        -- these positionally, so diff goes on the END and a save written before it
-        -- existed reads back with diff nil - which prices at base until the next
-        -- purge re-reads the target, which is the right answer anyway.
-        parts[#parts + 1] = table.concat({o.guild, o.kind, o.target, o.owner or "",
-                                          o.gold, o.rep, o.posted,
-                                          o.taken and 1 or 0, o.diff or 0,
-                                          -- v2, APPENDED (2026-09-27): a save from
-                                          -- before reads these five as zero.
-                                          o.war or 0, o.stake or 0, o.amount or 0,
-                                          o.done or 0, o.void and 1 or 0}, ",")
-    end
+    for i = 1, #list do parts[#parts + 1] = GG.pack_offer(list[i]) end
     cm:set_saved_value("derpy_gg_bounties_" .. faction, table.concat(parts, ";"))
 end
 
@@ -2856,23 +2956,8 @@ function GG.load_bounties(faction)
     if not packed then return end
     local list = {}
     for chunk in string.gmatch(packed, "[^;]+") do
-        local f = {}
-        for field in string.gmatch(chunk .. ",", "([^,]*),") do
-            f[#f + 1] = field
-        end
-        if f[1] and GG.BOUNTY_KINDS[f[2]] then
-            list[#list + 1] = {guild = f[1], kind = f[2], target = f[3],
-                               owner = f[4] or "", gold = tonumber(f[5]) or 0,
-                               rep = tonumber(f[6]) or 0,
-                               posted = tonumber(f[7]) or 0,
-                               taken = f[8] == "1",
-                               diff = tonumber(f[9]) or 0,
-                               war = tonumber(f[10]) or 0,
-                               stake = tonumber(f[11]) or 0,
-                               amount = tonumber(f[12]) or 0,
-                               done = tonumber(f[13]) or 0,
-                               void = f[14] == "1"}
-        end
+        local o = GG.unpack_offer(chunk)
+        if o then list[#list + 1] = o end
     end
     GG.bounties[faction] = list
 end
@@ -2921,6 +3006,75 @@ GG.SERVICES = {
     {key="coffle_drive",    guild="slavers",      rank=2, cost=50,  cd=8,  kind="bundle",   turns=8},
     {key="slave_tithe",     guild="slavers",      rank=3, cost=150, cd=10, kind="pooled"},
     {key="great_coffle",    guild="slavers",      rank=4, cost=400, cd=18, kind="bundle",   turns=12, lead=true},
+    -- THE POOLS (2026-09-29, spec §5): two more per card. Effects and values live in the
+    -- generator; these rows carry what the payload reads.
+    {key="alms_and_bribes",    guild="brass",        rank=2, cost=50,  cd=8,  kind="bundle",   turns=8},
+    {key="mercenary_contract", guild="brass",        rank=2, cost=50,  cd=8,  kind="bundle",   turns=6},
+    {key="guild_loan",         guild="brass",        rank=3, cost=150, cd=12, kind="gold",     value=6000, turns=10, with_bundle=true},
+    {key="industry_charter",   guild="brass",        rank=3, cost=150, cd=12, kind="bundle",   turns=10},
+    {key="treasury_seal",      guild="brass",        rank=4, cost=400, cd=16, kind="bundle",   turns=12, lead=true},
+    {key="bought_peace",       guild="brass",        rank=4, cost=400, cd=16, kind="bundle",   turns=12, lead=true},
+    {key="forced_march",       guild="immortals",    rank=2, cost=50,  cd=8,  kind="army",     turns=3},
+    {key="drillmasters",       guild="immortals",    rank=2, cost=50,  cd=8,  kind="bundle",   turns=8},
+    {key="battle_standard",    guild="immortals",    rank=3, cost=150, cd=12, kind="army",     turns=5},
+    {key="field_surgeons",     guild="immortals",    rank=3, cost=150, cd=12, kind="army",     turns=2, heal=true},
+    {key="veteran_cadre",      guild="immortals",    rank=4, cost=400, cd=16, kind="bundle",   turns=10, lead=true},
+    {key="warlords_honour",    guild="immortals",    rank=4, cost=400, cd=16, kind="ranks",    value=5, lead=true},
+    {key="ward_runes",         guild="daemonsmiths", rank=2, cost=50,  cd=8,  kind="army",     turns=5},
+    {key="spirit_siphon",      guild="daemonsmiths", rank=2, cost=50,  cd=8,  kind="bundle",   turns=8},
+    {key="forged_arms",        guild="daemonsmiths", rank=3, cost=150, cd=12, kind="bundle",   turns=8},
+    {key="master_gunners",     guild="daemonsmiths", rank=3, cost=150, cd=12, kind="bundle",   turns=10},
+    {key="great_work",         guild="daemonsmiths", rank=4, cost=400, cd=16, kind="research", turns=10, with_bundle=true, lead=true},
+    {key="arsenal",            guild="daemonsmiths", rank=4, cost=400, cd=16, kind="bundle",   turns=10, lead=true},
+    {key="bribed_guards",      guild="khanate",      rank=2, cost=50,  cd=8,  kind="bundle",   turns=8},
+    {key="blooded_agents",     guild="khanate",      rank=2, cost=50,  cd=8,  kind="bundle",   turns=10},
+    {key="hired_blade",        guild="khanate",      rank=3, cost=150, cd=12, kind="ranks",    value=3},
+    {key="sow_discord",        guild="khanate",      rank=3, cost=150, cd=12, kind="enemy_settlement", turns=5},
+    {key="web_of_whispers",    guild="khanate",      rank=4, cost=400, cd=16, kind="bundle",   turns=15, lead=true},
+    {key="poisoned_wells",     guild="khanate",      rank=4, cost=400, cd=16, kind="enemy_settlement", turns=8, lead=true},
+    {key="granaries",          guild="overseers",    rank=2, cost=50,  cd=8,  kind="settlement", turns=8},
+    {key="road_gangs",         guild="overseers",    rank=2, cost=50,  cd=8,  kind="bundle",   turns=8},
+    {key="enforcers",          guild="overseers",    rank=3, cost=150, cd=12, kind="settlement", turns=8},
+    {key="fortify",            guild="overseers",    rank=3, cost=150, cd=12, kind="settlement", turns=8},
+    {key="master_builders",    guild="overseers",    rank=4, cost=400, cd=16, kind="bundle",   turns=10, lead=true},
+    {key="public_works",       guild="overseers",    rank=4, cost=400, cd=16, kind="bundle",   turns=10, lead=true},
+    {key="raiding_parties",    guild="slavers",      rank=2, cost=50,  cd=8,  kind="bundle",   turns=8},
+    {key="captive_markets",    guild="slavers",      rank=2, cost=50,  cd=8,  kind="bundle",   turns=8},
+    {key="slave_levy",         guild="slavers",      rank=3, cost=150, cd=12, kind="bundle",   turns=6},
+    {key="pit_fights",         guild="slavers",      rank=3, cost=150, cd=12, kind="bundle",   turns=10},
+    {key="great_hunt",         guild="slavers",      rank=4, cost=400, cd=16, kind="bundle",   turns=10, lead=true},
+    {key="scorched_earth",     guild="slavers",      rank=4, cost=400, cd=16, kind="enemy_settlement", turns=8, lead=true},
+    -- RACE SERVICES (2026-09-29, spec §6): drawn for their own race only, and only while
+    -- race differences are on. What each calls is below GG.take_self.
+    {key="conclave_favour",     guild="khanate",      rank=2, cost=50,  cd=8,  kind="resource", resource="wh3_dlc23_chd_conclave_influence", factor="wh3_dlc23_chd_conclave_influence_gained_events", value=40, race="wh3_dlc23_chd_chaos_dwarfs"},
+    {key="hellforge_allotment", guild="daemonsmiths", rank=3, cost=150, cd=12, kind="race",     value=1, race="wh3_dlc23_chd_chaos_dwarfs"},
+    {key="labour_gangs",        guild="overseers",    rank=4, cost=400, cd=16, kind="race",     value=200, lead=true, race="wh3_dlc23_chd_chaos_dwarfs"},
+    {key="high_kings_decree",   guild="overseers",    rank=2, cost=50,  cd=8,  kind="resource", resource="dwf_underdeeps", factor="underdeep_faction", value=1, race="wh_main_dwf_dwarfs"},
+    {key="strike_lines",        guild="daemonsmiths", rank=3, cost=150, cd=12, kind="resource", resource="wh3_dlc25_dwf_grudge_points", factor="settled", value=200, race="wh_main_dwf_dwarfs"},
+    {key="call_reckoning",      guild="immortals",    rank=4, cost=400, cd=16, kind="race",     lead=true, race="wh_main_dwf_dwarfs"},
+    {key="witch_hunters_warrant", guild="overseers",  rank=2, cost=50,  cd=8,  kind="settlement", turns=8, race="wh_main_emp_empire"},
+    {key="electors_muster",     guild="immortals",    rank=3, cost=150, cd=12, kind="race_army", room=true, units="wh_main_emp_inf_swordsmen,wh_main_emp_inf_handgunners", race="wh_main_emp_empire"},
+    {key="unity_of_empire",     guild="brass",        rank=4, cost=400, cd=16, kind="bundle",   turns=15, lead=true, race="wh_main_emp_empire"},
+    {key="electors_favour",     guild="khanate",      rank=3, cost=150, cd=12, kind="race",     value=1, race="wh_main_emp_empire"},
+    {key="gunnery_schematics",  guild="daemonsmiths", rank=3, cost=150, cd=12, kind="resource", resource="wh3_dlc25_emp_research", factor="other", value=300, race="wh_main_emp_empire"},
+    {key="arcane_essays",       guild="daemonsmiths", rank=3, cost=150, cd=12, kind="resource", resource="wh3_dlc25_emp_arcane_essays", factor="other", value=300, race="wh_main_emp_empire"},
+    {key="fervour",             guild="immortals",    rank=3, cost=150, cd=12, kind="resource", resource="wh3_dlc29_emp_fervour", factor="missions", value=300, race="wh_main_emp_empire"},
+    {key="supply_train",        guild="brass",        rank=3, cost=150, cd=12, kind="race",     race="wh_main_emp_empire"},
+    {key="prayers_motherland",  guild="daemonsmiths", rank=2, cost=50,  cd=8,  kind="resource", resource="wh3_main_ksl_devotion", factor="events", value=75, race="wh3_main_ksl_kislev"},
+    {key="court_favour",        guild="khanate",      rank=3, cost=150, cd=12, kind="race",     value=30, race="wh3_main_ksl_kislev"},
+    {key="blessing_motherland", guild="immortals",    rank=4, cost=400, cd=16, kind="race",     value=100, value2=20, lead=true, race="wh3_main_ksl_kislev"},
+    {key="ladys_blessing",      guild="immortals",    rank=2, cost=50,  cd=8,  kind="race_army", race="wh_main_brt_bretonnia"},
+    {key="peasant_levies",      guild="brass",        rank=3, cost=150, cd=12, kind="bundle",   turns=10, race="wh_main_brt_bretonnia"},
+    {key="tales_of_valour",     guild="daemonsmiths", rank=4, cost=400, cd=16, kind="race",     value=150, lead=true, race="wh_main_brt_bretonnia"},
+    {key="realign_compass",     guild="daemonsmiths", rank=2, cost=50,  cd=8,  kind="race",     race="wh3_main_cth_cathay"},
+    {key="ivory_cargo",         guild="brass",        rank=3, cost=150, cd=12, kind="race",     value=200, race="wh3_main_cth_cathay"},
+    {key="mandate_of_heaven",   guild="overseers",    rank=4, cost=400, cd=16, kind="bundle",   turns=10, lead=true, race="wh3_main_cth_cathay"},
+    {key="slave_coffles",       guild="slavers",      rank=2, cost=50,  cd=8,  kind="resource", resource="def_slaves", factor="missions", value=500, race="wh2_main_def_dark_elves"},
+    {key="bought_loyalty",      guild="khanate",      rank=3, cost=150, cd=12, kind="race_army", value=3, race="wh2_main_def_dark_elves"},
+    {key="black_ark_tithe",     guild="slavers",      rank=4, cost=400, cd=16, kind="bundle",   turns=10, lead=true, race="wh2_main_def_dark_elves"},
+    {key="whispers_at_court",   guild="khanate",      rank=2, cost=50,  cd=8,  kind="race",     value=30, race="wh2_main_hef_high_elves"},
+    {key="phoenix_favour",      guild="brass",        rank=3, cost=150, cd=12, kind="resource", resource="wh3_dlc27_hef_favour", factor="faction", value=50, race="wh2_main_hef_high_elves"},
+    {key="asuryans_grace",      guild="daemonsmiths", rank=4, cost=400, cd=16, kind="race",     value=150, value2=40, lead=true, race="wh2_main_hef_high_elves"},
 }
 
 -- ONE UNIT PER CULTURE, NOT ONE UNIT. This was a single Chaos Dwarf key, and it was the
@@ -3099,7 +3253,10 @@ function GG.feed(faction, base)
     return base + (f and f.feed or 0)
 end
 
+-- The cache is filled first, as GG.flavour_of does: read unfilled, nil counted as a Chaos
+-- Dwarf, and a payload reached before any covered() call paid a Kislev faction armaments.
 local function is_chd(faction)
+    if GG.CULTURE_OF[faction] == nil then GG.covered(faction) end
     return (GG.CULTURE_OF[faction] or GG.CHD_CULTURE) == GG.CHD_CULTURE
 end
 
@@ -3130,7 +3287,12 @@ function GG.payload(faction, s, target)
         -- mapped, so this branch should be unreachable - but a payload that fires with a
         -- nil unit key is the silent-forever shape, and one `if` is cheaper than trusting
         -- two call sites to stay in step.
-        if target and unit then cm:grant_unit_to_character(target, unit) end
+        -- A LOOKUP STRING, NOT A CQI. CA documents the first argument as a character
+        -- lookup string and every CA call builds one with cm:char_lookup_str; the cqi
+        -- off the wire was passed bare from the first build (found 2026-09-29).
+        if target and unit then
+            cm:grant_unit_to_character(cm:char_lookup_str(target), unit)
+        end
 
     elseif s.kind == "research" then
         -- THREE ARGUMENTS, not two. CA documents the third as "Send a notification to
@@ -3152,6 +3314,13 @@ function GG.payload(faction, s, target)
         -- The building key must be a valid upgrade for the chain in that slot.
         if target and target.slot and target.building then
             cm:region_slot_instantly_upgrade_building(target.slot, target.building)
+            -- READ BACK, not trusted: CA's docs say this returns nil while CA's own
+            -- custom starts read a building from it, and an upgrade the engine refuses
+            -- kept the favour. The slot answers either way; a throw refunds.
+            local now = target.slot:building():name()
+            if now ~= target.building then
+                error("the upgrade to " .. tostring(target.building) .. " did not land")
+            end
         end
 
     elseif s.kind == "pooled" then
@@ -3166,9 +3335,65 @@ function GG.payload(faction, s, target)
             -- dwf_oathgold_quest_rewards junction binds - the one of its nine that takes
             -- either sign. 250 is half what CA's Underdeep pays for one building.
             cm:faction_add_pooled_resource(faction, "dwf_oathgold", GG.TITHE_FACTOR, 250)
+        elseif GG.culture_of(faction) == "wh3_main_ksl_kislev"
+               and GG.has_resource(faction, "wh3_main_ksl_devotion") then
+            -- DEVOTION (2026-09-29, spec §6.2), through "events" as CA grants it
+            -- (wh3_tol_something_rotten_in_kislev.lua:19). No DB table assigns Devotion,
+            -- so a Kislev faction without it takes the gold below.
+            cm:faction_add_pooled_resource(faction, "wh3_main_ksl_devotion", "events", 150)
+        elseif GG.culture_of(faction) == "wh2_main_def_dark_elves" then
+            -- SLAVES, through "missions" as CA's own payloads grant them
+            -- (lib_campaign_mission_manager.lua:2616). Every Dark Elf faction holds them.
+            cm:faction_add_pooled_resource(faction, "def_slaves", "missions", 1000)
         else
             cm:treasury_mod(faction, 3000)
         end
+
+    elseif s.kind == "army" then
+        -- A CHARACTER cqi on the wire (the army's general, as Hire takes), turned into
+        -- the FORCE cqi apply_effect_bundle_to_force documents.
+        local okf, force = pcall(function()
+            local c = cm:get_character_by_cqi(target)
+            if not c or c:is_null_interface() or not c:has_military_force() then return nil end
+            return c:military_force()
+        end)
+        if okf and force then
+            cm:apply_effect_bundle_to_force("derpy_gg_svc_" .. s.key .. GG.tag(faction),
+                                            force:command_queue_index(), s.turns)
+            if s.heal then cm:heal_military_force(force) end
+        end
+
+    elseif s.kind == "settlement" or s.kind == "enemy_settlement" then
+        -- The BUYER's tag on an enemy's region too, as The Khan's Price does: the victim
+        -- reads who did it.
+        if target then
+            cm:apply_effect_bundle_to_region("derpy_gg_svc_" .. s.key .. GG.tag(faction),
+                                             target, s.turns)
+        end
+
+    elseif s.kind == "ranks" then
+        -- The third argument makes the number RANKS, not experience points: CA's wrapper
+        -- hands it to level_up_agent_rank (lib_campaign_manager.lua:7964).
+        if target then cm:add_agent_experience(cm:char_lookup_str(target), s.value, true) end
+
+    elseif s.kind == "resource" then
+        -- A FACTION POOL (spec §6), by faction KEY. Recorded first, so a race earning that
+        -- listens to this pool does not pay for the purchase (GG.take_self) - and only when
+        -- the route counts this factor: Slave Coffles grants through missions, which
+        -- captives ignore, so a record would outlive its own change and eat the next raid.
+        local route = GG.POOL_ROUTES[s.resource]
+        if route and GG.pool_route_counts(route, s.factor) then
+            GG.note_self(faction, s.resource, s.value)
+        end
+        cm:faction_add_pooled_resource(faction, s.resource, s.factor, s.value)
+
+    elseif s.kind == "race" or s.kind == "race_army" then
+        -- A RACE'S OWN CALL. A missing one throws, and GG.buy refunds the purchase.
+        GG.RACE_FIRE[s.key](faction, s, target)
+    end
+    -- A GOLD OR RESEARCH SERVICE MAY CARRY A BUNDLE TOO (the Guild Loan, The Great Work).
+    if s.with_bundle and (s.kind == "gold" or s.kind == "research") then
+        cm:apply_effect_bundle("derpy_gg_svc_" .. s.key .. GG.tag(faction), faction, s.turns)
     end
 end
 
@@ -3177,6 +3402,638 @@ function GG.service(key)
         if GG.SERVICES[i].key == key then return GG.SERVICES[i] end
     end
     return nil
+end
+
+-- ------------------------------------------------------------ race services --
+-- WHAT A RACE'S OWN SERVICE CALLS (spec §6), one function per service whose payload is not
+-- a plain pool grant. Keyed by service key, because a GG.SERVICES row stays on one line.
+-- A function that throws is refunded by GG.buy. Each hook was read in CA's 9.0 scripts
+-- and DB on 2026-09-29; the note beside each names where.
+GG.RACE_FIRE = {}
+-- What a race service needs of the world beyond its pool, read at the draw and at the
+-- till (GG.needs_ok).
+GG.RACE_NEEDS = {}
+-- What a race_army service asks of the army it is aimed at, beyond being the buyer's own.
+GG.RACE_TARGET_OK = {}
+
+-- A POOL THE FACTION HOLDS. CA's resource(key) answers a null interface, not nil, for a
+-- pool the faction lacks ("Null if not present").
+function GG.has_resource(faction, key)
+    local okr, yes = pcall(function()
+        local f = cm:get_faction(faction)
+        if not f or f:is_null_interface() then return false end
+        return not f:pooled_resource_manager():resource(key):is_null_interface()
+    end)
+    return okr and yes == true
+end
+
+-- WHAT THE SERVICE WORKS ON IS THERE. A pool grant needs the pool; a row's own check asks
+-- the rest. Read at the draw and again at the till, because a period is ten turns and the
+-- world moves: a caravan comes home, a confederation takes a pool. A throw is a no.
+function GG.needs_ok(faction, s)
+    if s.kind == "resource" and not GG.has_resource(faction, s.resource) then return false end
+    local need = s.needs or GG.RACE_NEEDS[s.key]
+    if need then
+        local okn, yes = pcall(need, faction)
+        if not okn or yes ~= true then return false end
+    end
+    return true
+end
+
+-- WHAT A PURCHASE IS ABOUT TO GRANT, so the race earning that listens to the same pool
+-- does not pay for it (spec §7). The engine raises the change inside the call or soon
+-- after, so the record is session memory for this turn only: one that outlived its turn
+-- would eat a real earning.
+GG.self_grants = GG.self_grants or {}
+
+function GG.note_self(faction, resource, n)
+    local k, turn = faction .. "|" .. resource, GG.turn_now()
+    local r = GG.self_grants[k]
+    if not r or r.turn ~= turn then r = {n = 0, turn = turn} end
+    r.n = r.n + (n or 0)
+    GG.self_grants[k] = r
+end
+
+-- The part of `amount` that was not the faction's own purchase. The record is spent once.
+function GG.take_self(faction, resource, amount)
+    local k = faction .. "|" .. resource
+    local r = GG.self_grants[k]
+    if not r then return amount end
+    GG.self_grants[k] = nil
+    if r.turn ~= GG.turn_now() then return amount end
+    local left = amount - r.n
+    if left < 0 then left = 0 end
+    return left
+end
+
+-- ------------------------------------------------- Chaos Dwarfs and Dwarfs --
+-- HELL-FORGE ALLOTMENT: +1 to one Hell-Forge unit's cap, rolled from the eleven the Tower
+-- of Zharr's seats grant (tower_of_zharr.lua:85-101). NOT by the Tower's route: that
+-- performs a ritual, a second ritual can end the one-turn commission rite in flight
+-- (docs/RITUALS.md §5), and the listener paying it raises the next paid cap by 25%. CA's
+-- own hellforge:modify_unit_cap (hellforge.lua:376) is the same +1 without either.
+GG.HELLFORGE_CAPS = {
+    "wh3_dlc23_chd_ritual_unit_cap_bale_taurus",
+    "wh3_dlc23_chd_ritual_unit_cap_bull_centaurs",
+    "wh3_dlc23_chd_ritual_unit_cap_great_taurus",
+    "wh3_dlc23_chd_ritual_unit_cap_kdaai_destroyer",
+    "wh3_dlc23_chd_ritual_unit_cap_kdaai_fireborn",
+    "wh3_dlc23_chd_ritual_unit_cap_lammasu",
+    "wh3_dlc23_chd_ritual_unit_cap_infernal_ironsworn",
+    "wh3_dlc23_chd_ritual_unit_cap_infernal_guard_fireglaives",
+    "wh3_dlc23_chd_ritual_unit_cap_infernal_guard",
+    "wh3_dlc23_chd_ritual_unit_cap_chaos_dwarf_warriors",
+    "wh3_dlc23_chd_ritual_unit_cap_chaos_dwarf_blunderbusses",
+}
+-- The Tower's message for a cap is "wh3_dlc23_chd_toz_cap_" .. its ritual, except the
+-- blunderbusses, whose incident row CA keyed differently - so CA's own roll of them shows
+-- nothing.
+GG.HELLFORGE_INCIDENT_FIX = {
+    wh3_dlc23_chd_ritual_unit_cap_chaos_dwarf_blunderbusses =
+        "wh3_dlc23_chd_toz_cap_wh3_dlc23_chd_ritual_unit_cap_dwarf_blunderbusses",
+}
+GG.RACE_NEEDS.hellforge_allotment = function()
+    return type(hellforge) == "table" and type(hellforge.modify_unit_cap) == "function"
+end
+GG.RACE_FIRE.hellforge_allotment = function(faction)
+    local rk = GG.HELLFORGE_CAPS[GG.roll(#GG.HELLFORGE_CAPS)]
+    hellforge:modify_unit_cap(rk, cm:get_faction(faction),
+                              hellforge.unit_cap_modifiers_bundle_string)
+    if GG.is_human(faction) then
+        cm:trigger_incident(faction, GG.HELLFORGE_INCIDENT_FIX[rk]
+                                     or ("wh3_dlc23_chd_toz_cap_" .. rk), true)
+    end
+end
+
+-- LABOUR GANGS: labour for every province, by CA's own route (labour_loss.lua:40-49).
+-- Labour is held per FACTION-province, so it is faction:provinces(), never a region's
+-- province. A province without the pool is skipped.
+-- AT LEAST ONE PROVINCE WITH THE POOL, or the purchase raised nothing and cost 400
+-- favour (logic audit, 2026-09-29): a faction that has lost every region still has cards.
+GG.RACE_NEEDS.labour_gangs = function(faction)
+    local provs = cm:get_faction(faction):provinces()
+    for i = 0, provs:num_items() - 1 do
+        local res = provs:item_at(i):pooled_resource_manager():resource("wh3_dlc23_chd_labour")
+        if not res:is_null_interface() then return true end
+    end
+    return false
+end
+GG.RACE_FIRE.labour_gangs = function(faction, s)
+    local provs = cm:get_faction(faction):provinces()
+    for i = 0, provs:num_items() - 1 do
+        local res = provs:item_at(i):pooled_resource_manager():resource("wh3_dlc23_chd_labour")
+        if not res:is_null_interface() then
+            cm:pooled_resource_factor_transaction(res, "other", s.value)
+        end
+    end
+end
+
+-- CALL THE RECKONING: the grudge cycle resolves at this faction's next turn start, as CA's
+-- Underdeep building does (wh3_campaign_underdeep.lua:219-227). ONLY AT THE TOP LEVEL:
+-- resolving pays the level reached, and level 1 is a penalty (grudge_cycles.lua:1385-1398),
+-- so it is offered only when waiting gains nothing. Human Dwarfs only - CA runs the cycle
+-- for no one else - and not with the grudge feature switched off. CA's bundle removal is
+-- not copied: resolution replaces the bundles itself.
+GG.RACE_NEEDS.call_reckoning = function(faction)
+    if type(grudge_cycle) ~= "table" or type(grudge_cycle.faction_times) ~= "table" then
+        return false
+    end
+    if not GG.is_human(faction) then return false end
+    if cm:get_factions_bonus_value(faction, "dwf_grudge_feature_off") ~= 0 then return false end
+    -- AND NOT ON THE CYCLE'S LAST TURN: CA's timer resolves at <= 0 after its decrement,
+    -- so from 1 it resolves at the next turn start anyway (grudge_cycles.lua:1274-1276),
+    -- and the purchase would buy nothing (logic audit, 2026-09-29).
+    if (grudge_cycle.faction_times[faction] or 0) <= 1 then return false end
+    return grudge_cycle:get_current_grudge_level(faction) == 5
+end
+GG.RACE_FIRE.call_reckoning = function(faction)
+    grudge_cycle.faction_times[faction] = 0
+end
+
+-- ---------------------------------------------------------------- the Empire --
+-- ELECTOR'S MUSTER: its regiments, in order, one grant each. CA creates a unit "only if
+-- there is room", so the second may not arrive; the row's `room` makes the till ask for
+-- space for at least one.
+GG.RACE_FIRE.electors_muster = function(faction, s, target)
+    local lookup = cm:char_lookup_str(target)
+    for unit in string.gmatch(s.units, "[^,]+") do cm:grant_unit_to_character(lookup, unit) end
+end
+
+-- ELECTOR'S FAVOUR: +1 Fealty to the least loyal Elector Count, through CA's own politics
+-- globals (wh2_dlc13_empire_politics.lua:949, :1943). The finder keeps only electors
+-- alive, not human and not at war with the buyer, so the least loyal is the first band of
+-- loyalty with anyone in it. faction_has_campaign_feature throws for a key the map lacks
+-- (lib_campaign_manager.lua:17626), so it is asked of the buyer alone.
+function GG.least_loyal_elector(faction)
+    local f = cm:get_faction(faction)
+    for band = 0, 9 do
+        local list = empire_find_electors_with_loyalty(f, band, band)
+        if list and #list > 0 then return list[1].elector end
+    end
+    return nil
+end
+GG.RACE_NEEDS.electors_favour = function(faction)
+    if type(empire_find_electors_with_loyalty) ~= "function"
+       or type(empire_modify_elector_loyalty) ~= "function" then
+        return false
+    end
+    if not cm:faction_has_campaign_feature(faction, "politics") then return false end
+    return GG.least_loyal_elector(faction) ~= nil
+end
+GG.RACE_FIRE.electors_favour = function(faction, s)
+    empire_modify_elector_loyalty(GG.least_loyal_elector(faction), "events", s.value)
+end
+
+-- THE IMPERIAL SUPPLY TRAIN: CA's supply dilemma now, at the strength CA's own meter would
+-- pick (wh2_dlc13_wulfhart_imperial_reinforcement.lua:672-684). NOT CA's
+-- trigger_imperial_reinforcements_event, which also zeroes that meter and so only brings
+-- the next supply forward. CA's choice handler matches the dilemma by key (:358) and
+-- spawns for Wulfhart's faction, so it is his faction only - and a human, since a dilemma
+-- needs one.
+GG.WULFHART = "wh2_dlc13_emp_the_huntmarshals_expedition"
+GG.SUPPLY_DILEMMAS = {
+    "wh2_dlc13_wulfhart_imperial_guards_st_1",
+    "wh2_dlc13_wulfhart_imperial_guards_st_2",
+    "wh2_dlc13_wulfhart_imperial_guards_st_3",
+}
+GG.RACE_NEEDS.supply_train = function(faction)
+    return faction == GG.WULFHART and GG.is_human(faction)
+           and GG.has_resource(faction, "emp_progress")
+end
+GG.RACE_FIRE.supply_train = function(faction)
+    local v = cm:get_faction(faction):pooled_resource_manager():resource("emp_progress"):value()
+    local band = (v < 20 and 1) or (v < 60 and 2) or 3
+    -- False when the director declines, which multiplayer can (it triggers directly, with
+    -- no intervention); the throw makes GG.buy refund it.
+    if not cm:trigger_dilemma(faction, GG.SUPPLY_DILEMMAS[band]) then
+        error("the supply dilemma was refused")
+    end
+end
+
+-- ------------------------------------------------------- Kislev and Bretonnia --
+-- THE COURT THAT IS BEHIND, compared as CA compares them (kislev_motherland.lua:354-355):
+-- a tie goes to the Ice Court. Each grant below is written out per court, so every pool
+-- and factor is a literal the generator checks.
+function GG.lower_court(faction)
+    local prm = cm:get_faction(faction):pooled_resource_manager()
+    local orth = prm:resource("wh3_main_ksl_support_level_orthodoxy"):value()
+    local ice = prm:resource("wh3_main_ksl_support_level_ice_court"):value()
+    return orth < ice and "orthodoxy" or "ice_court"
+end
+GG.RACE_NEEDS.court_favour = function(faction)
+    return GG.has_resource(faction, "wh3_main_ksl_support_level_orthodoxy")
+       and GG.has_resource(faction, "wh3_main_ksl_support_level_ice_court")
+end
+GG.RACE_FIRE.court_favour = function(faction, s)
+    if GG.lower_court(faction) == "orthodoxy" then
+        cm:faction_add_pooled_resource(faction, "wh3_main_ksl_support_tracker_orthodoxy",
+                                       "faction", s.value)
+    else
+        cm:faction_add_pooled_resource(faction, "wh3_main_ksl_support_tracker_ice_court",
+                                       "faction", s.value)
+    end
+end
+
+-- THE BLESSING OF THE MOTHERLAND: Devotion as Prayers grants it, and both courts at once.
+-- Not every minor Kislev faction can be shown to hold Devotion, so it is asked.
+GG.RACE_NEEDS.blessing_motherland = function(faction)
+    return GG.has_resource(faction, "wh3_main_ksl_devotion")
+end
+GG.RACE_FIRE.blessing_motherland = function(faction, s)
+    cm:faction_add_pooled_resource(faction, "wh3_main_ksl_devotion", "events", s.value)
+    cm:faction_add_pooled_resource(faction, "wh3_main_ksl_support_tracker_orthodoxy",
+                                   "faction", s.value2)
+    cm:faction_add_pooled_resource(faction, "wh3_main_ksl_support_tracker_ice_court",
+                                   "faction", s.value2)
+end
+
+-- THE LADY'S BLESSING by CA's own call (wh_dlc07_blessing_of_the_lady.lua:91), which
+-- returns nothing and does nothing for an army already blessed - so the till refuses one
+-- first, by CA's own list and by the bundle itself.
+GG.RACE_NEEDS.ladys_blessing = function()
+    return type(Blessing_Character_Won) == "function"
+       and type(Has_Blessing_Already) == "function"
+end
+GG.RACE_TARGET_OK.ladys_blessing = function(_faction, c)
+    local mf = c:military_force()
+    return not Has_Blessing_Already(mf:command_queue_index())
+       and not mf:has_effect_bundle("wh_dlc07_blessing_of_the_lady")
+end
+GG.RACE_FIRE.ladys_blessing = function(_faction, _s, target)
+    Blessing_Character_Won(cm:get_character_by_cqi(target))
+end
+
+-- TALES OF VALOUR: Chivalry through CA's chivalry:ModifyChivalry (wh_campaign_bretonnia_
+-- chivalry.lua:315), which also runs the win check a human is owed at 8000; the plain
+-- grant where that global is not loaded. Through "missions", which the Bretonnian earning
+-- does not count, so the purchase does not pay itself.
+GG.RACE_NEEDS.tales_of_valour = function(faction)
+    return GG.has_resource(faction, "brt_chivalry")
+end
+GG.RACE_FIRE.tales_of_valour = function(faction, s)
+    if type(chivalry) == "table" and type(chivalry.ModifyChivalry) == "function" then
+        chivalry:ModifyChivalry(faction, "missions", s.value)
+    else
+        cm:faction_add_pooled_resource(faction, "brt_chivalry", "missions", s.value)
+    end
+end
+
+-- ------------------------------------------ Cathay, Dark Elves, High Elves --
+-- REALIGN THE COMPASS: the Winds of Magic compass may be turned again now. The call takes a
+-- faction INTERFACE (CA: wh3_main_chaos/wh_start.lua:130). Never for the Celestial Court,
+-- whose jade compass is a different system this call does not reach.
+GG.CELESTIAL_COURT = "wh3_dlc24_cth_the_celestial_court"
+GG.RACE_NEEDS.realign_compass = function(faction) return faction ~= GG.CELESTIAL_COURT end
+GG.RACE_FIRE.realign_compass = function(faction)
+    cm:set_next_winds_of_magic_compass_selection_cooldown(cm:get_faction(faction), 0)
+end
+
+-- IVORY ROAD CARGO: every caravan still on its way carries more, as CA's own event adds it
+-- (wh3_campaign_ivory_road_events.lua:551). A caravan coming home is skipped.
+function GG.caravans_out(faction)
+    local out = {}
+    local fc = cm:model():world():caravans_system():faction_caravans(cm:get_faction(faction))
+    if fc:is_null_interface() then return out end
+    local list = fc:active_caravans()
+    for i = 0, list:num_items() - 1 do
+        local c = list:item_at(i)
+        if not c:is_returning() then out[#out + 1] = c end
+    end
+    return out
+end
+GG.RACE_NEEDS.ivory_cargo = function(faction) return #GG.caravans_out(faction) > 0 end
+GG.RACE_FIRE.ivory_cargo = function(faction, s)
+    local list = GG.caravans_out(faction)
+    for i = 1, #list do cm:set_caravan_cargo(list[i], list[i]:cargo() + s.value) end
+end
+
+-- BOUGHT LOYALTY for the lord of the selected army (CA: wh2_dlc14_malus_malekiths_favour
+-- .lua:29), through a lookup string. Never the faction leader, who has no loyalty to buy.
+GG.RACE_TARGET_OK.bought_loyalty = function(_faction, c) return not c:is_faction_leader() end
+GG.RACE_FIRE.bought_loyalty = function(_faction, s, target)
+    cm:modify_character_personal_loyalty_factor(cm:char_lookup_str(target), s.value)
+end
+
+-- INFLUENCE, by faction key (CA: wh3_dlc27_valiant_imperatives.lua:131). A High Elf
+-- service only: the Empire's factions turn influence into Prestige.
+GG.RACE_FIRE.whispers_at_court = function(faction, s) cm:change_influence(faction, s.value) end
+
+-- ASURYAN'S GRACE: the Phoenix King's favour and influence at once. The favour pool caps at
+-- 900, lower while others hold Ulthuan, and clips a grant above it in silence.
+GG.RACE_NEEDS.asuryans_grace = function(faction)
+    return GG.has_resource(faction, "wh3_dlc27_hef_favour")
+end
+GG.RACE_FIRE.asuryans_grace = function(faction, s)
+    cm:faction_add_pooled_resource(faction, "wh3_dlc27_hef_favour", "faction", s.value)
+    cm:change_influence(faction, s.value2)
+end
+
+-- ------------------------------------------------------------ race earnings --
+-- WHAT ONLY ONE RACE DOES, paid to the guild of that trade (spec §7), through
+-- GG.capped_grant like every other earning - so the guild's turn limit, the rival's share
+-- and the patron all apply. The route key is the ledger source, so letters only. Mirrored
+-- by EARN_ROUTES and EARN_OF in tools/gen_great_guilds.py (check_race_mirror), whose Help
+-- page names the guild.
+GG.EARN_ROUTES = {
+    caravan    = {guild = "brass",        rep = 60},
+    -- BY THE POINT, not per change: CA pays one battle's grudges as one change per
+    -- winning army, so a flat sum paid a two-army win twice (logic audit, 2026-09-29).
+    grudges    = {guild = "immortals",    per = 5},
+    reclaimed  = {guild = "immortals",    rep = 50},
+    motherland = {guild = "daemonsmiths", rep = 40},
+    chivalry   = {guild = "immortals",    per = 5},
+    captives   = {guild = "slavers",      per = 20},
+    court      = {guild = "khanate",      rep = 40},
+}
+-- Which race earns by which route. CaravanCompleted is raised for Chaos Dwarf convoys and
+-- Cathay's caravans alike, so both earn by it.
+GG.EARN_OF = {
+    ["wh3_dlc23_chd_chaos_dwarfs"] = "caravan",
+    ["wh3_main_cth_cathay"]        = "caravan",
+    ["wh_main_dwf_dwarfs"]         = "grudges",
+    ["wh_main_emp_empire"]         = "reclaimed",
+    ["wh3_main_ksl_kislev"]        = "motherland",
+    ["wh_main_brt_bretonnia"]      = "chivalry",
+    ["wh2_main_def_dark_elves"]    = "captives",
+    ["wh2_main_hef_high_elves"]    = "court",
+}
+-- The pools an earning listens to, and which of their factors count.
+GG.POOL_ROUTES = {wh3_dlc25_dwf_grudge_points = "grudges", brt_chivalry = "chivalry",
+                  def_slaves = "captives"}
+-- Captives from raiding and battle only. Chivalry from anything but "missions": Tales of
+-- Valour grants through it, and so does every mission's Chivalry reward (CA's
+-- payload.chivalry), which a mission already pays the guilds for through rate_missions.
+function GG.pool_route_counts(route, factor)
+    if route == "captives" then return factor == "raiding" or factor == "battles" end
+    if route == "chivalry" then return factor ~= "missions" end
+    return true
+end
+
+-- THE OLD EMPIRE'S LANDS: both of CA's region groups, tested by name. CA builds the key from
+-- cm:get_campaign_name(), which answers a map name on some maps (docs/VICTORY_CONDITIONS.md
+-- §11). A group this map lacks answers false.
+GG.IMPERIAL_LANDS = {
+    "wh3_dlc25_imperial_authority_regions_main_warhammer",
+    "wh3_dlc25_imperial_authority_regions_wh3_main_chaos",
+}
+function GG.in_imperial_lands(region)
+    for i = 1, #GG.IMPERIAL_LANDS do
+        if region:is_contained_in_region_group(GG.IMPERIAL_LANDS[i]) then return true end
+    end
+    return false
+end
+-- TAKEN BACK, not handed over: from a faction that is not the Empire, and not by a trade two
+-- players could repeat for ever, an abandonment, or the game setting itself up.
+GG.RECLAIM_SKIP = {["abandoned"] = true, ["abandoned to rebels"] = true,
+                   ["startpos setup"] = true, ["cli command"] = true,
+                   ["diplomacy trade"] = true}
+function GG.reclaim_counts(prev_culture, reason)
+    return prev_culture ~= "wh_main_emp_empire" and not GG.RECLAIM_SKIP[reason or ""]
+end
+
+-- What a points route has not paid out yet, per faction and route: session memory, so a
+-- raid of 12 Slaves is not lost every turn.
+GG.earn_carry = GG.earn_carry or {}
+
+-- PAYS `faction` BY `route` when that is its race's route: `rep` a time, or one per `per`
+-- of `amount`. Returns what the guild gained after its turn limit, and writes the Log line
+-- only when that is something.
+function GG.race_earn(faction, route, amount)
+    local r = GG.EARN_ROUTES[route]
+    if not r or not faction or not GG.race_on() then return 0 end
+    if GG.EARN_OF[GG.culture_of(faction) or ""] ~= route then return 0 end
+    local n = r.rep
+    if not n then
+        -- SAVED AS IT CHANGES and read back when memory has none, so a load does not drop
+        -- 19 Slaves towards the next point (logic audit, 2026-09-29).
+        local k = faction .. "|" .. route
+        local sk = "derpy_gg_carry_" .. faction .. "_" .. route
+        if GG.earn_carry[k] == nil then
+            GG.earn_carry[k] = tonumber(cm:get_saved_value(sk)) or 0
+        end
+        local have = GG.earn_carry[k] + (amount or 0)
+        n = math.floor(have / r.per)
+        GG.earn_carry[k] = have - n * r.per
+        cm:set_saved_value(sk, GG.earn_carry[k])
+    end
+    if n <= 0 then return 0 end
+    local before = GG.get(faction, r.guild)
+    GG.capped_grant(faction, r.guild, n, route)
+    local paid = GG.get(faction, r.guild) - before
+    if paid > 0 then GG.log_add(faction, "earn", r.guild, route, paid) end
+    return paid
+end
+
+-- ---------------------------------------------------------------- the cards --
+-- EIGHTEEN CARDS PER FACTION, one per guild per rank, each holding one service drawn from
+-- that guild and rank's pool (spec 2026-09-29-great-guilds-service-pools-and-races §4).
+-- A faction with no cards holds each card's FIRST row - today's service - so an old save,
+-- the panel before the first turn and every test that never draws all read the
+-- eighteen the mod always sold. Reading cards never rolls: the panel reads them, and a
+-- roll from UI code runs on one machine and desyncs multiplayer.
+GG.CARD_RANKS = {2, 3, 4}
+GG.cards = GG.cards or {}   -- [faction] = {turn = n, keys = {18 service keys}}
+
+function GG.default_card(guild, rank)
+    for i = 1, #GG.SERVICES do
+        local s = GG.SERVICES[i]
+        if s.guild == guild and s.rank == rank then return s.key end
+    end
+    return nil
+end
+
+function GG.cards_of(faction)
+    local c = faction and GG.cards[faction]
+    if c and c.keys and #c.keys == #GG.GUILDS * #GG.CARD_RANKS then return c.keys end
+    local out = {}
+    for gi = 1, #GG.GUILDS do
+        for ri = 1, #GG.CARD_RANKS do
+            out[#out + 1] = GG.default_card(GG.GUILDS[gi], GG.CARD_RANKS[ri])
+        end
+    end
+    return out
+end
+
+function GG.guild_cards(faction, guild)
+    local keys, out = GG.cards_of(faction), {}
+    for gi = 1, #GG.GUILDS do
+        if GG.GUILDS[gi] == guild then
+            for ri = 1, #GG.CARD_RANKS do
+                local s = GG.service(keys[(gi - 1) * #GG.CARD_RANKS + ri])
+                if s then out[#out + 1] = s end
+            end
+        end
+    end
+    return out
+end
+
+function GG.on_card(faction, key)
+    local keys = GG.cards_of(faction)
+    for i = 1, #keys do
+        if keys[i] == key then return true end
+    end
+    return false
+end
+
+function GG.cards_key(faction) return "derpy_gg_cards_" .. faction end
+
+-- "<turn drawn>;<key>,<key>,...". Keys, not indices: a key survives the table growing.
+function GG.save_cards(faction)
+    local c = GG.cards[faction]
+    if not c then return end
+    cm:set_saved_value(GG.cards_key(faction),
+                       tostring(c.turn or 0) .. ";" .. table.concat(c.keys, ","))
+end
+
+-- A key this build does not sell, or one saved in the wrong slot, reads as that slot's
+-- default; an unreadable value is no cards at all, so the faction reads today's services
+-- until its next turn draws.
+function GG.load_cards(faction)
+    GG.cards[faction] = nil
+    local s = cm:get_saved_value(GG.cards_key(faction))
+    if type(s) ~= "string" then return end
+    local turn, list = string.match(s, "^(%d+);(.+)$")
+    if not turn then return end
+    local keys, i = {}, 0
+    for k in string.gmatch(list, "[^,]+") do
+        i = i + 1
+        local g = GG.GUILDS[math.floor((i - 1) / #GG.CARD_RANKS) + 1]
+        local rank = GG.CARD_RANKS[((i - 1) % #GG.CARD_RANKS) + 1]
+        if not g then break end
+        local svc = GG.service(k)
+        keys[i] = (svc and svc.guild == g and svc.rank == rank) and k
+                  or GG.default_card(g, rank)
+    end
+    if #keys ~= #GG.GUILDS * #GG.CARD_RANKS then return end
+    GG.cards[faction] = {turn = tonumber(turn), keys = keys}
+end
+
+-- WHAT A CARD MAY DRAW.
+-- A `needs` check reads only world state every machine shares, and a throw is a no.
+function GG.pool_ok(faction, s)
+    -- A RACE'S OWN SERVICE, for that race alone and only while race differences are on.
+    if s.race ~= nil and (not GG.race_on() or s.race ~= GG.culture_of(faction)) then
+        return false
+    end
+    if (s.hostile or s.kind == "enemy_settlement")
+       and GG.setting("hostile_services") == false then
+        return false
+    end
+    return GG.needs_ok(faction, s)
+end
+
+function GG.pool(faction, guild, rank)
+    local out = {}
+    for i = 1, #GG.SERVICES do
+        local s = GG.SERVICES[i]
+        if s.guild == guild and s.rank == rank and GG.pool_ok(faction, s) then
+            out[#out + 1] = s
+        end
+    end
+    return out
+end
+
+function GG.rotation_turns()
+    local n = tonumber(GG.setting("rotate_turns")) or 10
+    if n < 1 then n = 10 end
+    return math.floor(n)
+end
+
+-- EVERY CARD IN ORDER, one GG.roll each - the order is fixed, so every machine rolls the
+-- same numbers for the same cards. Never the card's last service when the pool has
+-- another - except on a `first` draw, when that "last service" is only the default no one
+-- was shown, and excluding it kept the original 18 out of every new campaign's first
+-- period. An empty pool (every row refused) keeps what the card held.
+function GG.draw_cards(faction, turn, first)
+    local old, keys, pools, i = GG.cards_of(faction), {}, {}, 0
+    for gi = 1, #GG.GUILDS do
+        for ri = 1, #GG.CARD_RANKS do
+            i = i + 1
+            local pool = GG.pool(faction, GG.GUILDS[gi], GG.CARD_RANKS[ri])
+            pools[i] = pool
+            local pick = old[i]
+            if #pool > 0 then
+                local fresh = {}
+                for j = 1, #pool do
+                    if pool[j].key ~= old[i] then fresh[#fresh + 1] = pool[j] end
+                end
+                if #fresh == 0 or first then fresh = pool end
+                pick = fresh[GG.roll(#fresh)].key
+            end
+            keys[i] = pick
+        end
+    end
+    GG.show_race_service(faction, old, keys, pools)
+    GG.cards[faction] = {turn = turn, keys = keys}
+    GG.save_cards(faction)
+end
+
+-- RULE 2 OF THE DRAW (spec §4): at least one race service on show. Without it about one
+-- rotation in three shows none, and a race's own services are the point of the race. One
+-- card, rolled among those whose pool holds one, is redrawn to a race service - not the
+-- one it held last, when it has another. A draw that already shows one is left alone.
+-- With race differences off the pools hold no race row, so there is nothing to show.
+function GG.show_race_service(faction, old, keys, pools)
+    local cands = {}
+    for i = 1, #keys do
+        local s = GG.service(keys[i])
+        if s and s.race then return end
+        local races = {}
+        for j = 1, #(pools[i] or {}) do
+            if pools[i][j].race then races[#races + 1] = pools[i][j] end
+        end
+        if #races > 0 then cands[#cands + 1] = {i = i, races = races} end
+    end
+    if #cands == 0 then return end
+    local c = cands[GG.roll(#cands)]
+    local fresh = {}
+    for j = 1, #c.races do
+        if c.races[j].key ~= old[c.i] then fresh[#fresh + 1] = c.races[j] end
+    end
+    if #fresh == 0 then fresh = c.races end
+    keys[c.i] = fresh[GG.roll(#fresh)].key
+end
+
+-- ONCE PER PERIOD, whoever asks: gg_turn and the rivals' round both call this, and the
+-- second call in a period does nothing. A period missed (a save loaded late, a faction
+-- that did not exist) catches up once. Covered factions only - the rivals' round walks
+-- every faction in the world, and a card set is a saved value. No notice on the first
+-- draw.
+function GG.rotate_cards(faction, turn)
+    if not GG.covered(faction) then return false end
+    local c = GG.cards[faction]
+    local n = GG.rotation_turns()
+    if c and c.turn and math.floor(turn / n) <= math.floor(c.turn / n) then return false end
+    local first = (c == nil)
+    -- A SAVE THAT NEVER DREW, past turn one: a save from before the pools, or one the mod
+    -- joined mid-campaign. Its player has been shown the original 18, so they stay until
+    -- the period ends and then change with the notice, when the countdown said - rather
+    -- than all at the next turn start, silently (2026-09-29).
+    if first and turn > 1 then
+        GG.cards[faction] = {turn = turn, keys = GG.cards_of(faction)}
+        GG.save_cards(faction)
+        return false
+    end
+    GG.draw_cards(faction, turn, first)
+    if not first and GG.announce_rotation then GG.announce_rotation(faction) end
+    return true
+end
+
+-- 5006: the guilds changed their services. Minted by tools/gen_great_guilds.py with its
+-- rows; check_feed_mirror pins this number. A scripted_persistent_event record with
+-- instant_open false, so it waits in the feed rather than opening a panel every period.
+GG.FEED_INDEX_ROTATION = 5006
+
+function GG.announce_rotation(faction)
+    if not GG.is_human(faction) then return end
+    GG.log_add(faction, "rotation", "", "", "")
+    if GG.setting("guild_notices") == false then return end
+    local k = "message_event_text_text_derpy_gg_rotation" .. GG.tag(faction)
+    pcall(function()
+        -- true: the record is a scripted_persistent_event and the flag must agree.
+        cm:show_message_event(faction, k .. "_title", k .. "_primary", k .. "_secondary",
+                              true, GG.feed(faction, GG.FEED_INDEX_ROTATION))
+    end)
 end
 
 function GG.cooldown_left(faction, service_key)
@@ -3245,13 +4102,27 @@ function GG.service_cost(faction, service_key)
     -- No floor here. The cheapest base is 50 and the deepest discount 30%, so the
     -- cheapest a service can ever be is 35; a runtime `cost < 1` guard could not fire.
     -- check() asserts that invariant at build time, where it can actually fail.
-    return math.floor(svc.cost * (100 + mod) / 100), mod
+    local price = math.floor(svc.cost * (100 + mod) / 100)
+    -- A SERVICE AIMED AT AN ENEMY, at the Dark Elves' price (GG.TWISTS hostile_price).
+    -- After the clamps, so the twist is never lost to them, and the modifier returned is
+    -- the whole difference, so the card's tooltip explains the number it shows.
+    local p = (svc.hostile or svc.kind == "enemy_settlement")
+              and GG.twist(faction, "hostile_price") or 100
+    if p ~= 100 then
+        price = math.floor(price * p / 100)
+        mod = math.floor(price * 100 / svc.cost) - 100
+    end
+    return price, mod
 end
 
 function GG.can_buy(faction, service_key)
     local s = GG.service(service_key)
     if not s then return false, "unknown" end
-    if s.hostile and GG.setting("hostile_services") == false then
+    -- ON ONE OF THIS FACTION'S CARDS, or not for sale. The panel, GG.buy and GGAI.choose
+    -- all come through here, so this one line is what makes all three honour the draw.
+    if not GG.on_card(faction, service_key) then return false, "card" end
+    if (s.hostile or s.kind == "enemy_settlement")
+       and GG.setting("hostile_services") == false then
         return false, "disabled"
     end
     -- NOT IN THE RACE, NOTHING TO BUY. The earning gate alone is not enough here: a save
@@ -3285,6 +4156,8 @@ function GG.can_buy(faction, service_key)
             return false, "lead"
         end
     end
+    -- WHAT IT WORKS ON IS STILL THERE: the draw asked, and the world has moved since.
+    if not GG.needs_ok(faction, s) then return false, "unavailable" end
     if GG.cooldown_left(faction, service_key) > 0 then return false, "cooldown" end
     if fav < GG.service_cost(faction, service_key) then return false, "favour" end
     return true, nil
@@ -3302,19 +4175,96 @@ end
 -- A PREDICATE, NOT A LIST AT EACH CALL SITE. GG.buy refuses on it and the panel greys the
 -- card on it, so the button and the till cannot disagree - which is the fault that put
 -- the hostile guard here in the first place.
+-- THE KINDS AIMED AT A CHARACTER. The till, the wire, the panel's pick and the rivals'
+-- pick all ask this, so a new character kind is one line here rather than five.
+GG.CHAR_KINDS = {unit = true, army = true, ranks = true, race_army = true}
+
 function GG.needs_target(s)
     if not s then return false end
     if s.hostile then return true end
-    return s.kind == "unit" or s.kind == "research" or s.kind == "shroud"
-        or s.kind == "building"
+    if GG.CHAR_KINDS[s.kind] then return true end
+    return s.kind == "research" or s.kind == "shroud" or s.kind == "building"
+        or s.kind == "settlement" or s.kind == "enemy_settlement"
+end
+
+-- THE TOP RANK, or nil when it cannot be known. No interface reports it; CA's campaign
+-- manager clamps its own level-ups to the length of this table (lib_campaign_manager.lua,
+-- add_agent_experience), which is 50 in 9.0. Read, not typed, so a patch that moves it
+-- moves this too - and an unknown top refuses nobody rather than guessing.
+function GG.max_rank()
+    local ok, t = pcall(function() return cm.character_xp_per_level end)
+    if ok and type(t) == "table" and #t > 0 then return #t end
+    return nil
+end
+
+-- THE RIGHT KIND OF TARGET, OWNED BY THE RIGHT SIDE. A buff aimed at a selected enemy
+-- army would land on the enemy; the map selection is whatever the player last clicked.
+-- Reads world state only, so every machine answers alike. A read that throws is a no.
+-- Kinds it does not judge (research, shroud, building, a hostile bundle) pass on any
+-- target; nil is never a target.
+--
+-- AND ONE THAT CAN TAKE WHAT IS BOUGHT (2026-09-29). A regiment for a full army and ranks
+-- for a character at the top were both sold, charged, and delivered nothing: CA's grant
+-- "will only be created if there is room for it in the force", and a level-up past the top
+-- has nowhere to go.
+function GG.target_ok(faction, s, target)
+    if not s or target == nil then return false end
+    local okr, yes = pcall(function()
+        if GG.CHAR_KINDS[s.kind] then
+            local c = cm:get_character_by_cqi(target)
+            if not c or c:is_null_interface() then return false end
+            if c:faction():name() ~= faction then return false end
+            if s.kind == "ranks" then
+                local top = GG.max_rank()
+                return top == nil or c:rank() < top
+            end
+            if not c:has_military_force() then return false end
+            local mf = c:military_force()
+            if mf:is_armed_citizenry() then return false end
+            -- A RACE SERVICE MAY ASK MORE OF ITS ARMY (not already blessed, not led by the
+            -- faction leader); a unit grant, and a row with `room`, needs space in it.
+            local more = GG.RACE_TARGET_OK[s.key]
+            if more and not more(faction, c) then return false end
+            if s.kind ~= "unit" and not s.room then return true end
+            -- THE FORCE'S OWN LIMIT, the way CA's caravans measure room
+            -- (wh3_campaign_caravans_core.lua:1618), so a mod that raises it is honoured.
+            return mf:unit_count_limit() - mf:unit_list():num_items() > 0
+        end
+        -- A HOSTILE SERVICE ON A FACTION AT WAR WITH THE BUYER, as its card says. Any
+        -- faction but the buyer's was taken, allies included (2026-09-29).
+        if s.hostile then
+            -- The buyer is refused here too: no faction is at war with itself.
+            local victim = cm:get_faction(target)
+            if not victim or victim:is_null_interface() then return false end
+            return cm:get_faction(faction):at_war_with(victim)
+        end
+        if s.kind == "settlement" or s.kind == "enemy_settlement" then
+            local r = cm:get_region(target)
+            if not r or r:is_null_interface() then return false end
+            local owner = r:owning_faction()
+            if not owner or owner:is_null_interface() then return false end
+            if s.kind == "settlement" then return owner:name() == faction end
+            return cm:get_faction(faction):at_war_with(owner)
+        end
+        -- THE REVEAL NOT ON THE BUYER'S OWN REGION, which it already sees. An abandoned
+        -- region has no owner and can be under the shroud, so it is a target.
+        if s.kind == "shroud" then
+            local r = cm:get_region(target)
+            if not r or r:is_null_interface() then return false end
+            local owner = r:owning_faction()
+            return not owner or owner:is_null_interface() or owner:name() ~= faction
+        end
+        return true
+    end)
+    return okr and yes == true
 end
 
 function GG.buy(faction, service_key, target)
     local ok, why = GG.can_buy(faction, service_key)
     if not ok then return false, why end
     local s = GG.service(service_key)
-    -- No target, no sale.
-    if GG.needs_target(s) and not target then return false, "target" end
+    -- No target, or the wrong one, no sale.
+    if GG.needs_target(s) and not GG.target_ok(faction, s, target) then return false, "target" end
     -- THE SAME FUNCTION THE CARD DREW, not s.cost. A card showing 320 and a till
     -- charging 400 is the shape of complaint no check catches.
     local price = GG.service_cost(faction, service_key)
@@ -3344,8 +4294,30 @@ function GG.buy(faction, service_key, target)
     -- and it is correct whether the engine raises those events synchronously or not,
     -- which is the part no offline check can settle.
     GG.save(faction)
-    GG.payload(faction, s, target)
+    -- A PAYLOAD THAT THROWS IS REFUNDED (2026-09-29). It ran bare, so an engine call that
+    -- raised kept the payment, the cooldown and the save above, delivered nothing, and
+    -- carried the error into the caller: the click handler, the multiplayer handler, or
+    -- the rivals' turn loop, which then skipped every faction after this one. Every
+    -- machine runs the same payload on the same state, so every machine refunds alike.
+    local okp, err = pcall(GG.payload, faction, s, target)
+    if not okp then
+        GG.refund_purchase(faction, s, price, err)
+        return false, "failed"
+    end
     return true, nil
+end
+
+-- THE PURCHASE UNDONE: favour back, cooldown cleared, both saved, and the player told.
+function GG.refund_purchase(faction, s, price, err)
+    local f = GG.state[faction]
+    if f and f[s.guild] then f[s.guild].fav = f[s.guild].fav + price end
+    if GG.cooldowns[faction] then GG.cooldowns[faction][s.key] = nil end
+    GG.log_add(faction, "refund", s.guild, s.key, price)
+    GG.save(faction)
+    pcall(function()
+        out("derpy_great_guilds: " .. tostring(s.key) .. " for " .. tostring(faction)
+            .. " failed and was refunded: " .. tostring(err))
+    end)
 end
 
 -- Guarded faction read. cm:get_faction returns FALSE, not nil, and a null
@@ -3379,6 +4351,13 @@ GG.TUNE_DEFAULTS = {
     cap_khanate = 40, cap_overseers = 40, cap_slavers = 80,
     ai_spending = true, hostile_services = true,
     guild_notices = true,
+    -- RIVALS TAKE BOUNTIES (2026-09-29). Off, rivals never take one; ai_spending off
+    -- stops them too, since it stops the whole AI round.
+    ai_bounties = true,
+    rotate_turns = 10,
+    -- RACE DIFFERENCES (2026-09-29, spec §8). Off: no race services, no race earnings, and
+    -- no race bends a rule - every race plays alike, and still gets the changing services.
+    race_differences = true,
     -- Paid to EVERY guild on a completed mission. No cap_missions to go with it:
     -- the grant runs through capped_grant, so each guild's own per-turn cap binds it.
     rate_missions = 10,
@@ -3441,6 +4420,9 @@ GG.TUNE_ORDER = {
     "decay_from",
     "rate_bounty_fail",
     "rate_bounty_stake",
+    "ai_bounties",
+    "rotate_turns",
+    "race_differences",
 }
 
 GG.TUNE = GG.TUNE or nil
@@ -3578,6 +4560,50 @@ function GG.setting(key)
     return GG.TUNE_DEFAULTS[key]
 end
 
+-- RACE DIFFERENCES ON: a switch like the others, read on every preset.
+function GG.race_on()
+    return GG.setting("race_differences") ~= false
+end
+
+-- EACH RACE BENDS ONE RULE (spec §7), as whole percentages of a setting - the game's Lua
+-- is float32, so 1.5 is never written. hostile_price and favour_cap are not settings;
+-- they are read by GG.service_cost and GG.grant. Mirrored by TWISTS in
+-- tools/gen_great_guilds.py, whose Help page names each rule; check_race_mirror compares
+-- the two.
+GG.TWISTS = {
+    ["wh3_dlc23_chd_chaos_dwarfs"] = {demand_every = 67, demand_reward = 150},
+    ["wh_main_dwf_dwarfs"]         = {rate_bounty_fail = 150, demand_penalty = 200},
+    ["wh_main_emp_empire"]         = {rate_rivalry = 150},
+    ["wh3_main_ksl_kislev"]        = {rate_decay = 50},
+    ["wh_main_brt_bretonnia"]      = {demand_reward = 150, demand_penalty = 200},
+    ["wh3_main_cth_cathay"]        = {rate_rivalry = 50},
+    ["wh2_main_def_dark_elves"]    = {rate_rivalry = 150, hostile_price = 75},
+    ["wh2_main_hef_high_elves"]    = {favour_cap = 150},
+}
+
+-- The percentage `faction`'s race puts on `key`: 100 when it bends nothing, when race
+-- differences are off, and for a faction outside the race.
+function GG.twist(faction, key)
+    if not faction or not GG.race_on() then return 100 end
+    local t = GG.TWISTS[GG.culture_of(faction) or ""]
+    return (t and t[key]) or 100
+end
+
+-- A SETTING AS ONE FACTION PLAYS IT. 0 stays 0 - a rule switched off is off for every
+-- race - and a rule switched on never rounds down to off.
+function GG.setting_for(faction, key)
+    local v = GG.setting(key)
+    local p = GG.twist(faction, key)
+    if type(v) ~= "number" or v <= 0 or p == 100 then return v end
+    local n = math.floor(v * p / 100)
+    if n < 1 then n = 1 end
+    return n
+end
+
+-- NUMBERS READ UNDER EVERY PRESET. The presets own the tuning; these are systems, sit in
+-- the systems section, and would otherwise look editable and be ignored off Custom.
+GG.EVERY_PRESET = {rotate_turns = true}
+
 function GG.read_mct_or_defaults()
     local t = {}
     for k, v in pairs(GG.TUNE_DEFAULTS) do t[k] = v end
@@ -3602,11 +4628,11 @@ function GG.read_mct_or_defaults()
         -- not the shape of the default is the default.
         for i = 1, #GG.TUNE_ORDER do
             local key = GG.TUNE_ORDER[i]
-            if type(GG.TUNE_DEFAULTS[key]) == "boolean" then
+            if type(GG.TUNE_DEFAULTS[key]) == "boolean" or GG.EVERY_PRESET[key] then
                 local opt = mod:get_option_by_key(key)
                 if opt then
                     local val = opt:get_finalized_setting()
-                    if type(val) == "boolean" then t[key] = val end
+                    if type(val) == type(GG.TUNE_DEFAULTS[key]) then t[key] = val end
                 end
             end
         end
@@ -3728,6 +4754,23 @@ function GG.register()
         if not ok then GG.trace("UITrigger failed: " .. tostring(err)) end
     end, true)
 
+    -- THE MCT'S "Write every reputation to the log" BUTTON raises this, and nothing heard
+    -- it (logic audit, 2026-09-29). A trace only: it writes to this machine's log and
+    -- changes nothing, so it is safe from any one machine.
+    core:add_listener("gg_dump", "DerpyGGDumpStandings", true, function()
+        local names = {}
+        for f in pairs(GG.state) do names[#names + 1] = f end
+        table.sort(names)
+        for _, f in ipairs(names) do
+            local parts = {}
+            for _, g in ipairs(GG.GUILDS) do
+                local t = GG.state[f][g]
+                if t then parts[#parts + 1] = g .. "=" .. t.rep .. "/" .. t.fav end
+            end
+            GG.trace(f .. ": " .. table.concat(parts, " "))
+        end
+    end, true)
+
     core:add_listener("gg_turn", "FactionTurnStart", true, function(context)
         local name = faction_name_of(context)
         if not name then return end
@@ -3742,6 +4785,9 @@ function GG.register()
         -- fields and neither is capped against the other.
         GG.decay(name, GG.turn_now())
         GG.tick_cooldowns(name)
+        -- THE CARDS, once a period (spec 2026-09-29 pools §4). Before income and grants,
+        -- so a faction reads this period's cards for everything it does this turn.
+        GG.rotate_cards(name, GG.turn_now())
         local ok, income = pcall(function() return context:faction():net_income() end)
         GG.on_turn_start(name, ok and income or 0)
         local human = false
@@ -3914,7 +4960,11 @@ function GG.register()
                 if not fm or fm:is_null_interface() then return nil end
                 return fm:command_queue_index()
             end)
-            if ok and cqi then GG.drop_bounty_target(cqi) end
+            if ok and cqi then
+                GG.drop_bounty_target(cqi)
+                -- A RIVAL'S KILL OR STRIKE (2026-09-29). GGAI lives in the AI file.
+                if GGAI and GGAI.on_character_destroyed then GGAI.on_character_destroyed(cqi) end
+            end
         end, true)
 
     -- TWO OUTCOMES, AND THEY ARE NOT THE SAME THING. Both free the slot so the guild can
@@ -4003,6 +5053,7 @@ function GG.register()
                 GG.trace("hero bounty progress: " .. tostring(akey) .. " on "
                          .. tostring(target))
             end
+            if GGAI and GGAI.hero_progress then GGAI.hero_progress(name, akey, target, won) end
         end, true)
     end
 
@@ -4020,6 +5071,11 @@ function GG.register()
             GG.load(name)
             GG.on_settlement(name, event == "CharacterRazedSettlement")
             GG.save(name)
+            -- A RIVAL'S SACK BOUNTY. The region comes off the garrison, which this
+            -- context carries (scripting_doc: character, garrison_residence).
+            local region = nil
+            pcall(function() region = context:garrison_residence():region():name() end)
+            if GGAI and GGAI.on_sack then GGAI.on_sack(name, region) end
         end, true)
     end
 
@@ -4029,6 +5085,79 @@ function GG.register()
     -- CA's scripting_doc on 2026-09-10:
     --   CharacterCompletedBattle -> pending_battle, character
     --   character:won_battle()   -> bool, "was the character in the winning alliance"
+    -- --------------------------------------------------- race earnings (spec §7) --
+    -- CaravanCompleted carries faction() (scripting_doc). CA re-raises the same context
+    -- as ScriptEventCaravanCompleted (caravans_core.lua:816); only the engine's is heard,
+    -- or every caravan would pay twice.
+    core:add_listener("gg_earn_caravan", "CaravanCompleted", true, function(context)
+        local name = faction_name_of(context)
+        if not name then return end
+        GG.load(name); GG.race_earn(name, "caravan"); GG.save(name)
+    end, true)
+
+    -- PooledResourceChanged fires for EVERY pool change in the game, so the key is read
+    -- first. factor() may be null, and faction() is read only behind has_faction().
+    core:add_listener("gg_earn_pool", "PooledResourceChanged", true, function(context)
+        local okk, key = pcall(function() return context:resource():key() end)
+        if not okk then return end
+        local route = GG.POOL_ROUTES[key]
+        if not route then return end
+        local okh, has = pcall(function() return context:has_faction() end)
+        if not okh or not has then return end
+        local oka, amount = pcall(function() return context:amount() end)
+        if not oka or type(amount) ~= "number" or amount <= 0 then return end
+        local factor = ""
+        pcall(function()
+            local f = context:factor()
+            if not f:is_null_interface() then factor = f:key() end
+        end)
+        if not GG.pool_route_counts(route, factor) then return end
+        local name = faction_name_of(context)
+        if not name then return end
+        amount = GG.take_self(name, key, amount)
+        if amount <= 0 then return end
+        GG.load(name); GG.race_earn(name, route, amount); GG.save(name)
+    end, true)
+
+    -- RegionFactionChangeEvent carries region(), previous_faction() and reason() - no
+    -- new_faction(), so the new owner is read off the region, as CA does
+    -- (wh3_dlc25_imperial_authority.lua:89).
+    core:add_listener("gg_earn_reclaimed", "RegionFactionChangeEvent", true, function(context)
+        local okr, name, prev, why = pcall(function()
+            local r = context:region()
+            local o = r:owning_faction()
+            if o:is_null_interface() or not GG.in_imperial_lands(r) then return nil end
+            local p = context:previous_faction()
+            return o:name(), (not p:is_null_interface()) and p:culture() or "",
+                   context:reason()
+        end)
+        if not okr or not name or not GG.reclaim_counts(prev, why) then return end
+        GG.load(name); GG.race_earn(name, "reclaimed"); GG.save(name)
+    end, true)
+
+    -- CA's own event, raised at a Motherland ritual's START for AI and humans alike
+    -- (wh3_campaign_generic_incidents.lua:24, :31), carrying faction().
+    core:add_listener("gg_earn_motherland", "ScriptEventFactionPerformsMotherlandRitual", true,
+        function(context)
+            local name = faction_name_of(context)
+            if not name then return end
+            GG.load(name); GG.race_earn(name, "motherland"); GG.save(name)
+        end, true)
+
+    -- RitualCompletedEvent carries performing_faction(), ritual() and succeeded(). Every
+    -- High Elf court category starts HEF_COURT_ACTION_ (ritual_categories). The AI takes
+    -- court seats without rituals (intrigue_at_the_court.lua:1707), so humans earn this.
+    core:add_listener("gg_earn_court", "RitualCompletedEvent", true, function(context)
+        local okc, cat, won = pcall(function()
+            return context:ritual():ritual_category(), context:succeeded()
+        end)
+        if not okc or not won or type(cat) ~= "string" then return end
+        if string.sub(cat, 1, 17) ~= "HEF_COURT_ACTION_" then return end
+        local name = faction_name_of(context, function() return context:performing_faction() end)
+        if not name then return end
+        GG.load(name); GG.race_earn(name, "court"); GG.save(name)
+    end, true)
+
     core:add_listener("gg_battle", "CharacterCompletedBattle", true, function(context)
         local ok, char = pcall(function() return context:character() end)
         if not ok or not char then return end
@@ -4040,8 +5169,30 @@ function GG.register()
         -- One award per faction per battle: a battle with three of your generals
         -- in it is one win, not three. The per-turn cap of 60 bounds it anyway,
         -- but the guard keeps a single battle from eating the whole turn's cap.
+        -- THE GUARD NOW EXISTS (logic audit, 2026-09-29): this event is raised for
+        -- every character in the battle, heroes included, and nothing stopped them.
+        local key = GG.battle_key(context)
+        if key then
+            if GG.battle_paid[name] == key then return end
+            GG.battle_paid[name] = key
+        end
         GG.battle_award(name, GG.was_outnumbered(context))
     end, true)
+end
+
+-- WHICH BATTLE THIS IS: the turn and both commanders' cqis, or nil when unreadable (and
+-- then the award is paid, as before). Session memory is enough - every character's event
+-- for one battle arrives before anyone can save.
+GG.battle_paid = {}
+function GG.battle_key(context)
+    local ok, key = pcall(function()
+        local pb = context:pending_battle()
+        if not pb or pb:is_null_interface() then return nil end
+        return GG.turn_now() .. "|" .. pb:attacker():command_queue_index() .. "|"
+               .. pb:defender():command_queue_index()
+    end)
+    if ok then return key end
+    return nil
 end
 
 -- Reads the pending battle to decide whether the win was against the odds.
@@ -4139,7 +5290,10 @@ GG.FEED_INDEX_LEAD = 5003
 -- before. "withheld" is what the per-turn cap kept back; every other source was paid.
 GG.LEDGER_SOURCES = {"income", "battles", "research", "agents", "buildings",
                      "settlements", "missions", "bounties", "demands", "other",
-                     "withheld"}
+                     "withheld",
+                     -- THE RACE EARNINGS (stage 2), one per route, by name.
+                     "caravan", "grudges", "reclaimed", "motherland", "chivalry",
+                     "captives", "court"}
 GG.LEDGER_KNOWN = {}
 for i = 1, #GG.LEDGER_SOURCES do GG.LEDGER_KNOWN[GG.LEDGER_SOURCES[i]] = true end
 
@@ -4216,6 +5370,7 @@ end
 --   hit        a = service key, b = the faction that used it on you
 --   lead_won   a = the faction it was taken from, or ""
 --   lead_lost  a = the faction that took it
+--   earn       a = the race's route, b = Reputation the guild gained
 GG.LOG_MAX = 100
 
 function GG.log_add(faction, kind, guild, a, b)
@@ -4266,6 +5421,10 @@ function GG.announce_lead(guild, who, was)
             -- record, the popup is only the interrupt.
             GG.log_add(me, "lead_" .. stem, guild,
                        stem == "won" and (was or "") or (who or ""))
+            -- LAPSED, NOT TAKEN: the player's reputation drained and nobody leads. The
+            -- popup says a rival out-earned you, which is untrue; the Log says who, or
+            -- that nobody does (logic audit, 2026-09-29).
+            if stem == "lost" and not who then return end
             local k = "message_event_text_text_derpy_gg_lead_" .. stem .. "_" .. guild
                       .. GG.tag(me)
             pcall(function()
@@ -4391,7 +5550,7 @@ function GG.target_from_wire(faction, s, t)
     if type(t) ~= "string" or t == "" then return nil end
     if s.hostile then return t end
     if s.kind == "building" then return GG.upgrade_target(faction, t) end
-    if s.kind == "unit" then return tonumber(t) end
+    if GG.CHAR_KINDS[s.kind] then return tonumber(t) end
     return t
 end
 
@@ -4427,11 +5586,14 @@ GG.MP_OPS.tune = function(_faction, arg)
 end
 
 -- The board index the card showed, which GG.bounty_view keeps equal to the list's.
+-- THE OFFER'S GUILD, not its place on the board: the board is one offer per guild, and
+-- an index captured at the panel's last draw named another offer once the board shifted
+-- under it (logic audit, 2026-09-29).
 GG.MP_OPS.bounty = function(faction, arg)
-    local n = tonumber(arg)
-    if not n then return end
     GG.load(faction)
     GG.load_bounties(faction)
+    local _, n = GG.bounty_for_guild(faction, arg)
+    if not n then return end
     if GG.take_bounty(faction, n) then
         GG.save_bounties(faction)
         -- THE STAKE LIVES IN THE STANDINGS, so both saved values are written.
@@ -4448,18 +5610,22 @@ GG.MP_OPS.demand = function(faction)
     end
 end
 
--- "guild|character cqi". The sitting guild's button dismisses, any other appoints -
--- decided here, on every machine, from the saved post.
+-- "appoint|guild|character cqi" or "dismiss|guild". THE VERB IS SENT, not inferred: the
+-- op used to dismiss whenever the post was held for that guild, so in multiplayer a second
+-- press of Appoint before the first came back dismissed the patron (logic audit).
 GG.MP_OPS.patron = function(faction, arg)
-    local guild, cqi = string.match(arg or "", "^([^|]*)|?(.*)$")
+    local verb, guild, cqi = string.match(arg or "", "^(%a+)|([^|]*)|?(.*)$")
     if not GG.is_guild(guild) then return end
     GG.load(faction)
     GG.load_patron(faction)
     local p = GG.patrons[faction]
-    if p and p.guild == guild then
-        GG.clear_patron(faction)
-    else
-        GG.set_patron(faction, guild, tonumber(cqi))
+    if verb == "dismiss" then
+        if p and p.guild == guild then GG.clear_patron(faction) end
+    elseif verb == "appoint" then
+        cqi = tonumber(cqi)
+        if not (p and p.guild == guild and p.cqi == cqi) then
+            GG.set_patron(faction, guild, cqi)
+        end
     end
     GG.save_patron(faction)
 end
@@ -4608,6 +5774,29 @@ function GG.first_boards()
     end
 end
 
+-- A NEW CAMPAIGN'S FIRST CARDS, at its first tick. No FactionTurnStart fires until turn 1
+-- ends, so the first draw landed on turn 2 and took GG.rotate_cards' branch for a save that
+-- never drew: the original cards for the whole first period, and no race service
+-- (logic audit, 2026-09-29). Every covered faction, humans by name too; the first tick runs
+-- in the same order on every machine and the roll is cm:random_number.
+function GG.first_cards()
+    local okn, new = pcall(function() return cm:is_new_game() end)
+    if not okn or not new then return end
+    local turn = GG.turn_now()
+    if turn < 1 then turn = 1 end
+    -- SORTED, because each draw rolls: the rolls must come in the same order everywhere.
+    local seen, order = {}, {}
+    local ok, humans = pcall(function() return cm:get_human_factions() end)
+    for _, h in ipairs(ok and humans or {}) do seen[h] = true; order[#order + 1] = h end
+    for _, list in pairs(GG.scan_world()) do
+        for i = 1, #list do
+            if not seen[list[i]] then seen[list[i]] = true; order[#order + 1] = list[i] end
+        end
+    end
+    table.sort(order)
+    for i = 1, #order do GG.rotate_cards(order[i], turn) end
+end
+
 -- THE SETTINGS FIRST, so turn 1 and the first boards play on them rather than on the
 -- defaults. MCT has loaded the player's values by now (its LoadingGame runs earlier).
 cm:add_first_tick_callback(function()
@@ -4616,9 +5805,13 @@ cm:add_first_tick_callback(function()
     GG.register()
     GG.send_tune()
     GG.first_boards()
+    GG.first_cards()
 end)
 
 function GG.load(faction)
+    -- THE CARDS FIRST: the return below skips a faction with no standing saved, and it
+    -- may still hold cards.
+    GG.load_cards(faction)
     local packed = cm:get_saved_value("derpy_gg_" .. faction)
     if not packed or packed == "" then return end
     local body, cdpart = string.match(packed, "^([^;]*);?(.*)$")
@@ -4665,8 +5858,31 @@ end
 -- guild per refresh; a saved-value read per faction per row is the same work several
 -- hundred times over on every panel open. GG.scan_world is the walk the mod already does
 -- and caches, so this costs one get_saved_value per present faction, once a session.
+--
+-- AND EVERY OTHER RECORD WITH IT (logic audit, 2026-09-29). The patron, the demand, the
+-- research subject, the bounties and the world record were re-read at the owner's turn
+-- start or when the panel opened - and the panel opens on ONE machine. GG.service_cost
+-- reads the patron, so after a mid-turn load one machine priced a sale with the discount
+-- and another without it, and sold on one: a desync. Every loader here is a pure read of
+-- a saved value, so this is the same answer on every machine.
 function GG.load_all()
-    for _, list in pairs(GG.scan_world()) do
-        for i = 1, #list do GG.load(list[i]) end
+    local seen = {}
+    local function one(f)
+        if seen[f] then return end
+        seen[f] = true
+        GG.load(f)
+        GG.load_patron(f)
+        GG.load_demand(f)
     end
+    for _, list in pairs(GG.scan_world()) do
+        for i = 1, #list do one(list[i]) end
+    end
+    -- The humans by name as well: a roster the world walk could not read is empty.
+    local ok, humans = pcall(function() return cm:get_human_factions() end)
+    for _, h in ipairs(ok and humans or {}) do
+        one(h)
+        GG.load_research(h)
+        GG.load_bounties(h)
+    end
+    GG.load_world()
 end

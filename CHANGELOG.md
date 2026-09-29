@@ -3,6 +3,230 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-09-29 - build 8AA9DDC1
+
+MD5 `8AA9DDC1ED5B070FCD504E1D3A7D6CBF`, 33,883,860 bytes.
+
+A full check of the mod's rules, with every fault it found fixed.
+
+- **Multiplayer: after a load, both machines now agree.** When the campaign loads, every
+  machine reads back your patron, any guild's demand, the technology you are researching,
+  your bounty board and the Leaderboard's records. Some of these used to come back only
+  when one player opened the panel, so a patron's discount could apply on one machine and
+  not on the other.
+- **A new campaign shows its first services on turn 1**, your race's own included. They
+  used to arrive on turn 2.
+- **Patrons:**
+  - Only one of your own lords with an army can be appointed. Selecting an enemy lord no
+    longer gives their army your patron's bonus.
+  - A patron who loses their army, dies or leaves your faction takes the bonus off that
+    army with them.
+  - After a load, the bonus is no longer left on an army the patron has since left.
+  - In multiplayer, pressing Appoint twice no longer dismisses the patron.
+- **Bounties no longer ask for a technology that only another faction can research**, such
+  as Aislinn's, Ostankya's or the Elector Counts'.
+- **Leading a guild:**
+  - After a load, a guild you lead by a small margin stays yours. It used to go to the
+    rival.
+  - When your Reputation drains away and nobody takes the lead, the Log says so, and no
+    message claims that a rival took it.
+  - The Leaderboard explains when the faction at the top is not yet the leader.
+- **Earning never costs favour.** After losing a rank, one more point of Reputation could
+  cut your favour down to the new rank's limit.
+- **Rival factions:**
+  - They buy once per round, even when a save is loaded mid-round.
+  - They never aim a service at a dead faction or at the rebels.
+  - A service that needs an enemy settlement is aimed at an enemy that has one.
+  - The Leaderboard keeps moving when rival factions are set not to use the guilds.
+- **A load no longer resets a guild's limit for the turn**, and a race's own earning keeps
+  its progress towards the next point.
+- **One battle pays once**, however many of your generals and heroes fought in it.
+- **Dwarfs: settling grudges now pays 1 Reputation for every 5 grudge points.** It used to
+  pay a flat sum for every army that won a battle, so one battle could pay twice.
+- **The Ziggurat service upgrades a building along its own line**, so Cathay's yin stays
+  yin. If the game refuses the upgrade, your favour is returned.
+- **Call the Reckoning** is offered only once a grudge cycle has run. **Labour Gangs** is
+  offered only while you hold a province with labour.
+- **The panel:**
+  - It redraws when you select something else while it is open, and any pending Confirm
+    is dropped.
+  - Take on a bounty always takes the bounty on the card you clicked.
+  - The guild button's badge counts only bounties the board shows.
+  - On a demand's last payable turn, the turns left show as 1, not 0.
+  - The footer shows your favour with the guild on screen.
+- **Five settings are now locked once a campaign is running:**
+  - rival factions spending favour;
+  - rival factions taking bounties;
+  - services aimed at enemies;
+  - guild notices;
+  - "Only the leader buys the finest service".
+- The settings' "Write every reputation to the log" button now works.
+- **Text corrections:**
+  - Rank-up messages say what each rank opens.
+  - Hobgoblin Eyes says it reveals a region for this turn.
+  - The patron's texts no longer promise a fixed "half again" or a flat 10%.
+  - Letting a demand lapse "can" cost a rank, rather than always costing one.
+  - The Help says a rival guild never takes a rank you have reached.
+  - The failed-bounty message names what you lost.
+  - The "only the leader" texts note that a setting can turn it off.
+  - Bought Loyalty and The Lady's Blessing say which army they need.
+  - The settings' descriptions for Easy, upkeep and razing are corrected.
+
+## 2026-09-29 - build B69679D0
+
+MD5 `B69679D0500C398334DFDEDAC146DEC5`, 33,839,402 bytes.
+
+- **New: every race has services of its own.** 29 new services, drawn only for their
+  own race. At least one is on show in every period, and its card carries a yellow label
+  with your race's name.
+  - The Empire's include five tied to its lords: Elspeth's Schematics, Gelt's Arcane
+    Essays, Todbringer's Fervour, Karl Franz's Elector's Favour and Wulfhart's Imperial
+    Supply Train.
+- **New: every race earns guild Reputation in its own way**, each with a Log line under
+  Mine:
+  - a caravan arriving (Chaos Dwarfs, Cathay);
+  - settling grudges (Dwarfs);
+  - taking back the old Empire's lands (Empire);
+  - beginning a Motherland ritual (Kislev);
+  - gaining Chivalry (Bretonnia);
+  - gaining Slaves (Dark Elves);
+  - a court action that succeeds (High Elves).
+- **New: every race bends one guild rule.**
+  - Chaos Dwarf demands come more often and pay more.
+  - Dwarfs lose more for a failed bounty or an expired demand.
+  - Bretonnian demands pay more when met and cost more when missed.
+  - The Empire and the Dark Elves lose more to rival guilds, Cathay less.
+  - Kislev pays half the upkeep.
+  - Dark Elf services aimed at enemies cost a quarter less.
+  - The High Elves can hold half again as much favour.
+- **New: Slave Tithe now pays Kislev 150 Devotion and the Dark Elves 1,000 Slaves.**
+- **New: a sixth Help page, "Your race",** explains all of this for your race.
+- **New setting: Race differences**, on by default. Turn it off when starting a campaign
+  to play without any of the above. It cannot be changed once the campaign is running.
+- A service whose requirement has gone since it was put on show, such as a caravan that
+  has already come home, now shows "Unavailable". It cannot be bought, and no favour is
+  taken.
+
+## 2026-09-29 - build F3F6FE85
+
+MD5 `F3F6FE853C70DEA9F720EF22442E241A`, 33,755,888 bytes.
+
+- **Fixed: The Khan's Price can only be used on a faction you are at war with**, as its
+  card says. It used to accept any faction, including your allies.
+- **Fixed: the map reveal can no longer be bought for your own region**, which you can
+  already see.
+- **Fixed: a new campaign can now offer the original services in its first period.**
+  An existing save keeps its current services until the countdown ends, and the
+  change is announced, instead of every card changing at once without a word.
+- The footer says "New services next turn" instead of "in 1 turns".
+- The Guild Loan and The Great Work now light their card while their effect runs.
+- The guild notices setting now says it also covers the services changing.
+
+## 2026-09-29 - build DF0221CE
+
+MD5 `DF0221CE230F2E9530234D2809592104`, 33,751,530 bytes.
+
+- **Fixed: a regiment can no longer be bought for a full army.** It used to take your
+  favour and start the cooldown, and no regiment arrived. The card now asks for an army
+  with room, and armies from mods that raise the limit are counted correctly.
+- **Fixed: Warlord's Honour and Hired Blade can no longer be bought for a lord or hero
+  already at the highest rank.**
+- **New: if a service fails to arrive for any reason, your favour is returned** and the
+  cooldown does not start. The Log says so.
+- Rival factions now hire into an army that has room, instead of always trying their
+  first army.
+- The hint for army services no longer says a regiment will join.
+
+## 2026-09-29 - build 25DD78AF
+
+MD5 `25DD78AF710F1B64BB03257C67692A4D`, 33,745,181 bytes.
+
+- **Changed: Warlord's Honour now adds 5 ranks** to the lord or hero you select (was 3).
+  Only the faction that leads the guild can buy it, and it cost 400 favour for the same
+  3 ranks the 150-favour Hired Blade gives.
+
+## 2026-09-29 - build 2B9176F5
+
+MD5 `2B9176F5E5ECD48C084B9E9F6E5CC539`, 33,745,181 bytes.
+
+- **New: every race now has its own panel frame.** The Empire, Dwarfs, High Elves,
+  Cathay, Kislev, Bretonnia and Dark Elves each get their own cards, tabs, bars and
+  borders, all taken from the game's own art for that race. The Chaos Dwarf panel is
+  unchanged. Before this, every race's panel used the Chaos Dwarf frame.
+- A running service now lights its card in the race's own colour.
+
+## 2026-09-29 - build 3CA24F72
+
+MD5 `3CA24F723D356E241B102133DD90874B`, 32,942,516 bytes.
+
+- **Fixed: Kislev's Master Gunners now strengthens Kislev's artillery**: +20% missile
+  damage for your War Sleds and Little Grom, for 10 turns. The game counts neither as
+  artillery, so the old version reached none of them, and the last build swapped it for
+  a missile infantry bonus instead.
+
+## 2026-09-29 - build E3C2984B
+
+MD5 `E3C2984B1F01C0D0F594F7F78F1BBA66`, 32,941,773 bytes. Every service checked against
+every race.
+
+- **Fixed: Temple Bribes now raises Chaos corruption for the Chaos Dwarfs** (+5 in every
+  province you hold, for 8 turns). It used to lower corruption, which costs a Chaos Dwarf
+  realm public order. Every other race still gets -5 corruption.
+- **Fixed: Gunnery Masters now reaches the Chaos Dwarfs' war machines.** +20% missile
+  damage for your artillery and Iron Daemons - Magma Cannons, Dreadquake Mortars,
+  Deathshrieker Rockets and Bolt Throwers. It used to reach the Bolt Thrower only.
+- Kislev's version became Streltsi Marksmen, +15% missile damage for missile infantry,
+  because it reached none of Kislev's units. Replaced in the next build by a version for
+  Kislev's actual artillery.
+- **Fixed: the Dwarfs' Runelord's Anvil now gives +10% spell resistance** to all your
+  armies. It gave Winds of Magic, and the Dwarfs have no wizards to use them.
+- The Slavers' texts now say "income from sacking settlements". They said "sacking and
+  razing", but razing never paid anything extra.
+
+## 2026-09-29 - build F6F81565
+
+MD5 `F6F815651008F8D56D947B5A26F04A42`, 32,941,490 bytes.
+
+- **The guilds now have 54 services between them, not 18.** Every rank of every guild has
+  three services, and one of them is on offer at a time. The offer changes every 10 turns, all
+  guilds together, and a card never shows the same service twice in a row. The Guilds
+  panel shows how many turns are left before the next change, and you get a message when
+  it happens.
+- **New option, "Services change every"**, from 5 to 30 turns, default 10. It can only be
+  set before the campaign starts.
+- **New kinds of service.** Some are spent on one of your armies (Forced March, Field
+  Surgeons), some on one of your settlements (Granaries, Fortify), some on an enemy's
+  settlement (Sow Discord, Poisoned Wells, Scorched Earth), and some give one of your lords
+  or heroes extra ranks (Warlord's Honour, Hired Blade). A service can only be spent on a
+  target it fits: your own army, your own settlement, or a settlement of a faction you are
+  at war with.
+- **"Guilds can be turned on you" now also covers the services aimed at enemy
+  settlements.** Turn it off and they are never offered.
+- **When a rival's service hits one of your settlements, you are told.** You get a
+  message, and the Log says which rival did it.
+- **Fixed: Hire the Immortals now adds its regiment.** Before this, it took your favour
+  and gave nothing.
+- A save from an earlier build keeps its cooldowns. Its services stay as they were until
+  your next turn starts.
+
+## 2026-09-29 - build BB0FB116
+
+MD5 `BB0FB116BBC06DB52C4965C32C4524C2`, 32,523,401 bytes.
+
+- **Rival factions of your race take the guilds' bounties too.** Each one holds one bounty at
+  a time, puts up favour for it the way you do, and earns Reputation and gold when it
+  finishes. A bounty it cannot finish in 20 turns costs it Reputation. A rival only takes
+  work near its own borders. This is a race you can lose: a rival working the bounty board
+  climbs the Leaderboard.
+- **A rival at war with you, whose borders touch yours, may be paid to take your
+  settlements or kill your lords and heroes.** You are told the turn it happens - a message that shows you the target - and the
+  Log says which rival, and what it was paid to take. You also hear when it collects, fails
+  or gives up.
+- **The Log's Rivals filter shows the race.** When a rival finishes a bounty against someone
+  else, you see what it earned.
+- **New option, "Rivals take bounties"**, on by default. Turn it off and only you take
+  bounties, as before.
+
 ## 2026-09-29 - build C7DD5E99
 
 MD5 `C7DD5E994D32A4CE78DA5B60C1F1F356`, 32,489,088 bytes.

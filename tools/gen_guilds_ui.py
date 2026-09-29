@@ -402,12 +402,15 @@ RANK_TX, RANK_TY = "50.00,0.00", "0.00,11.00"
 ICON_HOLDER = HF + "cap_category_iconm_holder.png"
 
 
-def holder_layers(w, h, glyph, path):
+def holder_layers(w, h, glyph, path, tag=""):
     """The round holder at w x h and a glyph-px square centred on its disc."""
-    ox = int(round(0.484 * w - glyph / 2.0))
-    oy = int(round(0.455 * h - glyph / 2.0))
+    # "" is the Chaos Dwarf holder, and is what the module-level layers below are built
+    # from before FRAMES exists.
+    holder, cx, cy = frame(tag)["holder"] if tag else (ICON_HOLDER, 0.484, 0.455)
+    ox = int(round(cx * w - glyph / 2.0))
+    oy = int(round(cy * h - glyph / 2.0))
     return [
-        {"path": ICON_HOLDER, "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0,
+        {"path": holder, "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0,
          "dock": None},
         {"path": path, "offset": (ox, oy), "dw": glyph - w, "dh": glyph - h,
          "margin": 0, "dock": None},
@@ -626,6 +629,327 @@ REP_BAR_LAYERS = [
 ]
 
 
+# ------------------------------------------------------ the race frames ---
+# EVERY RACE IN ITS OWN CHROME (asked for 2026-09-29). Everything above is the Chaos
+# Dwarf dressing, and until now every race wore it: an Empire player's guild hall was
+# framed in Hell-Forge bronze and Tower of Zharr glow. The ground and the glyphs were
+# already per race; the frames were not.
+#
+# A SECOND .twui.xml PER RACE, not a runtime repaint. The 9-slice margins live in the file
+# and SetImagePath cannot change them, so a repaint would stretch each race's art through
+# the Chaos Dwarf margins. derpy_gg_panel_emp.twui.xml / derpy_gg_card_emp.twui.xml carry
+# the same components under the same GUIDs with only their images changed, and the Lua
+# creates the reader's copy (GGUI.frame_path). check() refuses a copy whose tree differs.
+#
+# CULTURE SKINS DO NOT DO THIS BY THEMSELVES. ui/skins/<culture>/X.png replaces
+# ui/skins/default/X.png, but they carry only a handful of generic files - Empire and the
+# Dark Elves override none - so every path below is named outright. Direct paths into a
+# culture skin or into ui/skins/warhammer2/ are CA's own habit: 51 twui files do it.
+#
+# SOURCES, all CA art, referenced and never copied:
+#   _emp  Gardens of Morr (tabs, holder, price, button bar), Great Temple of Ulric (header,
+#         card, reputation), Gunnery School (the gold rim a running service wears)
+#   _dwf  Book of Grudges (tabs, holder, reputation fill), the Dwarf skin's Mortuary Cult
+#         and button-bar pieces, Malakai's rune glow for the rim
+#   _hef  the Intrigue Court (tabs, card, header), Asur Domination (holder, price, reputation)
+#   _cth  the Tiger Court (tabs, holder, card), Shang Yang (header, price), the Cathay skin
+#   _ksl  the Ice Court and Orthodoxy (tabs, card, price, rim, reputation), Devotion (header)
+#   _brt  the Vows (header, price, tabs), Chivalry (reputation), the Bretonnian skin's
+#         heraldic tile and border for the card
+#   _def  Malus Darkblade (tabs, card, header, holder), Murderous Prowess (reputation, price),
+#         Hag Graef's bar, and the Dark Elf rite flare as the running-service glow
+# Margins are CA's where CA draws the file (py scratch ca_margins, 2026-09-29) and measured
+# off the file where it does not. Tab captions turn yellow on the open tab, so no selected
+# plate may be light: the Dwarfs' gold banner failed that and the open Dwarf tab is blue.
+_D = "ui/skins/default/"
+_W2 = "ui/skins/warhammer2/"
+# ONE GREY GLOW, tinted per race, for the six races with no glow of their own: Ulric's radial
+# blur, which falls off from the middle to nothing at every edge the way the Hell-Forge's
+# heat_glow does and has no colour to fight the tint. NOT Malakai's tab_shadow, used first: it
+# is a flat plateau with 20px soft edges, and stretched to 300px it drew a lit BLOCK that
+# stopped a third of the way across the card.
+_GLOW = _D + "dlc29_great_temple_of_ulric/fx_radial_blur.png"
+_TUTGLOW = _D + "tutglow_square.png"
+# The dimmed standard state of a tab that has one texture for every state: hover is the
+# same art at full brightness. Colour multiplies, so this is the only direction it goes.
+_DIM = "#B4B4B4FF"
+
+
+def _L(path, margin=0, tile=False, colour=None, offset=(0, 0), dw=0, dh=0):
+    lay = {"path": path, "offset": offset, "dw": dw, "dh": dh, "margin": margin,
+           "dock": None}
+    if tile:
+        lay["tile"] = True
+    if colour:
+        lay["colour"] = colour
+    return lay
+
+
+# THE REPUTATION FILL'S RECT IS FIXED - gg_rep_bar at 38,148 714x13, which the Lua narrows
+# to the fraction earned - so each race's track is drawn to put ITS trough there instead.
+# trough is (x0, y0, x1, y1) in the texture, measured off its alpha and luminance. The ends
+# keep their native width (the L/R margin) and the height scales to fit 13 rows into the
+# trough. An end cap wider than the 18px the track has left of the fill is clamped at the
+# track's edge rather than drawn outside it (the engine does not clip), and the fill then
+# overlaps that cap by the difference.
+_TRACK_W, _TRACK_H = 750, 29          # PANEL_LAYOUT["gg_bar_track"], checked in check()
+_FILL_IN = (18, 8, 714, 13)           # gg_rep_bar inside gg_bar_track
+
+
+def fit_track(path, size, trough, tile=False):
+    W, H = size
+    x0, y0, x1, y1 = trough
+    fx, fy, fw, fh = _FILL_IN
+    sy = min(float(fh) / (y1 - y0), float(_TRACK_H) / H)
+    h = int(round(H * sy))
+    dy = max(0, min(_TRACK_H - h, int(round(fy - y0 * sy))))
+    dx = max(0, fx - x0)
+    w = min(_TRACK_W - dx, fx + fw - dx + (W - x1))
+    return [_L(path, (0, W - x1, 0, x0), tile, offset=(dx, dy),
+               dw=w - _TRACK_W, dh=h - _TRACK_H)]
+
+
+# tab: "layers" and "hover" are the two states the file draws; "selected" and
+# "selected_hover" are PATHS the Lua swaps into those same slots for the open tab, so they
+# are drawn through the slot's margins and colour - check_margins_fit_textures() checks
+# them against those. Every state has the same number of layers.
+FRAMES = {
+    "": {
+        "card": CARD_LAYERS[0], "heat": (CARD_HEAT, None),
+        "rim": (CARD_RIM, (40, 40, 40, 40), None),
+        "holder": (ICON_HOLDER, 0.484, 0.455),
+        "cost": COST_LAYERS, "rank": RANK_BAR_LAYERS, "rank_tx": RANK_TX, "rank_ty": RANK_TY,
+        "gbar": GBAR_LAYERS,
+        "tab": {"layers": tab_plate("active"), "hover": tab_plate("hover"),
+                "selected": [TAB_PLATE % "selected"],
+                "selected_hover": [TAB_PLATE % "selected_hover"]},
+        "track": REP_TRACK_LAYERS, "fill": REP_BAR_LAYERS,
+    },
+    "_emp": {
+        "card": _L(_D + "dlc29_great_temple_of_ulric/text_bgr.png", (25, 20, 25, 20), True),
+        "heat": (_GLOW, "#FFB45A50"),
+        "rim": (_D + "dlc25_gunnery_school/frame_unit_card_selected.png",
+                (25, 25, 25, 25), None),
+        "holder": (_D + "dlc25_gardens_of_morr/garden_frame_empty_default.png", 0.5, 0.40),
+        "cost": [_L(_D + "dlc25_gardens_of_morr/don_square_slot_empty.png",
+                    (0, 25, 0, 25), True)],
+        "rank": [_L(_D + "dlc29_great_temple_of_ulric/button_frame.png", (0, 60, 0, 60))],
+        "rank_tx": RANK_TX, "rank_ty": "0.00,0.00",
+        "gbar": [_L(_D + "dlc25_gardens_of_morr/lower_frame.png", (0, 60, 0, 60), True)],
+        "tab": {"layers": [_L(_D + "dlc25_gardens_of_morr/don_square_button_default.png",
+                              (0, 25, 0, 25), True)],
+                "hover": [_L(_D + "dlc25_gardens_of_morr/don_square_button_hover.png",
+                             (0, 25, 0, 25), True)],
+                "selected": [_D + "dlc25_gardens_of_morr/don_square_button_selected.png"],
+                "selected_hover":
+                    [_D + "dlc25_gardens_of_morr/don_square_button_selected_hover.png"]},
+        "track": fit_track(_D + "dlc29_great_temple_of_ulric/progress_bar_bg.png",
+                           (127, 18), (4, 3, 123, 15)),
+        "fill": [_L(_D + "dlc29_great_temple_of_ulric/bar_fill_yellow.png")],
+    },
+    "_dwf": {
+        # Malakai's dark text ground in the Book of Grudges' red-ink frame. The Mortuary
+        # Cult plate tried first is a pointed outline at this size, and the text ran
+        # across its diagonals.
+        "card": _L(_D + "dlc25_malakais_adventures/text_bg.png"),
+        "card_extra": [_L(_D + "dlc25_book_of_grudges/unit_info_frame.png", (20, 40, 20, 40))],
+        "heat": (_GLOW, "#FF8A2A50"),
+        "rim": (_D + "dlc25_malakais_adventures/tab_hover_glow.png", (35, 35, 35, 35), None),
+        "holder": (_D + "dlc25_book_of_grudges/unit_locked_bg.png", 0.5, 0.5),
+        "cost": [_L("ui/skins/wh_main_dwf_dwarfs/mortuary_cult_bottom_strip.png",
+                    (5, 30, 10, 30), True)],
+        "rank": [_L("ui/skins/wh_main_dwf_dwarfs/mortuary_cult_top_strip.png",
+                    (10, 50, 5, 50), True)],
+        "rank_tx": RANK_TX, "rank_ty": "0.00,0.00",
+        "gbar": [_L("ui/skins/wh_main_dwf_dwarfs/bar_small_buttons.png",
+                    (0, 110, 0, 110), True)],
+        "tab": {"layers": [_L(_D + "dlc25_book_of_grudges/tab_button_confederation_active.png",
+                              (0, 10, 0, 25))],
+                "hover": [_L(_D + "dlc25_book_of_grudges/tab_button_confederation_selected.png",
+                             (0, 45, 0, 25))],
+                "selected": [_D + "dlc25_book_of_grudges/tab_button_unit_pack_active.png"],
+                "selected_hover":
+                    [_D + "dlc25_book_of_grudges/tab_button_unit_pack_selected.png"]},
+        "track": fit_track(_D + "grudge_bar_hud_frame.png", (149, 23), (13, 7, 136, 17)),
+        "fill": [_L(_D + "dlc25_book_of_grudges/tab_button_bar_fill.png")],
+    },
+    "_hef": {
+        # The Intrigue Court's alert plate. Its progress_bg, tried first, is a thin bar in a
+        # 678x191 canvas and drew as nothing at all.
+        "card": _L(_D + "dlc27_hef_intrigue_court/dlc27_intrigue_court_alert_holder.png",
+                   (0, 40, 0, 40)),
+        "heat": (_GLOW, "#FFF0C050"),
+        "rim": (_TUTGLOW, (16, 16, 16, 16), "#FFE9A0C0"),
+        "holder": (_D + "dlc27_hef_asur_domination/faction_selection_frame_active.png",
+                   0.5, 0.46),
+        "cost": [_L(_D + "dlc27_hef_asur_domination/dlc27_hef_asur_domination_focus_holder.png",
+                    (0, 14, 0, 40))],
+        "rank": [_L(_D + "dlc27_hef_intrigue_court/dlc27_intrigue_court_immunity.png",
+                    (0, 70, 0, 70))],
+        "rank_tx": RANK_TX, "rank_ty": "0.00,0.00",
+        "gbar": [_L("ui/skins/wh2_main_hef_high_elves/bar_small_buttons.png",
+                    (0, 110, 0, 110), True)],
+        "tab": {"layers": [_L(_D + "dlc27_hef_intrigue_court/button_basic_active.png",
+                              (0, 12, 0, 12))],
+                "hover": [_L(_D + "dlc27_hef_intrigue_court/button_basic_hover.png",
+                             (0, 12, 0, 12))],
+                "selected": [_D + "dlc27_hef_intrigue_court/button_basic_pressed.png"],
+                "selected_hover": [_D + "dlc27_hef_intrigue_court/button_basic_pressed.png"]},
+        "track": fit_track(_D + "dlc27_hef_asur_domination/wh3_sea_patrol_progress_bar_frame.png",
+                           (216, 36), (7, 7, 209, 28)),
+        "fill": [_L(_D + "dlc27_hef_asur_domination/wh3_sea_patrol_progress_bar_fill.png")],
+    },
+    "_cth": {
+        # Shang Yang's hexagonal plate in its bronze frame, STRETCHED: tiled, the frame's
+        # rails repeated down the card as well as along it and crossed every line of text.
+        # The Tiger Court's effects plate tried first has a dark band that stops three
+        # quarters across, and tiling repeated its end mid-card.
+        "card": _L(_D + "cp1_cth_shang_yang/unit_capacity_holder_bg.png", (0, 25, 0, 25)),
+        "card_extra": [_L(_D + "cp1_cth_shang_yang/unit_capacity_holder_frame.png",
+                          (0, 25, 0, 23))],
+        "heat": (_GLOW, "#60E0A050"),
+        "rim": (_TUTGLOW, (16, 16, 16, 16), "#70E8B8C0"),
+        "holder": (_D + "cp1_cth_tiger_court/button_decrees_active.png", 0.5, 0.5),
+        "cost": [_L(_D + "cp1_cth_shang_yang/requirement_holder.png", (0, 25, 0, 25))],
+        "rank": [_L(_D + "cp1_cth_shang_yang/unit_category_header_holder_plate.png",
+                    (0, 60, 0, 60))],
+        "rank_tx": RANK_TX, "rank_ty": "0.00,0.00",
+        "gbar": [_L("ui/skins/wh3_main_cth_cathay/bar_small_buttons.png",
+                    (0, 110, 0, 110), True)],
+        "tab": {"layers": [_L(_D + "cp1_cth_tiger_court/button_decrees_active.png",
+                              (0, 22, 0, 22), colour=_DIM)],
+                "hover": [_L(_D + "cp1_cth_tiger_court/button_decrees_active.png",
+                             (0, 22, 0, 22))],
+                # The Tiger Court's jade banner. The glowing selected octagon put the open
+                # tab's yellow caption at 3.5:1 (preview_guilds_panel.py, 2026-09-29).
+                "selected": [_D + "cp1_cth_tiger_court/position_flag_3.png"],
+                "selected_hover": [_D + "cp1_cth_tiger_court/position_flag_3.png"]},
+        "track": fit_track("ui/skins/wh3_main_cth_cathay/compass_power_bar_frame.png",
+                           (272, 26), (5, 5, 267, 20), True),
+        "fill": [_L(_D + "compass_power_bar_fill.png")],
+    },
+    "_ksl": {
+        "card": _L(_D + "wh3_main_court_orthodoxy/court_chain_background.png",
+                   (12, 12, 12, 12)),
+        "heat": (_GLOW, "#80D8FF50"),
+        "rim": (_D + "wh3_main_court_orthodoxy/court_completed_btn_ornaments.png",
+                (24, 24, 24, 24), None),
+        "holder": (_D + "buildings_slot_circle_bg.png", 0.5, 0.5),
+        "cost": [_L(_D + "wh3_main_court_orthodoxy/court_favour_resource_holder.png",
+                    (0, 14, 0, 40))],
+        "rank": [_L(_D + "wh3_main_ksl_devotion/devotion_bar_frame.png", (0, 50, 0, 50))],
+        "rank_tx": RANK_TX, "rank_ty": "0.00,0.00",
+        "gbar": [_L("ui/skins/wh3_main_ksl_kislev/bar_small_buttons.png",
+                    (0, 110, 0, 110), True)],
+        # The Ice Court's slate plate under Orthodoxy's bronze outline; the open tab trades
+        # the outline for the Ice Court's glowing one.
+        "tab": {"layers": [_L(_D + "wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png",
+                              (0, 20, 0, 4), colour=_DIM),
+                           _L(_D + "wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png",
+                              (0, 24, 0, 6))],
+                "hover": [_L(_D + "wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png",
+                             (0, 20, 0, 4)),
+                          _L(_D + "wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png",
+                             (0, 24, 0, 6))],
+                "selected": [_D + "wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png",
+                             _D + "wh3_main_court_orthodoxy/court_completed_btn_ornaments.png"],
+                "selected_hover":
+                    [_D + "wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png",
+                     _D + "wh3_main_court_orthodoxy/court_completed_btn_ornaments.png"]},
+        "track": fit_track(_D + "wh3_main_court_orthodoxy/kislev_support_frame.png",
+                           (554, 41), (26, 2, 548, 37)),
+        "fill": [_L("ui/skins/warhammer3/kislev_devotion_fillbar.png")],
+    },
+    "_brt": {
+        # 5px slices, as CA draws its own panel_back_tile: this one has a 4px black edge,
+        # and tiled whole it drew a dark seam every 256px.
+        "card": _L("ui/skins/wh_main_brt_bretonnia/legacy/panel_back_tile.png", 5, True),
+        # 42px slices, measured off the file: the band is 33px and the corner squares reach
+        # 40. CA's 30 is for the GENERIC panel_back_border, a thinner file - on this one the
+        # band's inner edge fell in the tiled middle and drew a rail through the text every
+        # 196px. At 14 the ornament itself tiled into a seam.
+        "card_extra": [_L("ui/skins/wh_main_brt_bretonnia/legacy/panel_back_border.png",
+                          (42, 42, 42, 42), True)],
+        "heat": (_GLOW, "#FFD37A50"),
+        "rim": (_TUTGLOW, (16, 16, 16, 16), "#FFD37AC0"),
+        "holder": (_D + "button_round_medium_frame.png", 0.5, 0.5),
+        "cost": [_L(_D + "bret_vows_titel.png", (0, 45, 0, 45))],
+        "rank": [_L(_D + "bret_vows_titel.png", (0, 60, 0, 60))],
+        "rank_tx": RANK_TX, "rank_ty": "0.00,0.00",
+        "gbar": [_L("ui/skins/wh_main_brt_bretonnia/bar_small_buttons.png",
+                    (0, 110, 0, 110), True)],
+        # The Vows title plate, with Chivalry's copper frame drawn round the open tab.
+        "tab": {"layers": [_L(_D + "bret_vows_titel.png", (0, 45, 0, 45), colour=_DIM),
+                           _L(CLEAR, (5, 5, 5, 5))],
+                "hover": [_L(_D + "bret_vows_titel.png", (0, 45, 0, 45)),
+                          _L(CLEAR, (5, 5, 5, 5))],
+                "selected": [_D + "bret_vows_titel.png", _D + "chivalry_bar_frame.png"],
+                "selected_hover": [_D + "bret_vows_titel.png", _D + "chivalry_bar_frame.png"]},
+        "track": fit_track(_D + "chivalry_bar_frame.png", (60, 19), (4, 3, 56, 15)),
+        "fill": [_L(_D + "bret_vows_bar_fill_2.png")],
+    },
+    "_def": {
+        "card": _L(_W2 + "malus_whispers_tooltip_background.png"),
+        "heat": (_W2 + "rite_def_text_holder.png", None),
+        "rim": (_TUTGLOW, (16, 16, 16, 16), "#E050FFC0"),
+        "holder": (_W2 + "malus_possession_bar_button_frame.png", 0.5, 0.5),
+        "cost": [_L(_W2 + "murderous_prowess_back.png")],
+        "rank": [_L(_W2 + "malus_whispers_tooltip_border_bottom.png", (0, 70, 0, 70))],
+        "rank_tx": RANK_TX, "rank_ty": "0.00,0.00",
+        # Malus's orb bar again. Hag Graef's bar_top_center is a 200px plate in the middle of
+        # a 399px texture, so behind six buttons it drew nothing that showed.
+        "gbar": [_L(_W2 + "malus_whispers_tooltip_border_bottom.png", (0, 70, 0, 70))],
+        "tab": {"layers": [_L(_W2 + "malus_parchment_button_square_active.png")],
+                "hover": [_L(_W2 + "malus_parchment_button_square_hover.png")],
+                "selected": [_W2 + "malus_parchment_button_square_pressed.png"],
+                "selected_hover": [_W2 + "malus_parchment_button_square_pressed.png"]},
+        "track": fit_track(_W2 + "murderous_prowess_frame.png", (253, 41), (24, 9, 228, 30)),
+        "fill": [_L(_W2 + "murderous_prowess_fill.png")],
+    },
+}
+FRAME_TAGS = sorted(t for t in FRAMES if t)
+
+
+def frame(tag):
+    """A race's frame; the Chaos Dwarf one for "" and for any flavour without its own."""
+    return FRAMES.get(tag) or FRAMES[""]
+
+
+def frame_file(base, tag):
+    """The .twui.xml a race's panel or card is created from (GGUI.frame_path)."""
+    return base + (tag if tag in FRAME_TAGS else "") + ".twui.xml"
+
+
+def card_layers(tag=""):
+    """Ground, heat, rim, then any border: the glows stay images 1 and 2 for every race."""
+    f = frame(tag)
+    heat = dict(CARD_LAYERS[CARD_HEAT_INDEX])
+    rim = dict(CARD_LAYERS[CARD_RIM_INDEX], margin=f["rim"][1])
+    for lay, colour in ((heat, f["heat"][1]), (rim, f["rim"][2])):
+        if colour:
+            lay["colour"] = colour
+    return [f["card"], heat, rim] + f.get("card_extra", [])
+
+
+# A RACE'S PANEL SHIPS ITS OWN GROUND. The Lua repaints image 1 per guild on every refresh
+# (GGUI.paint_ground), so this is only what shows before that runs - but it is the Tower of
+# Zharr in the Chaos Dwarf file, and a frame that exists so no other race wears Chaos Dwarf
+# art should not start from it. The first guild's ground, in the race's flavour.
+PANEL_BG_FIRST = "ui/campaign ui/derpy_gg_bg/brass.png"
+
+
+def panel_layers(tag=""):
+    if tag not in FRAME_TAGS:
+        return PANEL_LAYERS
+    return [dict(l, path=flavoured(PANEL_BG_FIRST, tag)) if l["path"] == PANEL_ART else l
+            for l in PANEL_LAYERS]
+
+
+def tab_layers(tag, state):
+    """The file's layers for a tab state: "layers" (standard) or "hover"."""
+    return frame(tag)["tab"][state]
+
+
 # TWO BUGS LIVED IN THE OLD BUILDERS, and they are the same bug twice.
 #
 # 1. tx/ty ARE THE TEXT OFFSET INSIDE A COMPONENT, not the component's position.
@@ -650,10 +974,11 @@ BTN_TEXT = {"text": True, "size": 12, "align": "Center", "valign": "Center",
             "tx": "0.00,0.00", "ty": "0.00,0.00"}
 
 
-def _panel():
+def _panel(tag=""):
+    f = frame(tag)
     root = EU.C("root", PANEL_W, PANEL_H)
     p = root.add(EU.C("derpy_gg_panel", PANEL_W, PANEL_H, priority=60,
-                      layers=PANEL_LAYERS))
+                      layers=panel_layers(tag)))
     for name in sorted(PANEL_LAYOUT):
         _x, _y, w, h = PANEL_LAYOUT[name]
         interactive = name in TABS + LOG_FILTERS + ["gg_prev", "gg_next", "gg_close"]
@@ -667,11 +992,12 @@ def _panel():
         elif name == "gg_gsel":
             kw = {"layers": GSEL_LAYERS}
         elif name == "gg_gbar":
-            kw = {"layers": GBAR_LAYERS}
+            kw = {"layers": f["gbar"]}
         elif name == "gg_rank_mark":
-            kw = {"layers": RANK_ICON_LAYERS}
+            kw = {"layers": holder_layers(w, h, RANK_GLYPH,
+                                          RANK_ICON_LAYERS[-1]["path"], tag)}
         elif name in TABS:
-            kw = dict(BTN_TEXT, layers=tab_plate("active"), hover=tab_plate("hover"),
+            kw = dict(BTN_TEXT, layers=f["tab"]["layers"], hover=f["tab"]["hover"],
                       interactive=True, sound=SOUND_TAB)
         elif name == "gg_close":
             # A cross, not a caption: no text block, so there is nothing to write
@@ -686,9 +1012,9 @@ def _panel():
                       interactive=True, sound=SOUND_TAB)
         elif name == "gg_rep_bar":
             # The bar is drawn, never written on.
-            kw = {"layers": REP_BAR_LAYERS}
+            kw = {"layers": f["fill"]}
         elif name == "gg_bar_track":
-            kw = {"layers": REP_TRACK_LAYERS}
+            kw = {"layers": f["track"]}
         elif name == "gg_divider":
             kw = {"layers": DIVIDER_LAYERS}
         elif name == "gg_crest":
@@ -699,9 +1025,9 @@ def _panel():
                   "text": True, "size": 24, "align": "Center", "valign": "Center",
                   "fontcat": "header_24_bold", "tx": "0.00,0.00", "ty": "0.00,0.00"}
         elif name == "gg_rank_line":
-            kw = {"layers": RANK_BAR_LAYERS,
+            kw = {"layers": f["rank"],
                   "text": True, "size": 12, "align": "Left", "valign": "Center",
-                  "fontcat": "body_12", "tx": RANK_TX, "ty": RANK_TY}
+                  "fontcat": "body_12", "tx": f["rank_tx"], "ty": f["rank_ty"]}
         elif name.startswith("gg_help_"):
             kw = {"text": True, "size": 12, "align": "Left", "valign": "Center",
                   "fontcat": "body_12", "colour": "#C9BFA8FF",
@@ -713,14 +1039,15 @@ def _panel():
     return root
 
 
-def _card():
+def _card(tag=""):
+    f = frame(tag)
     root = EU.C("root", CARD_W, CARD_H)
     # INTERACTIVE, for two reasons: its tooltip carries everything the card has no room
     # for, and a tooltip on a component that is not interactive is never shown; and on the
     # bounty board a click on the card pans the map to the target. NO SOUND, deliberately:
     # on the Guilds and Court tabs the card body does nothing, and a click sound there
     # would say something happened. On the board the camera moving is the answer.
-    c = root.add(EU.C("derpy_gg_card", CARD_W, CARD_H, layers=CARD_LAYERS,
+    c = root.add(EU.C("derpy_gg_card", CARD_W, CARD_H, layers=card_layers(tag),
                       interactive=True))
     for name in sorted(CARD_LAYOUT):
         _x, _y, w, h = CARD_LAYOUT[name]
@@ -728,7 +1055,8 @@ def _card():
             kw = dict(BTN_TEXT, layers=plate(h, "active"), hover=plate(h, "hover"),
                       interactive=True, sound=SOUND_BUY)
         elif name == "card_icon":
-            kw = {"layers": CARD_ICON_LAYERS}
+            kw = {"layers": holder_layers(w, h, CARD_GLYPH,
+                                          CARD_ICON_LAYERS[CARD_ICON]["path"], tag)}
         elif name.startswith("card_desc"):
             # Dimmer than the name, and body text rather than a heading.
             kw = {"text": True, "size": 12, "align": "Left", "valign": "Center",
@@ -739,7 +1067,7 @@ def _card():
                   "fontcat": "header_14", "tx": LABEL_TX, "ty": LABEL_TY}
         elif name == "card_cost":
             # The number reads better against the Buy button below it when centred.
-            kw = {"layers": COST_LAYERS,
+            kw = {"layers": f["cost"],
                   "text": True, "size": 14, "align": "Center", "valign": "Center",
                   "tx": "0.00,0.00", "ty": "0.00,0.00"}
         else:
@@ -885,10 +1213,21 @@ FILES = [
 ]
 
 
+def frame_files():
+    """FILES plus each race's own panel and card (see FRAMES)."""
+    out = list(FILES)
+    for tag in FRAME_TAGS:
+        out.append((frame_file("derpy_gg_panel", tag), lambda t=tag: _panel(t),
+                    "The Great Guilds - panel frame, tabs, pager (%s frame)" % tag))
+        out.append((frame_file("derpy_gg_card", tag), lambda t=tag: _card(t),
+                    "The Great Guilds - one service card (%s frame)" % tag))
+    return out
+
+
 def build_xml():
     """path -> xml text. GUIDs are minted per file from one counter, as the Exchange does."""
     out = {}
-    for fname, builder, comment in FILES:
+    for fname, builder, comment in frame_files():
         root = EU.assign(builder(), GUID_PREFIX)
         if fname not in UNSCALED_FILES:
             for c in root.walk():
@@ -1347,16 +1686,20 @@ def check_margins_fit_textures():
     """
     out = []
     pairs = []
-    for fname, builder, _c in FILES:
+    for fname, builder, _c in frame_files():
         for c in builder().walk():
             for lay in EU._spec(c.kw, "layers") + EU._spec(c.kw, "hover"):
                 pairs.append((fname, c.name, lay, lay["path"]))
-    for st in TAB_STATES:
-        pairs.append(("derpy_gg_panel.twui.xml", "tabs", tab_plate(st)[0], TAB_PLATE % st))
-    pairs.append(("derpy_gg_card.twui.xml", "card heat", CARD_LAYERS[CARD_HEAT_INDEX],
-                  CARD_HEAT))
-    pairs.append(("derpy_gg_card.twui.xml", "card rim", CARD_LAYERS[CARD_RIM_INDEX],
-                  CARD_RIM))
+    # WHAT THE LUA SWAPS IN is drawn through the SLOT's margins: the open tab's plates
+    # through the standard and hover layers, the glows through the card's images 1 and 2.
+    for tag in [""] + FRAME_TAGS:
+        f, pf, cf = frame(tag), frame_file("derpy_gg_panel", tag), frame_file("derpy_gg_card", tag)
+        for slot, state in (("layers", "selected"), ("hover", "selected_hover")):
+            for lay, path in zip(f["tab"][slot], f["tab"][state]):
+                pairs.append((pf, "tabs (%s)" % state, lay, path))
+        cl = card_layers(tag)
+        pairs.append((cf, "card heat", cl[CARD_HEAT_INDEX], f["heat"][0]))
+        pairs.append((cf, "card rim", cl[CARD_RIM_INDEX], f["rim"][0]))
     for fname, name, lay, path in pairs:
         t, r, b, lft = _margins(lay)
         if not (t or r or b or lft):
@@ -1858,12 +2201,14 @@ def check():
         if x + w > ROW_W or y + h > ROW_H:
             out.append("row child %s overhangs the %dx%d row" % (name, ROW_W, ROW_H))
 
-    # Three cards on screen, three services per guild. If those ever disagree the
+    # Three cards on screen, three ranks per guild. If those ever disagree the
     # panel silently drops or duplicates one.
-    per_guild = max(len([s for s in G.SERVICES if s["guild"] == g]) for g in G.GUILDS)
+    # ONE CARD PER RANK: a guild holds a POOL of services per rank since 2026-09-29.
+    per_guild = max(len(set(s["rank"] for s in G.SERVICES if s["guild"] == g))
+                    for g in G.GUILDS)
     cards = len([n for n in PANEL_LAYOUT if n.startswith("gg_card_")])
     if cards != per_guild:
-        out.append("%d card slots but %d services per guild" % (cards, per_guild))
+        out.append("%d card slots but %d ranks per guild" % (cards, per_guild))
 
     # Six guild pages, six pager stops.
     if len(G.GUILDS) != 6:
@@ -1906,6 +2251,22 @@ def check():
              ("tab", tab_plate("active"), (TAB_W, TAB_H)),
              ("row icon", ROW_ICON_LAYERS, tuple(ROW_LAYOUT["row_icon"][2:])),
              ("row", ROW_LAYERS, (ROW_W, ROW_H)))
+    # AND EVERY RACE'S FRAME, which is where a fitted track or a two-layer tab could reach
+    # past its box.
+    for tag in FRAME_TAGS:
+        f = frame(tag)
+        sized += (
+            (tag + " card", card_layers(tag), (CARD_W, CARD_H)),
+            (tag + " card icon", holder_layers(CARD_LAYOUT["card_icon"][2],
+                                               CARD_LAYOUT["card_icon"][3], CARD_GLYPH,
+                                               CLEAR, tag),
+             tuple(CARD_LAYOUT["card_icon"][2:])),
+            (tag + " card cost", f["cost"], tuple(CARD_LAYOUT["card_cost"][2:])),
+            (tag + " rank bar", f["rank"], tuple(PANEL_LAYOUT["gg_rank_line"][2:])),
+            (tag + " rep track", f["track"], tuple(PANEL_LAYOUT["gg_bar_track"][2:])),
+            (tag + " rep fill", f["fill"], tuple(PANEL_LAYOUT["gg_rep_bar"][2:])),
+            (tag + " guild bar", f["gbar"], tuple(PANEL_LAYOUT["gg_gbar"][2:])),
+            (tag + " tab", f["tab"]["layers"] + f["tab"]["hover"], (TAB_W, TAB_H)))
     for lname, layers, (cw, ch) in sized:
         for lay in layers:
             ox, oy = lay.get("offset", (0, 0))
@@ -1958,33 +2319,118 @@ def check():
             if CARD_LAYERS[want]["path"] != CARD_OFF:
                 out.append("card image %d ships %s, not the blank - the card starts lit"
                            % (want, CARD_LAYERS[want]["path"]))
-        for const, want in (("CARD_OFF", CARD_OFF), ("CARD_HEAT", CARD_HEAT),
-                            ("CARD_RIM", CARD_RIM)):
-            m = re.search(r'GGUI\.%s\s*=\s*"([^"]+)"' % const, src)
-            if not m or m.group(1) != want:
-                out.append("GGUI.%s is %r but the generator says %r"
-                           % (const, m and m.group(1), want))
-        try:
-            assets = _assets()
-            for p in (CARD_HEAT, CARD_RIM):
-                if p not in assets:
-                    out.append("card glow %s is in no ui pack - a running service's card "
-                               "would draw a blank square" % p)
-        except Exception as e:                                      # noqa: BLE001
-            out.append("could not verify the card glows: %r" % (e,))
-        # The open tab's plate is written by the Lua from its own copy of the pattern.
-        m = re.search(r'GGUI\.TAB_PLATE\s*=\s*"([^"]+)"', src)
-        if not m or m.group(1) != TAB_PLATE:
-            out.append("GGUI.TAB_PLATE is %r but the tabs draw %r"
-                       % (m and m.group(1), TAB_PLATE))
-        try:
-            assets = _assets()
-            for st in TAB_STATES:
-                if TAB_PLATE % st not in assets:
-                    out.append("tab plate %s is in no ui pack" % (TAB_PLATE % st))
-        except Exception as e:                                      # noqa: BLE001
-            out.append("could not verify the tab plates: %r" % (e,))
+        m = re.search(r'GGUI\.CARD_OFF\s*=\s*"([^"]+)"', src)
+        if not m or m.group(1) != CARD_OFF:
+            out.append("GGUI.CARD_OFF is %r but the generator says %r"
+                       % (m and m.group(1), CARD_OFF))
+        out += check_frame_mirror(src)
 
+    out += check_frame_files(files)
+
+    return out
+
+
+def lua_frames(src):
+    """GGUI.FRAME as the campaign Lua declares it: {tag: {key: path or [paths]}}."""
+    m = re.search(r"GGUI\.FRAME\s*=\s*\{(.*?)\n\}", src, re.S)
+    if not m:
+        return None
+    out = {}
+    for key, body in re.findall(r'\n    (\[""\]|_\w+)\s*=\s*\{(.*?)\n    \},',
+                                m.group(1), re.S):
+        ent = dict(re.findall(r'(\w+)\s*=\s*"([^"]*)"', body))
+        for name, lst in re.findall(r"(\w+)\s*=\s*\{([^}]*)\}", body):
+            ent[name] = re.findall(r'"([^"]*)"', lst)
+        out["" if key == '[""]' else key] = ent
+    return out
+
+
+def check_frame_mirror(src):
+    """GGUI.FRAME must say what FRAMES says, race by race and layer by layer.
+
+    The Lua repaints the lit card's glows and the open tab's plates from its own copy. A
+    drift is a Chaos Dwarf glow in an Empire frame, or a tab whose plate vanishes the
+    moment it is opened - both silent.
+    """
+    out = []
+    got = lua_frames(src)
+    if got is None:
+        return ["zzz_derpy_guilds_ui.lua declares no GGUI.FRAME"]
+    for tag in [""] + FRAME_TAGS:
+        f = frame(tag)
+        want = {"heat": f["heat"][0], "rim": f["rim"][0],
+                "active": [l["path"] for l in f["tab"]["layers"]],
+                "hover": [l["path"] for l in f["tab"]["hover"]],
+                "selected": list(f["tab"]["selected"]),
+                "selected_hover": list(f["tab"]["selected_hover"])}
+        if tag not in got:
+            out.append("GGUI.FRAME has no %r entry - that race's glows and tabs fall back "
+                       "to the Chaos Dwarf art in a frame that is not" % tag)
+            continue
+        for k, v in sorted(want.items()):
+            if got[tag].get(k) != v:
+                out.append("GGUI.FRAME[%r].%s is %r but FRAMES says %r"
+                           % (tag, k, got[tag].get(k), v))
+        n = set(len(want[k]) for k in ("active", "hover", "selected", "selected_hover"))
+        if len(n) != 1:
+            out.append("the %r tab states have %r layers - GGUI.paint_tab puts the hover "
+                       "state's at image n, so every state needs the same count" % (tag, n))
+    for tag in sorted(set(got) - set([""] + FRAME_TAGS)):
+        out.append("GGUI.FRAME has %r, which FRAMES does not - GGUI.frame_path would ask "
+                   "for a .twui.xml nobody writes" % tag)
+    try:
+        assets = _assets()
+        for tag, ent in sorted(got.items()):
+            for k, v in sorted(ent.items()):
+                for p in (v if isinstance(v, list) else [v]):
+                    if p not in assets:
+                        out.append("GGUI.FRAME[%r].%s names %s, which is in no ui pack - "
+                                   "it would draw a blank" % (tag, k, p))
+    except Exception as e:                                          # noqa: BLE001
+        out.append("could not verify GGUI.FRAME's art: %r" % (e,))
+    return out
+
+
+# THE CHAOS DWARFS' OWN ART, by where CA keeps it. None of it may be in another race's frame.
+CHD_ART = ("dlc23_chd_", "dlc23_tower_of_zharr", "wh3_dlc23_chd_chaos_dwarfs")
+
+
+def check_frame_files(files):
+    """Each race's panel and card are the original's tree with only their art changed.
+
+    The Lua creates the reader's copy and then reaches every component by name and
+    repaints images by index, so a copy with one component more or less, or a GUID moved,
+    is a panel that half-works for one race only. And the reason the copies exist is that
+    no race but the Chaos Dwarfs wears Chaos Dwarf art.
+    """
+    out = []
+    for base in ("derpy_gg_panel", "derpy_gg_card"):
+        orig = files.get(base + ".twui.xml", "")
+        tree = orig.split("<hierarchy>", 1)[-1].split("</hierarchy>", 1)[0]
+        names = xml_component_names(orig) if orig else []
+        for tag in FRAME_TAGS:
+            fname = frame_file(base, tag)
+            text = files.get(fname)
+            if text is None:
+                out.append("%s is not generated, so a %s reader's panel draws nothing"
+                           % (fname, tag))
+                continue
+            if text.split("<hierarchy>", 1)[-1].split("</hierarchy>", 1)[0] != tree:
+                out.append("%s's hierarchy is not %s.twui.xml's - same components, same "
+                           "GUIDs, or the Lua reaches for parts that are not there"
+                           % (fname, base))
+            if xml_component_names(text) != names:
+                out.append("%s declares different components from %s.twui.xml"
+                           % (fname, base))
+            for path in sorted(set(re.findall(r'imagepath="([^"]+)"', text))):
+                if any(k in path for k in CHD_ART):
+                    out.append("%s draws Chaos Dwarf art: %s" % (fname, path))
+    for tag in FRAME_TAGS:
+        f = frame(tag)
+        for p in [f["heat"][0], f["rim"][0]] + list(f["tab"]["selected"]) \
+                + list(f["tab"]["selected_hover"]):
+            if any(k in p for k in CHD_ART):
+                out.append("FRAMES[%r] swaps in Chaos Dwarf art at runtime: %s" % (tag, p))
     return out
 
 
@@ -2012,7 +2458,8 @@ def selftest():
         seen[g] = name
 
     files = build_xml()
-    assert len(files) == 6, "six xml files, got %d" % len(files)
+    assert len(files) == 6 + 2 * len(FRAME_TAGS), (
+        "six xml files and a panel and card per race frame, got %d" % len(files))
 
     total_guids = 0
     for path, text in sorted(files.items()):
@@ -2057,6 +2504,42 @@ def selftest():
             assert m in declared or base in declared, (
                 "Lua reaches for %r, which no .twui.xml declares and which is "
                 "not a known CA host component" % m)
+
+    # THE RACE FRAME CHECKS MUST BE ABLE TO FAIL. Each fault below is one a later edit
+    # could plausibly make, and each must be reported.
+    assert not check_frame_files(files), check_frame_files(files)
+    broken = dict(files)
+    broken["derpy_gg_card_emp.twui.xml"] = broken["derpy_gg_card_emp.twui.xml"].replace(
+        FRAMES["_emp"]["card"]["path"], CARD_LAYERS[0]["path"])
+    assert any("Chaos Dwarf art" in m for m in check_frame_files(broken)), \
+        "an Empire card on the Hell-Forge plate was not reported"
+    broken = dict(files)
+    del broken["derpy_gg_panel_ksl.twui.xml"]
+    assert any("not generated" in m for m in check_frame_files(broken)), \
+        "a missing Kislev panel was not reported"
+    broken = dict(files)
+    broken["derpy_gg_card_dwf.twui.xml"] = broken["derpy_gg_card_dwf.twui.xml"].replace(
+        "<card_cost this=", "<card_price this=", 1)
+    assert any("hierarchy" in m for m in check_frame_files(broken)), \
+        "a Dwarf card with a renamed part was not reported"
+    if os.path.isfile(lua_path):
+        assert not check_frame_mirror(lua), check_frame_mirror(lua)
+        assert any("no '_hef' entry" in m for m in check_frame_mirror(
+            re.sub(r"\n    _hef = \{.*?\n    \},", "", lua, flags=re.S))), \
+            "a Lua frame table without the High Elves was not reported"
+        assert any("GGUI.FRAME['_emp'].rim" in m for m in check_frame_mirror(
+            lua.replace(FRAMES["_emp"]["rim"][0], CARD_RIM, 1))), \
+            "an Empire rim drifted to the Tower of Zharr glow was not reported"
+        assert any("GGUI.FRAME['_brt'].selected" in m for m in check_frame_mirror(lua.replace(
+            'selected = {"ui/skins/default/bret_vows_titel.png", ',
+            'selected = {', 1))), "a Lua open Bretonnian tab one layer short was not reported"
+        saved = FRAMES["_brt"]["tab"]["selected"]
+        FRAMES["_brt"]["tab"]["selected"] = saved[:1]
+        try:
+            assert any("layers" in m for m in check_frame_mirror(lua)), \
+                "an open Bretonnian tab with fewer layers than its slot was not reported"
+        finally:
+            FRAMES["_brt"]["tab"]["selected"] = saved
 
     assert not check(), "check() found problems: %r" % (check(),)
     print("selftest ok: %d files, %d guids" % (len(files), total_guids))
