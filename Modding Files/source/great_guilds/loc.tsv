@@ -257,6 +257,7 @@ derpy_gg_opener_none	Nothing needs you right now.	false
 derpy_gg_opener_bounties	Bounties to take:	false
 derpy_gg_opener_demand	A demand you can pay now:	false
 derpy_gg_opener_click	Click to open.	false
+derpy_gg_opener_wait	Opens again on your turn.	false
 derpy_gg_pager_end	Nothing further this way.	false
 derpy_gg_pager_page_next	Next page	false
 derpy_gg_pager_page_prev	Previous page	false
@@ -776,6 +777,7 @@ derpy_gg_opener_none_emp	Nothing needs you right now.	false
 derpy_gg_opener_bounties_emp	Bounties to take:	false
 derpy_gg_opener_demand_emp	A demand you can pay now:	false
 derpy_gg_opener_click_emp	Click to open.	false
+derpy_gg_opener_wait_emp	Opens again on your turn.	false
 derpy_gg_pager_end_emp	Nothing further this way.	false
 derpy_gg_pager_page_next_emp	Next page	false
 derpy_gg_pager_page_prev_emp	Previous page	false
@@ -1295,6 +1297,7 @@ derpy_gg_opener_none_dwf	Nothing needs you right now.	false
 derpy_gg_opener_bounties_dwf	Bounties to take:	false
 derpy_gg_opener_demand_dwf	A demand you can pay now:	false
 derpy_gg_opener_click_dwf	Click to open.	false
+derpy_gg_opener_wait_dwf	Opens again on your turn.	false
 derpy_gg_pager_end_dwf	Nothing further this way.	false
 derpy_gg_pager_page_next_dwf	Next page	false
 derpy_gg_pager_page_prev_dwf	Previous page	false
@@ -1814,6 +1817,7 @@ derpy_gg_opener_none_brt	Nothing needs you right now.	false
 derpy_gg_opener_bounties_brt	Bounties to take:	false
 derpy_gg_opener_demand_brt	A demand you can pay now:	false
 derpy_gg_opener_click_brt	Click to open.	false
+derpy_gg_opener_wait_brt	Opens again on your turn.	false
 derpy_gg_pager_end_brt	Nothing further this way.	false
 derpy_gg_pager_page_next_brt	Next page	false
 derpy_gg_pager_page_prev_brt	Previous page	false
@@ -2333,6 +2337,7 @@ derpy_gg_opener_none_cth	Nothing needs you right now.	false
 derpy_gg_opener_bounties_cth	Bounties to take:	false
 derpy_gg_opener_demand_cth	A demand you can pay now:	false
 derpy_gg_opener_click_cth	Click to open.	false
+derpy_gg_opener_wait_cth	Opens again on your turn.	false
 derpy_gg_pager_end_cth	Nothing further this way.	false
 derpy_gg_pager_page_next_cth	Next page	false
 derpy_gg_pager_page_prev_cth	Previous page	false
@@ -2852,6 +2857,7 @@ derpy_gg_opener_none_ksl	Nothing needs you right now.	false
 derpy_gg_opener_bounties_ksl	Bounties to take:	false
 derpy_gg_opener_demand_ksl	A demand you can pay now:	false
 derpy_gg_opener_click_ksl	Click to open.	false
+derpy_gg_opener_wait_ksl	Opens again on your turn.	false
 derpy_gg_pager_end_ksl	Nothing further this way.	false
 derpy_gg_pager_page_next_ksl	Next page	false
 derpy_gg_pager_page_prev_ksl	Previous page	false
@@ -3371,6 +3377,7 @@ derpy_gg_opener_none_def	Nothing needs you right now.	false
 derpy_gg_opener_bounties_def	Bounties to take:	false
 derpy_gg_opener_demand_def	A demand you can pay now:	false
 derpy_gg_opener_click_def	Click to open.	false
+derpy_gg_opener_wait_def	Opens again on your turn.	false
 derpy_gg_pager_end_def	Nothing further this way.	false
 derpy_gg_pager_page_next_def	Next page	false
 derpy_gg_pager_page_prev_def	Previous page	false
@@ -3890,6 +3897,7 @@ derpy_gg_opener_none_hef	Nothing needs you right now.	false
 derpy_gg_opener_bounties_hef	Bounties to take:	false
 derpy_gg_opener_demand_hef	A demand you can pay now:	false
 derpy_gg_opener_click_hef	Click to open.	false
+derpy_gg_opener_wait_hef	Opens again on your turn.	false
 derpy_gg_pager_end_hef	Nothing further this way.	false
 derpy_gg_pager_page_next_hef	Next page	false
 derpy_gg_pager_page_prev_hef	Previous page	false
@@ -4409,6 +4417,7 @@ derpy_gg_opener_none_gen	Nothing needs you right now.	false
 derpy_gg_opener_bounties_gen	Bounties to take:	false
 derpy_gg_opener_demand_gen	A demand you can pay now:	false
 derpy_gg_opener_click_gen	Click to open.	false
+derpy_gg_opener_wait_gen	Opens again on your turn.	false
 derpy_gg_pager_end_gen	Nothing further this way.	false
 derpy_gg_pager_page_next_gen	Next page	false
 derpy_gg_pager_page_prev_gen	Previous page	false

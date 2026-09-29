@@ -3,6 +3,20 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-09-29 - build C7DD5E99
+
+MD5 `C7DD5E994D32A4CE78DA5B60C1F1F356`, 32,489,088 bytes.
+
+- **The number on the Guilds button counts only bounties you can take.** An offer whose
+  favour you cannot put up has a dead Take button, and the button no longer counts it.
+- **A bounty to harry a lord goes when his army does.** It stayed on the board, asking
+  heroes to harry a lord with nothing left to harry. A bounty to kill him still stands.
+- **A building request only names an upgrade your settlement can hold.** Every level a guild
+  asks for needs a settlement at level 3, 4 or 5, and a minor settlement stops at 3 - so a
+  request could name an upgrade that could never be built where the building stood.
+- **A building request you have not taken goes if you lose the region it needs.**
+- **The greyed Guilds button's hover says "Opens again on your turn"**, not "Click to open".
+
 ## 2026-09-28 - build 33819446
 
 MD5 `338194468A5A5449D21A9F248BD33E16`, 32,484,829 bytes.

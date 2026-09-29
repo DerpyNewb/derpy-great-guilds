@@ -101,7 +101,8 @@ local function fi(key)
 end
 W.fi = fi
 
--- A REGION. t: owner, x, y, adj = {keys}, buildings = {level=true}, worth = {n, cap, army}
+-- A REGION. t: owner, x, y, adj = {keys}, buildings = {level=true}, worth = {n, cap, army},
+-- level = the main settlement's level (default 5, so no older test is held back by it)
 function W.region(key, t)
     R[key] = t
     return t
@@ -124,7 +125,12 @@ function W.ri(key)
             return {logical_position_x = function() return t.x or 0 end,
                     logical_position_y = function() return t.y or 0 end,
                     display_position_x = function() return t.x or 0 end,
-                    display_position_y = function() return t.y or 0 end}
+                    display_position_y = function() return t.y or 0 end,
+                    primary_slot = function()
+                        return {building = function()
+                            return {building_level = function() return t.level or 5 end}
+                        end}
+                    end}
         end,
         building_exists = function(_, lvl) return (t.buildings or {})[lvl] == true end,
         num_buildings = function() return w[1] or 0 end,
@@ -622,10 +628,23 @@ do
     W.region("home", {owner = "me", buildings = {}})
     assert(GG.make_offer("me", "brass", "job_build", 1, {}) == nil,
            "nothing to upgrade from means no building job")
-    GG.BOUNTY_BUILDINGS[""].brass = {{"lvl_far", 5, {"lvl_want"}},
-                                     {"lvl_have", 3, {"lvl_base"}},
-                                     {"lvl_want", 4, {"lvl_have"}}}
-    W.region("home", {owner = "me", buildings = {lvl_have = true}})
+    -- THE SETTLEMENT MUST ALREADY BE BIG ENOUGH (the 4th field). lvl_want needs a level-4
+    -- settlement: in a level-3 one there is no job, at 4 there is.
+    GG.BOUNTY_BUILDINGS[""].brass = {{"lvl_far", 5, {"lvl_want"}, 3},
+                                     {"lvl_have", 3, {"lvl_base"}, 3},
+                                     {"lvl_want", 4, {"lvl_have"}, 4}}
+    W.region("home", {owner = "me", level = 3, buildings = {lvl_have = true}})
+    assert(GG.make_offer("me", "brass", "job_build", 1, {}) == nil,
+           "a settlement too small for the upgrade means no building job")
+    R.home.level = 4
+    o = GG.make_offer("me", "brass", "job_build", 1, {})
+    assert(o and o.target == "lvl_want", "a settlement big enough gets the job, got "
+           .. tostring(o and o.target))
+    -- The lower level is in a region the player then loses: the untaken offer goes.
+    R.home.owner, F.me.regions = "foe", {}
+    assert(not GG.bounty_still_valid("me", o), "losing the lower level withdraws the offer")
+    R.home.owner, F.me.regions = "me", {"home"}
+    assert(GG.bounty_still_valid("me", o), "and holding it again keeps the offer")
     R.home.buildings.lvl_want = true
     assert(not GG.bounty_still_valid("me", o), "building it withdraws the offer")
     GG.BOUNTY_BUILDINGS[""].khanate = nil
@@ -782,6 +801,24 @@ do
                       .. "mission_text_text_derpy_gg_hero_harry" .. GG.tag("me") .. ";", 1, true), s)
     end
     ok("hero bounties allow the front and serve Dwarfs and Empire")
+end
+
+do
+    -- AN UNTAKEN HARRY OFFER GOES WITH ITS TARGET'S ARMY (2026-09-29). A taken one was
+    -- already voided on this test; an untaken one sat on the board.
+    world4()
+    local h = GG.make_offer("me", "immortals", "hero_harry", 1, {})
+    assert(h and C[h.target], "harry needs a lord to name")
+    assert(GG.bounty_still_valid("me", h), "a lord with an army is a harry target")
+    C[h.target].army = false
+    assert(not GG.bounty_still_valid("me", h), "a lord who lost his army is not")
+    -- A KILL is not harrying: an armyless lord is still a kill target. The far lord, 31,
+    -- because harry may name the one on the front, where a kill offer is never posted.
+    C["31"].army = false
+    local kill = {guild = "khanate", kind = "lord_kill", target = "31", owner = "foe",
+                  war = 0}
+    assert(GG.bounty_still_valid("me", kill), "an armyless lord can still be killed")
+    ok("an untaken harry offer is withdrawn when its lord has no army")
 end
 
 print("bounty harness ok")

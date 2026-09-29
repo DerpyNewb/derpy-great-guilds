@@ -10,6 +10,7 @@ Not uploaded to the Workshop. Pushed to GitHub with a CHANGELOG entry for `FF483
 | `20C88DBC` | bar closed top and bottom; research job asks only for a reachable tech | `.bak_research_20260928` |
 | `FF48368B` | building job asks only for an upgrade the player can make now | `.bak_build_jobs_20260928` |
 | `33819446` | Guilds button greyed outside the player's turn; tooltips cut to 10 lines or fewer | `.bak_opener_grey_20260928` (= `FF48368B`) |
+| `C7DD5E99` | the small gaps (section 6) | `.bak_small_gaps_20260929` (= `33819446`) |
 
 The live pack before this session was `60CA7EAD` (bounty card tooltips, repo commit
 `e260cb3`), one build after the `7AB4585D` the docs-refresh handoff names.
@@ -93,6 +94,28 @@ After: worst is 9.
 - Upkeep on the Guilds rank line: "Upkeep: -12/turn. Stop earning and you slide back down."
 - A mutant putting the description back on Leaderboard rows is caught; 19 mutants in all.
 - MCT tooltips (longest 6 lines) and every other loc string (longest 8) checked and left.
+
+## 6. The small gaps, each verified first (2026-09-29, build `C7DD5E99`, deployed to `data/`)
+
+| Gap | Verdict | Fix |
+|---|---|---|
+| HUD badge counts offers the player cannot stake | real | `GG.stake_affordable`, shared by the card's red Take and `actionable_items` |
+| untaken harry offer stays after its lord loses his army | real (taken ones were voided) | `bounty_still_valid`: a hero `lord` target needs `has_military_force` |
+| building job ignores the settlement level | real - every bounty level needs 3, 4 or 5; minors stop at 3 | data row gains `primary_slot_building_building_level_requirement`; `GG.upgrade_open` needs a region with a `from` level AND `settlement():primary_slot():building():building_level() >= need` (fails open per region) |
+| building job survives losing the lower level | real | `BOUNTY_VALID.build` asks `GG.upgrade_open` too, via `GG.build_row` |
+| greyed opener's hover says "Click to open" | real | new loc `opener_wait`, "Opens again on your turn." |
+| mid-turn war leaves an empty board | GONE since bounties v2 - military offers fall back to new-war targets and jobs need no war | none |
+| UI Scale changed with the panel open | CANNOT HAPPEN - the Escape menu, where the option lives, is in `GGUI.CLOSE_FOR` | none |
+| Daemonsmiths / Khanate / Slavers rarely ask for a building | true, by design: Khanate has 0 options in every race, Slavers 1 (Chaos Dwarfs only), Brass 0 in six races; each guild has other kinds | none - a design question |
+
+Settlement numbering: the settlement chain's `level` is `_1`..`_5` = 1..5 and the requirement is
+written in the same numbers; ordinary building chains count from 0 (`barracks_1` is 0).
+`building_level()` is taken to return the settlement chain's `level` - inferred from CA's
+confederation missions comparing it to plain tier numbers, not measured.
+
+Tests: bounty harness (settlement too small / big enough / lost region / regained; harry with
+and without an army, and a kill target unaffected), main harness (unaffordable offer not
+counted, mid-round hover). Five new mutants plus one re-aimed stale anchor: 24, all caught.
 
 ## Verified
 

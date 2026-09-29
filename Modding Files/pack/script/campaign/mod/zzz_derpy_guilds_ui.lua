@@ -1146,7 +1146,7 @@ function GGUI.draw_bounties(faction)
                     -- SHORT OF FAVOUR, the Take is red and dead, the way a service the
                     -- player cannot afford is, and the tooltip says by how much.
                     local _, fav = GG.get(faction, o.guild)
-                    local short = (o.stake or 0) > (fav or 0)
+                    local short = not GG.stake_affordable(faction, o)
                     set_text(btn, short and ("[[col:red]]" .. GGUI.loc("take") .. "[[/col]]")
                                         or GGUI.loc("take"))
                     pcall(function() btn:SetDisabled(short) end)
@@ -2830,7 +2830,8 @@ function GGUI.actionable_items(faction)
     end
     local offers = (GG.bounties and GG.bounties[faction]) or {}
     for i = 1, #offers do
-        if not offers[i].taken then
+        -- ONLY ONE THE PLAYER CAN TAKE: an offer short of favour has a dead Take button.
+        if not offers[i].taken and GG.stake_affordable(faction, offers[i]) then
             out[#out + 1] = {kind = "bounty", guild = offers[i].guild}
         end
     end
@@ -2875,7 +2876,8 @@ function GGUI.opener_tip(faction)
     if demand then
         parts[#parts + 1] = GGUI.loc("opener_demand") .. " " .. GGUI.loc_guild(demand.guild)
     end
-    parts[#parts + 1] = GGUI.loc("opener_click")
+    -- GREYED MID-ROUND (GGUI.gate_opener), so "click" would be a lie the button refuses.
+    parts[#parts + 1] = GGUI.loc(GGUI.player_turn() and "opener_click" or "opener_wait")
     return table.concat(parts, "||")
 end
 

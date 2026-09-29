@@ -7130,6 +7130,16 @@ end)()
     assert(kinds.bounty == 1, "a TAKEN offer has no button, so it is not waiting on the "
            .. "player - got " .. tostring(kinds.bounty))
     assert(kinds.demand == 1 and (kinds.service or 0) >= 1, "services and the demand count")
+    -- SHORT OF FAVOUR IS NOT READY (2026-09-29): the Khanate offer asks a stake of 50 and
+    -- the player holds 0 favour with them, so its Take is dead and the badge must agree.
+    GG.bounties[ME][1].stake = 50
+    local counted = 0
+    for _, it in ipairs(GGUI.actionable_items(ME)) do
+        if it.kind == "bounty" then counted = counted + 1 end
+    end
+    assert(counted == 0, "an offer the player cannot stake must not be counted, got "
+           .. counted)
+    GG.bounties[ME][1].stake = nil
     assert(GGUI.actionable(ME) == #GGUI.actionable_items(ME),
            "the badge must count exactly what the tooltip lists")
     made[GGUI.BTN] = true
@@ -7716,6 +7726,11 @@ end
     assert(last() == "disabled=true set_greyscale_t0", "an AI turn keeps it grey: " .. last())
     handlers.gg_clicks({string = GGUI.BTN})
     assert(opened == 0, "a click during the AI round must open nothing")
+    -- AND ITS HOVER SAYS WHY instead of "Click to open" (2026-09-29).
+    local wait_tip = GGUI.opener_tip("cr_me")
+    assert(string.find(wait_tip, "opener_wait", 1, true)
+           and not string.find(wait_tip, "opener_click", 1, true),
+           "mid-round the hover must say it opens on your turn, got " .. wait_tip)
     mine = true
     handlers.gg_opener_place()
     assert(last() == "disabled=false normal_t0", "the player's turn un-greys: " .. last())

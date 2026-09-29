@@ -325,6 +325,13 @@ function GG.spend(faction, guild, amount)
     return true
 end
 
+-- CAN THE STAKE BE PUT UP NOW - the one question the Take button and the HUD badge both
+-- ask, so the badge never counts an offer whose Take is red and dead (2026-09-29).
+function GG.stake_affordable(faction, o)
+    local _, fav = GG.get(faction, o.guild)
+    return (o.stake or 0) <= (fav or 0)
+end
+
 -- Per-turn ceilings. 0 means no cap. These mirror RATES in
 -- tools/gen_great_guilds.py; if one changes, change both.
 --
@@ -2044,6 +2051,12 @@ function GG.bounty_still_valid(faction, o)
             if k.military and not o.taken and GG.char_on_front(faction, c) then
                 return false
             end
+            -- HARRYING NEEDS AN ARMY. A taken one is voided by GG.hero_target_alive on the
+            -- same test; an untaken one stayed on the board, asking heroes to harry a lord
+            -- who had nothing left to harry (2026-09-29).
+            if k.shape and k.target == "lord" and not c:has_military_force() then
+                return false
+            end
             return true
         end
         -- Jobs (Task 7) answer through their own check.
@@ -2350,6 +2363,45 @@ function GG.highest_rank(faction)
     return best
 end
 
+-- CAN THE UPGRADE BE BUILT NOW, somewhere: a region the player holds has a level that
+-- upgrades into it AND a settlement already at the level it needs. The second half is
+-- what a build job lacked - every bounty level needs a settlement at 3, 4 or 5, a minor
+-- settlement stops at 3, and a job named upgrades that could never be built where the
+-- lower level stood (2026-09-29). building_level() is read as the settlement chain's own
+-- `level` (_3 is 3), the number the requirement is written against; CA's confederation
+-- missions compare it the same way. A region whose settlement cannot be read counts as
+-- high enough - an unreadable answer must not take a job away.
+function GG.upgrade_open(faction, froms, need)
+    local ok, yes = pcall(function()
+        local rl = cm:get_faction(faction):region_list()
+        for i = 0, rl:num_items() - 1 do
+            local r = rl:item_at(i)
+            for j = 1, #froms do
+                if r:building_exists(froms[j]) then
+                    local okl, lvl = pcall(function()
+                        return r:settlement():primary_slot():building():building_level()
+                    end)
+                    if not okl or type(lvl) ~= "number" or lvl >= (need or 0) then
+                        return true
+                    end
+                end
+            end
+        end
+        return false
+    end)
+    return ok and yes == true
+end
+
+-- The generated row for a building level a guild asks for, or nil.
+function GG.build_row(faction, guild, level)
+    local per = GG.BOUNTY_BUILDINGS and GG.BOUNTY_BUILDINGS[GG.tag(faction)]
+    local list = per and per[guild] or {}
+    for i = 1, #list do
+        if list[i][1] == level then return list[i] end
+    end
+    return nil
+end
+
 function GG.player_has_building(faction, level)
     local ok, has = pcall(function()
         local rl = cm:get_faction(faction):region_list()
@@ -2413,18 +2465,15 @@ GG.BOUNTY_PICK = {
         local per = GG.BOUNTY_BUILDINGS and GG.BOUNTY_BUILDINGS[GG.tag(faction)]
         local list = per and per[guild]
         if not list then return nil end
-        -- ONLY AN UPGRADE THE PLAYER CAN MAKE NOW: they own a level that upgrades into it
-        -- (row = level, rank, {levels that upgrade into it}). Same rule as research.
+        -- ONLY AN UPGRADE THE PLAYER CAN MAKE NOW: a level that upgrades into it, in a
+        -- settlement already big enough (row = level, rank, {froms}, settlement level).
+        -- Same rule as research.
         local found = {}
         for i = 1, #list do
-            local lvl, froms = list[i][1], list[i][3] or {}
-            if not used[lvl] and not GG.player_has_building(faction, lvl) then
-                for j = 1, #froms do
-                    if GG.player_has_building(faction, froms[j]) then
-                        found[#found + 1] = list[i]
-                        break
-                    end
-                end
+            local lvl = list[i][1]
+            if not used[lvl] and not GG.player_has_building(faction, lvl)
+               and GG.upgrade_open(faction, list[i][3] or {}, list[i][4]) then
+                found[#found + 1] = list[i]
             end
         end
         if #found == 0 then return nil end
@@ -2441,7 +2490,14 @@ GG.BOUNTY_VALID = {
         end)
         return not (ok and has)
     end,
-    build = function(faction, o) return not GG.player_has_building(faction, o.target) end,
+    -- An untaken offer goes when it is built, AND when it stops being buildable - the
+    -- region holding the lower level lost, or razed. A row the data no longer has keeps
+    -- the offer (the old rule), since there is nothing to judge it by.
+    build = function(faction, o)
+        if GG.player_has_building(faction, o.target) then return false end
+        local row = GG.build_row(faction, o.guild, o.target)
+        return row == nil or GG.upgrade_open(faction, row[3] or {}, row[4])
+    end,
 }
 
 GG.HERO_SHAPES = {
