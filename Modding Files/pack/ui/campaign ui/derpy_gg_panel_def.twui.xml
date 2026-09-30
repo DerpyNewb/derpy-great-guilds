@@ -101,10 +101,14 @@
 				<component_image
 					this="GG210004-D005-4000-B000000000000004"
 					uniqueguid="GG210004-D005-4000-B000000000000004"
-					imagepath="ui/skins/default/1x1_blank_white.png"/>
+					imagepath="ui/skins/default/panel_back_smoke.png"/>
 				<component_image
 					this="GG210004-D007-4000-B000000000000004"
 					uniqueguid="GG210004-D007-4000-B000000000000004"
+					imagepath="ui/skins/default/1x1_blank_white.png"/>
+				<component_image
+					this="GG210004-D009-4000-B000000000000004"
+					uniqueguid="GG210004-D009-4000-B000000000000004"
 					imagepath="ui/skins/default/panel_back_border.png"/>
 			</componentimages>
 			<states>
@@ -119,32 +123,43 @@
 							this="GG210004-D002-4000-B000000000000004"
 							uniqueguid="GG210004-D002-4000-B000000000000004"
 							componentimage="GG210004-D001-4000-B000000000000004"
-							offset="0.00,0.00"
-							width="790"
-							height="700"
+							offset="4.00,4.00"
+							width="782"
+							height="692"
 							tile="true"
 							margin="5.00,5.00,5.00,5.00"/>
 						<image
 							this="GG210004-D004-4000-B000000000000004"
 							uniqueguid="GG210004-D004-4000-B000000000000004"
 							componentimage="GG210004-D003-4000-B000000000000004"
-							offset="0.00,0.00"
-							width="790"
-							height="700"
+							offset="4.00,4.00"
+							width="782"
+							height="692"
 							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG210004-D006-4000-B000000000000004"
 							uniqueguid="GG210004-D006-4000-B000000000000004"
 							componentimage="GG210004-D005-4000-B000000000000004"
-							offset="0.00,0.00"
-							width="790"
-							height="700"
-							colour="#00000077"
+							offset="4.00,4.00"
+							width="782"
+							height="692"
+							colour="#FF822E3C"
+							shader_name="smoke_overlay_t0"
+							shadertechnique_vars="2.00,10.00,0.00,0.00"
 							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG210004-D008-4000-B000000000000004"
 							uniqueguid="GG210004-D008-4000-B000000000000004"
 							componentimage="GG210004-D007-4000-B000000000000004"
+							offset="4.00,4.00"
+							width="782"
+							height="692"
+							colour="#00000077"
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG210004-D010-4000-B000000000000004"
+							uniqueguid="GG210004-D010-4000-B000000000000004"
+							componentimage="GG210004-D009-4000-B000000000000004"
 							offset="0.00,0.00"
 							width="790"
 							height="700"
@@ -3218,7 +3233,7 @@
 				<standard
 					this="GG2100A7-D000-4000-B0000000000000A7"
 					name="standard"
-					width="600"
+					width="680"
 					height="54"
 					uniqueguid="GG2100A7-D000-4000-B0000000000000A7">
 					<imagemetrics>
@@ -3227,7 +3242,7 @@
 							uniqueguid="GG2100A6-D002-4000-B0000000000000A6"
 							componentimage="GG2100A6-D001-4000-B0000000000000A6"
 							offset="0.00,0.00"
-							width="600"
+							width="680"
 							height="54"
 							tile="true"
 							margin="0.00,165.00,0.00,165.00"/>
@@ -3252,7 +3267,7 @@
 							interpolationtime="0"
 							interpolationpropertymask="512"
 							targetmetrics_m_height="54"
-							targetmetrics_m_width="600"
+							targetmetrics_m_width="680"
 							targetmetrics_m_font_scale="1"/>
 					</frames>
 				</derpy_gg_scale>

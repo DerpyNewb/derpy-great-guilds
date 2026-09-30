@@ -168,6 +168,27 @@ def brighten(im, ink=INK):
     return Image.merge("RGBA", (flat[0], flat[1], flat[2], a))
 
 
+# SHIPPED AT 2x. CA ships these at 74px only, and the card draws its glyph at 62 - so at
+# 125-150% UI scale the engine was upscaling a 74px file to 78-93px, which is what read as
+# blurry in game (2026-09-30). The shape is all alpha, so the alpha is enlarged 4x smoothly,
+# its edge ramp steepened by EDGE about the midpoint (what a vector edge would be), then
+# box-reduced to 2x so the edge keeps anti-aliasing. EDGE 2 keeps every stroke CA drew:
+# only pixels under alpha 64 - the outer half of the source's own anti-aliasing - drop out.
+UPSCALE, EDGE = 2, 2.0
+
+
+def upscale(im, k=UPSCALE, edge=EDGE):
+    """A flat-ink silhouette at k times the size, with crisp anti-aliased edges."""
+    from PIL import Image
+    a = im.getchannel("A")
+    w, h = a.size
+    big = a.resize((w * 4, h * 4), Image.LANCZOS)
+    big = big.point(lambda v: max(0, min(255, int(round((v - 128) * edge + 128)))))
+    a = big.resize((w * k, h * k), Image.BOX)
+    flat = [Image.new("L", a.size, c) for c in im.getpixel((0, 0))[:3]]
+    return Image.merge("RGBA", flat + [a])
+
+
 def build(write=True):
     from PIL import Image
     out, made = [], []
@@ -206,9 +227,20 @@ def build(write=True):
                        "pixels, so it is not a silhouette and recolouring it would "
                        "discard detail" % (stem, share * 100))
             continue
+        new = upscale(new)
+        w, h = new.size
         if write:
             new.save(os.path.join(DST, name + ".png"))
         made.append((IN_PACK % name, w, h))
+    # gen_guilds_ui.check() refuses an icon drawn larger than the size recorded here, so
+    # the record follows the files rather than being hand-edited.
+    if write and made:
+        import json
+        jp = os.path.join(ROOT, "tools", "ui_icon_sizes.json")
+        sizes = json.load(io.open(jp, encoding="utf-8"))
+        sizes.update({p: w for p, w, _h in made})
+        with io.open(jp, "w", encoding="utf-8") as fh:
+            fh.write(json.dumps(sizes, indent=1, sort_keys=True) + "\n")
     return out, made
 
 

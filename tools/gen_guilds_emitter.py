@@ -187,6 +187,13 @@ def _state(c, name, sguid, entries, target):
                 out += '\t\t\t\t\t\t\tdockpoint="%s"\n' % dock
             if lay.get("colour"):
                 out += '\t\t\t\t\t\t\tcolour="%s"\n' % lay["colour"]
+            # A SHADER ON ONE IMAGE, not the state: shader_name plus shadertechnique_vars on
+            # the <image>, the shape 44 of CA's campaign smoke layers use. On the STATE
+            # (shadervars) it would run over every layer the component draws.
+            if lay.get("shader"):
+                out += '\t\t\t\t\t\t\tshader_name="%s"\n' % lay["shader"]
+                out += ('\t\t\t\t\t\t\tshadertechnique_vars="%s"\n'
+                        % lay.get("shader_vars", "0.00,0.00,0.00,0.00"))
             # A number is all four sides; a 4-tuple is top,right,bottom,left, CA's order
             # (TWUI Studio's rasteriser reads it the same way). CA's Chaos Dwarf bars slice
             # left and right only - cap_title_holder is 0,50,0,60 - which one number cannot say.

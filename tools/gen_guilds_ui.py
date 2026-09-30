@@ -52,10 +52,13 @@ TABS = ["gg_tab_guilds", "gg_tab_stand", "gg_tab_bounty", "gg_tab_court", "gg_ta
 TAB_W, TAB_H = 125, 34
 PANEL_LAYOUT = {
     "gg_crest":      (16,  9,   34,  34),
-    # CENTRED ON THE PANEL, on CA's title plate: 95..695, clear of the crest (ends x=50)
-    # and the close cross (x=748), and ending at y=54 above the tabs. 600 is the width
-    # CA's Hell-Forge header draws the same plate at.
-    "gg_title":      (95,  0,   600, 54),
+    # CENTRED ON THE PANEL, on CA's title plate: 55..735, clear of the crest (ends x=50)
+    # and the close cross (x=748), and ending at y=54 above the tabs. 680, not the 600
+    # CA's Hell-Forge header uses: at 600 the 165px end caps leave a ~270px dark band and
+    # "The Great Guilds" at header_24_bold touched both ends of it (seen in game
+    # 2026-09-30). Every culture's plate is transparent for its first 25px or more, so the
+    # arrows still start clear of the crest.
+    "gg_title":      (55,  0,   680, 54),
     "gg_close":      (748, 12,  30,  30),
     "gg_divider":    (20,  44,  750, 10),
     # THE HELL-FORGE HEADER BAR (see RANK_BAR_LAYERS) with the guild's glyph in CA's round
@@ -345,20 +348,49 @@ PANEL_SCRIM = "#00000077"
 # frame's 9-slice margin is the knob for it if it ever matters. Nothing here may exceed
 # PANEL_W x PANEL_H; check() enforces it.
 
-# Body, art, scrim, frame - in that order, because each draws over the one before it.
+# THE GROUND STOPS WHERE THE BORDER'S LINE STARTS. panel_back_border.png is transparent
+# for its outer 3 pixels (alpha 0,0,0,25 then 255 at pixel 4, measured on every side and
+# the corners), so a ground drawn to the component's edge showed a strip of picture
+# OUTSIDE the brown line - 3px at 100% UI scale, 5-10 at the scales players use. Inset,
+# not an outward border: see the overscan note above.
+GROUND_INSET = 4
+
+# THE MAIN MENU'S DRIFTING SMOKE, over the art. CA's frontend main.twui.xml draws it with
+# smoke_overlay_t0 on a component named "smoke" at "8.00,10.00,0.00,0.00" - the idle state's
+# values; hover, selected and new states drop the first to 4, 2 and 1. The shader is NOT in
+# the uicomponent.html shader table, so the four numbers are copied, never reasoned about.
+# The mask is not the menu's: porthole_back.png is an opaque grey texture that covers a
+# whole screen there and would cover the art here. panel_back_smoke.png - flat black at
+# alpha 102, so the shader paints the smoke - is what CA puts under a PANEL (the Silent
+# Sanctum confirm box, Oxyotl's drop-down). Tint is the ember of CA's Chaos Dwarf narrative
+# panel smoke. Under the scrim, so the scrim that was tuned for text dims it too.
+# SEEN IN GAME 2026-09-30 at the menu's idle 8.00 and alpha FF: a dense orange mottle over
+# the whole ground, "too strong and too compact". Now 2.00 (the menu's own selected-state
+# value) and alpha 3C (the Silent Sanctum's, CA's panel-sized use) - both CA's numbers.
+PANEL_SMOKE = {"path": "ui/skins/default/panel_back_smoke.png",
+               "offset": (GROUND_INSET, GROUND_INSET), "dw": -2 * GROUND_INSET,
+               "dh": -2 * GROUND_INSET, "margin": 0, "colour": "#FF822E3C",
+               "shader": "smoke_overlay_t0", "shader_vars": "2.00,10.00,0.00,0.00",
+               "dock": None}
+
+# Body, art, smoke, scrim, frame - in that order, because each draws over the one before it.
 PANEL_LAYERS = [
     # The plain tile STAYS, underneath. The art above is opaque and hides it completely,
     # and that is the point: a panel whose only ground is one texture has no ground at all
     # on the day that texture moves.
     {"path": "ui/skins/default/panel_back_tile.png",
-     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 5, "tile": True, "dock": None},
+     "offset": (GROUND_INSET, GROUND_INSET), "dw": -2 * GROUND_INSET,
+     "dh": -2 * GROUND_INSET, "margin": 5, "tile": True, "dock": None},
     {"path": PANEL_ART,
-     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "dock": None},
+     "offset": (GROUND_INSET, GROUND_INSET), "dw": -2 * GROUND_INSET,
+     "dh": -2 * GROUND_INSET, "margin": 0, "dock": None},
+    PANEL_SMOKE,
     # SAME RECT AS THE ART, deliberately. The scrim is what makes this ground dark enough
     # to carry the Help tab's unplated text; a strip of art the scrim misses is that text
     # losing its contrast on one edge.
     {"path": "ui/skins/default/1x1_blank_white.png",
-     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "colour": PANEL_SCRIM,
+     "offset": (GROUND_INSET, GROUND_INSET), "dw": -2 * GROUND_INSET,
+     "dh": -2 * GROUND_INSET, "margin": 0, "colour": PANEL_SCRIM,
      "dock": None},
     # The border draws over the body's edge last, so nothing can leave a bare strip.
     {"path": "ui/skins/default/panel_back_border.png",
@@ -715,7 +747,7 @@ def fit_track(path, size, trough, tile=False):
 # them against those. Every state has the same number of layers.
 FRAMES = {
     "": {
-        "card": CARD_LAYERS[0], "heat": (CARD_HEAT, None),
+        "card": CARD_LAYERS[0], "heat": (CARD_HEAT, "#FFFFFFD0"),
         "rim": (CARD_RIM, (40, 40, 40, 40), None),
         "holder": (ICON_HOLDER, 0.484, 0.455),
         "cost": COST_LAYERS, "rank": RANK_BAR_LAYERS, "rank_tx": RANK_TX, "rank_ty": RANK_TY,
@@ -786,7 +818,8 @@ FRAMES = {
                     (0, 14, 0, 40))],
         "rank": [_L(_D + "dlc27_hef_intrigue_court/dlc27_intrigue_court_immunity.png",
                     (0, 70, 0, 70))],
-        "rank_tx": RANK_TX, "rank_ty": "0.00,0.00",
+        # 64: the scroll at the plate's left end runs to column 57 and the band starts at 58.
+        "rank_tx": "64.00,0.00", "rank_ty": "0.00,0.00",
         "gbar": [_L("ui/skins/wh2_main_hef_high_elves/bar_small_buttons.png",
                     (0, 110, 0, 110), True)],
         "tab": {"layers": [_L(_D + "dlc27_hef_intrigue_court/button_basic_active.png",
@@ -804,16 +837,26 @@ FRAMES = {
         # rails repeated down the card as well as along it and crossed every line of text.
         # The Tiger Court's effects plate tried first has a dark band that stops three
         # quarters across, and tiling repeated its end mid-card.
-        "card": _L(_D + "cp1_cth_shang_yang/unit_capacity_holder_bg.png", (0, 25, 0, 25)),
+        # 22-PIXEL TOP AND BOTTOM SLICES on both. The frame is 67px tall with an arched
+        # top rail; stretched 1.79x into the 120px card, the arch dropped to y 18-36 at the
+        # left and ran through every title at 2.2:1. Sliced, the rails keep their native
+        # height and only the plain middle stretches; the ground is sliced the same way so
+        # its edge stays under the frame's.
+        "card": _L(_D + "cp1_cth_shang_yang/unit_capacity_holder_bg.png", (22, 25, 22, 25)),
         "card_extra": [_L(_D + "cp1_cth_shang_yang/unit_capacity_holder_frame.png",
-                          (0, 25, 0, 23))],
+                          (22, 25, 22, 23))],
         "heat": (_GLOW, "#60E0A050"),
         "rim": (_TUTGLOW, (16, 16, 16, 16), "#70E8B8C0"),
         "holder": (_D + "cp1_cth_tiger_court/button_decrees_active.png", 0.5, 0.5),
         "cost": [_L(_D + "cp1_cth_shang_yang/requirement_holder.png", (0, 25, 0, 25))],
+        # 84-PIXEL ENDS, TEXT AT 90 AND LIFTED 2. The spear collar runs to column 81; at 60
+        # it was stretched under the first word, and the line crossed it at 2.7:1. Squeezed
+        # into the 46px strip, the plate's band is rows 14-29 with a 1px rail at each edge,
+        # and a centred line's descenders sat on the lower rail - bottom padding 4 lifts it
+        # clear. Not drawn taller than the strip: nothing may draw outside its component.
         "rank": [_L(_D + "cp1_cth_shang_yang/unit_category_header_holder_plate.png",
-                    (0, 60, 0, 60))],
-        "rank_tx": RANK_TX, "rank_ty": "0.00,0.00",
+                    (0, 84, 0, 84))],
+        "rank_tx": "90.00,0.00", "rank_ty": "0.00,4.00",
         "gbar": [_L("ui/skins/wh3_main_cth_cathay/bar_small_buttons.png",
                     (0, 110, 0, 110), True)],
         "tab": {"layers": [_L(_D + "cp1_cth_tiger_court/button_decrees_active.png",
@@ -830,15 +873,18 @@ FRAMES = {
     },
     "_ksl": {
         "card": _L(_D + "wh3_main_court_orthodoxy/court_chain_background.png",
-                   (12, 12, 12, 12)),
+                   (12, 12, 12, 12), colour="#C8C8C8FF"),
         "heat": (_GLOW, "#80D8FF50"),
         "rim": (_D + "wh3_main_court_orthodoxy/court_completed_btn_ornaments.png",
                 (24, 24, 24, 24), None),
         "holder": (_D + "buildings_slot_circle_bg.png", 0.5, 0.5),
         "cost": [_L(_D + "wh3_main_court_orthodoxy/court_favour_resource_holder.png",
                     (0, 14, 0, 40))],
-        "rank": [_L(_D + "wh3_main_ksl_devotion/devotion_bar_frame.png", (0, 50, 0, 50))],
-        "rank_tx": RANK_TX, "rank_ty": "0.00,0.00",
+        # 64-PIXEL ENDS AND TEXT AT 68. The cap and the frame's inner bar run to column 61
+        # and the opening starts at 62; at 50 the bar was in the stretched middle, drawn
+        # 2.4x wide from x 55 to 77, and the first word sat on it.
+        "rank": [_L(_D + "wh3_main_ksl_devotion/devotion_bar_frame.png", (0, 64, 0, 64))],
+        "rank_tx": "68.00,0.00", "rank_ty": "0.00,0.00",
         "gbar": [_L("ui/skins/wh3_main_ksl_kislev/bar_small_buttons.png",
                     (0, 110, 0, 110), True)],
         # The Ice Court's slate plate under Orthodoxy's bronze outline; the open tab trades
@@ -875,13 +921,19 @@ FRAMES = {
         "holder": (_D + "button_round_medium_frame.png", 0.5, 0.5),
         "cost": [_L(_D + "bret_vows_titel.png", (0, 45, 0, 45))],
         "rank": [_L(_D + "bret_vows_titel.png", (0, 60, 0, 60))],
-        "rank_tx": RANK_TX, "rank_ty": "0.00,0.00",
+        # 64, not RANK_TX's 50: the plate's scroll and post run to column 57 and the first
+        # letter sat on the post. The dark band starts at 58.
+        "rank_tx": "64.00,0.00", "rank_ty": "0.00,0.00",
         "gbar": [_L("ui/skins/wh_main_brt_bretonnia/bar_small_buttons.png",
                     (0, 110, 0, 110), True)],
         # The Vows title plate, with Chivalry's copper frame drawn round the open tab.
-        "tab": {"layers": [_L(_D + "bret_vows_titel.png", (0, 45, 0, 45), colour=_DIM),
+        # SCALED WHOLE, NOT NINE-SLICED. Each end is a scroll and a post 57px wide at native
+        # size; sliced into a 125px tab that left 11px between the posts, and "Leaderboard"
+        # and "Bounties" ran across them at 3.8:1. Scaled, the ornament shrinks with the tab
+        # and every caption sits in the dark band.
+        "tab": {"layers": [_L(_D + "bret_vows_titel.png", colour=_DIM),
                            _L(CLEAR, (5, 5, 5, 5))],
-                "hover": [_L(_D + "bret_vows_titel.png", (0, 45, 0, 45)),
+                "hover": [_L(_D + "bret_vows_titel.png"),
                           _L(CLEAR, (5, 5, 5, 5))],
                 "selected": [_D + "bret_vows_titel.png", _D + "chivalry_bar_frame.png"],
                 "selected_hover": [_D + "bret_vows_titel.png", _D + "chivalry_bar_frame.png"]},
@@ -890,7 +942,10 @@ FRAMES = {
     },
     "_def": {
         "card": _L(_W2 + "malus_whispers_tooltip_background.png"),
-        "heat": (_W2 + "rite_def_text_holder.png", None),
+        # THE SHARED GLOW, TINTED, like the six races with no glow of their own. The Dark Elf
+        # rite flare that was here is white-hot in the middle and sat under the first half of
+        # a running card's text at 0.7:1 (preview_guilds_panel.py, 2026-09-30).
+        "heat": (_GLOW, "#D040FF50"),
         "rim": (_TUTGLOW, (16, 16, 16, 16), "#E050FFC0"),
         "holder": (_W2 + "malus_possession_bar_button_frame.png", 0.5, 0.5),
         "cost": [_L(_W2 + "murderous_prowess_back.png")],

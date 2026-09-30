@@ -3,6 +3,23 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-09-30 - build B77AA0A1
+
+MD5 `B77AA0A19E89CBB7A2C7A76DE0B7BF86`, 34,196,301 bytes.
+
+How the panel looks.
+
+- **The panel's frame is its outer edge.** The background picture used to show a few
+  pixels past the border.
+- **A slow drifting smoke over the background**, the same effect as the game's main menu,
+  kept faint so text stays easy to read.
+- **The title has room.** The title plate is wider, so "The Great Guilds" no longer touches
+  its ends.
+- **Sharper guild icons.** The icons now ship at twice the size, so they stay crisp at
+  larger UI scales.
+- **Text in the other races' frames sits where it should:** the rank line clears the ends
+  of its bar, and card and tab text keep inside their plates.
+
 ## 2026-09-29 - build 8AA9DDC1
 
 MD5 `8AA9DDC1ED5B070FCD504E1D3A7D6CBF`, 33,883,860 bytes.

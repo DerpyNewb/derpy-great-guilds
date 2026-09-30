@@ -130,3 +130,41 @@ names failed bounties; t9 the hidden-number check is a signed, delimited match
 - Appoint with an enemy lord selected keeps the pick open.
 - A Ziggurat on a yin building upgrades to yin.
 - Hobgoblin Eyes' region closes again at the next turn (the wording now claims it does).
+
+## 7. Per-race frame readability (2026-09-30): built `4C532CBB`, deployed to data/
+
+The user asked for previews of the panel for each race, then for the four faults they showed
+to be fixed. Built with `py tools/import_great_guilds.py`, deployed to `data/` (backup
+`.bak_frames_20260930` = `8AA9DDC1`), md5 compared. **The importer's own `verify_saved` crashed**
+with a PermissionError reading RPFM's exported TSVs in `%TEMP%` - RPFM was running elevated, so
+its files were unreadable to the script. The saved pack was verified offline instead with
+`read_vanilla_db` / `read_vanilla_loc` / `read_pack_index`: all ten DB tables row for row
+against `build()`, 6,464 loc keys, and the 4 scripts and 20 UI files byte for byte; the same
+check run on the old `8AA9DDC1` failed on exactly the nine edited files. Previews: `Modding Files/reference/great_guilds_previews/`
+(one sheet per race plus `_all_races_guilds_tab.png`), made from `preview_guilds_panel.py`
+output.
+
+**The preview's contrast check could not see these.** It took the brightest tenth of the
+WHOLE line, so an ornament under two letters was outvoted by the dark band; it never reported
+the Guilds, Log, Bounties or picking views (LOW was printed after the Leaderboard render and
+never again); and it drew tab captions 40px from the left where the game centres them, which
+flagged a Cathay rim the caption never touches. Now: worst glyph-wide window, reported after
+every view, captions centred, and **exit 1 on any LOW**. All nine flavours exit 0.
+
+Fixed in `gen_guilds_ui.py` FRAMES (numbers measured off the art, in the comments there):
+
+| Race | Fault | Fix |
+|---|---|---|
+| Dark Elves | rite flare under a running card's text, 0.7:1 | the shared radial glow tinted `#D040FF50`; `GGUI.FRAME._def.heat` in the Lua too (the mirror check caught it) |
+| Bretonnia | tab posts across "Leaderboard"/"Bounties", 3.8:1; header "T" on a post | Vows plate scaled whole on tabs (not nine-sliced); `rank_tx` 64 |
+| Cathay | header rails and spear collar through the line, 2.7:1; card arch through every title, 2.2:1 | header ends 84px, `rank_tx` 90, lifted 2 (`rank_ty` 0,4); card ground and frame sliced 22px top and bottom |
+| Kislev | header cap on the first word; card titles 4.2:1 | ends 64px, `rank_tx` 68; card ground `#C8C8C8FF` |
+| High Elves | header's first letter on the scroll, 4.2:1 | `rank_tx` 64 |
+| Chaos Dwarfs (+ generic) | running card's text 4.4:1 | heat glow `#FFFFFFD0` |
+
+A first Cathay attempt drew the header plate 76px tall, 15px above the strip; `check()`
+refused it (nothing may draw outside its component - the 2026-09-12 black ring), so the fix
+stays inside 46px. Gates run: `gen_guilds_ui --check` and `--selftest`, `check_guilds_ui`,
+`preview_guilds_panel --selftest`, `gen_great_guilds --selftest`, `import_great_guilds
+--check`, `luac -p`. Backups: `Modding Files/source/great_guilds/_bak_20260930_frames/`.
+Not seen in game.

@@ -252,7 +252,7 @@ end
 -- drift here is silent misplacement rather than an error.
 GGUI.PANEL_XY = {
     gg_crest      = {16, 9},
-    gg_title      = {95, 0},
+    gg_title      = {55, 0},
     gg_close      = {748, 12},
     gg_divider    = {20, 44},
     gg_tab_guilds = {20, 56},
@@ -389,7 +389,7 @@ GGUI.FRAME = {
         selected_hover = {"ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"},
     },
     _def = {
-        heat = "ui/skins/warhammer2/rite_def_text_holder.png",
+        heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
         rim = "ui/skins/default/tutglow_square.png",
         active = {"ui/skins/warhammer2/malus_parchment_button_square_active.png"},
         hover = {"ui/skins/warhammer2/malus_parchment_button_square_hover.png"},
