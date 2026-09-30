@@ -573,13 +573,13 @@
 				<component_image
 					this="GG210022-D001-4000-B000000000000022"
 					uniqueguid="GG210022-D001-4000-B000000000000022"
-					imagepath="ui/skins/wh3_main_cth_cathay/bar_small_buttons.png"/>
+					imagepath="ui/skins/default/cp1_cth_shang_yang/army_cap_holder.png"/>
 			</componentimages>
 			<states>
 				<standard
 					this="GG210023-D000-4000-B000000000000023"
 					name="standard"
-					width="310"
+					width="438"
 					height="40"
 					uniqueguid="GG210023-D000-4000-B000000000000023">
 					<imagemetrics>
@@ -588,10 +588,9 @@
 							uniqueguid="GG210022-D002-4000-B000000000000022"
 							componentimage="GG210022-D001-4000-B000000000000022"
 							offset="0.00,0.00"
-							width="310"
+							width="438"
 							height="40"
-							tile="true"
-							margin="0.00,110.00,0.00,110.00"/>
+							margin="0.00,20.00,0.00,20.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -2636,11 +2635,19 @@
 				<component_image
 					this="GG210094-D001-4000-B000000000000094"
 					uniqueguid="GG210094-D001-4000-B000000000000094"
-					imagepath="ui/skins/default/cp1_cth_tiger_court/button_decrees_active.png"/>
+					imagepath="ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"/>
 				<component_image
 					this="GG210094-D003-4000-B000000000000094"
 					uniqueguid="GG210094-D003-4000-B000000000000094"
-					imagepath="ui/skins/default/cp1_cth_tiger_court/button_decrees_active.png"/>
+					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
+				<component_image
+					this="GG210094-D005-4000-B000000000000094"
+					uniqueguid="GG210094-D005-4000-B000000000000094"
+					imagepath="ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"/>
+				<component_image
+					this="GG210094-D007-4000-B000000000000094"
+					uniqueguid="GG210094-D007-4000-B000000000000094"
+					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -2659,7 +2666,16 @@
 							width="125"
 							height="34"
 							colour="#B4B4B4FF"
-							margin="0.00,22.00,0.00,22.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG210094-D004-4000-B000000000000094"
+							uniqueguid="GG210094-D004-4000-B000000000000094"
+							componentimage="GG210094-D003-4000-B000000000000094"
+							offset="0.00,0.00"
+							width="125"
+							height="34"
+							colour="#70E8B8C0"
+							margin="16.00,16.00,16.00,16.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2685,13 +2701,22 @@
 					uniqueguid="GG210096-D000-4000-B000000000000096">
 					<imagemetrics>
 						<image
-							this="GG210094-D004-4000-B000000000000094"
-							uniqueguid="GG210094-D004-4000-B000000000000094"
-							componentimage="GG210094-D003-4000-B000000000000094"
+							this="GG210094-D006-4000-B000000000000094"
+							uniqueguid="GG210094-D006-4000-B000000000000094"
+							componentimage="GG210094-D005-4000-B000000000000094"
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,22.00,0.00,22.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG210094-D008-4000-B000000000000094"
+							uniqueguid="GG210094-D008-4000-B000000000000094"
+							componentimage="GG210094-D007-4000-B000000000000094"
+							offset="0.00,0.00"
+							width="125"
+							height="34"
+							colour="#70E8B8C0"
+							margin="16.00,16.00,16.00,16.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2736,11 +2761,19 @@
 				<component_image
 					this="GG210097-D001-4000-B000000000000097"
 					uniqueguid="GG210097-D001-4000-B000000000000097"
-					imagepath="ui/skins/default/cp1_cth_tiger_court/button_decrees_active.png"/>
+					imagepath="ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"/>
 				<component_image
 					this="GG210097-D003-4000-B000000000000097"
 					uniqueguid="GG210097-D003-4000-B000000000000097"
-					imagepath="ui/skins/default/cp1_cth_tiger_court/button_decrees_active.png"/>
+					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
+				<component_image
+					this="GG210097-D005-4000-B000000000000097"
+					uniqueguid="GG210097-D005-4000-B000000000000097"
+					imagepath="ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"/>
+				<component_image
+					this="GG210097-D007-4000-B000000000000097"
+					uniqueguid="GG210097-D007-4000-B000000000000097"
+					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -2759,7 +2792,16 @@
 							width="125"
 							height="34"
 							colour="#B4B4B4FF"
-							margin="0.00,22.00,0.00,22.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG210097-D004-4000-B000000000000097"
+							uniqueguid="GG210097-D004-4000-B000000000000097"
+							componentimage="GG210097-D003-4000-B000000000000097"
+							offset="0.00,0.00"
+							width="125"
+							height="34"
+							colour="#70E8B8C0"
+							margin="16.00,16.00,16.00,16.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2785,13 +2827,22 @@
 					uniqueguid="GG210099-D000-4000-B000000000000099">
 					<imagemetrics>
 						<image
-							this="GG210097-D004-4000-B000000000000097"
-							uniqueguid="GG210097-D004-4000-B000000000000097"
-							componentimage="GG210097-D003-4000-B000000000000097"
+							this="GG210097-D006-4000-B000000000000097"
+							uniqueguid="GG210097-D006-4000-B000000000000097"
+							componentimage="GG210097-D005-4000-B000000000000097"
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,22.00,0.00,22.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG210097-D008-4000-B000000000000097"
+							uniqueguid="GG210097-D008-4000-B000000000000097"
+							componentimage="GG210097-D007-4000-B000000000000097"
+							offset="0.00,0.00"
+							width="125"
+							height="34"
+							colour="#70E8B8C0"
+							margin="16.00,16.00,16.00,16.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2836,11 +2887,19 @@
 				<component_image
 					this="GG21009A-D001-4000-B00000000000009A"
 					uniqueguid="GG21009A-D001-4000-B00000000000009A"
-					imagepath="ui/skins/default/cp1_cth_tiger_court/button_decrees_active.png"/>
+					imagepath="ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"/>
 				<component_image
 					this="GG21009A-D003-4000-B00000000000009A"
 					uniqueguid="GG21009A-D003-4000-B00000000000009A"
-					imagepath="ui/skins/default/cp1_cth_tiger_court/button_decrees_active.png"/>
+					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
+				<component_image
+					this="GG21009A-D005-4000-B00000000000009A"
+					uniqueguid="GG21009A-D005-4000-B00000000000009A"
+					imagepath="ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"/>
+				<component_image
+					this="GG21009A-D007-4000-B00000000000009A"
+					uniqueguid="GG21009A-D007-4000-B00000000000009A"
+					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -2859,7 +2918,16 @@
 							width="125"
 							height="34"
 							colour="#B4B4B4FF"
-							margin="0.00,22.00,0.00,22.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG21009A-D004-4000-B00000000000009A"
+							uniqueguid="GG21009A-D004-4000-B00000000000009A"
+							componentimage="GG21009A-D003-4000-B00000000000009A"
+							offset="0.00,0.00"
+							width="125"
+							height="34"
+							colour="#70E8B8C0"
+							margin="16.00,16.00,16.00,16.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2885,13 +2953,22 @@
 					uniqueguid="GG21009C-D000-4000-B00000000000009C">
 					<imagemetrics>
 						<image
-							this="GG21009A-D004-4000-B00000000000009A"
-							uniqueguid="GG21009A-D004-4000-B00000000000009A"
-							componentimage="GG21009A-D003-4000-B00000000000009A"
+							this="GG21009A-D006-4000-B00000000000009A"
+							uniqueguid="GG21009A-D006-4000-B00000000000009A"
+							componentimage="GG21009A-D005-4000-B00000000000009A"
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,22.00,0.00,22.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG21009A-D008-4000-B00000000000009A"
+							uniqueguid="GG21009A-D008-4000-B00000000000009A"
+							componentimage="GG21009A-D007-4000-B00000000000009A"
+							offset="0.00,0.00"
+							width="125"
+							height="34"
+							colour="#70E8B8C0"
+							margin="16.00,16.00,16.00,16.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2936,11 +3013,19 @@
 				<component_image
 					this="GG21009D-D001-4000-B00000000000009D"
 					uniqueguid="GG21009D-D001-4000-B00000000000009D"
-					imagepath="ui/skins/default/cp1_cth_tiger_court/button_decrees_active.png"/>
+					imagepath="ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"/>
 				<component_image
 					this="GG21009D-D003-4000-B00000000000009D"
 					uniqueguid="GG21009D-D003-4000-B00000000000009D"
-					imagepath="ui/skins/default/cp1_cth_tiger_court/button_decrees_active.png"/>
+					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
+				<component_image
+					this="GG21009D-D005-4000-B00000000000009D"
+					uniqueguid="GG21009D-D005-4000-B00000000000009D"
+					imagepath="ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"/>
+				<component_image
+					this="GG21009D-D007-4000-B00000000000009D"
+					uniqueguid="GG21009D-D007-4000-B00000000000009D"
+					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -2959,7 +3044,16 @@
 							width="125"
 							height="34"
 							colour="#B4B4B4FF"
-							margin="0.00,22.00,0.00,22.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG21009D-D004-4000-B00000000000009D"
+							uniqueguid="GG21009D-D004-4000-B00000000000009D"
+							componentimage="GG21009D-D003-4000-B00000000000009D"
+							offset="0.00,0.00"
+							width="125"
+							height="34"
+							colour="#70E8B8C0"
+							margin="16.00,16.00,16.00,16.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2985,13 +3079,22 @@
 					uniqueguid="GG21009F-D000-4000-B00000000000009F">
 					<imagemetrics>
 						<image
-							this="GG21009D-D004-4000-B00000000000009D"
-							uniqueguid="GG21009D-D004-4000-B00000000000009D"
-							componentimage="GG21009D-D003-4000-B00000000000009D"
+							this="GG21009D-D006-4000-B00000000000009D"
+							uniqueguid="GG21009D-D006-4000-B00000000000009D"
+							componentimage="GG21009D-D005-4000-B00000000000009D"
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,22.00,0.00,22.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG21009D-D008-4000-B00000000000009D"
+							uniqueguid="GG21009D-D008-4000-B00000000000009D"
+							componentimage="GG21009D-D007-4000-B00000000000009D"
+							offset="0.00,0.00"
+							width="125"
+							height="34"
+							colour="#70E8B8C0"
+							margin="16.00,16.00,16.00,16.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3036,11 +3139,19 @@
 				<component_image
 					this="GG2100A0-D001-4000-B0000000000000A0"
 					uniqueguid="GG2100A0-D001-4000-B0000000000000A0"
-					imagepath="ui/skins/default/cp1_cth_tiger_court/button_decrees_active.png"/>
+					imagepath="ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"/>
 				<component_image
 					this="GG2100A0-D003-4000-B0000000000000A0"
 					uniqueguid="GG2100A0-D003-4000-B0000000000000A0"
-					imagepath="ui/skins/default/cp1_cth_tiger_court/button_decrees_active.png"/>
+					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
+				<component_image
+					this="GG2100A0-D005-4000-B0000000000000A0"
+					uniqueguid="GG2100A0-D005-4000-B0000000000000A0"
+					imagepath="ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"/>
+				<component_image
+					this="GG2100A0-D007-4000-B0000000000000A0"
+					uniqueguid="GG2100A0-D007-4000-B0000000000000A0"
+					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -3059,7 +3170,16 @@
 							width="125"
 							height="34"
 							colour="#B4B4B4FF"
-							margin="0.00,22.00,0.00,22.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG2100A0-D004-4000-B0000000000000A0"
+							uniqueguid="GG2100A0-D004-4000-B0000000000000A0"
+							componentimage="GG2100A0-D003-4000-B0000000000000A0"
+							offset="0.00,0.00"
+							width="125"
+							height="34"
+							colour="#70E8B8C0"
+							margin="16.00,16.00,16.00,16.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3085,13 +3205,22 @@
 					uniqueguid="GG2100A2-D000-4000-B0000000000000A2">
 					<imagemetrics>
 						<image
-							this="GG2100A0-D004-4000-B0000000000000A0"
-							uniqueguid="GG2100A0-D004-4000-B0000000000000A0"
-							componentimage="GG2100A0-D003-4000-B0000000000000A0"
+							this="GG2100A0-D006-4000-B0000000000000A0"
+							uniqueguid="GG2100A0-D006-4000-B0000000000000A0"
+							componentimage="GG2100A0-D005-4000-B0000000000000A0"
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,22.00,0.00,22.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG2100A0-D008-4000-B0000000000000A0"
+							uniqueguid="GG2100A0-D008-4000-B0000000000000A0"
+							componentimage="GG2100A0-D007-4000-B0000000000000A0"
+							offset="0.00,0.00"
+							width="125"
+							height="34"
+							colour="#70E8B8C0"
+							margin="16.00,16.00,16.00,16.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3136,11 +3265,19 @@
 				<component_image
 					this="GG2100A3-D001-4000-B0000000000000A3"
 					uniqueguid="GG2100A3-D001-4000-B0000000000000A3"
-					imagepath="ui/skins/default/cp1_cth_tiger_court/button_decrees_active.png"/>
+					imagepath="ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"/>
 				<component_image
 					this="GG2100A3-D003-4000-B0000000000000A3"
 					uniqueguid="GG2100A3-D003-4000-B0000000000000A3"
-					imagepath="ui/skins/default/cp1_cth_tiger_court/button_decrees_active.png"/>
+					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
+				<component_image
+					this="GG2100A3-D005-4000-B0000000000000A3"
+					uniqueguid="GG2100A3-D005-4000-B0000000000000A3"
+					imagepath="ui/skins/default/cp1_cth_tiger_court/position_flag_3.png"/>
+				<component_image
+					this="GG2100A3-D007-4000-B0000000000000A3"
+					uniqueguid="GG2100A3-D007-4000-B0000000000000A3"
+					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -3159,7 +3296,16 @@
 							width="125"
 							height="34"
 							colour="#B4B4B4FF"
-							margin="0.00,22.00,0.00,22.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG2100A3-D004-4000-B0000000000000A3"
+							uniqueguid="GG2100A3-D004-4000-B0000000000000A3"
+							componentimage="GG2100A3-D003-4000-B0000000000000A3"
+							offset="0.00,0.00"
+							width="125"
+							height="34"
+							colour="#70E8B8C0"
+							margin="16.00,16.00,16.00,16.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3185,13 +3331,22 @@
 					uniqueguid="GG2100A5-D000-4000-B0000000000000A5">
 					<imagemetrics>
 						<image
-							this="GG2100A3-D004-4000-B0000000000000A3"
-							uniqueguid="GG2100A3-D004-4000-B0000000000000A3"
-							componentimage="GG2100A3-D003-4000-B0000000000000A3"
+							this="GG2100A3-D006-4000-B0000000000000A3"
+							uniqueguid="GG2100A3-D006-4000-B0000000000000A3"
+							componentimage="GG2100A3-D005-4000-B0000000000000A3"
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,22.00,0.00,22.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG2100A3-D008-4000-B0000000000000A3"
+							uniqueguid="GG2100A3-D008-4000-B0000000000000A3"
+							componentimage="GG2100A3-D007-4000-B0000000000000A3"
+							offset="0.00,0.00"
+							width="125"
+							height="34"
+							colour="#70E8B8C0"
+							margin="16.00,16.00,16.00,16.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition

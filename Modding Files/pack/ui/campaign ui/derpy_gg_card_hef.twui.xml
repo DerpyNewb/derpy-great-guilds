@@ -53,6 +53,10 @@
 					this="GG210004-D005-4000-B000000000000004"
 					uniqueguid="GG210004-D005-4000-B000000000000004"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
+				<component_image
+					this="GG210004-D007-4000-B000000000000004"
+					uniqueguid="GG210004-D007-4000-B000000000000004"
+					imagepath="ui/skins/default/influence_balance_bar_frame.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -70,7 +74,7 @@
 							offset="0.00,0.00"
 							width="750"
 							height="120"
-							margin="0.00,40.00,0.00,40.00"/>
+							margin="70.00,20.00,20.00,20.00"/>
 						<image
 							this="GG210004-D004-4000-B000000000000004"
 							uniqueguid="GG210004-D004-4000-B000000000000004"
@@ -89,6 +93,15 @@
 							height="120"
 							colour="#FFE9A0C0"
 							margin="16.00,16.00,16.00,16.00"/>
+						<image
+							this="GG210004-D008-4000-B000000000000004"
+							uniqueguid="GG210004-D008-4000-B000000000000004"
+							componentimage="GG210004-D007-4000-B000000000000004"
+							offset="0.00,0.00"
+							width="750"
+							height="120"
+							tile="true"
+							margin="3.00,3.00,2.00,3.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -203,7 +216,7 @@
 				<component_image
 					this="GG21000A-D001-4000-B00000000000000A"
 					uniqueguid="GG21000A-D001-4000-B00000000000000A"
-					imagepath="ui/skins/default/dlc27_hef_asur_domination/dlc27_hef_asur_domination_focus_holder.png"/>
+					imagepath="ui/skins/default/dlc27_hef_asur_domination/wh3_hef_gifted_settlement_bg.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -217,10 +230,10 @@
 							this="GG21000A-D002-4000-B00000000000000A"
 							uniqueguid="GG21000A-D002-4000-B00000000000000A"
 							componentimage="GG21000A-D001-4000-B00000000000000A"
-							offset="0.00,0.00"
-							width="138"
+							offset="3.00,0.00"
+							width="132"
 							height="30"
-							margin="0.00,14.00,0.00,40.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<component_text
 						texthalign="Center"

@@ -56,7 +56,7 @@
 				<component_image
 					this="GG210004-D007-4000-B000000000000004"
 					uniqueguid="GG210004-D007-4000-B000000000000004"
-					imagepath="ui/skins/wh_main_brt_bretonnia/legacy/panel_back_border.png"/>
+					imagepath="ui/skins/default/chivalry_bar_frame.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -75,6 +75,7 @@
 							width="750"
 							height="120"
 							tile="true"
+							colour="#B4B4B4FF"
 							margin="5.00,5.00,5.00,5.00"/>
 						<image
 							this="GG210004-D004-4000-B000000000000004"
@@ -102,7 +103,7 @@
 							width="750"
 							height="120"
 							tile="true"
-							margin="42.00,42.00,42.00,42.00"/>
+							margin="5.00,10.00,5.00,10.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -353,7 +354,7 @@
 				<component_image
 					this="GG210013-D001-4000-B000000000000013"
 					uniqueguid="GG210013-D001-4000-B000000000000013"
-					imagepath="ui/skins/default/button_round_medium_frame.png"/>
+					imagepath="ui/skins/default/dlc26_fragments_sorcery/ability_frame.png"/>
 				<component_image
 					this="GG210013-D003-4000-B000000000000013"
 					uniqueguid="GG210013-D003-4000-B000000000000013"
@@ -379,7 +380,7 @@
 							this="GG210013-D004-4000-B000000000000013"
 							uniqueguid="GG210013-D004-4000-B000000000000013"
 							componentimage="GG210013-D003-4000-B000000000000013"
-							offset="19.00,22.00"
+							offset="20.00,25.00"
 							width="62"
 							height="62"
 							margin="0.00,0.00,0.00,0.00"/>

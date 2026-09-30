@@ -92,12 +92,17 @@ GTAB_W, GTAB_STEP = 38, 48
 for _i, _name in enumerate(GUILD_BTNS):
     PANEL_LAYOUT[_name] = (256 + _i * GTAB_STEP, 596, GTAB_W, GTAB_W)
 PANEL_LAYOUT["gg_gsel"] = (256, 590, GTAB_W, 4)
-# The Hell-Forge's bronze button bar behind the six, 16px past each end, drawn first
+# The Hell-Forge's bronze button bar behind the six, 80px past each end, drawn first
 # (gg_gbar sorts before gg_gtab_*) so the buttons sit on it.
+# 438 WIDE, NOT 310 (2026-09-30). At 310 only 16px of bar showed past each end button, and
+# every race bar with end ornaments - the culture bar_small_buttons, Kislev's horse heads,
+# the High Elf griffins, the Vows scrolls - drew them UNDER the first and last button. 438
+# at x=176 clears them all (the widest, Kislev's heads, end at column 75) and stays clear
+# of the pager (20..58, 732..770).
 # 40 TALL, CENTRED on the plates' rings (rows 2..35 of 38, so y 598..631) with 3-4px of bar
 # above and below. At 34 tall and y=598 the ring ended on the bar's last row and read as
 # sliced off; see GBAR_LAYERS for why the bar now has a bottom rim at all.
-PANEL_LAYOUT["gg_gbar"] = (240, 595, 310, 40)
+PANEL_LAYOUT["gg_gbar"] = (176, 595, 438, 40)
 # THE LOG'S FILTERS, in the band the reputation bar and its track use on the Guilds tab -
 # both are hidden on the Log, and the first of its 21 lines starts at y=168.
 LOG_FILTERS = ["gg_lf_all", "gg_lf_mine", "gg_lf_rivals", "gg_lf_ranks"]
@@ -429,16 +434,20 @@ RANK_TX, RANK_TY = "50.00,0.00", "0.00,11.00"
 
 # A GLYPH IN CA'S ROUND HOLDER, placed by OFFSET WITH NO DOCKPOINT: on an image the two
 # are cumulative (docs/CUSTOM_UI.md), so an inset plus dock Center draws the glyph off
-# centre by its own inset. The holder's dark disc is 43 of its 62 wide, centred at
-# 0.484 across and 0.455 down, measured off the file; the glyph is sized to sit inside it.
-ICON_HOLDER = HF + "cap_category_iconm_holder.png"
+# centre by its own inset.
+# NOT the Hell-Forge's cap_category_iconm_holder: it is 62x66, so the 100x106 card box drew
+# it 1.6x its size, soft in game (2026-09-30). The labour economy's surplus ring is 129px,
+# drawn smaller than its file; its dark disc is centred.
+ICON_HOLDER = "ui/skins/default/chd_labour_economy/surplus_holder.png"
+ICON_HOLDER_CX, ICON_HOLDER_CY = 0.5, 0.5
 
 
 def holder_layers(w, h, glyph, path, tag=""):
     """The round holder at w x h and a glyph-px square centred on its disc."""
     # "" is the Chaos Dwarf holder, and is what the module-level layers below are built
     # from before FRAMES exists.
-    holder, cx, cy = frame(tag)["holder"] if tag else (ICON_HOLDER, 0.484, 0.455)
+    holder, cx, cy = (frame(tag)["holder"] if tag
+                      else (ICON_HOLDER, ICON_HOLDER_CX, ICON_HOLDER_CY))
     ox = int(round(cx * w - glyph / 2.0))
     oy = int(round(cy * h - glyph / 2.0))
     return [
@@ -705,6 +714,8 @@ _TUTGLOW = _D + "tutglow_square.png"
 # The dimmed standard state of a tab that has one texture for every state: hover is the
 # same art at full brightness. Colour multiplies, so this is the only direction it goes.
 _DIM = "#B4B4B4FF"
+_HEF_TAB = _D + "dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"
+_BRT_TILE = "ui/skins/wh_main_brt_bretonnia/legacy/panel_back_tile.png"
 
 
 def _L(path, margin=0, tile=False, colour=None, offset=(0, 0), dw=0, dh=0):
@@ -749,7 +760,7 @@ FRAMES = {
     "": {
         "card": CARD_LAYERS[0], "heat": (CARD_HEAT, "#FFFFFFD0"),
         "rim": (CARD_RIM, (40, 40, 40, 40), None),
-        "holder": (ICON_HOLDER, 0.484, 0.455),
+        "holder": (ICON_HOLDER, ICON_HOLDER_CX, ICON_HOLDER_CY),
         "cost": COST_LAYERS, "rank": RANK_BAR_LAYERS, "rank_tx": RANK_TX, "rank_ty": RANK_TY,
         "gbar": GBAR_LAYERS,
         "tab": {"layers": tab_plate("active"), "hover": tab_plate("hover"),
@@ -757,94 +768,131 @@ FRAMES = {
                 "selected_hover": [TAB_PLATE % "selected_hover"]},
         "track": REP_TRACK_LAYERS, "fill": REP_BAR_LAYERS,
     },
+    # THE RACE FRAMES WERE REBUILT 2026-09-30 after an in-game Dwarf screenshot: pieces cut
+    # off (half-strips of larger frames, one-sided bookmark tabs, bar ends under the first
+    # and last button) and pieces soft (holders drawn 1.3-2.3x their file, a card 3.3x its
+    # height). Every layer below is either drawn at or under its file's size, or stretched
+    # only along content that is flat in that direction. TILE REPEATS AT THE FILE'S SIZE IN
+    # BOTH AXES - it does not scale - so a tiled layer drawn shorter than its file loses its
+    # bottom rows unless top/bottom margins keep them.
     "_emp": {
         "card": _L(_D + "dlc29_great_temple_of_ulric/text_bgr.png", (25, 20, 25, 20), True),
         "heat": (_GLOW, "#FFB45A50"),
         "rim": (_D + "dlc25_gunnery_school/frame_unit_card_selected.png",
                 (25, 25, 25, 25), None),
-        "holder": (_D + "dlc25_gardens_of_morr/garden_frame_empty_default.png", 0.5, 0.40),
-        "cost": [_L(_D + "dlc25_gardens_of_morr/don_square_slot_empty.png",
-                    (0, 25, 0, 25), True)],
-        "rank": [_L(_D + "dlc29_great_temple_of_ulric/button_frame.png", (0, 60, 0, 60))],
+        # Ulric's hexagon plate, 119x99: drawn 0.84 across, 1.07 down.
+        "holder": (_D + "dlc29_great_temple_of_ulric/plate.png", 0.51, 0.5),
+        # Not tiled: tiled at 30px the 47px slot lost its bottom border.
+        "cost": [_L(_D + "dlc25_gardens_of_morr/don_square_slot_empty.png", (0, 25, 0, 25))],
+        # Ulric's bronze frame, middle TILED between 83/85px ends - the edge columns whose
+        # join matches best - where it was stretched 3.3x into streaks.
+        "rank": [_L(_D + "dlc29_great_temple_of_ulric/button_frame.png", (12, 85, 13, 83), True)],
         "rank_tx": RANK_TX, "rank_ty": "0.00,0.00",
-        "gbar": [_L(_D + "dlc25_gardens_of_morr/lower_frame.png", (0, 60, 0, 60), True)],
+        "gbar": [_L(_D + "dlc29_great_temple_of_ulric/button_frame.png", (12, 85, 13, 83), True)],
         "tab": {"layers": [_L(_D + "dlc25_gardens_of_morr/don_square_button_default.png",
-                              (0, 25, 0, 25), True)],
+                              (0, 25, 0, 25))],
                 "hover": [_L(_D + "dlc25_gardens_of_morr/don_square_button_hover.png",
-                             (0, 25, 0, 25), True)],
+                             (0, 25, 0, 25))],
                 "selected": [_D + "dlc25_gardens_of_morr/don_square_button_selected.png"],
                 "selected_hover":
                     [_D + "dlc25_gardens_of_morr/don_square_button_selected_hover.png"]},
-        "track": fit_track(_D + "dlc29_great_temple_of_ulric/progress_bar_bg.png",
-                           (127, 18), (4, 3, 123, 15)),
-        "fill": [_L(_D + "dlc29_great_temple_of_ulric/bar_fill_yellow.png")],
+        # A complete slot frame (7px border every side); its dark inside y 7..21, x 7..742
+        # holds the 714x13 fill. The old progress_bar_bg showed no frame at all.
+        "track": [_L(_D + "dlc25_gardens_of_morr/don_square_slot_empty.png", (7, 25, 7, 25),
+                     True)],
+        # Every column identical, already 13 tall: stretched along its length it loses
+        # nothing. A plain amber bar; the Chaos Gifts path is only where CA keeps it.
+        "fill": [_L(_D + "chaos_gifts/souls_bar_fill_undiveded.png")],
     },
     "_dwf": {
-        # Malakai's dark text ground in the Book of Grudges' red-ink frame. The Mortuary
-        # Cult plate tried first is a pointed outline at this size, and the text ran
-        # across its diagonals.
-        "card": _L(_D + "dlc25_malakais_adventures/text_bg.png"),
-        "card_extra": [_L(_D + "dlc25_book_of_grudges/unit_info_frame.png", (20, 40, 20, 40))],
+        # Malakai's dark ground sliced as CA slices it (25, tiled), in the Book of Grudges'
+        # complete red double-line frame - diamonds at all four corners. unit_info_frame,
+        # before it, had a gap in its top line and was drawn 1.44x.
+        "card": _L(_D + "dlc25_malakais_adventures/text_bg.png", (25, 25, 25, 25), True),
+        "card_extra": [_L(_D + "dlc25_book_of_grudges/book_of_grudges_unit_pack_frame.png",
+                          (15, 15, 15, 15), True)],
         "heat": (_GLOW, "#FF8A2A50"),
         "rim": (_D + "dlc25_malakais_adventures/tab_hover_glow.png", (35, 35, 35, 35), None),
-        "holder": (_D + "dlc25_book_of_grudges/unit_locked_bg.png", 0.5, 0.5),
-        "cost": [_L("ui/skins/wh_main_dwf_dwarfs/mortuary_cult_bottom_strip.png",
-                    (5, 30, 10, 30), True)],
-        "rank": [_L("ui/skins/wh_main_dwf_dwarfs/mortuary_cult_top_strip.png",
-                    (10, 50, 5, 50), True)],
+        # Malakai's diamond slot, 109x110: drawn under its size. The Grudges hexagon was
+        # 44x51 drawn 2.3x.
+        "holder": (_D + "dlc25_malakais_adventures/button_slot.png", 0.5, 0.5),
+        # 13 top/bottom, measured: CA's 15 fills all 30 rows. Complete on four sides, where
+        # the mortuary-cult strips were the top and bottom halves of a larger frame. The
+        # frame is open inside, so a dark ground goes under it: without one a running
+        # card's rim glow ran behind the price at 2.3:1.
+        "cost": [_L(_D + "1x1_blank_white.png", colour="#140E0AE6", offset=(2, 2),
+                    dw=-4, dh=-4),
+                 _L(_D + "dlc25_book_of_grudges/book_of_grudges_unit_pack_frame.png",
+                    (13, 15, 13, 15))],
+        "rank": [_L(_D + "dlc25_malakais_adventures/text_bg.png", (20, 25, 20, 25), True),
+                 _L(_D + "dlc25_book_of_grudges/book_of_grudges_unit_pack_frame.png",
+                    (15, 15, 15, 15), True)],
         "rank_tx": RANK_TX, "rank_ty": "0.00,0.00",
-        "gbar": [_L("ui/skins/wh_main_dwf_dwarfs/bar_small_buttons.png",
-                    (0, 110, 0, 110), True)],
-        "tab": {"layers": [_L(_D + "dlc25_book_of_grudges/tab_button_confederation_active.png",
-                              (0, 10, 0, 25))],
-                "hover": [_L(_D + "dlc25_book_of_grudges/tab_button_confederation_selected.png",
-                             (0, 45, 0, 25))],
-                "selected": [_D + "dlc25_book_of_grudges/tab_button_unit_pack_active.png"],
+        # The Dwarf HUD bar, SCALED WHOLE (0.59 both ways) to 438x34 - its carved pillar caps
+        # end clear of the first and last button.
+        "gbar": [_L("ui/skins/wh_main_dwf_dwarfs/bar_small_central_left.png",
+                    offset=(0, 3), dh=-6)],
+        # The complete bookmark banners, drawn whole: trimmed at both ends. The _active files
+        # before were cut square on the right.
+        "tab": {"layers": [_L(_D + "dlc25_book_of_grudges/tab_button_confederation_selected.png",
+                              colour=_DIM)],
+                "hover": [_L(_D + "dlc25_book_of_grudges/tab_button_confederation_selected.png")],
+                "selected": [_D + "dlc25_book_of_grudges/tab_button_unit_pack_selected.png"],
                 "selected_hover":
                     [_D + "dlc25_book_of_grudges/tab_button_unit_pack_selected.png"]},
-        "track": fit_track(_D + "grudge_bar_hud_frame.png", (149, 23), (13, 7, 136, 17)),
-        "fill": [_L(_D + "dlc25_book_of_grudges/tab_button_bar_fill.png")],
+        # At native height, not fit_track: the trough is 8 rows, so fitting it was 1.26x.
+        # Only row 15, one dark trough row, repeats. Trough y 8..21, x 17..732.
+        "track": [_L(_D + "grudge_bar_hud_frame.png", (15, 18, 7, 17), True)],
+        # The 1px highlight native; rows 1..3 (175/165/167) are near flat and stretch.
+        "fill": [_L(_D + "dlc25_book_of_grudges/tab_button_bar_fill.png", (1, 0, 0, 0))],
     },
     "_hef": {
-        # The Intrigue Court's alert plate. Its progress_bg, tried first, is a thin bar in a
-        # 678x191 canvas and drew as nothing at all.
+        # The Intrigue Court's alert plate at CA's top 70 / bottom 20, sides 20 so the edge
+        # lines keep their size, inside Influence's 3px gold rim - the card was a 30% wash
+        # before and vanished into the panel.
         "card": _L(_D + "dlc27_hef_intrigue_court/dlc27_intrigue_court_alert_holder.png",
-                   (0, 40, 0, 40)),
+                   (70, 20, 20, 20)),
+        "card_extra": [_L(_D + "influence_balance_bar_frame.png", (3, 3, 2, 3), True)],
         "heat": (_GLOW, "#FFF0C050"),
         "rim": (_TUTGLOW, (16, 16, 16, 16), "#FFE9A0C0"),
         "holder": (_D + "dlc27_hef_asur_domination/faction_selection_frame_active.png",
                    0.5, 0.46),
-        "cost": [_L(_D + "dlc27_hef_asur_domination/dlc27_hef_asur_domination_focus_holder.png",
-                    (0, 14, 0, 40))],
+        # Asur Domination's symmetric teal banner, full width, 0.79 tall.
+        "cost": [_L(_D + "dlc27_hef_asur_domination/wh3_hef_gifted_settlement_bg.png",
+                    offset=(3, 0), dw=-6)],
         "rank": [_L(_D + "dlc27_hef_intrigue_court/dlc27_intrigue_court_immunity.png",
                     (0, 70, 0, 70))],
         # 64: the scroll at the plate's left end runs to column 57 and the band starts at 58.
         "rank_tx": "64.00,0.00", "rank_ty": "0.00,0.00",
-        "gbar": [_L("ui/skins/wh2_main_hef_high_elves/bar_small_buttons.png",
-                    (0, 110, 0, 110), True)],
-        "tab": {"layers": [_L(_D + "dlc27_hef_intrigue_court/button_basic_active.png",
-                              (0, 12, 0, 12))],
-                "hover": [_L(_D + "dlc27_hef_intrigue_court/button_basic_hover.png",
-                             (0, 12, 0, 12))],
-                "selected": [_D + "dlc27_hef_intrigue_court/button_basic_pressed.png"],
-                "selected_hover": [_D + "dlc27_hef_intrigue_court/button_basic_pressed.png"]},
-        "track": fit_track(_D + "dlc27_hef_asur_domination/wh3_sea_patrol_progress_bar_frame.png",
-                           (216, 36), (7, 7, 209, 28)),
-        "fill": [_L(_D + "dlc27_hef_asur_domination/wh3_sea_patrol_progress_bar_fill.png")],
+        # CA's 85 ends, NOT tiled: 467x71 into 438x40 only shrinks. The griffins (columns
+        # 30..70) sit outside the buttons.
+        "gbar": [_L("ui/skins/wh2_main_hef_high_elves/bar_small_buttons.png", (0, 85, 0, 85))],
+        # Aislinn's dragonship header, navy with blue corner curls, tiled at its own size;
+        # its last 12 columns are transparent, hence the 24 right margin and the second
+        # slot stopping at 113. The open tab wears a gold outline.
+        "tab": {"layers": [_L(_HEF_TAB, (12, 24, 12, 12), True, colour=_DIM,
+                              offset=(6, 0), dw=-6),
+                           _L(CLEAR, (8, 8, 8, 8), colour="#FFD37AFF", offset=(6, 0), dw=-18)],
+                "hover": [_L(_HEF_TAB, (12, 24, 12, 12), True, offset=(6, 0), dw=-6),
+                          _L(CLEAR, (8, 8, 8, 8), colour="#FFD37AFF", offset=(6, 0), dw=-18)],
+                "selected": [_HEF_TAB, _D + "white_frame.png"],
+                "selected_hover": [_HEF_TAB, _D + "white_frame.png"]},
+        # The card's gold rim again round a dark trough; its opening 17..733, 7..21 holds the
+        # fill. The sea patrol frame had two dividers in its middle and was drawn 3.5x.
+        "track": [_L(_D + "1x1_blank_white.png", colour="#000000A0", offset=(17, 7),
+                     dw=-34, dh=-14),
+                  _L(_D + "influence_balance_bar_frame.png", (3, 3, 2, 3), True,
+                     offset=(14, 4), dw=-28, dh=-9)],
+        "fill": [_L(_D + "dlc27_hef_asur_domination/wh3_sea_patrol_progress_bar_fill.png",
+                    tile=True)],
     },
     "_cth": {
-        # Shang Yang's hexagonal plate in its bronze frame, STRETCHED: tiled, the frame's
-        # rails repeated down the card as well as along it and crossed every line of text.
-        # The Tiger Court's effects plate tried first has a dark band that stops three
-        # quarters across, and tiling repeated its end mid-card.
-        # 22-PIXEL TOP AND BOTTOM SLICES on both. The frame is 67px tall with an arched
-        # top rail; stretched 1.79x into the 120px card, the arch dropped to y 18-36 at the
-        # left and ran through every title at 2.2:1. Sliced, the rails keep their native
-        # height and only the plain middle stretches; the ground is sliced the same way so
-        # its edge stays under the frame's.
-        "card": _L(_D + "cp1_cth_shang_yang/unit_capacity_holder_bg.png", (22, 25, 22, 25)),
-        "card_extra": [_L(_D + "cp1_cth_shang_yang/unit_capacity_holder_frame.png",
-                          (22, 25, 22, 23))],
+        # The Tiger Court's pillar ground, tiled as CA tiles it, inset to where the frame's
+        # rails start, inside Shang Yang's chain-railed category frame at CA's 20. The old
+        # capacity holder was 67px tall drawn at 120.
+        "card": _L(_D + "cp1_cth_tiger_court/pillar_info_holder.png", 0, True,
+                   offset=(12, 7), dw=-21, dh=-12),
+        "card_extra": [_L(_D + "cp1_cth_shang_yang/unit_category_holder.png", 20)],
         "heat": (_GLOW, "#60E0A050"),
         "rim": (_TUTGLOW, (16, 16, 16, 16), "#70E8B8C0"),
         "holder": (_D + "cp1_cth_tiger_court/button_decrees_active.png", 0.5, 0.5),
@@ -857,108 +905,126 @@ FRAMES = {
         "rank": [_L(_D + "cp1_cth_shang_yang/unit_category_header_holder_plate.png",
                     (0, 84, 0, 84))],
         "rank_tx": "90.00,0.00", "rank_ty": "0.00,4.00",
-        "gbar": [_L("ui/skins/wh3_main_cth_cathay/bar_small_buttons.png",
-                    (0, 110, 0, 110), True)],
-        "tab": {"layers": [_L(_D + "cp1_cth_tiger_court/button_decrees_active.png",
-                              (0, 22, 0, 22), colour=_DIM)],
-                "hover": [_L(_D + "cp1_cth_tiger_court/button_decrees_active.png",
-                             (0, 22, 0, 22))],
-                # The Tiger Court's jade banner. The glowing selected octagon put the open
-                # tab's yellow caption at 3.5:1 (preview_guilds_panel.py, 2026-09-29).
-                "selected": [_D + "cp1_cth_tiger_court/position_flag_3.png"],
-                "selected_hover": [_D + "cp1_cth_tiger_court/position_flag_3.png"]},
+        # Shang Yang's army-cap pill: 20px round ends, flat middle.
+        "gbar": [_L(_D + "cp1_cth_shang_yang/army_cap_holder.png", (0, 20, 0, 20))],
+        # The Tiger Court's jade banner top SCALED WHOLE (0.68 both ways), so each tab is its
+        # own banner; the open tab ringed by the tutorial glow in jade. Only position_flag_3
+        # is dark enough for the yellow caption: flag_1 puts it at 2.4:1, flag_2 at 0.9:1.
+        "tab": {"layers": [_L(_D + "cp1_cth_tiger_court/position_flag_3.png", colour=_DIM),
+                           _L(CLEAR, 16, colour="#70E8B8C0")],
+                "hover": [_L(_D + "cp1_cth_tiger_court/position_flag_3.png"),
+                          _L(CLEAR, 16, colour="#70E8B8C0")],
+                "selected": [_D + "cp1_cth_tiger_court/position_flag_3.png", _TUTGLOW],
+                "selected_hover": [_D + "cp1_cth_tiger_court/position_flag_3.png", _TUTGLOW]},
         "track": fit_track("ui/skins/wh3_main_cth_cathay/compass_power_bar_frame.png",
                            (272, 26), (5, 5, 267, 20), True),
         "fill": [_L(_D + "compass_power_bar_fill.png")],
     },
     "_ksl": {
-        "card": _L(_D + "wh3_main_court_orthodoxy/court_chain_background.png",
-                   (12, 12, 12, 12), colour="#C8C8C8FF"),
+        # Kislev's own frost tile (CA's 1px slices, tiled) with the Ice Court's corner
+        # ornaments - plain when unlit, CA's glowing pair when a service runs. The Orthodoxy
+        # chain background before was drawn short of the card with hard edges.
+        "card": _L("ui/skins/wh3_main_ksl_kislev/selectable_non_button_tile_bg.png", 1, True,
+                   colour="#B4B4B4FF"),
+        "card_extra": [_L(_D + "wh3_main_court_orthodoxy/court_btn_ornaments.png",
+                          (32, 36, 32, 36))],
         "heat": (_GLOW, "#80D8FF50"),
         "rim": (_D + "wh3_main_court_orthodoxy/court_completed_btn_ornaments.png",
-                (24, 24, 24, 24), None),
+                (32, 36, 32, 36), None),
         "holder": (_D + "buildings_slot_circle_bg.png", 0.5, 0.5),
+        # The star ends at column 43 and its rim at 46; the old 40 cut into the star.
         "cost": [_L(_D + "wh3_main_court_orthodoxy/court_favour_resource_holder.png",
-                    (0, 14, 0, 40))],
-        # 64-PIXEL ENDS AND TEXT AT 68. The cap and the frame's inner bar run to column 61
-        # and the opening starts at 62; at 50 the bar was in the stretched middle, drawn
-        # 2.4x wide from x 55 to 77, and the first word sat on it.
-        "rank": [_L(_D + "wh3_main_ksl_devotion/devotion_bar_frame.png", (0, 64, 0, 64))],
-        "rank_tx": "68.00,0.00", "rank_ty": "0.00,0.00",
-        "gbar": [_L("ui/skins/wh3_main_ksl_kislev/bar_small_buttons.png",
-                    (0, 110, 0, 110), True)],
-        # The Ice Court's slate plate under Orthodoxy's bronze outline; the open tab trades
-        # the outline for the Ice Court's glowing one.
-        "tab": {"layers": [_L(_D + "wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png",
-                              (0, 20, 0, 4), colour=_DIM),
-                           _L(_D + "wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png",
-                              (0, 24, 0, 6))],
-                "hover": [_L(_D + "wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png",
-                             (0, 20, 0, 4)),
-                          _L(_D + "wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png",
-                             (0, 24, 0, 6))],
-                "selected": [_D + "wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png",
-                             _D + "wh3_main_court_orthodoxy/court_completed_btn_ornaments.png"],
-                "selected_hover":
-                    [_D + "wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png",
-                     _D + "wh3_main_court_orthodoxy/court_completed_btn_ornaments.png"]},
-        "track": fit_track(_D + "wh3_main_court_orthodoxy/kislev_support_frame.png",
-                           (554, 41), (26, 2, 548, 37)),
-        "fill": [_L("ui/skins/warhammer3/kislev_devotion_fillbar.png")],
+                    (0, 16, 0, 46))],
+        # The Kislev HUD bar with horse-head ends at almost its own width (1.017x).
+        "rank": [_L("ui/skins/wh3_main_ksl_kislev/bar_small_central_left.png", (0, 75, 0, 75))],
+        "rank_tx": "78.00,0.00", "rank_ty": "8.00,0.00",
+        # Heads at columns 18..75; the middle only shrinks (307 to 278).
+        "gbar": [_L("ui/skins/wh3_main_ksl_kislev/bar_small_buttons.png", (0, 80, 0, 80))],
+        # The icy bar and its copper outline SCALED WHOLE: nine-sliced, the files' 23px
+        # transparent left pad pushed each caption 10px off centre. The open tab is
+        # Devotion's black plate.
+        "tab": {"layers": [_L(_D + "wh3_main_court_orthodoxy/court_progress_bar.png",
+                              colour="#50647AFF"),
+                           _L(_D + "wh3_main_court_orthodoxy/kislev_support_frame.png")],
+                "hover": [_L(_D + "wh3_main_court_orthodoxy/court_progress_bar.png",
+                             colour="#6A8098FF"),
+                          _L(_D + "wh3_main_court_orthodoxy/kislev_support_frame.png")],
+                "selected": ["ui/skins/warhammer3/kislev_devotion_base.png",
+                             "ui/skins/warhammer3/kislev_devotion_frame.png"],
+                "selected_hover": ["ui/skins/warhammer3/kislev_devotion_base.png",
+                                   "ui/skins/warhammer3/kislev_devotion_frame.png"]},
+        "track": [_L("ui/skins/warhammer3/kislev_devotion_frame_small.png", (5, 10, 5, 10),
+                     True, offset=(0, 3), dh=-6)],
+        "fill": [_L(_D + "wh3_main_court_orthodoxy/court_progress_top_bar.png", (0, 0, 0, 20),
+                    True)],
     },
     "_brt": {
-        # 5px slices, as CA draws its own panel_back_tile: this one has a 4px black edge,
-        # and tiled whole it drew a dark seam every 256px.
-        "card": _L("ui/skins/wh_main_brt_bretonnia/legacy/panel_back_tile.png", 5, True),
-        # 42px slices, measured off the file: the band is 33px and the corner squares reach
-        # 40. CA's 30 is for the GENERIC panel_back_border, a thinner file - on this one the
-        # band's inner edge fell in the tiled middle and drew a rail through the text every
-        # 196px. At 14 the ornament itself tiled into a seam.
-        "card_extra": [_L("ui/skins/wh_main_brt_bretonnia/legacy/panel_back_border.png",
-                          (42, 42, 42, 42), True)],
+        # The heraldic border is gone: it collided with the title and the price. A dimmed
+        # burgundy ground inside Chivalry's thin copper outline, both tiled at CA's slices.
+        "card": _L("ui/skins/wh_main_brt_bretonnia/legacy/panel_back_tile.png", 5, True,
+                   colour=_DIM),
+        "card_extra": [_L(_D + "chivalry_bar_frame.png", (5, 10, 5, 10), True)],
         "heat": (_GLOW, "#FFD37A50"),
         "rim": (_TUTGLOW, (16, 16, 16, 16), "#FFD37AC0"),
-        "holder": (_D + "button_round_medium_frame.png", 0.5, 0.5),
+        # A plain copper ring, 96x96: no square box and no spikes. Bretonnia has no round
+        # holder of this size; button_round_medium_frame was 56px drawn 1.9x.
+        "holder": (_D + "dlc26_fragments_sorcery/ability_frame.png", 0.51, 0.53),
         "cost": [_L(_D + "bret_vows_titel.png", (0, 45, 0, 45))],
-        "rank": [_L(_D + "bret_vows_titel.png", (0, 60, 0, 60))],
-        # 64, not RANK_TX's 50: the plate's scroll and post run to column 57 and the first
-        # letter sat on the post. The dark band starts at 58.
+        # CA's 64 ends, middle tiled where it was stretched 2.7x.
+        "rank": [_L(_D + "bret_vows_titel.png", (0, 64, 0, 64), True)],
+        # 64, not RANK_TX's 50: the plate's scroll and post run to column 57.
         "rank_tx": "64.00,0.00", "rank_ty": "0.00,0.00",
-        "gbar": [_L("ui/skins/wh_main_brt_bretonnia/bar_small_buttons.png",
-                    (0, 110, 0, 110), True)],
-        # The Vows title plate, with Chivalry's copper frame drawn round the open tab.
-        # SCALED WHOLE, NOT NINE-SLICED. Each end is a scroll and a post 57px wide at native
-        # size; sliced into a 125px tab that left 11px between the posts, and "Leaderboard"
-        # and "Bounties" ran across them at 3.8:1. Scaled, the ornament shrinks with the tab
-        # and every caption sits in the dark band.
-        "tab": {"layers": [_L(_D + "bret_vows_titel.png", colour=_DIM),
-                           _L(CLEAR, (5, 5, 5, 5))],
-                "hover": [_L(_D + "bret_vows_titel.png"),
-                          _L(CLEAR, (5, 5, 5, 5))],
-                "selected": [_D + "bret_vows_titel.png", _D + "chivalry_bar_frame.png"],
-                "selected_hover": [_D + "bret_vows_titel.png", _D + "chivalry_bar_frame.png"]},
-        "track": fit_track(_D + "chivalry_bar_frame.png", (60, 19), (4, 3, 56, 15)),
-        "fill": [_L(_D + "bret_vows_bar_fill_2.png")],
+        # The Vows plate again, its scroll ends outside the buttons. 8px top and bottom kept
+        # native so the tile does not crop the lower rim.
+        "gbar": [_L(_D + "bret_vows_titel.png", (8, 64, 8, 64), True)],
+        # Burgundy with a copper outline, tiled; the open tab gets CA's gold selection line.
+        # The Vows plates before had scroll ends that collided between neighbours.
+        "tab": {"layers": [_L(_BRT_TILE, 5, True, colour=_DIM),
+                           _L(_D + "chivalry_bar_frame.png", (5, 10, 5, 10), True)],
+                "hover": [_L(_BRT_TILE, 5, True),
+                          _L(_D + "chivalry_bar_frame.png", (5, 10, 5, 10), True)],
+                "selected": [_BRT_TILE, _D + "building_frame_selected.png"],
+                "selected_hover": [_BRT_TILE, _D + "building_frame_selected.png"]},
+        # The trough counts the bevel rows 3..15: 13 rows, so the frame stays 19px native.
+        "track": fit_track(_D + "chivalry_bar_frame.png", (60, 19), (4, 3, 56, 16), True),
+        "fill": [_L(_D + "chaos_gifts/souls_bar_fill_undiveded.png")],
     },
     "_def": {
-        "card": _L(_W2 + "malus_whispers_tooltip_background.png"),
+        # Malus's parchment plate, complete with its thin dark border, tiled at CA's 10 and
+        # darkened to median 36 under the text, under CA's own tooltip overlay. No Dark Elf
+        # plate exists at card proportions: the whispers tooltip before has 75 transparent
+        # rows at its top and drew short of the card.
+        "card": _L(_W2 + "malus_parchment_button_square_pressed.png", 10, True,
+                   colour="#909090FF"),
+        "card_extra": [_L(_W2 + "malus_whispers_tooltip_backgound_text.png",
+                          (30, 30, 15, 30), True)],
         # THE SHARED GLOW, TINTED, like the six races with no glow of their own. The Dark Elf
         # rite flare that was here is white-hot in the middle and sat under the first half of
         # a running card's text at 0.7:1 (preview_guilds_panel.py, 2026-09-30).
         "heat": (_GLOW, "#D040FF50"),
         "rim": (_TUTGLOW, (16, 16, 16, 16), "#E050FFC0"),
-        "holder": (_W2 + "malus_possession_bar_button_frame.png", 0.5, 0.5),
-        "cost": [_L(_W2 + "murderous_prowess_back.png")],
-        "rank": [_L(_W2 + "malus_whispers_tooltip_border_bottom.png", (0, 70, 0, 70))],
-        "rank_tx": RANK_TX, "rank_ty": "0.00,0.00",
-        # Malus's orb bar again. Hag Graef's bar_top_center is a 200px plate in the middle of
-        # a 399px texture, so behind six buttons it drew nothing that showed.
+        # Slaanesh's Eternal Dance ring, bronze with a purple centre, 128px. No Dark Elf round
+        # holder over 60px exists.
+        "holder": (_D + "dlc27_sla_the_eternal_dance/tempo_choice_t4_frame.png", 0.493, 0.483),
+        # A small Murderous Prowess frame with the price in its own dark trough.
+        "cost": [_L(_W2 + "murderous_prowess_back.png", offset=(24, 7), dw=-49, dh=-15),
+                 _L(_W2 + "murderous_prowess_frame.png", (0, 25, 0, 24))],
+        # The same frame at native height with its 50px caps, where a tooltip's BOTTOM border
+        # was stretched 2.3x.
+        "rank": [_L(_W2 + "murderous_prowess_back.png", offset=(24, 11), dw=-49, dh=-25),
+                 _L(_W2 + "murderous_prowess_frame.png", (0, 50, 0, 50), True,
+                    offset=(0, 2), dh=-5)],
+        "rank_tx": "56.00,0.00", "rank_ty": "0.00,0.00",
+        # Malus's orb bar. Hag Graef's bar_top_center is a 200px plate in the middle of a
+        # 399px texture, so behind six buttons it drew nothing that showed.
         "gbar": [_L(_W2 + "malus_whispers_tooltip_border_bottom.png", (0, 70, 0, 70))],
-        "tab": {"layers": [_L(_W2 + "malus_parchment_button_square_active.png")],
-                "hover": [_L(_W2 + "malus_parchment_button_square_hover.png")],
+        # Same parchment, sliced as CA slices it at this height (10, tiled).
+        "tab": {"layers": [_L(_W2 + "malus_parchment_button_square_active.png", 10, True)],
+                "hover": [_L(_W2 + "malus_parchment_button_square_hover.png", 10, True)],
                 "selected": [_W2 + "malus_parchment_button_square_pressed.png"],
                 "selected_hover": [_W2 + "malus_parchment_button_square_pressed.png"]},
-        "track": fit_track(_W2 + "murderous_prowess_frame.png", (253, 41), (24, 9, 228, 30)),
+        "track": [_L(_W2 + "murderous_prowess_frame.png", (0, 50, 0, 50), True,
+                     offset=(0, 2), dh=-4)],
         "fill": [_L(_W2 + "murderous_prowess_fill.png")],
     },
 }
@@ -2585,9 +2651,13 @@ def selftest():
         assert any("GGUI.FRAME['_emp'].rim" in m for m in check_frame_mirror(
             lua.replace(FRAMES["_emp"]["rim"][0], CARD_RIM, 1))), \
             "an Empire rim drifted to the Tower of Zharr glow was not reported"
-        assert any("GGUI.FRAME['_brt'].selected" in m for m in check_frame_mirror(lua.replace(
-            'selected = {"ui/skins/default/bret_vows_titel.png", ',
-            'selected = {', 1))), "a Lua open Bretonnian tab one layer short was not reported"
+        # The first path from FRAMES, not a literal: a literal went stale when the frames
+        # were rebuilt, and the mutation then changed nothing.
+        first = FRAMES["_brt"]["tab"]["selected"][0]
+        cut = lua.replace('selected = {"%s", ' % first, 'selected = {', 1)
+        assert cut != lua, "the Bretonnian mutation no longer matches the Lua"
+        assert any("GGUI.FRAME['_brt'].selected" in m for m in check_frame_mirror(cut)), \
+            "a Lua open Bretonnian tab one layer short was not reported"
         saved = FRAMES["_brt"]["tab"]["selected"]
         FRAMES["_brt"]["tab"]["selected"] = saved[:1]
         try:

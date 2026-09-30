@@ -148,12 +148,24 @@ The panel is **our own `.twui.xml`, created at runtime**. No CA layout is overri
 - The tabs, in screen order: Guilds, Leaderboard, Bounties, Court, Log, Help. The code
   still calls the Leaderboard `standings`. The Help and Log tabs share 21 text slots
   (`gg_help_01`..`gg_help_21`) and one pager.
-- The frames are CA's own Chaos Dwarf art, referenced by path where the game already ships
-  it: the Hell-Forge's header bar, card frames, price plates and square tabs, and the Tower
-  of Zharr's glow round a card whose service is running (`GGUI.CARD_RIM`).
-- The panel ground is image index 1 of four on the panel component, and is repainted per
-  guild and per race. The grounds are dimmed until they measure what CA's own `tier_01`
-  ground measures under the scrim, so text keeps its contrast.
+- The frames are CA's own art, referenced by path where the game already ships it. The
+  Chaos Dwarfs use the Hell-Forge's header bar, card frames, price plates and square tabs,
+  and the Tower of Zharr's glow round a card whose service is running (`GGUI.CARD_RIM`).
+  Each other race has its own panel and card file, built from its own culture's art in
+  `gen_guilds_ui.FRAMES` and mirrored into `GGUI.FRAME`. Pieces are drawn at or near their
+  native size, since a nine-slice stretched far past its file blurs, and `tile="true"`
+  repeats a texture rather than scaling it. The guild-button bar is 438 wide at x=176 for
+  every race so no end ornament sits under a button.
+- The panel ground is image index 1 of five on the panel component (tile, art, smoke,
+  scrim, border), and is repainted per guild and per race. The grounds are dimmed until they
+  measure what CA's own `tier_01` ground measures under the scrim, so text keeps its contrast.
+  The Chaos Dwarfs and Dwarfs have one painting per guild; the other races use six crops of
+  one loading-screen painting each.
+- The ground layers are inset 4px, because `panel_back_border.png` is transparent for its
+  outer 3px; drawn to the edge, the picture showed outside the frame.
+- The drifting smoke is CA's main-menu shader, `smoke_overlay_t0`, on
+  `panel_back_smoke.png` at `2.00,10.00` and alpha `3C`. The shader is undocumented, so
+  those values are copied from CA's own panels.
 - **Scale.** `GGUI.scale_for` sizes the panel by `min(w/1920, h/1080)`, never below 1, so it
   grows at 1440p and 4K and is unchanged at 1080p. The screen a script reads is already
   divided by the game's UI Scale, so that setting still applies on top.

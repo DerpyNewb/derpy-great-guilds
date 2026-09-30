@@ -44,7 +44,7 @@
 				<component_image
 					this="GG210004-D001-4000-B000000000000004"
 					uniqueguid="GG210004-D001-4000-B000000000000004"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_chain_background.png"/>
+					imagepath="ui/skins/wh3_main_ksl_kislev/selectable_non_button_tile_bg.png"/>
 				<component_image
 					this="GG210004-D003-4000-B000000000000004"
 					uniqueguid="GG210004-D003-4000-B000000000000004"
@@ -53,6 +53,10 @@
 					this="GG210004-D005-4000-B000000000000004"
 					uniqueguid="GG210004-D005-4000-B000000000000004"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
+				<component_image
+					this="GG210004-D007-4000-B000000000000004"
+					uniqueguid="GG210004-D007-4000-B000000000000004"
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_btn_ornaments.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -70,8 +74,9 @@
 							offset="0.00,0.00"
 							width="750"
 							height="120"
-							colour="#C8C8C8FF"
-							margin="12.00,12.00,12.00,12.00"/>
+							tile="true"
+							colour="#B4B4B4FF"
+							margin="1.00,1.00,1.00,1.00"/>
 						<image
 							this="GG210004-D004-4000-B000000000000004"
 							uniqueguid="GG210004-D004-4000-B000000000000004"
@@ -88,7 +93,15 @@
 							offset="0.00,0.00"
 							width="750"
 							height="120"
-							margin="24.00,24.00,24.00,24.00"/>
+							margin="32.00,36.00,32.00,36.00"/>
+						<image
+							this="GG210004-D008-4000-B000000000000004"
+							uniqueguid="GG210004-D008-4000-B000000000000004"
+							componentimage="GG210004-D007-4000-B000000000000004"
+							offset="0.00,0.00"
+							width="750"
+							height="120"
+							margin="32.00,36.00,32.00,36.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -220,7 +233,7 @@
 							offset="0.00,0.00"
 							width="138"
 							height="30"
-							margin="0.00,14.00,0.00,40.00"/>
+							margin="0.00,16.00,0.00,46.00"/>
 					</imagemetrics>
 					<component_text
 						texthalign="Center"

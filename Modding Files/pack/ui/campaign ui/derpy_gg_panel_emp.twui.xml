@@ -180,7 +180,7 @@
 				<component_image
 					this="GG210007-D001-4000-B000000000000007"
 					uniqueguid="GG210007-D001-4000-B000000000000007"
-					imagepath="ui/skins/default/dlc29_great_temple_of_ulric/progress_bar_bg.png"/>
+					imagepath="ui/skins/default/dlc25_gardens_of_morr/don_square_slot_empty.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -194,10 +194,11 @@
 							this="GG210007-D002-4000-B000000000000007"
 							uniqueguid="GG210007-D002-4000-B000000000000007"
 							componentimage="GG210007-D001-4000-B000000000000007"
-							offset="14.00,5.00"
-							width="722"
-							height="20"
-							margin="0.00,4.00,0.00,4.00"/>
+							offset="0.00,0.00"
+							width="750"
+							height="29"
+							tile="true"
+							margin="7.00,25.00,7.00,25.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -572,13 +573,13 @@
 				<component_image
 					this="GG210022-D001-4000-B000000000000022"
 					uniqueguid="GG210022-D001-4000-B000000000000022"
-					imagepath="ui/skins/default/dlc25_gardens_of_morr/lower_frame.png"/>
+					imagepath="ui/skins/default/dlc29_great_temple_of_ulric/button_frame.png"/>
 			</componentimages>
 			<states>
 				<standard
 					this="GG210023-D000-4000-B000000000000023"
 					name="standard"
-					width="310"
+					width="438"
 					height="40"
 					uniqueguid="GG210023-D000-4000-B000000000000023">
 					<imagemetrics>
@@ -587,10 +588,10 @@
 							uniqueguid="GG210022-D002-4000-B000000000000022"
 							componentimage="GG210022-D001-4000-B000000000000022"
 							offset="0.00,0.00"
-							width="310"
+							width="438"
 							height="40"
 							tile="true"
-							margin="0.00,60.00,0.00,60.00"/>
+							margin="12.00,85.00,13.00,83.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -2517,7 +2518,8 @@
 							offset="0.00,0.00"
 							width="750"
 							height="46"
-							margin="0.00,60.00,0.00,60.00"/>
+							tile="true"
+							margin="12.00,85.00,13.00,83.00"/>
 					</imagemetrics>
 					<component_text
 						texthalign="Left"
@@ -2556,7 +2558,7 @@
 				<component_image
 					this="GG21008E-D001-4000-B00000000000008E"
 					uniqueguid="GG21008E-D001-4000-B00000000000008E"
-					imagepath="ui/skins/default/dlc25_gardens_of_morr/garden_frame_empty_default.png"/>
+					imagepath="ui/skins/default/dlc29_great_temple_of_ulric/plate.png"/>
 				<component_image
 					this="GG21008E-D003-4000-B00000000000008E"
 					uniqueguid="GG21008E-D003-4000-B00000000000008E"
@@ -2582,7 +2584,7 @@
 							this="GG21008E-D004-4000-B00000000000008E"
 							uniqueguid="GG21008E-D004-4000-B00000000000008E"
 							componentimage="GG21008E-D003-4000-B00000000000008E"
-							offset="8.00,5.00"
+							offset="8.00,10.00"
 							width="28"
 							height="28"
 							margin="0.00,0.00,0.00,0.00"/>
@@ -2601,7 +2603,7 @@
 				<component_image
 					this="GG210091-D001-4000-B000000000000091"
 					uniqueguid="GG210091-D001-4000-B000000000000091"
-					imagepath="ui/skins/default/dlc29_great_temple_of_ulric/bar_fill_yellow.png"/>
+					imagepath="ui/skins/default/chaos_gifts/souls_bar_fill_undiveded.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -2657,7 +2659,6 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							tile="true"
 							margin="0.00,25.00,0.00,25.00"/>
 					</imagemetrics>
 					<transitionmap>
@@ -2690,7 +2691,6 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							tile="true"
 							margin="0.00,25.00,0.00,25.00"/>
 					</imagemetrics>
 					<transitionmap>
@@ -2758,7 +2758,6 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							tile="true"
 							margin="0.00,25.00,0.00,25.00"/>
 					</imagemetrics>
 					<transitionmap>
@@ -2791,7 +2790,6 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							tile="true"
 							margin="0.00,25.00,0.00,25.00"/>
 					</imagemetrics>
 					<transitionmap>
@@ -2859,7 +2857,6 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							tile="true"
 							margin="0.00,25.00,0.00,25.00"/>
 					</imagemetrics>
 					<transitionmap>
@@ -2892,7 +2889,6 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							tile="true"
 							margin="0.00,25.00,0.00,25.00"/>
 					</imagemetrics>
 					<transitionmap>
@@ -2960,7 +2956,6 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							tile="true"
 							margin="0.00,25.00,0.00,25.00"/>
 					</imagemetrics>
 					<transitionmap>
@@ -2993,7 +2988,6 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							tile="true"
 							margin="0.00,25.00,0.00,25.00"/>
 					</imagemetrics>
 					<transitionmap>
@@ -3061,7 +3055,6 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							tile="true"
 							margin="0.00,25.00,0.00,25.00"/>
 					</imagemetrics>
 					<transitionmap>
@@ -3094,7 +3087,6 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							tile="true"
 							margin="0.00,25.00,0.00,25.00"/>
 					</imagemetrics>
 					<transitionmap>
@@ -3162,7 +3154,6 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							tile="true"
 							margin="0.00,25.00,0.00,25.00"/>
 					</imagemetrics>
 					<transitionmap>
@@ -3195,7 +3186,6 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							tile="true"
 							margin="0.00,25.00,0.00,25.00"/>
 					</imagemetrics>
 					<transitionmap>

@@ -57,16 +57,34 @@ FOOTER = 0.16
 # 0.5 centred, 1 right/bottom). Content first, then measured brightness - a picture that
 # has to be multiplied by 0.4 to pass the gate arrives on screen as a dark smudge.
 BACKGROUNDS = {
-    "brass":        ("alex-voysey-chd-zharr-n-3c.jpg", 0.5),
-    "immortals":    ("nedim-can-chd-showreel04.jpg", 0.5),
-    "daemonsmiths": ("morgan-ketelaar-jarass-wh3-chd-hellforge.jpg", 0.5),
-    "khanate":      ("ashley-heppell-ashley-heppell-wh3-dlc-environment-art-chaos-"
+    "brass":        ("Chaos Dwarf/alex-voysey-chd-zharr-n-3c.jpg", 0.5),
+    "immortals":    ("Chaos Dwarf/nedim-can-chd-showreel04.jpg", 0.5),
+    "daemonsmiths": ("Chaos Dwarf/morgan-ketelaar-jarass-wh3-chd-hellforge.jpg", 0.5),
+    "khanate":      ("Chaos Dwarf/ashley-heppell-ashley-heppell-wh3-dlc-environment-art-chaos-"
                      "dwarfs-3.jpg", 0.5),
-    "overseers":    ("simon-tosovsky-simon-tosovsky-factories.jpg", 0.5),
-    "slavers":      ("alex-voysey-chd-underground-7.jpg", 0.5),
+    "overseers":    ("Chaos Dwarf/simon-tosovsky-simon-tosovsky-factories.jpg", 0.5),
+    "slavers":      ("Chaos Dwarf/alex-voysey-chd-underground-7.jpg", 0.5),
 }
 
-# THE EMPIRE AND THE DWARFS PAN ONE PAINTING EACH: six 790x700 windows out of the race's
+# ANOTHER RACE'S OWN PAINTINGS, where the user supplied them (Dwarfs, 2026-09-30: "why
+# does the dwarf only have one art?" - every race but the Chaos Dwarfs was six windows of
+# ONE loading screen). name -> (file under Modding Files/reference, anchor, footer). The
+# footer is 0: these carry no logo strip along the bottom; the Warhammer Community mark
+# and the copyright line on two of them sit at the TOP and the anchor crops them away.
+# Three are narrower than the panel (600-611px) and are drawn up about 1.3x - soft, but
+# under the scrim and the smoke; a larger copy of the same picture is the fix.
+RACE_ART = {
+    "brass_dwf":        ("Dwarf/1a997fae9bc798278596ff1b2833ebfb-2363351981.jpg", 0.5, 0),
+    "immortals_dwf":    ("Dwarf/yukjjkhkcxdyoz9r-2769844208.jpg", 0.6, 0),
+    "daemonsmiths_dwf": ("Dwarf/Elspeth-von-Draken-Warhammer-Fantasy-Malakai-Makaisson-"
+                         "Tamurkhan-8396384-1750630314.jpg", 0.5, 0),
+    "khanate_dwf":      ("Dwarf/Dwarfs-(Wh-FB)-Warhammer-Fantasy-FB-Песочница-"
+                         "красивые-картинки-1927004.jpeg", 0.5, 0),
+    "overseers_dwf":    ("Dwarf/5e26d1faf167d8afef00040fdf169db5.jpg", 0.1, 0),
+    "slavers_dwf":      ("Dwarf/jb-casacop-thesewers-post.jpg", 0.6, 0),
+}
+
+# THE EMPIRE (AND THE DWARFS UNTIL RACE_ART) PAN ONE PAINTING: six 790x700 windows out of the race's
 # loading-screen art, so paging from guild to guild moves across one picture. Native
 # resolution, so no crop-and-scale; the brightness gate below is the same one. Boxes
 # chosen by rendering all six and looking (2026-09-23): the top row starts at y=200
@@ -75,7 +93,6 @@ GAME_UI = os.path.join(r"F:\SteamLibrary\steamapps\common\Total War WARHAMMER II
                        "data", "ui.pack")
 CA_ART = {
     "emp": "ui/loading_ui/load_images/campaign_empire1.png",
-    "dwf": "ui/loading_ui/load_images/campaign_dwarfs1.png",
     # EVERY OTHER RACE. No race's own loading screen can be theirs, so a prologue battle
     # sketch that shows nobody's banner: two cloaked watchers and a column crossing a
     # plain. Chosen over battle_scene_a2 and the loading screens by rendering all six
@@ -102,9 +119,6 @@ CA_BACKGROUNDS = {
     "brass_emp": ("emp", 1), "overseers_emp": ("emp", 2),
     "daemonsmiths_emp": ("emp", 3), "immortals_emp": ("emp", 4),
     "slavers_emp": ("emp", 5), "khanate_emp": ("emp", 6),
-    "brass_dwf": ("dwf", 1), "immortals_dwf": ("dwf", 2),
-    "slavers_dwf": ("dwf", 3), "overseers_dwf": ("dwf", 4),
-    "khanate_dwf": ("dwf", 5), "daemonsmiths_dwf": ("dwf", 6),
     "immortals_gen": ("gen", 1), "overseers_gen": ("gen", 2),
     "brass_gen": ("gen", 3), "khanate_gen": ("gen", 4),
     "daemonsmiths_gen": ("gen", 5), "slavers_gen": ("gen", 6),
@@ -200,12 +214,12 @@ def trim_letterbox(im, floor=12):
     return im.crop((0, top, w, bot)) if (top or bot != h) else im
 
 
-def frame(im, anchor=0.5):
+def frame(im, anchor=0.5, footer=FOOTER):
     """Drop the bars and the logo strip, then cover-crop to panel size."""
     from PIL import Image
     im = trim_letterbox(im.convert("RGB"))
     w, h = im.size
-    cut = int(h * FOOTER)
+    cut = int(h * footer)
     im = im.crop((0, 0, w, h - cut))
     w, h = im.size
     par = PANEL_W / float(PANEL_H)
@@ -254,13 +268,15 @@ def build(write=True):
                    % (GROUND, max_p99, max_peak))
     if write and not os.path.isdir(DST):
         os.makedirs(DST)
-    for guild in sorted(BACKGROUNDS):
-        fname, anchor = BACKGROUNDS[guild]
+    refs = dict((g, v + (FOOTER,)) for g, v in BACKGROUNDS.items())
+    refs.update(RACE_ART)
+    for guild in sorted(refs):
+        fname, anchor, footer = refs[guild]
         src = os.path.join(SRC, fname)
         if not os.path.isfile(src):
             out.append("%s: no such reference picture: %s" % (guild, src))
             continue
-        im, factor = darken(frame(Image.open(src), anchor), max_p99, max_peak)
+        im, factor = darken(frame(Image.open(src), anchor, footer), max_p99, max_peak)
         p99, peak = measure(im)
         if p99 > max_p99 + 0.5 or peak > max_peak + 0.5:
             # Bisection cannot fail on a picture with any dark in it at all, so this
@@ -304,7 +320,7 @@ def check():
     from PIL import Image
     out = []
     (max_p99, max_peak), _ = ceiling()
-    for guild in sorted(BACKGROUNDS) + sorted(CA_BACKGROUNDS):
+    for guild in sorted(BACKGROUNDS) + sorted(RACE_ART) + sorted(CA_BACKGROUNDS):
         path = os.path.join(DST, guild + ".png")
         if not os.path.isfile(path):
             out.append("%s: %s does not ship - the Lua's SetImagePath would silently "
@@ -381,6 +397,13 @@ def selftest():
                     if r == race)
         assert sorted(mine) == sorted(BACKGROUNDS), (race, sorted(mine))
         assert sorted(mine.values()) == sorted(WINDOWS), (race, mine)
+    # A RACE WITH ITS OWN PAINTINGS has all six guilds from them, and no window left over
+    # in CA_BACKGROUNDS that build() would write over one of them.
+    for race in set(n.rsplit("_", 1)[1] for n in RACE_ART):
+        mine = [n[:-len(race) - 1] for n in RACE_ART if n.endswith("_" + race)]
+        assert sorted(mine) == sorted(BACKGROUNDS), (race, sorted(mine))
+        assert race not in CA_ART, race
+        assert not [n for n in CA_BACKGROUNDS if n.endswith("_" + race)], race
     for x0, y0, x1, y1 in WINDOWS.values():
         assert (x1 - x0, y1 - y0) == (PANEL_W, PANEL_H), (x0, y0, x1, y1)
         assert 0 <= x0 and x1 <= 1920 and 0 <= y0 and y1 <= 1200, (x0, y0, x1, y1)

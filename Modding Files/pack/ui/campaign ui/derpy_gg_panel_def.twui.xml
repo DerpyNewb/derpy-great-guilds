@@ -197,7 +197,8 @@
 							offset="0.00,2.00"
 							width="750"
 							height="25"
-							margin="0.00,25.00,0.00,24.00"/>
+							tile="true"
+							margin="0.00,50.00,0.00,50.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -578,7 +579,7 @@
 				<standard
 					this="GG210023-D000-4000-B000000000000023"
 					name="standard"
-					width="310"
+					width="438"
 					height="40"
 					uniqueguid="GG210023-D000-4000-B000000000000023">
 					<imagemetrics>
@@ -587,7 +588,7 @@
 							uniqueguid="GG210022-D002-4000-B000000000000022"
 							componentimage="GG210022-D001-4000-B000000000000022"
 							offset="0.00,0.00"
-							width="310"
+							width="438"
 							height="40"
 							margin="0.00,70.00,0.00,70.00"/>
 					</imagemetrics>
@@ -2499,7 +2500,11 @@
 				<component_image
 					this="GG21008B-D001-4000-B00000000000008B"
 					uniqueguid="GG21008B-D001-4000-B00000000000008B"
-					imagepath="ui/skins/warhammer2/malus_whispers_tooltip_border_bottom.png"/>
+					imagepath="ui/skins/warhammer2/murderous_prowess_back.png"/>
+				<component_image
+					this="GG21008B-D003-4000-B00000000000008B"
+					uniqueguid="GG21008B-D003-4000-B00000000000008B"
+					imagepath="ui/skins/warhammer2/murderous_prowess_frame.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -2513,15 +2518,24 @@
 							this="GG21008B-D002-4000-B00000000000008B"
 							uniqueguid="GG21008B-D002-4000-B00000000000008B"
 							componentimage="GG21008B-D001-4000-B00000000000008B"
-							offset="0.00,0.00"
+							offset="24.00,11.00"
+							width="701"
+							height="21"
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG21008B-D004-4000-B00000000000008B"
+							uniqueguid="GG21008B-D004-4000-B00000000000008B"
+							componentimage="GG21008B-D003-4000-B00000000000008B"
+							offset="0.00,2.00"
 							width="750"
-							height="46"
-							margin="0.00,70.00,0.00,70.00"/>
+							height="41"
+							tile="true"
+							margin="0.00,50.00,0.00,50.00"/>
 					</imagemetrics>
 					<component_text
 						texthalign="Left"
 						textvalign="Center"
-						textxoffset="50.00,0.00"
+						textxoffset="56.00,0.00"
 						textyoffset="0.00,0.00"
 						texthbehaviour="Never split"
 						font_m_size="12"
@@ -2555,7 +2569,7 @@
 				<component_image
 					this="GG21008E-D001-4000-B00000000000008E"
 					uniqueguid="GG21008E-D001-4000-B00000000000008E"
-					imagepath="ui/skins/warhammer2/malus_possession_bar_button_frame.png"/>
+					imagepath="ui/skins/default/dlc27_sla_the_eternal_dance/tempo_choice_t4_frame.png"/>
 				<component_image
 					this="GG21008E-D003-4000-B00000000000008E"
 					uniqueguid="GG21008E-D003-4000-B00000000000008E"
@@ -2581,7 +2595,7 @@
 							this="GG21008E-D004-4000-B00000000000008E"
 							uniqueguid="GG21008E-D004-4000-B00000000000008E"
 							componentimage="GG21008E-D003-4000-B00000000000008E"
-							offset="8.00,10.00"
+							offset="8.00,9.00"
 							width="28"
 							height="28"
 							margin="0.00,0.00,0.00,0.00"/>
@@ -2656,7 +2670,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,0.00,0.00,0.00"/>
+							tile="true"
+							margin="10.00,10.00,10.00,10.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2688,7 +2703,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,0.00,0.00,0.00"/>
+							tile="true"
+							margin="10.00,10.00,10.00,10.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2755,7 +2771,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,0.00,0.00,0.00"/>
+							tile="true"
+							margin="10.00,10.00,10.00,10.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2787,7 +2804,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,0.00,0.00,0.00"/>
+							tile="true"
+							margin="10.00,10.00,10.00,10.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2854,7 +2872,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,0.00,0.00,0.00"/>
+							tile="true"
+							margin="10.00,10.00,10.00,10.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2886,7 +2905,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,0.00,0.00,0.00"/>
+							tile="true"
+							margin="10.00,10.00,10.00,10.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2953,7 +2973,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,0.00,0.00,0.00"/>
+							tile="true"
+							margin="10.00,10.00,10.00,10.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2985,7 +3006,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,0.00,0.00,0.00"/>
+							tile="true"
+							margin="10.00,10.00,10.00,10.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3052,7 +3074,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,0.00,0.00,0.00"/>
+							tile="true"
+							margin="10.00,10.00,10.00,10.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3084,7 +3107,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,0.00,0.00,0.00"/>
+							tile="true"
+							margin="10.00,10.00,10.00,10.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3151,7 +3175,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,0.00,0.00,0.00"/>
+							tile="true"
+							margin="10.00,10.00,10.00,10.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3183,7 +3208,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,0.00,0.00,0.00"/>
+							tile="true"
+							margin="10.00,10.00,10.00,10.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition

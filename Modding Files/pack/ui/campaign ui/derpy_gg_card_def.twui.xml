@@ -44,7 +44,7 @@
 				<component_image
 					this="GG210004-D001-4000-B000000000000004"
 					uniqueguid="GG210004-D001-4000-B000000000000004"
-					imagepath="ui/skins/warhammer2/malus_whispers_tooltip_background.png"/>
+					imagepath="ui/skins/warhammer2/malus_parchment_button_square_pressed.png"/>
 				<component_image
 					this="GG210004-D003-4000-B000000000000004"
 					uniqueguid="GG210004-D003-4000-B000000000000004"
@@ -53,6 +53,10 @@
 					this="GG210004-D005-4000-B000000000000004"
 					uniqueguid="GG210004-D005-4000-B000000000000004"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
+				<component_image
+					this="GG210004-D007-4000-B000000000000004"
+					uniqueguid="GG210004-D007-4000-B000000000000004"
+					imagepath="ui/skins/warhammer2/malus_whispers_tooltip_backgound_text.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -70,7 +74,9 @@
 							offset="0.00,0.00"
 							width="750"
 							height="120"
-							margin="0.00,0.00,0.00,0.00"/>
+							tile="true"
+							colour="#909090FF"
+							margin="10.00,10.00,10.00,10.00"/>
 						<image
 							this="GG210004-D004-4000-B000000000000004"
 							uniqueguid="GG210004-D004-4000-B000000000000004"
@@ -89,6 +95,15 @@
 							height="120"
 							colour="#E050FFC0"
 							margin="16.00,16.00,16.00,16.00"/>
+						<image
+							this="GG210004-D008-4000-B000000000000004"
+							uniqueguid="GG210004-D008-4000-B000000000000004"
+							componentimage="GG210004-D007-4000-B000000000000004"
+							offset="0.00,0.00"
+							width="750"
+							height="120"
+							tile="true"
+							margin="30.00,30.00,15.00,30.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -204,6 +219,10 @@
 					this="GG21000A-D001-4000-B00000000000000A"
 					uniqueguid="GG21000A-D001-4000-B00000000000000A"
 					imagepath="ui/skins/warhammer2/murderous_prowess_back.png"/>
+				<component_image
+					this="GG21000A-D003-4000-B00000000000000A"
+					uniqueguid="GG21000A-D003-4000-B00000000000000A"
+					imagepath="ui/skins/warhammer2/murderous_prowess_frame.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -217,10 +236,18 @@
 							this="GG21000A-D002-4000-B00000000000000A"
 							uniqueguid="GG21000A-D002-4000-B00000000000000A"
 							componentimage="GG21000A-D001-4000-B00000000000000A"
+							offset="24.00,7.00"
+							width="89"
+							height="15"
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG21000A-D004-4000-B00000000000000A"
+							uniqueguid="GG21000A-D004-4000-B00000000000000A"
+							componentimage="GG21000A-D003-4000-B00000000000000A"
 							offset="0.00,0.00"
 							width="138"
 							height="30"
-							margin="0.00,0.00,0.00,0.00"/>
+							margin="0.00,25.00,0.00,24.00"/>
 					</imagemetrics>
 					<component_text
 						texthalign="Center"
@@ -339,7 +366,7 @@
 				<component_image
 					this="GG210013-D001-4000-B000000000000013"
 					uniqueguid="GG210013-D001-4000-B000000000000013"
-					imagepath="ui/skins/warhammer2/malus_possession_bar_button_frame.png"/>
+					imagepath="ui/skins/default/dlc27_sla_the_eternal_dance/tempo_choice_t4_frame.png"/>
 				<component_image
 					this="GG210013-D003-4000-B000000000000013"
 					uniqueguid="GG210013-D003-4000-B000000000000013"
@@ -365,7 +392,7 @@
 							this="GG210013-D004-4000-B000000000000013"
 							uniqueguid="GG210013-D004-4000-B000000000000013"
 							componentimage="GG210013-D003-4000-B000000000000013"
-							offset="19.00,22.00"
+							offset="18.00,20.00"
 							width="62"
 							height="62"
 							margin="0.00,0.00,0.00,0.00"/>

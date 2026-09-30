@@ -180,7 +180,7 @@
 				<component_image
 					this="GG210007-D001-4000-B000000000000007"
 					uniqueguid="GG210007-D001-4000-B000000000000007"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/kislev_support_frame.png"/>
+					imagepath="ui/skins/warhammer3/kislev_devotion_frame_small.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -194,10 +194,11 @@
 							this="GG210007-D002-4000-B000000000000007"
 							uniqueguid="GG210007-D002-4000-B000000000000007"
 							componentimage="GG210007-D001-4000-B000000000000007"
-							offset="0.00,7.00"
-							width="738"
-							height="15"
-							margin="0.00,6.00,0.00,26.00"/>
+							offset="0.00,3.00"
+							width="750"
+							height="23"
+							tile="true"
+							margin="5.00,10.00,5.00,10.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -578,7 +579,7 @@
 				<standard
 					this="GG210023-D000-4000-B000000000000023"
 					name="standard"
-					width="310"
+					width="438"
 					height="40"
 					uniqueguid="GG210023-D000-4000-B000000000000023">
 					<imagemetrics>
@@ -587,10 +588,9 @@
 							uniqueguid="GG210022-D002-4000-B000000000000022"
 							componentimage="GG210022-D001-4000-B000000000000022"
 							offset="0.00,0.00"
-							width="310"
+							width="438"
 							height="40"
-							tile="true"
-							margin="0.00,110.00,0.00,110.00"/>
+							margin="0.00,80.00,0.00,80.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -2500,7 +2500,7 @@
 				<component_image
 					this="GG21008B-D001-4000-B00000000000008B"
 					uniqueguid="GG21008B-D001-4000-B00000000000008B"
-					imagepath="ui/skins/default/wh3_main_ksl_devotion/devotion_bar_frame.png"/>
+					imagepath="ui/skins/wh3_main_ksl_kislev/bar_small_central_left.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -2517,13 +2517,13 @@
 							offset="0.00,0.00"
 							width="750"
 							height="46"
-							margin="0.00,64.00,0.00,64.00"/>
+							margin="0.00,75.00,0.00,75.00"/>
 					</imagemetrics>
 					<component_text
 						texthalign="Left"
 						textvalign="Center"
-						textxoffset="68.00,0.00"
-						textyoffset="0.00,0.00"
+						textxoffset="78.00,0.00"
+						textyoffset="8.00,0.00"
 						texthbehaviour="Never split"
 						font_m_size="12"
 						font_m_colour="#FFF8D7FF"
@@ -2601,7 +2601,7 @@
 				<component_image
 					this="GG210091-D001-4000-B000000000000091"
 					uniqueguid="GG210091-D001-4000-B000000000000091"
-					imagepath="ui/skins/warhammer3/kislev_devotion_fillbar.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_progress_top_bar.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -2618,7 +2618,8 @@
 							offset="0.00,0.00"
 							width="714"
 							height="13"
-							margin="0.00,0.00,0.00,0.00"/>
+							tile="true"
+							margin="0.00,0.00,0.00,20.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -2635,19 +2636,19 @@
 				<component_image
 					this="GG210094-D001-4000-B000000000000094"
 					uniqueguid="GG210094-D001-4000-B000000000000094"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_progress_bar.png"/>
 				<component_image
 					this="GG210094-D003-4000-B000000000000094"
 					uniqueguid="GG210094-D003-4000-B000000000000094"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/kislev_support_frame.png"/>
 				<component_image
 					this="GG210094-D005-4000-B000000000000094"
 					uniqueguid="GG210094-D005-4000-B000000000000094"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_progress_bar.png"/>
 				<component_image
 					this="GG210094-D007-4000-B000000000000094"
 					uniqueguid="GG210094-D007-4000-B000000000000094"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/kislev_support_frame.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -2665,8 +2666,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							colour="#B4B4B4FF"
-							margin="0.00,20.00,0.00,4.00"/>
+							colour="#50647AFF"
+							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG210094-D004-4000-B000000000000094"
 							uniqueguid="GG210094-D004-4000-B000000000000094"
@@ -2674,7 +2675,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,24.00,0.00,6.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2706,7 +2707,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,20.00,0.00,4.00"/>
+							colour="#6A8098FF"
+							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG210094-D008-4000-B000000000000094"
 							uniqueguid="GG210094-D008-4000-B000000000000094"
@@ -2714,7 +2716,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,24.00,0.00,6.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2759,19 +2761,19 @@
 				<component_image
 					this="GG210097-D001-4000-B000000000000097"
 					uniqueguid="GG210097-D001-4000-B000000000000097"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_progress_bar.png"/>
 				<component_image
 					this="GG210097-D003-4000-B000000000000097"
 					uniqueguid="GG210097-D003-4000-B000000000000097"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/kislev_support_frame.png"/>
 				<component_image
 					this="GG210097-D005-4000-B000000000000097"
 					uniqueguid="GG210097-D005-4000-B000000000000097"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_progress_bar.png"/>
 				<component_image
 					this="GG210097-D007-4000-B000000000000097"
 					uniqueguid="GG210097-D007-4000-B000000000000097"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/kislev_support_frame.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -2789,8 +2791,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							colour="#B4B4B4FF"
-							margin="0.00,20.00,0.00,4.00"/>
+							colour="#50647AFF"
+							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG210097-D004-4000-B000000000000097"
 							uniqueguid="GG210097-D004-4000-B000000000000097"
@@ -2798,7 +2800,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,24.00,0.00,6.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2830,7 +2832,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,20.00,0.00,4.00"/>
+							colour="#6A8098FF"
+							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG210097-D008-4000-B000000000000097"
 							uniqueguid="GG210097-D008-4000-B000000000000097"
@@ -2838,7 +2841,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,24.00,0.00,6.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2883,19 +2886,19 @@
 				<component_image
 					this="GG21009A-D001-4000-B00000000000009A"
 					uniqueguid="GG21009A-D001-4000-B00000000000009A"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_progress_bar.png"/>
 				<component_image
 					this="GG21009A-D003-4000-B00000000000009A"
 					uniqueguid="GG21009A-D003-4000-B00000000000009A"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/kislev_support_frame.png"/>
 				<component_image
 					this="GG21009A-D005-4000-B00000000000009A"
 					uniqueguid="GG21009A-D005-4000-B00000000000009A"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_progress_bar.png"/>
 				<component_image
 					this="GG21009A-D007-4000-B00000000000009A"
 					uniqueguid="GG21009A-D007-4000-B00000000000009A"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/kislev_support_frame.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -2913,8 +2916,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							colour="#B4B4B4FF"
-							margin="0.00,20.00,0.00,4.00"/>
+							colour="#50647AFF"
+							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG21009A-D004-4000-B00000000000009A"
 							uniqueguid="GG21009A-D004-4000-B00000000000009A"
@@ -2922,7 +2925,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,24.00,0.00,6.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2954,7 +2957,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,20.00,0.00,4.00"/>
+							colour="#6A8098FF"
+							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG21009A-D008-4000-B00000000000009A"
 							uniqueguid="GG21009A-D008-4000-B00000000000009A"
@@ -2962,7 +2966,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,24.00,0.00,6.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3007,19 +3011,19 @@
 				<component_image
 					this="GG21009D-D001-4000-B00000000000009D"
 					uniqueguid="GG21009D-D001-4000-B00000000000009D"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_progress_bar.png"/>
 				<component_image
 					this="GG21009D-D003-4000-B00000000000009D"
 					uniqueguid="GG21009D-D003-4000-B00000000000009D"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/kislev_support_frame.png"/>
 				<component_image
 					this="GG21009D-D005-4000-B00000000000009D"
 					uniqueguid="GG21009D-D005-4000-B00000000000009D"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_progress_bar.png"/>
 				<component_image
 					this="GG21009D-D007-4000-B00000000000009D"
 					uniqueguid="GG21009D-D007-4000-B00000000000009D"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/kislev_support_frame.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -3037,8 +3041,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							colour="#B4B4B4FF"
-							margin="0.00,20.00,0.00,4.00"/>
+							colour="#50647AFF"
+							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG21009D-D004-4000-B00000000000009D"
 							uniqueguid="GG21009D-D004-4000-B00000000000009D"
@@ -3046,7 +3050,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,24.00,0.00,6.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3078,7 +3082,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,20.00,0.00,4.00"/>
+							colour="#6A8098FF"
+							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG21009D-D008-4000-B00000000000009D"
 							uniqueguid="GG21009D-D008-4000-B00000000000009D"
@@ -3086,7 +3091,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,24.00,0.00,6.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3131,19 +3136,19 @@
 				<component_image
 					this="GG2100A0-D001-4000-B0000000000000A0"
 					uniqueguid="GG2100A0-D001-4000-B0000000000000A0"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_progress_bar.png"/>
 				<component_image
 					this="GG2100A0-D003-4000-B0000000000000A0"
 					uniqueguid="GG2100A0-D003-4000-B0000000000000A0"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/kislev_support_frame.png"/>
 				<component_image
 					this="GG2100A0-D005-4000-B0000000000000A0"
 					uniqueguid="GG2100A0-D005-4000-B0000000000000A0"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_progress_bar.png"/>
 				<component_image
 					this="GG2100A0-D007-4000-B0000000000000A0"
 					uniqueguid="GG2100A0-D007-4000-B0000000000000A0"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/kislev_support_frame.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -3161,8 +3166,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							colour="#B4B4B4FF"
-							margin="0.00,20.00,0.00,4.00"/>
+							colour="#50647AFF"
+							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG2100A0-D004-4000-B0000000000000A0"
 							uniqueguid="GG2100A0-D004-4000-B0000000000000A0"
@@ -3170,7 +3175,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,24.00,0.00,6.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3202,7 +3207,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,20.00,0.00,4.00"/>
+							colour="#6A8098FF"
+							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG2100A0-D008-4000-B0000000000000A0"
 							uniqueguid="GG2100A0-D008-4000-B0000000000000A0"
@@ -3210,7 +3216,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,24.00,0.00,6.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3255,19 +3261,19 @@
 				<component_image
 					this="GG2100A3-D001-4000-B0000000000000A3"
 					uniqueguid="GG2100A3-D001-4000-B0000000000000A3"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_progress_bar.png"/>
 				<component_image
 					this="GG2100A3-D003-4000-B0000000000000A3"
 					uniqueguid="GG2100A3-D003-4000-B0000000000000A3"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/kislev_support_frame.png"/>
 				<component_image
 					this="GG2100A3-D005-4000-B0000000000000A3"
 					uniqueguid="GG2100A3-D005-4000-B0000000000000A3"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_bg.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/court_progress_bar.png"/>
 				<component_image
 					this="GG2100A3-D007-4000-B0000000000000A3"
 					uniqueguid="GG2100A3-D007-4000-B0000000000000A3"
-					imagepath="ui/skins/default/wh3_main_court_orthodoxy/orthodoxy_top_bar_frame.png"/>
+					imagepath="ui/skins/default/wh3_main_court_orthodoxy/kislev_support_frame.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -3285,8 +3291,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							colour="#B4B4B4FF"
-							margin="0.00,20.00,0.00,4.00"/>
+							colour="#50647AFF"
+							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG2100A3-D004-4000-B0000000000000A3"
 							uniqueguid="GG2100A3-D004-4000-B0000000000000A3"
@@ -3294,7 +3300,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,24.00,0.00,6.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3326,7 +3332,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,20.00,0.00,4.00"/>
+							colour="#6A8098FF"
+							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG2100A3-D008-4000-B0000000000000A3"
 							uniqueguid="GG2100A3-D008-4000-B0000000000000A3"
@@ -3334,7 +3341,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,24.00,0.00,6.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition

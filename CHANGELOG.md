@@ -3,6 +3,23 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-09-30 - build 0A1DD16B
+
+MD5 `0A1DD16BB1C92BE574DC5BCC673ADD2D`, 34,642,231 bytes. Includes build A7EBBBB4, which
+was not released on its own.
+
+How the other races' panels look.
+
+- **Every race's frames rebuilt.** No more cut-off plates, half frames or tab ornaments
+  running into each other.
+- **Sharper holders and bars.** Pieces are now drawn at or near the size they were made
+  for, instead of stretched and blurry. The Chaos Dwarfs' icon ring is new and crisp too.
+- **The guild buttons clear their bar's ends** on every race.
+- **The Dwarf price box is readable** when a service is running: it has a dark ground under
+  its frame.
+- **The Dwarfs get their own backgrounds.** Each of the six Dwarf guilds now has its own
+  painting behind the panel, instead of six crops of one picture.
+
 ## 2026-09-30 - build B77AA0A1
 
 MD5 `B77AA0A19E89CBB7A2C7A76DE0B7BF86`, 34,196,301 bytes.

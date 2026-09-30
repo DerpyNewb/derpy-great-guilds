@@ -220,7 +220,6 @@
 							offset="0.00,0.00"
 							width="138"
 							height="30"
-							tile="true"
 							margin="0.00,25.00,0.00,25.00"/>
 					</imagemetrics>
 					<component_text
@@ -340,7 +339,7 @@
 				<component_image
 					this="GG210013-D001-4000-B000000000000013"
 					uniqueguid="GG210013-D001-4000-B000000000000013"
-					imagepath="ui/skins/default/dlc25_gardens_of_morr/garden_frame_empty_default.png"/>
+					imagepath="ui/skins/default/dlc29_great_temple_of_ulric/plate.png"/>
 				<component_image
 					this="GG210013-D003-4000-B000000000000013"
 					uniqueguid="GG210013-D003-4000-B000000000000013"
@@ -366,7 +365,7 @@
 							this="GG210013-D004-4000-B000000000000013"
 							uniqueguid="GG210013-D004-4000-B000000000000013"
 							componentimage="GG210013-D003-4000-B000000000000013"
-							offset="19.00,11.00"
+							offset="20.00,22.00"
 							width="62"
 							height="62"
 							margin="0.00,0.00,0.00,0.00"/>

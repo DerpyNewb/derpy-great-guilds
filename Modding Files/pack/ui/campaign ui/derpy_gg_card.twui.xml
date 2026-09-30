@@ -340,7 +340,7 @@
 				<component_image
 					this="GG210013-D001-4000-B000000000000013"
 					uniqueguid="GG210013-D001-4000-B000000000000013"
-					imagepath="ui/skins/default/dlc23_chd_hell_forge/cap_category_iconm_holder.png"/>
+					imagepath="ui/skins/default/chd_labour_economy/surplus_holder.png"/>
 				<component_image
 					this="GG210013-D003-4000-B000000000000013"
 					uniqueguid="GG210013-D003-4000-B000000000000013"
@@ -366,7 +366,7 @@
 							this="GG210013-D004-4000-B000000000000013"
 							uniqueguid="GG210013-D004-4000-B000000000000013"
 							componentimage="GG210013-D003-4000-B000000000000013"
-							offset="17.00,17.00"
+							offset="19.00,22.00"
 							width="62"
 							height="62"
 							margin="0.00,0.00,0.00,0.00"/>

@@ -44,7 +44,7 @@
 				<component_image
 					this="GG210004-D001-4000-B000000000000004"
 					uniqueguid="GG210004-D001-4000-B000000000000004"
-					imagepath="ui/skins/default/cp1_cth_shang_yang/unit_capacity_holder_bg.png"/>
+					imagepath="ui/skins/default/cp1_cth_tiger_court/pillar_info_holder.png"/>
 				<component_image
 					this="GG210004-D003-4000-B000000000000004"
 					uniqueguid="GG210004-D003-4000-B000000000000004"
@@ -56,7 +56,7 @@
 				<component_image
 					this="GG210004-D007-4000-B000000000000004"
 					uniqueguid="GG210004-D007-4000-B000000000000004"
-					imagepath="ui/skins/default/cp1_cth_shang_yang/unit_capacity_holder_frame.png"/>
+					imagepath="ui/skins/default/cp1_cth_shang_yang/unit_category_holder.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -71,10 +71,11 @@
 							this="GG210004-D002-4000-B000000000000004"
 							uniqueguid="GG210004-D002-4000-B000000000000004"
 							componentimage="GG210004-D001-4000-B000000000000004"
-							offset="0.00,0.00"
-							width="750"
-							height="120"
-							margin="22.00,25.00,22.00,25.00"/>
+							offset="12.00,7.00"
+							width="729"
+							height="108"
+							tile="true"
+							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG210004-D004-4000-B000000000000004"
 							uniqueguid="GG210004-D004-4000-B000000000000004"
@@ -100,7 +101,7 @@
 							offset="0.00,0.00"
 							width="750"
 							height="120"
-							margin="22.00,25.00,22.00,23.00"/>
+							margin="20.00,20.00,20.00,20.00"/>
 					</imagemetrics>
 				</standard>
 			</states>

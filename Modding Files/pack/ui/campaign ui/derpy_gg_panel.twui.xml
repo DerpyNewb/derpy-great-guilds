@@ -583,7 +583,7 @@
 				<standard
 					this="GG210023-D000-4000-B000000000000023"
 					name="standard"
-					width="310"
+					width="438"
 					height="40"
 					uniqueguid="GG210023-D000-4000-B000000000000023">
 					<imagemetrics>
@@ -592,7 +592,7 @@
 							uniqueguid="GG210022-D002-4000-B000000000000022"
 							componentimage="GG210022-D001-4000-B000000000000022"
 							offset="0.00,0.00"
-							width="310"
+							width="438"
 							height="20"
 							margin="0.00,20.00,0.00,20.00"/>
 						<image
@@ -600,7 +600,7 @@
 							uniqueguid="GG210022-D004-4000-B000000000000022"
 							componentimage="GG210022-D003-4000-B000000000000022"
 							offset="0.00,20.00"
-							width="310"
+							width="438"
 							height="20"
 							y_flipped="true"
 							margin="0.00,20.00,0.00,20.00"/>
@@ -2570,7 +2570,7 @@
 				<component_image
 					this="GG21008E-D001-4000-B00000000000008E"
 					uniqueguid="GG21008E-D001-4000-B00000000000008E"
-					imagepath="ui/skins/default/dlc23_chd_hell_forge/cap_category_iconm_holder.png"/>
+					imagepath="ui/skins/default/chd_labour_economy/surplus_holder.png"/>
 				<component_image
 					this="GG21008E-D003-4000-B00000000000008E"
 					uniqueguid="GG21008E-D003-4000-B00000000000008E"
@@ -2596,7 +2596,7 @@
 							this="GG21008E-D004-4000-B00000000000008E"
 							uniqueguid="GG21008E-D004-4000-B00000000000008E"
 							componentimage="GG21008E-D003-4000-B00000000000008E"
-							offset="7.00,7.00"
+							offset="8.00,10.00"
 							width="28"
 							height="28"
 							margin="0.00,0.00,0.00,0.00"/>

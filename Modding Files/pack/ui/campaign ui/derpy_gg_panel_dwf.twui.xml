@@ -194,10 +194,11 @@
 							this="GG210007-D002-4000-B000000000000007"
 							uniqueguid="GG210007-D002-4000-B000000000000007"
 							componentimage="GG210007-D001-4000-B000000000000007"
-							offset="5.00,0.00"
-							width="740"
+							offset="0.00,0.00"
+							width="750"
 							height="29"
-							margin="0.00,13.00,0.00,13.00"/>
+							tile="true"
+							margin="15.00,18.00,7.00,17.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -572,13 +573,13 @@
 				<component_image
 					this="GG210022-D001-4000-B000000000000022"
 					uniqueguid="GG210022-D001-4000-B000000000000022"
-					imagepath="ui/skins/wh_main_dwf_dwarfs/bar_small_buttons.png"/>
+					imagepath="ui/skins/wh_main_dwf_dwarfs/bar_small_central_left.png"/>
 			</componentimages>
 			<states>
 				<standard
 					this="GG210023-D000-4000-B000000000000023"
 					name="standard"
-					width="310"
+					width="438"
 					height="40"
 					uniqueguid="GG210023-D000-4000-B000000000000023">
 					<imagemetrics>
@@ -586,11 +587,10 @@
 							this="GG210022-D002-4000-B000000000000022"
 							uniqueguid="GG210022-D002-4000-B000000000000022"
 							componentimage="GG210022-D001-4000-B000000000000022"
-							offset="0.00,0.00"
-							width="310"
-							height="40"
-							tile="true"
-							margin="0.00,110.00,0.00,110.00"/>
+							offset="0.00,3.00"
+							width="438"
+							height="34"
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -2500,7 +2500,11 @@
 				<component_image
 					this="GG21008B-D001-4000-B00000000000008B"
 					uniqueguid="GG21008B-D001-4000-B00000000000008B"
-					imagepath="ui/skins/wh_main_dwf_dwarfs/mortuary_cult_top_strip.png"/>
+					imagepath="ui/skins/default/dlc25_malakais_adventures/text_bg.png"/>
+				<component_image
+					this="GG21008B-D003-4000-B00000000000008B"
+					uniqueguid="GG21008B-D003-4000-B00000000000008B"
+					imagepath="ui/skins/default/dlc25_book_of_grudges/book_of_grudges_unit_pack_frame.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -2518,7 +2522,16 @@
 							width="750"
 							height="46"
 							tile="true"
-							margin="10.00,50.00,5.00,50.00"/>
+							margin="20.00,25.00,20.00,25.00"/>
+						<image
+							this="GG21008B-D004-4000-B00000000000008B"
+							uniqueguid="GG21008B-D004-4000-B00000000000008B"
+							componentimage="GG21008B-D003-4000-B00000000000008B"
+							offset="0.00,0.00"
+							width="750"
+							height="46"
+							tile="true"
+							margin="15.00,15.00,15.00,15.00"/>
 					</imagemetrics>
 					<component_text
 						texthalign="Left"
@@ -2557,7 +2570,7 @@
 				<component_image
 					this="GG21008E-D001-4000-B00000000000008E"
 					uniqueguid="GG21008E-D001-4000-B00000000000008E"
-					imagepath="ui/skins/default/dlc25_book_of_grudges/unit_locked_bg.png"/>
+					imagepath="ui/skins/default/dlc25_malakais_adventures/button_slot.png"/>
 				<component_image
 					this="GG21008E-D003-4000-B00000000000008E"
 					uniqueguid="GG21008E-D003-4000-B00000000000008E"
@@ -2619,7 +2632,7 @@
 							offset="0.00,0.00"
 							width="714"
 							height="13"
-							margin="0.00,0.00,0.00,0.00"/>
+							margin="1.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
@@ -2636,7 +2649,7 @@
 				<component_image
 					this="GG210094-D001-4000-B000000000000094"
 					uniqueguid="GG210094-D001-4000-B000000000000094"
-					imagepath="ui/skins/default/dlc25_book_of_grudges/tab_button_confederation_active.png"/>
+					imagepath="ui/skins/default/dlc25_book_of_grudges/tab_button_confederation_selected.png"/>
 				<component_image
 					this="GG210094-D003-4000-B000000000000094"
 					uniqueguid="GG210094-D003-4000-B000000000000094"
@@ -2658,7 +2671,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,10.00,0.00,25.00"/>
+							colour="#B4B4B4FF"
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2690,7 +2704,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,45.00,0.00,25.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2735,7 +2749,7 @@
 				<component_image
 					this="GG210097-D001-4000-B000000000000097"
 					uniqueguid="GG210097-D001-4000-B000000000000097"
-					imagepath="ui/skins/default/dlc25_book_of_grudges/tab_button_confederation_active.png"/>
+					imagepath="ui/skins/default/dlc25_book_of_grudges/tab_button_confederation_selected.png"/>
 				<component_image
 					this="GG210097-D003-4000-B000000000000097"
 					uniqueguid="GG210097-D003-4000-B000000000000097"
@@ -2757,7 +2771,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,10.00,0.00,25.00"/>
+							colour="#B4B4B4FF"
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2789,7 +2804,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,45.00,0.00,25.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2834,7 +2849,7 @@
 				<component_image
 					this="GG21009A-D001-4000-B00000000000009A"
 					uniqueguid="GG21009A-D001-4000-B00000000000009A"
-					imagepath="ui/skins/default/dlc25_book_of_grudges/tab_button_confederation_active.png"/>
+					imagepath="ui/skins/default/dlc25_book_of_grudges/tab_button_confederation_selected.png"/>
 				<component_image
 					this="GG21009A-D003-4000-B00000000000009A"
 					uniqueguid="GG21009A-D003-4000-B00000000000009A"
@@ -2856,7 +2871,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,10.00,0.00,25.00"/>
+							colour="#B4B4B4FF"
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2888,7 +2904,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,45.00,0.00,25.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2933,7 +2949,7 @@
 				<component_image
 					this="GG21009D-D001-4000-B00000000000009D"
 					uniqueguid="GG21009D-D001-4000-B00000000000009D"
-					imagepath="ui/skins/default/dlc25_book_of_grudges/tab_button_confederation_active.png"/>
+					imagepath="ui/skins/default/dlc25_book_of_grudges/tab_button_confederation_selected.png"/>
 				<component_image
 					this="GG21009D-D003-4000-B00000000000009D"
 					uniqueguid="GG21009D-D003-4000-B00000000000009D"
@@ -2955,7 +2971,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,10.00,0.00,25.00"/>
+							colour="#B4B4B4FF"
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -2987,7 +3004,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,45.00,0.00,25.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3032,7 +3049,7 @@
 				<component_image
 					this="GG2100A0-D001-4000-B0000000000000A0"
 					uniqueguid="GG2100A0-D001-4000-B0000000000000A0"
-					imagepath="ui/skins/default/dlc25_book_of_grudges/tab_button_confederation_active.png"/>
+					imagepath="ui/skins/default/dlc25_book_of_grudges/tab_button_confederation_selected.png"/>
 				<component_image
 					this="GG2100A0-D003-4000-B0000000000000A0"
 					uniqueguid="GG2100A0-D003-4000-B0000000000000A0"
@@ -3054,7 +3071,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,10.00,0.00,25.00"/>
+							colour="#B4B4B4FF"
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3086,7 +3104,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,45.00,0.00,25.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3131,7 +3149,7 @@
 				<component_image
 					this="GG2100A3-D001-4000-B0000000000000A3"
 					uniqueguid="GG2100A3-D001-4000-B0000000000000A3"
-					imagepath="ui/skins/default/dlc25_book_of_grudges/tab_button_confederation_active.png"/>
+					imagepath="ui/skins/default/dlc25_book_of_grudges/tab_button_confederation_selected.png"/>
 				<component_image
 					this="GG2100A3-D003-4000-B0000000000000A3"
 					uniqueguid="GG2100A3-D003-4000-B0000000000000A3"
@@ -3153,7 +3171,8 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,10.00,0.00,25.00"/>
+							colour="#B4B4B4FF"
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -3185,7 +3204,7 @@
 							offset="0.00,0.00"
 							width="125"
 							height="34"
-							margin="0.00,45.00,0.00,25.00"/>
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
