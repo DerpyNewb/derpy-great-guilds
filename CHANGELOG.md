@@ -3,6 +3,16 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-10-01 - build D1E0DB29
+
+MD5 `D1E0DB2947F2B7AA338DB4920CE40207`, 34,678,844 bytes.
+
+- **One HUD button for the author's mods.** With two or more of The Iron Court, The Great
+  Guilds and the Zharr Exchange installed, one button beside the top bar replaces their
+  three. Hovering it unfolds their buttons in a column on a plate; moving away folds them
+  back. With one of them installed, nothing changes. The same hub file ships in each mod,
+  and the newest copy serves all three. Detail: `docs/history/HANDOFF_20261001_HUD_HUB_PLAN.md`.
+
 ## 2026-09-30 - build 0A1DD16B
 
 MD5 `0A1DD16BB1C92BE574DC5BCC673ADD2D`, 34,642,231 bytes. Includes build A7EBBBB4, which

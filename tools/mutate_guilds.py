@@ -525,6 +525,16 @@ MUTANTS = [
     ("a Confirm kept across a selection change", U,
      b"        GGUI.CONFIRM = nil\r\n        cm:callback(function() GGUI.refresh() end, 0.1)",
      b"        cm:callback(function() GGUI.refresh() end, 0.1)"),
+    # ---- the HUD hub -------------------------------------------------------
+    ("the guilds button placed by itself while the hub manages it", U,
+     b"    if GGUI.hubbed() then\r\n        GGUI.paint_opener(b)",
+     b"    if false then\r\n        GGUI.paint_opener(b)"),
+    ("the follow poll moving a button the hub manages", U,
+     b"    if GGUI.hubbed() then return end            -- the hub owns its place",
+     b"    -- the hub owns its place"),
+    ("the hub told the guilds button is live while it is grey", U,
+     b"    GGUI.opener_live = on and true or false     -- what the hub's live() reads",
+     b"    GGUI.opener_live = true"),
 ]
 
 

@@ -6627,6 +6627,72 @@ end)()
     core.get_screen_resolution = prev_res
 end)()
 
+-- ---------------------------------------------- the opener defers to the HUD hub --
+-- With a second Derpy opener installed, one hub button takes the strip slot and shows this
+-- button in a row on hover (spec 2026-10-01). While managed, place_opener still makes,
+-- paints and greys the button, and neither it nor the follow poll may move or show it.
+;(function()
+    local E = "cr_hub_emp"
+    CULTURE[E] = "wh_main_emp_empire"
+    GG.CULTURE_OF[E] = nil
+    local prev_local = cm.get_local_faction_name
+    cm.get_local_faction_name = function() return E end
+    local moves, shown, made = 0, nil, false
+    local BTN = setmetatable({
+        MoveTo = function() moves = moves + 1 end,
+        SetVisible = function(_, v) shown = v end,
+        Position = function() return 0, 0 end,
+    }, {__index = function() return function() end end})
+    local BAR = setmetatable({
+        Position = function() return 431, -4 end,
+        Dimensions = function() return 1019, 60 end,
+    }, {__index = function() return function() end end})
+    local prev_root, prev_res, prev_cb = core.get_ui_root, core.get_screen_resolution,
+                                         cm.callback
+    local prev_find, prev_is, prev_at, prev_hub = find_uicomponent, is_uicomponent,
+                                                  GGUI.btn_at, DERPY_HUB
+    core.get_ui_root = function() return {CreateComponent = function() made = true end} end
+    core.get_screen_resolution = function() return 1920, 1080 end
+    find_uicomponent = function(_, name)
+        if name == "resources_bar" then return BAR end
+        if name == GGUI.BTN and made then return BTN end
+        return nil
+    end
+    is_uicomponent = function(x) return type(x) == "table" end
+    cm.callback = function() end
+
+    DERPY_HUB = {version = 1, manages = function(key) return key == "gg" end}
+    GGUI.btn_at, GGUI.btn_chain = nil, false
+    GGUI.place_opener(1)
+    assert(made, "managed, the button must still be created for the hub to find")
+    assert(moves == 0 and shown == nil, "managed, place_opener moved or showed the button")
+    GGUI.btn_at = "placed"
+    GGUI.follow_bar()
+    assert(moves == 0, "managed, the follow poll moved the button")
+
+    DERPY_HUB = {version = 1, manages = function() return false end}
+    GGUI.btn_at, GGUI.btn_chain = nil, false
+    GGUI.place_opener(1)
+    assert(moves == 1 and shown == true, "unmanaged, it must place and show itself as before")
+
+    -- The registration, and live() reading what gate_opener last drew.
+    local mine
+    for _, e in ipairs(DERPY_HUB_QUEUE or {}) do
+        if e.key == "gg" then mine = e end
+    end
+    assert(mine and mine.button == GGUI.BTN and mine.order == 2, "no gg hub registration")
+    GGUI.gate_opener(false)
+    assert(mine.live() == false, "greyed, live() must be false")
+    GGUI.gate_opener(true)
+    assert(mine.live() == true, "live, live() must be true")
+
+    core.get_ui_root, core.get_screen_resolution, cm.callback = prev_root, prev_res, prev_cb
+    find_uicomponent, is_uicomponent, GGUI.btn_at, DERPY_HUB = prev_find, prev_is, prev_at,
+                                                               prev_hub
+    cm.get_local_faction_name = prev_local
+    CULTURE[E], GG.CULTURE_OF[E] = nil, nil
+end)()
+
 -- ---------------------------------------------- the opener's tooltip, on hover --
 -- NO LOC FROM A TURN HANDLER: place_opener runs from FactionTurnStart, and a loc call
 -- there can crash at turn 1 past pcall. The tooltip is written when the button is

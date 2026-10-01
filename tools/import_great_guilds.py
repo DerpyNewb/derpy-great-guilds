@@ -19,6 +19,7 @@ import sys
 
 sys.path.insert(0, "tools")
 import gen_great_guilds as G          # noqa: E402
+import sync_derpy_hub as _HUB         # noqa: E402  - the Derpy HUD hub's copy for this pack
 
 SRC = "Modding Files/source/great_guilds"
 SCRIPTS = [
@@ -184,6 +185,10 @@ def verify():
             problems.append("missing script: " + s)
         elif any(c.isupper() for c in os.path.basename(s)):
             problems.append("uppercase in pack path crashes since patch 6.1: " + s)
+
+    # THE HUB COPY IS THE SOURCE'S. A hand edit to derpy_hub_gg.lua would ship a hub that
+    # no other mod has.
+    problems += ["hub: " + p for p in _HUB.check()]
 
     # Every table the generator emits must have somewhere to go in the pack.
     for table in built:
@@ -367,6 +372,9 @@ def _pack_files():
     for path in SCRIPTS + UI_FILES + [MCT_FILE]:
         out.append((os.path.abspath(path),
                     path.replace("Modding Files/pack/", "")))
+    # THE DERPY HUD HUB's two files. Not in UI_FILES, which _check_ui_file_list compares
+    # against what gen_guilds_ui.py builds.
+    out += [(os.path.abspath(s), d) for s, d in _HUB.pack_files("gg")]
     for folder in ART_DIRS:
         disk = "Modding Files/pack/" + folder
         if os.path.isdir(disk):

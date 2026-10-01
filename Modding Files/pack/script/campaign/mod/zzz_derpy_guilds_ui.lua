@@ -3036,6 +3036,17 @@ end
 GGUI.BTN      = "gg_opener"
 GGUI.BTN_SIZE = 44          -- must match OPENER_W/H in tools/gen_guilds_ui.py
 
+-- THE HUB (tools/sync_derpy_hub.py, spec 2026-10-01). With a second Derpy opener on the
+-- HUD, one hub button takes the strip slot and shows this button in a row on hover. While
+-- the hub manages it, the hub owns its place and visibility; this file still makes it,
+-- paints it, greys it and writes its tooltip.
+GGUI.HUB_KEY = "gg"
+
+function GGUI.hubbed()
+    return DERPY_HUB ~= nil and DERPY_HUB.manages ~= nil
+        and DERPY_HUB.manages(GGUI.HUB_KEY) == true
+end
+
 -- IS IT THE PLAYER'S TURN? ASKED, NOT REMEMBERED: a flag set at turn end and cleared at
 -- turn start is wrong after a load, which restores neither. Fails OPEN - a probe that
 -- throws must never be what locks the player out of the panel. The Zharr Exchange's
@@ -3056,6 +3067,7 @@ end
 function GGUI.gate_opener(on)
     local b = comp(GGUI.BTN)
     if not b then return end
+    GGUI.opener_live = on and true or false     -- what the hub's live() reads
     pcall(function()
         b:SetDisabled(not on)
         b:ShaderTechniqueSet(on and "normal_t0" or "set_greyscale_t0", true, true)
@@ -3285,6 +3297,7 @@ GGUI.FOLLOW_MS = 300
 
 function GGUI.follow_bar()
     if not GGUI.btn_at then return end
+    if GGUI.hubbed() then return end            -- the hub owns its place
     local b = comp(GGUI.BTN)
     if not b then return end
     local x, y = GGUI.btn_anchor()
@@ -3341,6 +3354,14 @@ function GGUI.place_opener(attempt)
         b = comp(GGUI.BTN)
     end
     if not is_uicomponent(b) then retry() return end
+
+    -- THE HUB PLACES IT while it manages this button. Still painted and greyed here, which
+    -- the hub never does; not moved or shown, which only one owner may do.
+    if GGUI.hubbed() then
+        GGUI.paint_opener(b)
+        GGUI.gate_opener(GGUI.player_turn())
+        return
+    end
 
     -- Recomputed every call, never cached: a wrong early read then heals itself
     -- instead of being made permanent.
@@ -3549,3 +3570,12 @@ core:add_listener("gg_opener_turn_end", "FactionTurnEnd",
         if comp(GGUI.PANEL) then GGUI.close() end
         GGUI.gate_opener(false)
     end, true)
+
+-- THE HUB'S REGISTRATION. A plain table, so load order against the hub copies does not
+-- matter. The label is read on hover, a UI event, so the loc call is safe there.
+DERPY_HUB_QUEUE = DERPY_HUB_QUEUE or {}
+table.insert(DERPY_HUB_QUEUE, {
+    key = GGUI.HUB_KEY, button = GGUI.BTN, order = 2,
+    label = function() return GGUI.loc("panel_title") end,
+    live = function() return GGUI.opener_live ~= false end,
+})
