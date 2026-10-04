@@ -3,6 +3,32 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-10-04 - build BB204325
+
+MD5 `BB2043255DC561FD6D82E247DCA04CCA`, 34,736,634 bytes. Includes builds 2EDAC23F and
+7A568114, which were not released on their own. Not yet seen in game.
+
+How the panel reads, and two Chaos Dwarf buildings.
+
+- **A running service's card breathes**, and so does the marker on the selected guild,
+  with the same slow glow as CA's own Tower of Zharr and Hell-Forge panels.
+- **The header has a heading.** The guild's name (or the tab's) sits in large type on
+  the left, with the figures in small type on the right, clear of each race's bar ornament.
+- **Locked services say why:** a padlock and the rank they need, such as "Needs Sworn".
+  A service on cooldown reads "7 turns left", not "7t".
+- **A dark field behind long text** on the Help and Log tabs and behind the faction list.
+- **The faction list uses the game's own scroll bar**, with its caps and arrows.
+- **Leaderboard names fit.** "The Erengrad Merchants" and "The Naggarond Builders" no
+  longer run past their column.
+- **The Cathay heading** moved off the trident on its bar.
+- **Hobgoblin camps pay the Khanate**, not the Immortals, and **the K'daai chain pays the
+  Daemonsmiths**, as their own descriptions say. A Daemonsmiths building bounty can now ask
+  for a K'daai building.
+- The preview tool now draws all six tabs from the shipped script and fails on text wider
+  than its box, which is how the Leaderboard overflow was found. Detail:
+  `docs/history/HANDOFF_20261004_GUILDS_UI_POLISH_PREVIEW.md` and
+  `docs/history/HANDOFF_20261004_GUILDS_GLOW_PULSE.md`.
+
 ## 2026-10-01 - build D1E0DB29
 
 MD5 `D1E0DB2947F2B7AA338DB4920CE40207`, 34,678,844 bytes.

@@ -5049,7 +5049,9 @@ end)()
     -- matches none of CA's 1,943 chains, because a token aimed at a chain nobody has
     -- looked at is indistinguishable from a typo.
     local REAL = {
-        {"wh3_dlc23_chd_military_hobgoblins",     "immortals"},
+        {"wh3_dlc23_chd_military_hobgoblins",     "khanate"},
+        {"wh3_dlc23_chd_military_kdaai",          "daemonsmiths"},
+        {"wh3_dlc23_chd_military_chaos_dwarf_infantry", "immortals"},
         {"wh3_dlc23_chd_military_war_machines",   "immortals"},
         {"wh3_dlc23_chd_factory_assembly_line",   "daemonsmiths"},
         {"wh3_dlc23_chd_factory_refinery",        "daemonsmiths"},
@@ -5078,9 +5080,12 @@ end)()
     assert(GG.guild_of_chain("wh3_dlc23_chd_factory_port") == "brass",
            "a factory port is a port: `_port` must beat nothing, and a bare `factory` "
            .. "token would have taken it for the Daemonsmiths")
-    assert(GG.guild_of_chain("wh3_dlc23_chd_military_kdaai") == "immortals",
-           "military (8) must beat a shorter unit-name token, or one chain in a military "
-           .. "group answers differently from its neighbours")
+    assert(GG.guild_of_chain("wh3_dlc23_chd_military_kdaai") == "daemonsmiths",
+           "military_kdaai (14) must beat military (8) - CA names the building the "
+           .. "Daemonsmithy, and a bare `kdaai` (5) would lose to `military` forever")
+    assert(GG.guild_of_chain("wh3_dlc23_chd_military_hobgoblins") == "khanate",
+           "hobgoblin (9) must beat military (8) - the Mustering Camp houses the Khanate's "
+           .. "own mercenaries")
     assert(GG.guild_of_chain("wh3_dlc23_chd_tower_temple_guardhouse") == "immortals",
            "guardhouse (10) must beat temple (6)")
     assert(GG.guild_of_chain("wh3_dlc23_chd_tower_temple_of_hashut") == "overseers",
@@ -5138,7 +5143,7 @@ end)()
     -- The themed guild, not the Overseers.
     GG.state[B] = nil
     GG.reset_turn(B)
-    GG.on_building(B, 1, "wh3_dlc23_chd_military_hobgoblins")
+    GG.on_building(B, 1, "wh3_dlc23_chd_military_chaos_dwarf_infantry")
     assert(select(1, GG.get(B, "immortals")) > 0,
            "a barracks must pay the Immortals")
     assert(select(1, GG.get(B, "overseers")) == 0,
@@ -6250,11 +6255,11 @@ end)()
     GGUI.S = 2
     GGUI.layout()
     find_uicomponent, is_uicomponent = prev_find, prev_is
-    assert(moved.gg_title == (100 + 95 * 2) .. "," .. (50 + 0 * 2),
+    assert(moved.gg_title == (100 + 55 * 2) .. "," .. (50 + 0 * 2),
            "gg_title at 2x, got " .. tostring(moved.gg_title))
     assert(moved.derpy_gg_row_2 == (100 + 20 * 2) .. "," .. (50 + (170 + 44) * 2),
            "the second standings row at 2x, got " .. tostring(moved.derpy_gg_row_2))
-    assert(moved.vslider == (100 + (20 + 734) * 2) .. "," .. (50 + 440 * 2),
+    assert(moved.vslider == (100 + (20 + 732) * 2) .. "," .. (50 + (440 + 24) * 2),
            "the list's slider at 2x, got " .. tostring(moved.vslider))
 
     -- THE HELP TAB WRAPS THE SAME AT EVERY SIZE. Text drawn at twice the size in a box
@@ -7131,9 +7136,12 @@ end)()
     -- ---- the fake UI ----
     -- refuse[name]: the engine declines to create it, as it does for a bad path.
     local made, gone, fakes, refuse = {}, {}, {}, {}
-    local texts, tips, inter, vis, dis, imgs, moved = {}, {}, {}, {}, {}, {}, {}
+    local texts, tips, inter, vis, dis, imgs, moved, sized = {}, {}, {}, {}, {}, {}, {}, {}
+    -- SIZE[name] = {w, h} out of our .twui.xml files, set only by GG_DUMP below: GGUI.wrap
+    -- breaks lines against a component's width, and 100px wraps a card at 14 characters.
+    local SIZE
     local function reset()
-        for _, t in ipairs({texts, tips, inter, vis, dis, imgs, moved}) do clear(t) end
+        for _, t in ipairs({texts, tips, inter, vis, dis, imgs, moved, sized}) do clear(t) end
     end
     local PANEL_KEY = "root/" .. GGUI.PANEL
     -- Created on the root and never inside the panel. Everything else a find from the root
@@ -7158,12 +7166,21 @@ end)()
         f.key, f.nm, f.up = key, name, up
         f.Id = function(self) return self.nm end
         f.Parent = function(self) return self.up end
-        f.Position = function() return 0, 0 end
+        -- WHERE IT WAS MOVED, as the engine answers: place_card reads the card's position
+        -- back and puts its six children relative to it.
+        f.Position = function(self)
+            local m = moved[self.key]
+            if m then return m[1], m[2] end
+            return 0, 0
+        end
         f.Dimensions = function(self)
             if self.key == "root" then return 1920, 1080 end
+            if sized[self.key] then return sized[self.key][1], sized[self.key][2] end
+            if SIZE and SIZE[self.nm] then return SIZE[self.nm][1], SIZE[self.nm][2] end
             return 100, 20
         end
         f.MoveTo = function(self, x, y) moved[self.key] = {x, y} end
+        f.Resize = function(self, w, h) sized[self.key] = {w, h} end
         f.SetText = function(self, s) texts[self.key] = s end
         f.SetTooltipText = function(self, s) tips[self.key] = s end
         f.SetInteractive = function(self, b) inter[self.key] = b end
@@ -7756,6 +7773,132 @@ end)()
         end
     end
     GGUI.close()
+
+    -- ---- THE HEADER, THE PLATES AND THE CARD TAGS (2026-10-04) ----
+    -- The header strip is a heading and its figures in two cells; the guild's name used to
+    -- be one more item on a body-size line. A text field sits under the Help and Log lines
+    -- and the faction list, and on no other tab. A locked service shows CA's padlock, not a
+    -- red tag that measured 2.2:1 on the card, and a cooldown is counted in words: "7t" was
+    -- what a player read.
+    ;(function()
+        GG.demands[ME], GG.bounties[ME] = nil, nil
+        standing({brass = {150, 150}})
+        local g1 = GGUI.GUILD_ORDER[1]
+        local function open_on(tab)
+            GGUI.TAB, GGUI.PAGE, GGUI.HELP_PAGE, GGUI.LOG_PAGE = tab, 1, 1, 1
+            GGUI.close()
+            GGUI.open()
+            reset()
+            GGUI.refresh()
+        end
+        open_on(1)
+        assert(texts["P/gg_rank_line"] == GGUI.loc_guild(g1),
+               "the header's heading is the guild alone, got " .. tostring(texts["P/gg_rank_line"]))
+        local stats = texts["P/gg_rank_stats"] or ""
+        assert(has(stats, GGUI.loc("reputation")) and not has(stats, GGUI.loc_guild(g1)),
+               "the figures carry the reputation and not the guild again, got " .. stats)
+        assert(tips["P/gg_rank_stats"] and inter["P/gg_rank_stats"] == true,
+               "the figures carry the header's hover")
+        local plates = {[1] = {}, [2] = {gg_back_list = true}, [3] = {}, [4] = {},
+                        [5] = {gg_back_text = true}, [6] = {gg_back_text = true}}
+        for tab, want in pairs(plates) do
+            open_on(tab)
+            for _, name in ipairs({"gg_back_text", "gg_back_list"}) do
+                assert((vis["P/" .. name] ~= false) == (want[name] == true),
+                       name .. " on tab " .. tab .. " is " .. tostring(vis["P/" .. name]))
+                assert(moved["P/" .. name], name .. " is never placed")
+            end
+        end
+        -- Sworn and above are locked at 150 reputation, so the Guilds tab shows a lock.
+        open_on(1)
+        local lock, red = false, false
+        for i = 1, 3 do
+            local t = texts["P/" .. GGUI.CARD .. "_" .. i .. "/card_name"] or ""
+            if has(t, GGUI.loc("needs")) then
+                lock = lock or has(t, "[[img:" .. GGUI.LOCK_ICON .. "]]")
+                red = red or has(t, "[[col:red]]")
+            end
+        end
+        assert(lock and not red, "a locked service shows the padlock and no red tag")
+        local key = GGUI.services_of(g1)[1].key
+        GG.cooldowns[ME] = {[key] = 7}
+        open_on(1)
+        local t = texts["P/" .. GGUI.CARD .. "_1/card_name"] or ""
+        assert(has(t, "7 " .. GGUI.loc("bounty_turns")) and not has(t, "7t"),
+               "a cooldown is counted in turns, got " .. t)
+        GG.cooldowns[ME] = {}
+        GGUI.close()
+    end)()
+
+    -- ---- GG_DUMP: WHAT tools/preview_guilds_panel.py DRAWS ----
+    -- Every component the SHIPPED Lua touched on each tab - where it moved it, what it
+    -- wrote, which images it set, what it hid - over this sweep's demo save, which is the
+    -- real English loc with a demand, a patron, three bounties and a log long enough to
+    -- page. The preview used to retype the Lua's strings and lay the panel out from the
+    -- generator's coordinates, so a fault in the Lua drew correctly in the picture.
+    -- Positions are panel-relative: reset() clears the panel's own move.
+    local DUMP = os.getenv("GG_DUMP")
+    if DUMP then
+        GG.demands[ME] = {guild = "slavers", kind = "tribute", amount = 900, due = 2}
+        GG.patrons[ME] = {guild = "brass", cqi = 77}
+        -- The longest Chaos Dwarf faction name, so a line that fits here fits in game.
+        LOC["factions_screen_name_" .. RIVAL] = "Slaves of the Black Dwarf"
+        -- GG_DUMP_TAG: draw it as that race reads it (its loc and its services).
+        local want = os.getenv("GG_DUMP_TAG") or ""
+        for culture, fl in pairs(GG.FLAVOURED) do
+            if fl.tag == want then GG.CULTURE_OF[ME], GG.CULTURE_OF[RIVAL] = culture, culture end
+        end
+        local log = {}
+        for n = 0, 3 do
+            for i, e in ipairs({"buy,brass,caravan_levy,50", "ai_buy,khanate,knife_in_dark," .. RIVAL,
+                                "hit,khanate,khans_price," .. RIVAL, "rank,immortals,2,3",
+                                "lead_won,brass," .. RIVAL, "lead_lost,slavers," .. RIVAL,
+                                "rank,overseers,3,2", "ai_buy,daemonsmiths,bound_blueprint," .. RIVAL}) do
+                local fields = select(2, string.gsub(e, ",", ""))
+                log[#log + 1] = (40 - i - 8 * n) .. "," .. e .. (fields == 3 and "" or ",")
+            end
+        end
+        saved["derpy_gg_log_" .. ME] = table.concat(log, "|")
+        SIZE = {}
+        for _, fn in ipairs({"panel", "card", "row", "list", "frow"}) do
+            local x = io.open("Modding Files/pack/ui/campaign ui/derpy_gg_" .. fn .. ".twui.xml"):read("*a")
+            -- The first width after each id is its state's: componentimages carry none.
+            for at, id in string.gmatch(x, '()%sid="([^"]+)"') do
+                local w, h = string.match(x, 'width="(%d+)"%s+height="(%d+)"', at)
+                SIZE[id] = SIZE[id] or {tonumber(w), tonumber(h)}
+            end
+        end
+        local function clean(s) return (string.gsub(tostring(s or ""), "[\t\r\n]", " ")) end
+        -- The log filter test above left its stub and the Rivals filter on.
+        local stub_log = GG.log_entries
+        GG.log_entries, GGUI.LOG_FILTER = keep_g.log, "all"
+        for tab = 1, 6 do
+            GGUI.TAB, GGUI.PAGE, GGUI.HELP_PAGE, GGUI.LOG_PAGE = tab, 1, 1, 1
+            GGUI.close()
+            GGUI.open()
+            reset()
+            GGUI.refresh()
+            local out = assert(io.open(DUMP .. "/tab" .. tab .. ".tsv", "w"))
+            for key in pairs(fakes) do
+                if key ~= "root" and alive(key) then
+                    local m, s, pics = moved[key], sized[key], {}
+                    for k, p in pairs(imgs) do
+                        local at = string.match(k, "^(.*)#")
+                        if at == key then pics[#pics + 1] = string.match(k, "#(.*)$") .. "=" .. p end
+                    end
+                    out:write(table.concat({key, m and m[1] or "", m and m[2] or "",
+                                            s and s[1] or "", s and s[2] or "",
+                                            tostring(vis[key] ~= false), clean(texts[key]),
+                                            table.concat(pics, ";")}, "\t"), "\n")
+                end
+            end
+            out:close()
+        end
+        GGUI.close()
+        GG.patrons[ME], SIZE, GG.log_entries = nil, nil, stub_log
+        GG.CULTURE_OF[ME], GG.CULTURE_OF[RIVAL] = GG.CHD_CULTURE, GG.CHD_CULTURE
+        saved["derpy_gg_log_" .. ME] = nil
+    end
     GG.demands[ME], GG.bounties[ME] = nil, nil
     common = nil
     local rows = {}

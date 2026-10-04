@@ -20,7 +20,7 @@
 				<standard
 					this="GG210002-D000-4000-B000000000000002"
 					name="standard"
-					width="710"
+					width="708"
 					height="24"
 					uniqueguid="GG210002-D000-4000-B000000000000002">
 				</standard>
@@ -37,7 +37,7 @@
 				<standard
 					this="GG210005-D000-4000-B000000000000005"
 					name="standard"
-					width="710"
+					width="708"
 					height="24"
 					interactive="true"
 					uniqueguid="GG210005-D000-4000-B000000000000005">
@@ -61,7 +61,7 @@
 							interpolationtime="0"
 							interpolationpropertymask="512"
 							targetmetrics_m_height="24"
-							targetmetrics_m_width="710"
+							targetmetrics_m_width="708"
 							targetmetrics_m_font_scale="1"/>
 					</frames>
 				</derpy_gg_scale>

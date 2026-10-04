@@ -78,7 +78,7 @@
 				<standard
 					this="GG210008-D000-4000-B000000000000008"
 					name="standard"
-					width="160"
+					width="170"
 					height="24"
 					uniqueguid="GG210008-D000-4000-B000000000000008">
 					<component_text
@@ -101,7 +101,7 @@
 							interpolationtime="0"
 							interpolationpropertymask="512"
 							targetmetrics_m_height="24"
-							targetmetrics_m_width="160"
+							targetmetrics_m_width="170"
 							targetmetrics_m_font_scale="1"/>
 					</frames>
 				</derpy_gg_scale>
@@ -193,7 +193,7 @@
 				<standard
 					this="GG210011-D000-4000-B000000000000011"
 					name="standard"
-					width="196"
+					width="186"
 					height="24"
 					uniqueguid="GG210011-D000-4000-B000000000000011">
 					<component_text
@@ -216,7 +216,7 @@
 							interpolationtime="0"
 							interpolationpropertymask="512"
 							targetmetrics_m_height="24"
-							targetmetrics_m_width="196"
+							targetmetrics_m_width="186"
 							targetmetrics_m_font_scale="1"/>
 					</frames>
 				</derpy_gg_scale>

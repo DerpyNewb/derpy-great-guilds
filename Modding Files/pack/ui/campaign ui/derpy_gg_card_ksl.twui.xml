@@ -85,6 +85,8 @@
 							width="300"
 							height="120"
 							colour="#80D8FF50"
+							shader_name="glow_pulse_t0"
+							shadertechnique_vars="0.80,1.00,0.50,0.00"
 							margin="0.00,0.00,0.00,0.00"/>
 						<image
 							this="GG210004-D006-4000-B000000000000004"
@@ -93,6 +95,8 @@
 							offset="0.00,0.00"
 							width="750"
 							height="120"
+							shader_name="glow_pulse_t0"
+							shadertechnique_vars="1.00,1.20,1.00,0.00"
 							margin="32.00,36.00,32.00,36.00"/>
 						<image
 							this="GG210004-D008-4000-B000000000000004"

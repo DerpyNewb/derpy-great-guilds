@@ -65,6 +65,11 @@ PANEL_LAYOUT = {
     # holder over its left end, the way the Hell-Forge draws "Melee Infantry". The bar's
     # lower third is its bronze strip, so the text is lifted into the dark band above it.
     "gg_rank_line":  (20,  92,  750, 46),
+    # THE STRIP'S FIGURES, right-aligned over the same bar, so gg_rank_line can carry its
+    # heading at 18 against body 12 (docs/CUSTOM_UI.md "Typography"). One body line held
+    # both until 2026-10-04 and the guild's name read as one more figure. Sorts after
+    # gg_rank_mark, so it draws over the bar.
+    "gg_rank_stats": (20,  92,  750, 46),
     # NAMED TO SORT AFTER gg_rank_line: siblings draw in hierarchy order, which is sorted
     # name order here, and as gg_rank_icon it drew UNDER the bar and vanished.
     "gg_rank_mark":  (18,  89,  44,  47),
@@ -81,6 +86,11 @@ PANEL_LAYOUT = {
     # between the third card (ends y=550) and the pager (starts y=596).
     "gg_earned":     (20,  562, 750, 24),
     "gg_footer":     (20,  640, 750, 30),
+    # A DARK FIELD UNDER TEXT THAT WOULD OTHERWISE SIT ON THE PAINTING: the Help and Log
+    # tabs' 21 lines, and the Leaderboard's faction list. Red Log lines measured 2.6:1 on
+    # the bare ground (2026-10-04). Sorted first among the panel's parts, so under them all.
+    "gg_back_text":  (20,  164, 750, 428),
+    "gg_back_list":  (20,  436, 750, 158),
 }
 for _i, _name in enumerate(TABS):
     PANEL_LAYOUT[_name] = (20 + _i * TAB_W, 56, TAB_W, TAB_H)
@@ -149,8 +159,10 @@ ROW_W, ROW_H = 750, 40
 # fits. The name gives up 32px for it: the longest guild name is 22 characters.
 ROW_LAYOUT = {
     "row_icon":   (6, 2, 36, 36),
-    "row_guild":  (46, 8, 160, 24),
-    "row_rank":   (212, 8, 196, 24),
+    # 170, not 160 (2026-10-04): "The Erengrad Merchants" and "The Naggarond Builders"
+    # ran 3-4px past the cell once the preview measured it. The rank column had the room.
+    "row_guild":  (46, 8, 170, 24),
+    "row_rank":   (222, 8, 186, 24),
     "row_leader": (416, 8, 324, 24),
 }
 
@@ -168,11 +180,15 @@ LIST_W, LIST_H = 750, 150
 # these four to something more descriptive silently produces a list that does not scroll.
 # Structure read out of CA's ui/common ui/tab_completer.twui.xml.
 #
-# The slider is 16 wide at the right edge, so the clip window stops 20px short of it.
-SLIDER_W = 16
+# THE SLIDER IS CA'S WHOLE EVENT-MESSAGE SLIDER (ca_vslider, below SLIDER_HANDLE_UNDER;
+# 2026-10-04, as the Zharr Exchange's): an 18px column whose track stops CA_SLIDER["cap"]
+# short of each end of the list, for a frame cap and an arrow. The clip window stops 4px
+# short of the column. The Lua MoveTo's the four end parts (GGUI.SLIDER_PARTS).
+SLIDER_W = 18
+SLIDER_CAP = 24
 LIST_LAYOUT = {
     "list_clip": (0, 0, LIST_W - SLIDER_W - 4, LIST_H),
-    "vslider":   (LIST_W - SLIDER_W, 0, SLIDER_W, LIST_H),
+    "vslider":   (LIST_W - SLIDER_W, SLIDER_CAP, SLIDER_W, LIST_H - 2 * SLIDER_CAP),
 }
 # The handle's authored height is a starting size only - the engine resizes it to the
 # fraction of the list that is on screen, which is what makes a scrollbar readable.
@@ -212,6 +228,89 @@ FLAG_FALLBACK = "ui/flags/wh3_dlc23_chd_chaos_dwarfs/mon_24.png"
 SLIDER_TRACK = "ui/skins/default/slider_vertical_mid.png"
 SLIDER_HANDLE = "ui/skins/default/slider_vertical_handle.png"
 SLIDER_HANDLE_UNDER = "ui/skins/default/slider_vertical_handle_underlay.png"
+
+# CA'S WHOLE SLIDER, as the event message panel draws it (ui/campaign ui/events.twui.xml,
+# dy_details_slider, an instance of ui/templates/parchment_slider_vertical.twui.xml). The bare
+# track-and-handle above stretched both: the 6px rod tiled 16 wide reads as three rails, and the
+# 18x96 handle drawn with margin 0 smears its end caps down its whole length. CA's handle is
+# 9-sliced 17px top and bottom and tiles its middle; its rod is drawn at native width, centred;
+# and the track is closed by an arrow cap at each end, 24px OUTSIDE the track.
+#
+# Every number is measured off the art (opaque columns), not CA's offsets, because CA places
+# these by docking and a runtime component ignores docking - the Lua MoveTo's each part:
+#   handle gem centred at 8.5 of 18      -> the column is the handle, x 0..18
+#   rod centred at 2.5 of 6              -> rod image at x 6
+#   cap triangle and stub at 9.5 of 20/19 -> caps at x -1
+#   arrow overlay centred at 7.5 of 15   -> arrows at x +1
+# Vertically (CA's own offsets): frame_top 24 above the track, its art 36 tall so 12px laps the
+# track; top arrow 23 above; frame_bottom at the track's end with its art lifted 13; bottom arrow
+# 1 above the track's end.
+SLIDER_ART = {
+    "frame_top": "ui/skins/default/slider_vertical_top.png",
+    "frame_bottom": "ui/skins/default/slider_vertical_bottom.png",
+    "top": ("ui/skins/default/slider_vertical_top_active.png",
+            "ui/skins/default/slider_vertical_top_hover.png"),
+    "bottom": ("ui/skins/default/slider_vertical_bottom_active.png",
+               "ui/skins/default/slider_vertical_bottom_hover.png"),
+}
+CA_SLIDER = {
+    "w": 18, "cap": 24, "rod_x": 6, "rod_w": 6, "handle_min": 39, "handle_slice": 17,
+    # part: (x, y) from the track's top-left, y measured from the track END for the two bottoms
+    "frame_top": (-1, -24), "frame_bottom": (-1, 0), "top": (1, -23), "bottom": (1, -1),
+}
+SND_SLIDER_HANDLE = "UI_GBL_TMP_Slider_Handle"
+SND_SLIDER_ARROWS = "UI_GBL_TMP_Slider_Arrows"
+
+
+def ca_vslider(h, handle_h=40):
+    """CA's vslider for a track `h` tall: rod, 9-sliced handle with CA's hover brighten, two
+    frame caps and two arrow buttons. The caller's Lua places the four end parts (CA_SLIDER)."""
+    S = CA_SLIDER
+    vs = EU.C("vslider", S["w"], h, interactive=True, callbacks=["VSlider"],
+              allowhresize=False,
+              props={"Value": 0, "minValue": 0, "maxValue": h - handle_h},
+              layers=[{"path": SLIDER_TRACK, "offset": (S["rod_x"], 0),
+                       "dw": S["rod_w"] - S["w"], "dh": 0, "margin": 0, "tile": True,
+                       "dock": None}])
+    # Children draw in this order, so the caps sit under the handle and the arrows over both.
+    vs.add(EU.C("frame_top", 20, S["cap"],
+                layers=[{"path": SLIDER_ART["frame_top"], "offset": (0, 0), "dw": 0,
+                         "dh": 12, "margin": 0, "dock": None}]))
+    vs.add(EU.C("frame_bottom", 19, S["cap"],
+                layers=[{"path": SLIDER_ART["frame_bottom"], "offset": (0, -13), "dw": 0,
+                         "dh": 13, "margin": 0, "dock": None}]))
+    sl = (S["handle_slice"], 0, S["handle_slice"], 0)
+
+    def gem(colour=None, shader_vars=None):
+        lay = {"path": SLIDER_HANDLE, "offset": (0, 0), "dw": 0, "dh": 0, "margin": sl,
+               "tile": True, "dock": None, "shader": "brighten_t0"}
+        if colour:
+            lay["colour"] = colour
+            lay["shader_vars"] = shader_vars
+        return lay
+    under = {"path": SLIDER_HANDLE_UNDER, "offset": (0, 0), "dw": 0, "dh": 0, "margin": sl,
+             "tile": True, "dock": None}
+    vs.add(EU.C("handle", S["w"], handle_h, interactive=True,
+                callbacks=["VSliderHandle", "TopmostWhenDraggingCallback"],
+                allowhresize=False, moveable="Movable XP", sound=SND_SLIDER_HANDLE,
+                props={"max_height": h - handle_h, "min_size": S["handle_min"]},
+                # CA's hover: a third copy of the gem, brightened 0.30, transparent until hover.
+                layers=[under, gem(), gem("#FFFFFF00", "0.30,0.00,0.00,0.00")],
+                hover=[under, gem(), gem("#FFFFFFFF", "0.30,0.00,0.00,0.00")]))
+    for name, cb in (("top", "SliderDecrementButton"), ("bottom", "SliderIncrementButton")):
+        std, hov = SLIDER_ART[name]
+        vs.add(EU.C(name, 15, 22, interactive=True, callbacks=[cb], sound=SND_SLIDER_ARROWS,
+                    props={"stepSize": 10},
+                    layers=[{"path": std, "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0,
+                             "dock": None}],
+                    hover=[{"path": hov, "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0,
+                            "dock": None}]))
+    return vs
+
+
+def ca_vslider_paths():
+    return {SLIDER_TRACK, SLIDER_HANDLE, SLIDER_HANDLE_UNDER, SLIDER_ART["frame_top"],
+            SLIDER_ART["frame_bottom"]} | set(SLIDER_ART["top"]) | set(SLIDER_ART["bottom"])
 
 # The panel title plate clips silently at about 19 characters, so the title is a
 # short constant and the guild name goes in gg_rank_line, a plain text component.
@@ -481,6 +580,14 @@ CLEAR_PX = 128
 CARD_OFF = CLEAR
 CARD_HEAT = HF + "heat_glow.png"
 CARD_RIM = "ui/skins/default/dlc23_tower_of_zharr/district_complete_glow_02.png"
+# THE LIT CARD BREATHES, as CA's own furnaces do: glow_pulse_t0 on each glow IMAGE (not the
+# state, which would pulse the bronze too). The shader belongs to the image slot, so it
+# rides along when the Lua swaps the art in, and pulses nothing while the slot holds CLEAR.
+# Both sets are CA's, copied (docs/sessions/CA_CHD_UI_FX_20260928.md 2b): the heat is the
+# Tower of Zharr torches' 0.80..1.00 - it never brightens past the shipped look, so the name
+# drawn over it keeps its measured contrast - and the rim is the Tower furnace glow_02's.
+CARD_HEAT_PULSE = "0.80,1.00,0.50,0.00"
+CARD_RIM_PULSE = "1.00,1.20,1.00,0.00"
 CARD_LAYERS = [
     {"path": HF + "cap_group_background.png", "offset": (0, 0), "dw": 0, "dh": 0,
      "margin": (0, 24, 0, 24), "tile": True, "dock": None},
@@ -488,9 +595,9 @@ CARD_LAYERS = [
     # centre sits behind the name, where the eye lands, and its left half behind the holder.
     # Nothing may draw outside the card - the engine does not clip.
     {"path": CARD_OFF, "offset": (0, 0), "dw": 300 - CARD_W, "dh": 0, "margin": 0,
-     "dock": None},
+     "dock": None, "shader": "glow_pulse_t0", "shader_vars": CARD_HEAT_PULSE},
     {"path": CARD_OFF, "offset": (0, 0), "dw": 0, "dh": 0, "margin": (40, 40, 40, 40),
-     "dock": None},
+     "dock": None, "shader": "glow_pulse_t0", "shader_vars": CARD_RIM_PULSE},
 ]
 CARD_HEAT_INDEX, CARD_RIM_INDEX = 1, 2
 
@@ -565,9 +672,14 @@ ROW_ICON_LAYERS = [
 
 # CA's gold, the colour of the counts on these buttons and on the HUD opener.
 GOLD = "#FFD37AFF"
+# The selected guild's marker pulses at CA's 0.80,1.50,0.80 - the Hell-Forge category
+# block's heat glow in its ACTIVE and cooldown states (not selected; re-read 2026-10-04).
+# CA does pulse selections too (glow_pulse_t0 on 22 selected states), so the shader is CA's
+# usage and the numbers are borrowed from the active look.
 GSEL_LAYERS = [
     {"path": "ui/skins/default/1x1_blank_white.png",
-     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "colour": GOLD, "dock": None},
+     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "colour": GOLD, "dock": None,
+     "shader": "glow_pulse_t0", "shader_vars": "0.80,1.50,0.80,0.00"},
 ]
 
 # A standings row is a BAND, not a button - a flat tint, the same idiom as the
@@ -591,6 +703,28 @@ DIVIDER_LAYERS = [
     {"path": "ui/skins/default/panel_back_divider.png",
      "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "dock": None},
 ]
+
+# THE TEXT FIELD (gg_back_text, gg_back_list): a dark wash, ruled top and bottom with the
+# same CA divider the title sits on, so it reads as a section of the panel and not as a
+# box. Every race's culture skin swaps the divider for its own. The wash's alpha is the
+# lowest that holds the Log's red lines at 4.5:1 on the brightest ground (preview, LOW).
+BACK_ALPHA = "B4"
+BACK_RULE = 10                          # panel_back_divider.png's own height
+
+
+def back_layers(h):
+    """The field for a component `h` tall: the wash, then a rule on each edge."""
+    rule = {"path": "ui/skins/default/panel_back_divider.png", "dw": 0,
+            "dh": BACK_RULE - h, "margin": 0, "dock": None}
+    return [{"path": "ui/skins/default/1x1_blank_white.png", "offset": (0, 0), "dw": 0,
+             "dh": 0, "margin": 0, "colour": "#000000" + BACK_ALPHA, "dock": None},
+            dict(rule, offset=(0, 0)), dict(rule, offset=(0, h - BACK_RULE))]
+# RIGHT INSET OF gg_rank_stats, per race: where that race's header bar ends in its own
+# ornament - a ring, a scroll, a trident, horse heads - read off the eight bars stacked in
+# one picture (2026-10-04) and held by the preview's contrast check, which measured the
+# figures on every ornament at a single 48.
+RANK_STATS_PAD = {"": 48, "_emp": 84, "_dwf": 48, "_brt": 84, "_cth": 104, "_ksl": 74,
+                  "_def": 66, "_hef": 94}
 
 
 # The pager and the close button are round: a chevron and a cross both want a disc,
@@ -904,7 +1038,8 @@ FRAMES = {
         # clear. Not drawn taller than the strip: nothing may draw outside its component.
         "rank": [_L(_D + "cp1_cth_shang_yang/unit_category_header_holder_plate.png",
                     (0, 84, 0, 84))],
-        "rank_tx": "90.00,0.00", "rank_ty": "0.00,4.00",
+        # 98, not 90: the heading at 18 put its first letter on the trident's end.
+        "rank_tx": "98.00,0.00", "rank_ty": "0.00,8.00",
         # Shang Yang's army-cap pill: 20px round ends, flat middle.
         "gbar": [_L(_D + "cp1_cth_shang_yang/army_cap_holder.png", (0, 20, 0, 20))],
         # The Tiger Court's jade banner top SCALED WHOLE (0.68 both ways), so each tab is its
@@ -1146,9 +1281,17 @@ def _panel(tag=""):
                   "text": True, "size": 24, "align": "Center", "valign": "Center",
                   "fontcat": "header_24_bold", "tx": "0.00,0.00", "ty": "0.00,0.00"}
         elif name == "gg_rank_line":
+            # THE HEADING: the guild, or the view. CA's header_18 against body 12.
             kw = {"layers": f["rank"],
-                  "text": True, "size": 12, "align": "Left", "valign": "Center",
-                  "fontcat": "body_12", "tx": f["rank_tx"], "ty": f["rank_ty"]}
+                  "text": True, "size": 18, "align": "Left", "valign": "Center",
+                  "fontcat": "header_18", "tx": f["rank_tx"], "ty": f["rank_ty"]}
+        elif name == "gg_rank_stats":
+            # The figures, right-aligned, clear of the bar's right-hand end ornament.
+            kw = {"text": True, "size": 12, "align": "Right", "valign": "Center",
+                  "fontcat": "body_12", "tx": "0.00,%.2f" % RANK_STATS_PAD[tag],
+                  "ty": f["rank_ty"]}
+        elif name in ("gg_back_text", "gg_back_list"):
+            kw = {"layers": back_layers(h)}
         elif name.startswith("gg_help_"):
             kw = {"text": True, "size": 12, "align": "Left", "valign": "Center",
                   "fontcat": "body_12", "colour": "#C9BFA8FF",
@@ -1260,23 +1403,11 @@ def _list():
                   layoutengine={"type": "List", "sizetocontent": True,
                                 "margins": "0.00,0.00", "columns": [FROW_W]}))
 
+    # CA's event-message slider, end caps and arrows included, as the Exchange's list
+    # draws it. GGUI.layout MoveTo's it and its four end parts (GGUI.SLIDER_PARTS).
     _x, _y, w, h = LIST_LAYOUT["vslider"]
-    vs = lst.add(EU.C("vslider", w, h, interactive=True, callbacks=["VSlider"],
-                      allowhresize=False,
-                      # The travel. CA sets both on every slider it ships; a slider with
-                      # no maxValue has nowhere to go.
-                      props={"Value": 0, "minValue": 0, "maxValue": LIST_H - HANDLE_H},
-                      layers=[{"path": SLIDER_TRACK, "offset": (0, 0), "dw": 0, "dh": 0,
-                               "margin": 0, "tile": True, "dock": None}]))
-    vs.add(EU.C("handle", SLIDER_W, HANDLE_H, interactive=True,
-                callbacks=["VSliderHandle"], allowhresize=False,
-                # DRAGGABLE. Without moveable the handle is a picture of a handle.
-                moveable="Movable XP", sound=SOUND_ROUND,
-                props={"max_height": LIST_H - HANDLE_H, "min_size": 10},
-                layers=[{"path": SLIDER_HANDLE_UNDER, "offset": (0, 0), "dw": 0,
-                         "dh": 0, "margin": 0, "dock": None},
-                        {"path": SLIDER_HANDLE, "offset": (0, 0), "dw": 0, "dh": 0,
-                         "margin": 0, "dock": None}]))
+    assert (w, SLIDER_CAP) == (CA_SLIDER["w"], CA_SLIDER["cap"]), "the slider is CA's"
+    lst.add(ca_vslider(h, HANDLE_H))
     return root
 
 
@@ -1523,6 +1654,22 @@ def check_loc_keys(lua):
                            "that key prints itself onto the panel"
                            % (lit.group(1), key))
     return sorted(set(out))
+
+
+def check_slider_parts(lua):
+    """GGUI.SLIDER_PARTS and GGUI.LIST_CHILD_XY's vslider against CA_SLIDER and LIST_LAYOUT.
+
+    A COPIED TABLE IS WHAT DRIFTS. The Lua MoveTo's the slider's four end parts from its own
+    numbers, because docking is ignored on a runtime component, and nothing else ties those
+    numbers to the art they were measured off. The Exchange pins EX.SLIDER_PARTS the same way.
+    """
+    out = []
+    for part in ("frame_top", "frame_bottom", "top", "bottom"):
+        want = '{"%s", %d, %d}' % ((part,) + CA_SLIDER[part])
+        if want not in lua:
+            out.append("GGUI.SLIDER_PARTS lacks %s - the Lua would put that part elsewhere"
+                       % want)
+    return out
 
 
 def check_scroll_parts(files):
@@ -2093,7 +2240,8 @@ def check():
     # draws blank - a plate with no caption, which is how the tab row, the pager and
     # the Buy buttons shipped once they had art.
     for fname, names in (("derpy_gg_panel.twui.xml",
-                          ["gg_title", "gg_rank_line", "gg_earned", "gg_footer"] + TABS
+                          ["gg_title", "gg_rank_line", "gg_rank_stats", "gg_earned",
+                           "gg_footer"] + TABS
                           + ["gg_prev", "gg_next"] + GUILD_BTNS + LOG_FILTERS),
                          ("derpy_gg_card.twui.xml",
                           ["card_name", "card_desc_1", "card_desc_2",
@@ -2220,6 +2368,10 @@ def check():
 
     out += check_scroll_parts(files)
     out += check_margins_fit_textures()
+    _ui_lua = os.path.join(ROOT, "Modding Files", "pack", "script", "campaign", "mod",
+                           "zzz_derpy_guilds_ui.lua")
+    if os.path.isfile(_ui_lua):
+        out += check_slider_parts(io.open(_ui_lua, encoding="utf-8").read())
 
     # THE CREST FALLBACK MUST RESOLVE. It is drawn with [[img:]] markup rather than as a
     # component image, and that markup fails the same way an imagepath does: a path the
@@ -2447,7 +2599,35 @@ def check():
         out += check_frame_mirror(src)
 
     out += check_frame_files(files)
+    out += check_pulses(files)
 
+    return out
+
+
+def check_pulses(files):
+    """Every race's card pulses its two glow slots and nothing else; every panel's marker pulses.
+
+    Read off the EMITTED XML, so a race whose card_extra or frame drops the shader key, or
+    an emitter that stops writing it, is caught. A pulse on an image that ships something
+    other than CLEAR would be the bronze plate breathing on every card, lit or not."""
+    out = []
+    for fname, text in sorted(files.items()):
+        # An <image> names its texture by componentimage GUID; the path is on that entry.
+        paths = dict(re.findall(r'<component_image\s+this="([^"]+)"[^>]*?imagepath="([^"]*)"',
+                                text))
+        pulsed = [m.group(0) for m in re.finditer(r"<image\b[^>]*>", text)
+                  if 'shader_name="glow_pulse_t0"' in m.group(0)]
+        if fname.startswith("derpy_gg_card"):
+            if len(pulsed) != 2:
+                out.append("%s: %d glow_pulse_t0 images, want the card's 2 glows"
+                           % (fname, len(pulsed)))
+            for img in pulsed:
+                ci = re.search(r'componentimage="([^"]+)"', img)
+                if not ci or paths.get(ci.group(1)) != CLEAR:
+                    out.append("%s: glow_pulse_t0 on an image that ships %s, not CLEAR"
+                               % (fname, ci and paths.get(ci.group(1))))
+        elif fname.startswith("derpy_gg_panel") and not pulsed:
+            out.append("%s: the selected-guild marker does not pulse" % fname)
     return out
 
 
@@ -2665,6 +2845,13 @@ def selftest():
                 "an open Bretonnian tab with fewer layers than its slot was not reported"
         finally:
             FRAMES["_brt"]["tab"]["selected"] = saved
+
+    # THE SLIDER PIN CAN FAIL: one number of one part moved is reported.
+    if os.path.isfile(lua_path):
+        assert not check_slider_parts(lua), check_slider_parts(lua)
+        moved = lua.replace('{"top", 1, -23}', '{"top", 1, -22}', 1)
+        assert moved != lua, "the slider mutation no longer matches the Lua"
+        assert check_slider_parts(moved), "a slider arrow 1px off CA_SLIDER was not reported"
 
     assert not check(), "check() found problems: %r" % (check(),)
     print("selftest ok: %d files, %d guids" % (len(files), total_guids))

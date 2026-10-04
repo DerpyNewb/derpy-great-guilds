@@ -535,6 +535,19 @@ MUTANTS = [
     ("the hub told the guilds button is live while it is grey", U,
      b"    GGUI.opener_live = on and true or false     -- what the hub's live() reads",
      b"    GGUI.opener_live = true"),
+    # 2026-10-04 polish: the header split, the text fields, the lock tag and turns in words.
+    ("the guild's name left in the header's figures", U,
+     b"        local line = GGUI.loc_rank(rank) .. \"   \"",
+     b"        local line = GGUI.loc_guild(guild) .. \"   \" .. GGUI.loc_rank(rank) .. \"   \""),
+    ("the Help and Log text field shown on every tab", U,
+     b"                           gg_back_text = GGUI.TAB == 5 or GGUI.TAB == 6}) do",
+     b"                           gg_back_text = true}) do"),
+    ("a locked service tagged in red without the padlock", U,
+     b"    return \"  [[img:\" .. GGUI.LOCK_ICON .. \"]][[/img]]\" .. text",
+     b"    return \"  [[col:red]]\" .. text .. \"[[/col]]\""),
+    ("a cooldown written as 7t", U,
+     b"        label = label .. \"  \" .. GG.cooldown_left(faction, s.key) .. \" \"",
+     b"        label = label .. \"  \" .. GG.cooldown_left(faction, s.key) .. \"t\" .. \"\""),
 ]
 
 

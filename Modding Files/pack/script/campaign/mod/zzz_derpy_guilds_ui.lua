@@ -105,6 +105,18 @@ local function set_named_text(name, text)
     set_text(comp(name), text)
 end
 
+-- THE HEADER STRIP: a heading at header_18 on the left (gg_rank_line) and the figures in body
+-- text on the right (gg_rank_stats). One body line carried both until 2026-10-04, so the
+-- guild's name read as one more number. Both cells carry the hover, since either is under
+-- the cursor.
+local set_tooltip
+local function set_header(head, stats, tip)
+    set_named_text("gg_rank_line", head)
+    set_named_text("gg_rank_stats", stats)
+    set_tooltip(comp("gg_rank_line"), tip)
+    set_tooltip(comp("gg_rank_stats"), tip)
+end
+
 -- SetTooltipText APPENDS to whatever the component already carries rather than
 -- replacing it, so a tooltip rewritten every refresh would grow without bound.
 -- Passing an empty string first clears it. The second argument takes a literal
@@ -118,7 +130,7 @@ end
 -- correct and never seen. Every card, the rank line, the cost and the footer carried one
 -- and none of them was interactive, so the whole panel's hover text was unreachable.
 -- Interactive is not clickable: nothing here listens for a click on a text cell.
-local function set_tooltip(c, text)
+function set_tooltip(c, text)
     if not c or not text or text == "" then return end
     pcall(function() c:SetTooltipText("", true) end)
     pcall(function() c:SetTooltipText(text, true) end)
@@ -262,7 +274,11 @@ GGUI.PANEL_XY = {
     gg_tab_log    = {520, 56},
     gg_tab_help   = {645, 56},
     gg_rank_line  = {20, 92},
+    gg_rank_stats = {20, 92},
     gg_rank_mark  = {18, 89},
+    -- The dark field under the Help and Log lines, and under the faction list.
+    gg_back_text  = {20, 164},
+    gg_back_list  = {20, 436},
     gg_bar_track  = {20, 140},
     gg_rep_bar    = {38, 148},
     gg_card_1     = {20, 170},
@@ -533,7 +549,7 @@ GGUI.REP_BAR_H = 13
 GGUI.ROW_CHILD_XY = {
     row_icon   = {6, 2},
     row_guild  = {46, 8},
-    row_rank   = {212, 8},
+    row_rank   = {222, 8},
     row_leader = {416, 8},
 }
 
@@ -566,7 +582,19 @@ GGUI.LIST_H  = 150
 -- the slider's handle, which VSlider owns.
 GGUI.LIST_CHILD_XY = {
     list_clip = {0, 0},
-    vslider   = {734, 0},
+    vslider   = {732, 24},
+}
+
+-- THE SLIDER IS CA'S EVENT-MESSAGE SLIDER (gen_guilds_ui.ca_vslider), as the Exchange's: its
+-- track stops 24px short of each end of the list, and a frame cap and an arrow sit in that
+-- gap. Docking is ignored on a runtime component, so each part is MoveTo'd: x from the
+-- track's left, y from its top - or from its END for the two bottoms. gen_guilds_ui.CA_SLIDER
+-- holds the same numbers, measured off CA's art.
+GGUI.SLIDER_PARTS = {
+    {"frame_top", -1, -24},
+    {"frame_bottom", -1, 0},
+    {"top", 1, -23},
+    {"bottom", 1, -1},
 }
 
 -- WHICH GUILD THE LIST IS SHOWING: an index into GG.GUILDS, because GGUI.leaders() builds
@@ -721,6 +749,20 @@ function GGUI.layout()
         for name, xy in pairs(GGUI.LIST_CHILD_XY) do
             local c = comp(name, list)
             if c then c:MoveTo(lx + P(xy[1]), ly + P(xy[2])) end
+        end
+        -- AFTER the slider: a parent's MoveTo carries its children with it.
+        -- Guarded: a cap left unplaced is cosmetic, a throw here would leave the rows unplaced.
+        local vs = comp("vslider", list)
+        if vs then
+            pcall(function()
+                local sx, sy = vs:Position()
+                local _, th = vs:Dimensions()
+                for _, p in ipairs(GGUI.SLIDER_PARTS) do
+                    local part = comp(p[1], vs)
+                    local base = (p[1] == "frame_bottom" or p[1] == "bottom") and sy + th or sy
+                    if part then part:MoveTo(sx + P(p[2]), base + P(p[3])) end
+                end
+            end)
         end
     end
     for i = 1, #GG.GUILDS do
@@ -896,18 +938,18 @@ function GGUI.draw_card(faction, i, s)
         -- drops the colour rather than erroring, so this uses a known one.
         -- "Needs Indebted" rather than "Indebted": the bare rank name reads as a
         -- property of the service, not as the thing standing in your way.
-        label = label .. "  [[col:red]]" .. GGUI.loc("needs") .. " "
-                .. GGUI.loc_rank(s.rank) .. "[[/col]]"
+        label = label .. GGUI.lock_tag(GGUI.loc("needs") .. " " .. GGUI.loc_rank(s.rank))
     elseif not ok and why == "lead" then
         -- The monopoly. Red, like the rank gate, because it is the same kind of thing:
         -- something standing between the player and a service they can otherwise afford.
-        label = label .. "  [[col:red]]" .. GGUI.loc("needs_lead") .. "[[/col]]"
+        label = label .. GGUI.lock_tag(GGUI.loc("needs_lead"))
     elseif not ok and why == "cooldown" then
-        label = label .. "  " .. GG.cooldown_left(faction, s.key) .. "t"
+        label = label .. "  " .. GG.cooldown_left(faction, s.key) .. " "
+                .. GGUI.loc("bounty_turns")
     elseif not ok and why == "target" then
-        label = label .. "  [[col:red]]" .. GGUI.loc("needs_target_short") .. "[[/col]]"
+        label = label .. "  [[col:yellow]]" .. GGUI.loc("needs_target_short") .. "[[/col]]"
     elseif not ok and why == "unavailable" then
-        label = label .. "  [[col:red]]" .. GGUI.loc("unavailable_short") .. "[[/col]]"
+        label = label .. GGUI.lock_tag(GGUI.loc("unavailable_short"))
     end
     set_text(comp("card_name", card), label)
 
@@ -993,7 +1035,7 @@ function GGUI.draw_card(faction, i, s)
         elseif asking then
             cap = "[[col:yellow]]" .. GGUI.loc("confirm") .. "[[/col]]"
         elseif not ok then
-            cap = "[[col:red]]" .. cap .. "[[/col]]"
+            cap = "[[col:" .. GGUI.LOCK_COL .. "]]" .. cap .. "[[/col]]"
         end
         set_text(btn, cap)
         -- SHOWN AGAIN. The bounty board and the Court both hide this button on a slot
@@ -1021,6 +1063,19 @@ function GGUI.card_body(s, tip)
         body = "[[col:yellow]]" .. GGUI.loc("race_label") .. "[[/col]]  " .. body
     end
     return body
+end
+
+-- WHAT STANDS BETWEEN THE PLAYER AND A SERVICE, after its name: CA's padlock, then the
+-- reason in the name's own colour - CA's locked-item look. It was red until 2026-10-04: red
+-- measured 2.2:1 on the card's bronze and CA's orange 4.4:1, both under the 4.5:1 every text
+-- cell here is held to. LOCK_COL (db/ui_colours "orange", FFAD5B; CA's own loc uses the
+-- name) marks the dead Buy caption and the Court's deadline, where it measures clear.
+-- A full path, as the faction list's flags are written.
+GGUI.LOCK_ICON = "ui/skins/default/icon_padlock.png"
+GGUI.LOCK_COL = "orange"
+
+function GGUI.lock_tag(text)
+    return "  [[img:" .. GGUI.LOCK_ICON .. "]][[/img]]" .. text
 end
 
 function GGUI.card_state(faction, s)
@@ -1381,7 +1436,7 @@ function GGUI.draw_court(faction)
         -- The deadline goes red in its last two turns. It is the only number on this
         -- panel with a point of no return behind it.
         local l2 = left .. " " .. GGUI.loc("demand_due")
-        if left <= 2 then l2 = "[[col:red]]" .. l2 .. "[[/col]]" end
+        if left <= 2 then l2 = "[[col:" .. GGUI.LOCK_COL .. "]]" .. l2 .. "[[/col]]" end
         local tip = GGUI.loc_guild(d.guild) .. "  -  "
                     .. GGUI.loc("demand_desc_" .. d.kind)
         if not ok then tip = tip .. "||" .. GGUI.loc("demand_short") end
@@ -1550,7 +1605,7 @@ function GGUI.refresh()
         -- EVERYTHING THAT TAKES REPUTATION AWAY IS NAMED HERE, in red, because a number
         -- that falls with no visible reason is a bug report. There are two of them: the
         -- rival, and the upkeep.
-        local line = GGUI.loc_guild(guild) .. "   " .. GGUI.loc_rank(rank) .. "   "
+        local line = GGUI.loc_rank(rank) .. "   "
                      .. GGUI.loc("reputation") .. " " .. rep .. " / " .. next_at
         -- THE UPKEEP, and only once it is actually running. Medieval 2's whole flaw was
         -- that it charged a hidden point a turn and showed the player nothing, ever - the
@@ -1566,22 +1621,21 @@ function GGUI.refresh()
             upkeep = GG.decay_amount(rank, faction)
         end
         if upkeep > 0 then
-            line = line .. "   [[col:red]]-" .. upkeep .. GGUI.loc("per_turn")
-                   .. "[[/col]]"
+            -- NOT COLOURED (2026-10-04): red, then CA's orange, measured under 4.5:1 on the
+            -- Empire's lighter bar. The words carry it, and the hover says the rest.
+            line = line .. "   -" .. upkeep .. GGUI.loc("per_turn")
         end
         local rival = GG.RIVALS[guild]
         local share = GG.setting("rate_rivalry") or 0
         if rival and share > 0 then
-            line = line .. "   [[col:red]]" .. GGUI.loc("rival") .. " "
-                   .. GGUI.loc_guild(rival) .. "[[/col]]"
+            line = line .. "   " .. GGUI.loc("rival") .. " " .. GGUI.loc_guild(rival)
         end
-        set_named_text("gg_rank_line", line)
         -- THE GUILD'S OWN DESCRIPTION, then what the upkeep is and when it starts. Said
         -- even before it bites, so a player reads the rule in the first twenty turns
         -- rather than discovering it as a rank quietly going backwards on turn 26.
         local tip = GGUI.loc_guild_desc(guild)
         tip = tip .. GGUI.upkeep_tip(upkeep, GG.turn_now())
-        set_tooltip(comp("gg_rank_line"), tip)
+        set_header(GGUI.loc_guild(guild), line, tip)
         -- WHAT THIS GUILD PAID, AND FOR WHAT. See GGUI.earned_line.
         local now, last = GG.earned(faction)
         set_named_text("gg_earned", GGUI.earned_line(now, last, guild))
@@ -1590,35 +1644,32 @@ function GGUI.refresh()
         -- The Help tab's header is its table of contents: which chapter, and how many
         -- there are, so the arrows read as pages rather than as something that might
         -- change the subject.
-        set_named_text("gg_rank_line",
-                       GGUI.loc("hdr_help") .. "   [[col:yellow]]"
-                       .. GGUI.loc("help_t" .. GGUI.HELP_PAGE) .. "[[/col]]   "
-                       .. GGUI.HELP_PAGE .. " " .. GGUI.loc("help_of") .. " "
-                       .. GGUI.HELP_PAGES)
-        set_tooltip(comp("gg_rank_line"), GGUI.loc("standing_help"))
+        set_header(GGUI.loc("help_t" .. GGUI.HELP_PAGE),
+                   GGUI.loc("hdr_help") .. "   " .. GGUI.HELP_PAGE .. " "
+                   .. GGUI.loc("help_of") .. " " .. GGUI.HELP_PAGES,
+                   GGUI.loc("standing_help"))
     elseif GGUI.TAB == 6 then
-        set_named_text("gg_rank_line", GGUI.loc("hdr_log") .. "   " .. GGUI.LOG_PAGE
-                       .. " " .. GGUI.loc("help_of") .. " " .. GGUI.log_pages(faction))
-        set_tooltip(comp("gg_rank_line"), GGUI.loc("log_help"))
+        set_header(GGUI.loc("tab_log"),
+                   GGUI.loc("hdr_log") .. "   " .. GGUI.LOG_PAGE .. " "
+                   .. GGUI.loc("help_of") .. " " .. GGUI.log_pages(faction),
+                   GGUI.loc("log_help"))
     elseif GGUI.TAB == 4 then
         -- The Court pages, but its header names the view AND the guild the arrows are
         -- pointing at, because two of its three cards are about that guild.
-        set_named_text("gg_rank_line", GGUI.loc("hdr_court") .. "   "
-                       .. GGUI.loc_guild(guild) .. "   " .. GGUI.loc_rank(rank)
-                       .. "   " .. GGUI.loc("reputation") .. " " .. rep)
-        set_tooltip(comp("gg_rank_line"), GGUI.loc("court_intro"))
+        set_header(GGUI.loc_guild(guild),
+                   GGUI.loc("hdr_court") .. "   " .. GGUI.loc_rank(rank) .. "   "
+                   .. GGUI.loc("reputation") .. " " .. rep,
+                   GGUI.loc("court_intro"))
     else
         -- A header that names the view, not a guild the view does not show. The
         -- bounty count is live because it is the one number a player wants before
         -- reading three cards.
         local head = GGUI.loc("hdr_help")
-        if GGUI.TAB == 4 then
-            head = GGUI.loc("hdr_court")
-        elseif GGUI.TAB == 2 then
+        if GGUI.TAB == 2 then
             -- THE LEAGUE TABLE'S HEADER IS THE SCOREBOARD'S CLOCK. "The Standings" on
             -- its own said nothing about whether anybody else was playing; this line
             -- is the one place in the mod that says out loud that they are.
-            head = GGUI.loc("hdr_stand") .. "   " .. GGUI.rivals_line()
+            head = GGUI.rivals_line()
         elseif GGUI.TAB == 3 then
             local list, taken = GG.bounties[faction] or {}, 0
             for i = 1, #list do
@@ -1627,11 +1678,13 @@ function GGUI.refresh()
             head = GGUI.loc("hdr_bounty") .. "   " .. taken .. " / "
                    .. #GGUI.CARD_XY .. " " .. GGUI.loc("bounty_taken")
         end
-        set_named_text("gg_rank_line", head)
         -- The Standings header carries the rivals' line, so its hover explains that
         -- rather than repeating the general standing rules a hover away on the title.
-        set_tooltip(comp("gg_rank_line"),
-                    GGUI.loc(GGUI.TAB == 2 and "rivals_help" or "standing_help"))
+        -- "Hover a row for the full table" leads that hover now: the figures took its room.
+        local tab_key = GGUI.TAB == 2 and "tab_stand" or "tab_bounty"
+        local tip = GGUI.loc(GGUI.TAB == 2 and "rivals_help" or "standing_help")
+        if GGUI.TAB == 2 then tip = GGUI.loc("hdr_stand") .. "||" .. tip end
+        set_header(GGUI.loc(tab_key), head, tip)
     end
     -- THE COUNTDOWN (spec §9), here because the footer carries one short number on a
     -- 750px line; the rank and earned lines are full.
@@ -1692,6 +1745,11 @@ function GGUI.refresh()
     end
     local list = comp(GGUI.LIST, comp(GGUI.PANEL))
     if list then pcall(function() list:SetVisible(GGUI.TAB == 2) end) end
+    for name, on in pairs({gg_back_list = GGUI.TAB == 2,
+                           gg_back_text = GGUI.TAB == 5 or GGUI.TAB == 6}) do
+        local c = comp(name)
+        if c then pcall(function() c:SetVisible(on) end) end
+    end
     -- THE LOG DRAWS INTO THE HELP TAB'S 21 SLOTS. Both are pages of single lines, and
     -- one set of slots is one set of components to keep placed.
     for i = 1, GGUI.HELP_SLOTS do

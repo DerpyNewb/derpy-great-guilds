@@ -569,6 +569,13 @@ end
 -- is buried in `secondary_attributes`, so it is `tribute_hall`. `amber` was buried in
 -- `chamber_of_visions` and is gone entirely - there is no amber chain to catch.
 --
+-- TWO MILITARY CHAINS ARE CLAIMED AWAY FROM THE IMMORTALS, on what CA's own loc says they
+-- are. `military` (8) takes every recruitment building, so the Hobgoblin Mustering Camp -
+-- "where the Hobgoblin mercenaries hang out", and the Khanate's own panel icon - paid the
+-- Immortals; `hobgoblin` (9) outranks it. The K'daai chain's first level is named
+-- "Daemonsmithy" and its loc says the Daemonsmiths bind them, but `kdaai` (5) can never
+-- beat `military`, so the token is `military_kdaai` (14).
+--
 -- MATCHED AGAINST A LOWERCASED CHAIN. Some of CA's chain keys carry uppercase segments -
 -- wh2_main_EMPIRE_academy, and NORSCA, DWARFS, VAMPIRES and GREENSKIN elsewhere - so a
 -- case-sensitive match would miss any token that landed on one.
@@ -576,8 +583,8 @@ GG.BUILDING_THEME = {
     {"slavers", {"slave", "scavanger", "prison", "dungeon"}},
     {"daemonsmiths", {"forge", "smith", "furnace", "workshop", "engineer", "library",
                       "research", "assembly", "refinery", "drills", "alchem", "magic",
-                      "arcane", "observator", "college"}},
-    {"khanate", {"watch", "patrol", "assassin"}},
+                      "arcane", "observator", "college", "military_kdaai"}},
+    {"khanate", {"watch", "patrol", "assassin", "hobgoblin"}},
     {"immortals", {"military", "barracks", "infantry", "cavalry", "ranged", "beast",
                    "monster", "garrison", "academy", "walls", "defence", "fortress",
                    "ballistic", "guardhouse", "gate", "drill", "war_machine",

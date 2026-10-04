@@ -41,11 +41,15 @@ all six guilds at once.
 - **A limit each turn.** Most guilds pay only so much per turn. The Guilds tab shows what
   each guild paid you this turn and last, from which sources, and anything the limit held
   back.
-- **Eighteen services,** three per guild, unlocked by rank and paid for in favour, each
-  with a cooldown. Examples: an instant gold levy, an elite regiment added to an army,
-  finishing your current technology, revealing a region through the shroud, a free
-  building upgrade, and a paid malus placed on an enemy. The price drops with a guild that
-  knows you and rises with one whose rival you have been courting.
+- **Services,** unlocked by rank and paid for in favour, each with a cooldown. Each guild
+  shows one service card at Indebted, one at Sworn and one at Favoured, each drawn from a
+  pool of three, and
+  the cards change every 10 turns (5 to 30 in MCT). Every race also has services of its own
+  that no other race gets, at least one on show each period: 83 services in all. Examples:
+  an instant gold levy, an elite regiment added to an army, finishing your current
+  technology, revealing a region through the shroud, a free building upgrade, and a paid
+  malus placed on an enemy. The price drops with a guild that knows you and rises with one
+  whose rival you have been courting.
 - **Rivalry.** Three pairs of guilds argue: Brass Tablets and Khanate, Immortals and
   Daemonsmiths, Overseers and Slavers. Earning with one takes reputation from its rival
   once you reach Indebted there, but never a rank you have reached.
@@ -67,9 +71,10 @@ all six guilds at once.
   and makes that guild's reputation pay half again.
 - **Upkeep.** After the opening turns, each guild takes back a little reputation every
   turn, more at higher ranks, so a guild you stop feeding slides back down the ladder.
-- **The AI plays it too.** AI factions of your race earn, buy all 18 services (never the
+- **The AI plays it too.** AI factions of your race earn, buy services (never the
   same one twice in a row while anything else is affordable), answer demands, appoint
-  patrons and take guilds off you. The feed tells you when a guild changes hands and you
+  patrons, take bounties of their own and take guilds off you. A rival's bounty can name
+  your land, and the feed warns you when it does. The feed tells you when a guild changes hands and you
   are one of the two parties.
 - **The Log tab** records your rank changes, your purchases, AI purchases in your race and
   hostile services used against you, newest first.
@@ -152,7 +157,7 @@ You need:
 ```sh
 lua tools/_guilds_harness.lua              # the model and panel against a stubbed campaign
 lua tools/_guilds_bounty_harness.lua       # the bounty board against a stubbed world
-py tools/mutate_guilds.py                  # break the bounty rules 12 ways; a harness must notice each
+py tools/mutate_guilds.py                  # break the rules 174 ways; a harness must notice each
 py tools/gen_great_guilds.py --check       # DB rows, loc and every design rule
 py tools/gen_great_guilds.py --write       # regenerate the TSVs
 py tools/gen_guilds_ui.py --write          # regenerate the .twui.xml layouts

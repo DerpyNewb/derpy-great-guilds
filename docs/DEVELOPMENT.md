@@ -71,6 +71,38 @@ that the mod completes itself with `cm:complete_scripted_mission_objective`, cou
 the two agent-action events. The kinds and their prices are `GG.BOUNTY_KINDS`; the design is
 `docs/design/2026-09-27-great-guilds-bounties-v2-design.md`.
 
+**Rival bounties.** Every covered AI faction holds one bounty at a time, under the same
+price, stake and failure rules as the player's. The mod scores it itself, because no engine
+mission is issued for the AI. A rival's targets are on its own front, and a bounty on a
+human's land warns them with a transient located feed message (index 5005). The MCT switch is
+`ai_bounties`. Design: `docs/design/2026-09-29-great-guilds-ai-bounties-design.md`.
+
+**Services and cards.** `GG.SERVICES` has 83 rows. It is append-only, because cooldowns are
+saved by position (section 3). Each guild shows one card at each of ranks 2, 3 and 4
+(`GG.CARD_RANKS`), drawn from that guild-and-rank pool by `GG.draw_cards`. Cards are drawn in
+a fixed order, one `GG.roll` each, so every machine draws the same cards. A card never shows
+its last service again when the pool has another. `GG.rotate_cards` redraws every
+`rotate_turns` turns (MCT, default 10) and posts feed index 5006. `GG.pool_ok` refuses three
+kinds of row:
+
+- a hostile row while `hostile_services` is off;
+- a row whose `needs` check fails;
+- a row tagged `race = <culture>` for any other race.
+
+Twenty-nine rows are race services. `GG.show_race_service` keeps at least one on show each
+period.
+
+**Race differences** (MCT `race_differences`, on by default) gate three things beyond the race
+services:
+
+- **An earn route of its own** (`GG.EARN_ROUTES` / `GG.EARN_OF`). Examples: caravans for
+  Chaos Dwarfs and Cathay, grudges for Dwarfs, captives for Dark Elves.
+- **A twist** that bends one rule as a whole percentage (`GG.TWISTS`). Examples: Kislev's
+  upkeep at 50%, the High Elves' favour cap at 150%.
+- **A Help page** naming the race's route and twist.
+
+Design: `docs/design/2026-09-29-great-guilds-service-pools-and-races-design.md`.
+
 Default rates (every one can be changed through MCT's Custom preset):
 
 | Guild | Rate | Per-turn cap |
@@ -89,7 +121,10 @@ All keys are `cm:set_saved_value` strings.
 
 | Key | Holds |
 |---|---|
-| `derpy_gg_<faction>` | six `rep,fav` pairs in `GG.GUILDS` order (brass, immortals, daemonsmiths, khanate, overseers, slavers), then `;`, then 18 cooldowns in `GG.SERVICES` order |
+| `derpy_gg_<faction>` | six `rep,fav` pairs in `GG.GUILDS` order (brass, immortals, daemonsmiths, khanate, overseers, slavers), then `;`, then one cooldown per `GG.SERVICES` row, by position |
+| `derpy_gg_cards_<faction>` | the service cards on show: `<turn drawn>;<key>,<key>,...`. Keys, not indexes, so a key survives the table growing; a key this build does not sell reads as its slot's default |
+| `derpy_gg_gain_<faction>` | what each guild has paid since the faction's last turn start (`guild=n,...`), so saving and reloading cannot earn a turn's limit twice |
+| `derpy_gg_carry_<faction>_<route>` | the remainder of a points-based race route (one per `per`) not yet paid out |
 | `derpy_gg_world` | the leadership table: `turn|...;culture/guild,rep,margin,leader,flag|...` |
 | `derpy_gg_bounties_<faction>` | the bounty board, offers joined by `;`. Five fields (`war`, `stake`, `amount`, `done`, `void`) were appended on 2026-09-27; an older save reads them as zero |
 | `derpy_gg_demand_<faction>` | the open demand |
@@ -121,20 +156,21 @@ applied a bundle.
 | Bounty mission | `derpy_gg_<family>_<guild><tag>`, family `bounty`, `job`, `build` or `hero`; one live mission per key per faction |
 | Building-card line | `derpy_gg_built_<guild><tag>`, a dummy effect on every building level that pays that guild |
 | Feed messages | `message_event_text_text_derpy_gg_<stem>_title` / `_primary` / `_secondary` |
-| Feed indexes | 5001 hostile hit, 5002 demand, 5003 leadership, 5004 rank, each plus the receiver's flavour offset (`GG.feed`) |
+| Feed indexes | 5001 hostile hit, 5002 demand, 5003 leadership, 5004 rank, 5005 a rival's bounty on your land (transient, located), 5006 services changed, each plus the receiver's flavour offset (`GG.feed`) |
 | Panel text | `derpy_gg_<key>`, resolved by `GGUI.loc` at draw time |
 
-The DB side is nine tables plus the loc. Row counts as of build 7AB4585D:
+The DB side is ten tables plus the loc. Row counts as of build BB204325:
 
 | Table | Rows | Why |
 |---|---|---|
-| `effect_bundles` | 379 | rank 216, leader 54, service 108, patron 1 |
-| `effect_bundles_to_effects_junctions` | 407 | |
-| `effects` | 48 | the building-card lines, six guilds by eight races |
+| `effect_bundles` | 690 | rank 216, leader 54, service 419, patron 1 |
+| `effect_bundles_to_effects_junctions` | 756 | |
+| `effects` | 49 | the building-card lines, six guilds by eight races, plus one Kislev war-machine effect |
+| `effect_bonus_value_ids_unit_sets` | 2 | that effect's two bonus values, bound to CA's `ksl_war_sleds_little_grom` unit set (Kislev's artillery) |
 | `building_effects_junction` | 1,726 | one per building level that pays a guild. `gen_great_guilds.py` runs the Lua's own building-to-guild matching and refuses a line that names a different guild than the one paid |
 | `missions` | 171 | 19 guild-and-family pairs by nine flavours |
-| `event_feed_message_events` | 36 | four indexes by nine offsets |
-| `campaign_groups`, `campaign_group_members`, `campaign_group_member_criteria_values` | 36 each | only to make the feed indexes resolve (section 7) |
+| `event_feed_message_events` | 54 | six indexes by nine offsets |
+| `campaign_groups`, `campaign_group_members`, `campaign_group_member_criteria_values` | 54 each | only to make the feed indexes resolve (section 7) |
 
 ## 5. The panel
 
@@ -151,6 +187,17 @@ The panel is **our own `.twui.xml`, created at runtime**. No CA layout is overri
 - The frames are CA's own art, referenced by path where the game already ships it. The
   Chaos Dwarfs use the Hell-Forge's header bar, card frames, price plates and square tabs,
   and the Tower of Zharr's glow round a card whose service is running (`GGUI.CARD_RIM`).
+  That glow and the selected-guild marker `gg_gsel` breathe with CA's `glow_pulse_t0`
+  shader, using values copied from CA's own Tower of Zharr and Hell-Forge panels. The shader
+  sits on the image slot, so it survives `GGUI.light_card` swapping the art in with
+  `SetImagePath`. A slot holding the clear image pulses nothing.
+- The header strip is two cells: `gg_rank_line` holds the heading at 18pt, and
+  `gg_rank_stats` holds the figures at 12pt, right-aligned. Its inset is set per race
+  (`RANK_STATS_PAD`), because each race's bar ends in its own ornament.
+- Locked services read as CA's padlock and "Needs Sworn" (or whichever rank). Text carries the state, not
+  colour, because red measured 2.2:1 on the card bronze and CA's orange 4.4:1. The faction
+  list uses CA's whole event-message slider (`ca_vslider`), whose caps and arrows are
+  `MoveTo`'d by `GGUI.SLIDER_PARTS`.
   Each other race has its own panel and card file, built from its own culture's art in
   `gen_guilds_ui.FRAMES` and mirrored into `GGUI.FRAME`. Pieces are drawn at or near their
   native size, since a nine-slice stretched far past its file blurs, and `tile="true"`
@@ -189,12 +236,12 @@ Run everything from the repo root.
 | Parse | `luac -p <file>` for the four scripts | Lua 5.1.5 |
 | Test | `lua tools/_guilds_harness.lua` | Runs the shipped Lua against a stubbed campaign and panel. Prints `harness ok`. |
 | Bounties | `lua tools/_guilds_bounty_harness.lua` | The bounty board against a stubbed world. Prints `bounty harness ok`. |
-| Mutation | `py tools/mutate_guilds.py` | Breaks the bounty rules 12 ways, one at a time, in the shipped Lua; a harness must fail on each. Restores the file byte for byte. |
+| Mutation | `py tools/mutate_guilds.py` | Breaks the rules 174 ways, one at a time, in the shipped Lua; a harness must fail on each. Restores the file byte for byte. A mutant whose anchor no longer matches is reported, not skipped. |
 | Opener maths | `py tools/check_guilds_anchor.py` | Extracts `GGUI.btn_anchor` from the shipped script and runs it against measured HUD geometry. |
 | Data | `py tools/gen_great_guilds.py --check`, then `--write` | Builds every DB row and loc line, and `zzz_derpy_guilds_bounty_data.lua`, and refuses on a broken rule (below). |
 | Layouts | `py tools/gen_guilds_ui.py --check`, then `--write` | Its XML emitter is `gen_guilds_emitter.py`, a deliberate copy of the Zharr Exchange's, so a fix made here cannot change that mod's output. |
 | Layout vs Lua | `py tools/check_guilds_ui.py` | Every component name the Lua reaches for exists; GUID pairing is intact. |
-| Look | `py tools/preview_guilds_panel.py` | Renders the panel to a PNG with the game shut, using the vendored source of TWUI Studio (not included). Glyph widths are approximate; positions are exact. |
+| Look | `py tools/preview_guilds_panel.py` | Renders all six tabs to PNGs with the game shut, using TWUI Studio's modules (not included). It draws from the shipped Lua: `GG_DUMP=<dir> lua tools/_guilds_harness.lua` opens the real panel over a demo save and writes where the script moved, sized, wrote and hid every part. Without that, a preview of the layout alone stacks the panel in one corner. `GG_DUMP_TAG=_emp` (etc.) dumps a race. Exits 1 on low contrast or on text wider than its box. Glyph widths are approximate; positions are exact. |
 | Art | `py tools/make_guild_icons.py`, `py tools/make_guild_backgrounds.py`, `py tools/make_guild_bundle_icons.py` | Icons are recoloured CA building icons; grounds are cropped and dimmed; effect-bundle icons put the guild's mark on the teal disc recovered from CA's own effect icons. `--check` re-measures what ships. **Neither the inputs nor the outputs are in this repo** (they are CA-derived); extract the sources from your own game install. |
 | Pack | `py tools/import_great_guilds.py` | Needs RPFM's MCP server. Refuses if the TSVs disagree with `build()`, packs, saves, then re-opens the saved pack and counts every table's rows. `--verify-only` re-checks a saved pack. |
 
@@ -293,7 +340,12 @@ Each of these cost a bug or a build to learn. Most fail silently.
 - [docs/design/2026-09-27-great-guilds-bounties-v2-design.md](design/2026-09-27-great-guilds-bounties-v2-design.md):
   bounties that cost a choice (far enemies, new wars, the favour stake, jobs, building
   requests, hero bounties). Built 2026-09-27.
-- `docs/plans/`: the plans the ladder, panel, AI, notices, flavours and bounties v2 were
-  built from.
+- [docs/design/2026-09-29-great-guilds-ai-bounties-design.md](design/2026-09-29-great-guilds-ai-bounties-design.md):
+  rivals of your race take bounties too. Built 2026-09-29.
+- [docs/design/2026-09-29-great-guilds-service-pools-and-races-design.md](design/2026-09-29-great-guilds-service-pools-and-races-design.md):
+  service pools and rotating cards, then each race's own services, earn route and twist.
+  Built 2026-09-29 in two stages.
+- `docs/plans/`: the plans the ladder, panel, AI, notices, flavours, bounties v2, AI
+  bounties and service pools were built from.
 - `docs/history/`: dated handoffs, the most recent last. When a handoff and the code
   disagree, the code wins.

@@ -19,8 +19,8 @@ GG.BOUNTY_TECHS_FACTION = {
 }
 GG.BOUNTY_BUILDINGS = {
     [""] = {
-        daemonsmiths = {{"wh3_dlc23_chd_factory_assembly_line_3", 3, {"wh3_dlc23_chd_factory_assembly_line_2"}, 3}, {"wh3_dlc23_chd_factory_refinery_3", 3, {"wh3_dlc23_chd_factory_refinery_2"}, 3}},
-        immortals = {{"wh3_dlc23_chd_factory_garrison_3", 3, {"wh3_dlc23_chd_factory_garrison_2"}, 3}, {"wh3_dlc23_chd_military_beasts_3", 3, {"wh3_dlc23_chd_military_beasts_2"}, 4}, {"wh3_dlc23_chd_military_beasts_4", 4, {"wh3_dlc23_chd_military_beasts_3"}, 5}, {"wh3_dlc23_chd_military_chaos_dwarf_infantry_3", 3, {"wh3_dlc23_chd_military_chaos_dwarf_infantry_2"}, 4}, {"wh3_dlc23_chd_military_kdaai_3", 3, {"wh3_dlc23_chd_military_kdaai_2"}, 5}, {"wh3_dlc23_chd_military_war_machines_3", 3, {"wh3_dlc23_chd_military_war_machines_2"}, 5}},
+        daemonsmiths = {{"wh3_dlc23_chd_factory_assembly_line_3", 3, {"wh3_dlc23_chd_factory_assembly_line_2"}, 3}, {"wh3_dlc23_chd_factory_refinery_3", 3, {"wh3_dlc23_chd_factory_refinery_2"}, 3}, {"wh3_dlc23_chd_military_kdaai_3", 3, {"wh3_dlc23_chd_military_kdaai_2"}, 5}},
+        immortals = {{"wh3_dlc23_chd_factory_garrison_3", 3, {"wh3_dlc23_chd_factory_garrison_2"}, 3}, {"wh3_dlc23_chd_military_beasts_3", 3, {"wh3_dlc23_chd_military_beasts_2"}, 4}, {"wh3_dlc23_chd_military_beasts_4", 4, {"wh3_dlc23_chd_military_beasts_3"}, 5}, {"wh3_dlc23_chd_military_chaos_dwarf_infantry_3", 3, {"wh3_dlc23_chd_military_chaos_dwarf_infantry_2"}, 4}, {"wh3_dlc23_chd_military_war_machines_3", 3, {"wh3_dlc23_chd_military_war_machines_2"}, 5}},
         overseers = {{"wh3_dlc23_chd_outpost_mine_3", 3, {"wh3_dlc23_chd_outpost_mine_2"}, 3}, {"wh3_dlc23_chd_outpost_overseer_hut_3", 3, {"wh3_dlc23_chd_outpost_overseer_hut_2"}, 3}},
         slavers = {{"wh3_dlc23_chd_outpost_scavangers_hovel_3", 3, {"wh3_dlc23_chd_outpost_scavangers_hovel_2"}, 3}},
     },

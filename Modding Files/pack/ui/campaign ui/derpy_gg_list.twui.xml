@@ -10,7 +10,11 @@
 					<list_box this="GG21000A-D000-4000-B00000000000000A"/>
 				</list_clip>
 				<vslider this="GG21000D-D000-4000-B00000000000000D">
-					<handle this="GG210010-D000-4000-B000000000000010"/>
+					<frame_top this="GG210010-D000-4000-B000000000000010"/>
+					<frame_bottom this="GG210013-D000-4000-B000000000000013"/>
+					<handle this="GG210016-D000-4000-B000000000000016"/>
+					<top this="GG210019-D000-4000-B000000000000019"/>
+					<bottom this="GG21001C-D000-4000-B00000000000001C"/>
 				</vslider>
 			</listview>
 		</root>
@@ -67,7 +71,7 @@
 				<standard
 					this="GG210008-D000-4000-B000000000000008"
 					name="standard"
-					width="730"
+					width="728"
 					height="150"
 					interactive="true"
 					uniqueguid="GG210008-D000-4000-B000000000000008">
@@ -89,7 +93,7 @@
 				<standard
 					this="GG21000B-D000-4000-B00000000000000B"
 					name="standard"
-					width="710"
+					width="708"
 					height="1"
 					interactive="true"
 					uniqueguid="GG21000B-D000-4000-B00000000000000B">
@@ -100,7 +104,7 @@
 				margins="0.00,0.00"
 				sizetocontent="true">
 				<columnwidths>
-					<column width="710"/>
+					<column width="708"/>
 				</columnwidths>
 			</LayoutEngine>
 		</list_box>
@@ -121,7 +125,7 @@
 					value="0"/>
 				<property
 					name="maxValue"
-					value="110"/>
+					value="62"/>
 				<property
 					name="minValue"
 					value="0"/>
@@ -136,8 +140,8 @@
 				<standard
 					this="GG21000E-D000-4000-B00000000000000E"
 					name="standard"
-					width="16"
-					height="150"
+					width="18"
+					height="102"
 					interactive="true"
 					uniqueguid="GG21000E-D000-4000-B00000000000000E">
 					<imagemetrics>
@@ -145,53 +149,34 @@
 							this="GG21000D-D002-4000-B00000000000000D"
 							uniqueguid="GG21000D-D002-4000-B00000000000000D"
 							componentimage="GG21000D-D001-4000-B00000000000000D"
-							offset="0.00,0.00"
-							width="16"
-							height="150"
+							offset="6.00,0.00"
+							width="6"
+							height="102"
 							tile="true"
 							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
 		</vslider>
-		<handle
+		<frame_top
 			this="GG210010-D000-4000-B000000000000010"
-			id="handle"
+			id="frame_top"
 			tooltipslocalised="true"
-			soundcategory="UI_GBL_TMP_Round_Small_Button"
-			moveable="Movable XP"
-			allowhorizontalresize="false"
 			uniqueguid="GG210010-D000-4000-B000000000000010"
 			currentstate="GG210011-D000-4000-B000000000000011"
 			defaultstate="GG210011-D000-4000-B000000000000011">
-			<callbackwithcontextlist>
-				<callback_with_context callback_id="VSliderHandle"/>
-			</callbackwithcontextlist>
-			<userproperties>
-				<property
-					name="max_height"
-					value="110"/>
-				<property
-					name="min_size"
-					value="10"/>
-			</userproperties>
 			<componentimages>
 				<component_image
 					this="GG210010-D001-4000-B000000000000010"
 					uniqueguid="GG210010-D001-4000-B000000000000010"
-					imagepath="ui/skins/default/slider_vertical_handle_underlay.png"/>
-				<component_image
-					this="GG210010-D003-4000-B000000000000010"
-					uniqueguid="GG210010-D003-4000-B000000000000010"
-					imagepath="ui/skins/default/slider_vertical_handle.png"/>
+					imagepath="ui/skins/default/slider_vertical_top.png"/>
 			</componentimages>
 			<states>
 				<standard
 					this="GG210011-D000-4000-B000000000000011"
 					name="standard"
-					width="16"
-					height="40"
-					interactive="true"
+					width="20"
+					height="24"
 					uniqueguid="GG210011-D000-4000-B000000000000011">
 					<imagemetrics>
 						<image
@@ -199,20 +184,337 @@
 							uniqueguid="GG210010-D002-4000-B000000000000010"
 							componentimage="GG210010-D001-4000-B000000000000010"
 							offset="0.00,0.00"
-							width="16"
-							height="40"
-							margin="0.00,0.00,0.00,0.00"/>
-						<image
-							this="GG210010-D004-4000-B000000000000010"
-							uniqueguid="GG210010-D004-4000-B000000000000010"
-							componentimage="GG210010-D003-4000-B000000000000010"
-							offset="0.00,0.00"
-							width="16"
-							height="40"
+							width="20"
+							height="36"
 							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 				</standard>
 			</states>
+		</frame_top>
+		<frame_bottom
+			this="GG210013-D000-4000-B000000000000013"
+			id="frame_bottom"
+			tooltipslocalised="true"
+			uniqueguid="GG210013-D000-4000-B000000000000013"
+			currentstate="GG210014-D000-4000-B000000000000014"
+			defaultstate="GG210014-D000-4000-B000000000000014">
+			<componentimages>
+				<component_image
+					this="GG210013-D001-4000-B000000000000013"
+					uniqueguid="GG210013-D001-4000-B000000000000013"
+					imagepath="ui/skins/default/slider_vertical_bottom.png"/>
+			</componentimages>
+			<states>
+				<standard
+					this="GG210014-D000-4000-B000000000000014"
+					name="standard"
+					width="19"
+					height="24"
+					uniqueguid="GG210014-D000-4000-B000000000000014">
+					<imagemetrics>
+						<image
+							this="GG210013-D002-4000-B000000000000013"
+							uniqueguid="GG210013-D002-4000-B000000000000013"
+							componentimage="GG210013-D001-4000-B000000000000013"
+							offset="0.00,-13.00"
+							width="19"
+							height="37"
+							margin="0.00,0.00,0.00,0.00"/>
+					</imagemetrics>
+				</standard>
+			</states>
+		</frame_bottom>
+		<handle
+			this="GG210016-D000-4000-B000000000000016"
+			id="handle"
+			tooltipslocalised="true"
+			soundcategory="UI_GBL_TMP_Slider_Handle"
+			moveable="Movable XP"
+			allowhorizontalresize="false"
+			uniqueguid="GG210016-D000-4000-B000000000000016"
+			currentstate="GG210017-D000-4000-B000000000000017"
+			defaultstate="GG210017-D000-4000-B000000000000017">
+			<callbackwithcontextlist>
+				<callback_with_context callback_id="VSliderHandle"/>
+				<callback_with_context callback_id="TopmostWhenDraggingCallback"/>
+			</callbackwithcontextlist>
+			<userproperties>
+				<property
+					name="max_height"
+					value="62"/>
+				<property
+					name="min_size"
+					value="39"/>
+			</userproperties>
+			<componentimages>
+				<component_image
+					this="GG210016-D001-4000-B000000000000016"
+					uniqueguid="GG210016-D001-4000-B000000000000016"
+					imagepath="ui/skins/default/slider_vertical_handle_underlay.png"/>
+				<component_image
+					this="GG210016-D003-4000-B000000000000016"
+					uniqueguid="GG210016-D003-4000-B000000000000016"
+					imagepath="ui/skins/default/slider_vertical_handle.png"/>
+				<component_image
+					this="GG210016-D005-4000-B000000000000016"
+					uniqueguid="GG210016-D005-4000-B000000000000016"
+					imagepath="ui/skins/default/slider_vertical_handle.png"/>
+				<component_image
+					this="GG210016-D007-4000-B000000000000016"
+					uniqueguid="GG210016-D007-4000-B000000000000016"
+					imagepath="ui/skins/default/slider_vertical_handle_underlay.png"/>
+				<component_image
+					this="GG210016-D009-4000-B000000000000016"
+					uniqueguid="GG210016-D009-4000-B000000000000016"
+					imagepath="ui/skins/default/slider_vertical_handle.png"/>
+				<component_image
+					this="GG210016-D011-4000-B000000000000016"
+					uniqueguid="GG210016-D011-4000-B000000000000016"
+					imagepath="ui/skins/default/slider_vertical_handle.png"/>
+			</componentimages>
+			<states>
+				<standard
+					this="GG210017-D000-4000-B000000000000017"
+					name="standard"
+					width="18"
+					height="40"
+					interactive="true"
+					uniqueguid="GG210017-D000-4000-B000000000000017">
+					<imagemetrics>
+						<image
+							this="GG210016-D002-4000-B000000000000016"
+							uniqueguid="GG210016-D002-4000-B000000000000016"
+							componentimage="GG210016-D001-4000-B000000000000016"
+							offset="0.00,0.00"
+							width="18"
+							height="40"
+							tile="true"
+							margin="17.00,0.00,17.00,0.00"/>
+						<image
+							this="GG210016-D004-4000-B000000000000016"
+							uniqueguid="GG210016-D004-4000-B000000000000016"
+							componentimage="GG210016-D003-4000-B000000000000016"
+							offset="0.00,0.00"
+							width="18"
+							height="40"
+							tile="true"
+							shader_name="brighten_t0"
+							shadertechnique_vars="0.00,0.00,0.00,0.00"
+							margin="17.00,0.00,17.00,0.00"/>
+						<image
+							this="GG210016-D006-4000-B000000000000016"
+							uniqueguid="GG210016-D006-4000-B000000000000016"
+							componentimage="GG210016-D005-4000-B000000000000016"
+							offset="0.00,0.00"
+							width="18"
+							height="40"
+							tile="true"
+							colour="#FFFFFF00"
+							shader_name="brighten_t0"
+							shadertechnique_vars="0.30,0.00,0.00,0.00"
+							margin="17.00,0.00,17.00,0.00"/>
+					</imagemetrics>
+					<transitionmap>
+						<transition
+							transition_m_target_state="GG210018-D000-4000-B000000000000018"/>
+					</transitionmap>
+				</standard>
+				<hover
+					this="GG210018-D000-4000-B000000000000018"
+					name="hover"
+					width="18"
+					height="40"
+					interactive="true"
+					uniqueguid="GG210018-D000-4000-B000000000000018">
+					<imagemetrics>
+						<image
+							this="GG210016-D008-4000-B000000000000016"
+							uniqueguid="GG210016-D008-4000-B000000000000016"
+							componentimage="GG210016-D007-4000-B000000000000016"
+							offset="0.00,0.00"
+							width="18"
+							height="40"
+							tile="true"
+							margin="17.00,0.00,17.00,0.00"/>
+						<image
+							this="GG210016-D010-4000-B000000000000016"
+							uniqueguid="GG210016-D010-4000-B000000000000016"
+							componentimage="GG210016-D009-4000-B000000000000016"
+							offset="0.00,0.00"
+							width="18"
+							height="40"
+							tile="true"
+							shader_name="brighten_t0"
+							shadertechnique_vars="0.00,0.00,0.00,0.00"
+							margin="17.00,0.00,17.00,0.00"/>
+						<image
+							this="GG210016-D012-4000-B000000000000016"
+							uniqueguid="GG210016-D012-4000-B000000000000016"
+							componentimage="GG210016-D011-4000-B000000000000016"
+							offset="0.00,0.00"
+							width="18"
+							height="40"
+							tile="true"
+							colour="#FFFFFFFF"
+							shader_name="brighten_t0"
+							shadertechnique_vars="0.30,0.00,0.00,0.00"
+							margin="17.00,0.00,17.00,0.00"/>
+					</imagemetrics>
+					<transitionmap>
+						<transition
+							index="1"
+							transition_m_target_state="GG210017-D000-4000-B000000000000017"/>
+					</transitionmap>
+				</hover>
+			</states>
 		</handle>
+		<top
+			this="GG210019-D000-4000-B000000000000019"
+			id="top"
+			tooltipslocalised="true"
+			soundcategory="UI_GBL_TMP_Slider_Arrows"
+			uniqueguid="GG210019-D000-4000-B000000000000019"
+			currentstate="GG21001A-D000-4000-B00000000000001A"
+			defaultstate="GG21001A-D000-4000-B00000000000001A">
+			<callbackwithcontextlist>
+				<callback_with_context callback_id="SliderDecrementButton"/>
+			</callbackwithcontextlist>
+			<userproperties>
+				<property
+					name="stepSize"
+					value="10"/>
+			</userproperties>
+			<componentimages>
+				<component_image
+					this="GG210019-D001-4000-B000000000000019"
+					uniqueguid="GG210019-D001-4000-B000000000000019"
+					imagepath="ui/skins/default/slider_vertical_top_active.png"/>
+				<component_image
+					this="GG210019-D003-4000-B000000000000019"
+					uniqueguid="GG210019-D003-4000-B000000000000019"
+					imagepath="ui/skins/default/slider_vertical_top_hover.png"/>
+			</componentimages>
+			<states>
+				<standard
+					this="GG21001A-D000-4000-B00000000000001A"
+					name="standard"
+					width="15"
+					height="22"
+					interactive="true"
+					uniqueguid="GG21001A-D000-4000-B00000000000001A">
+					<imagemetrics>
+						<image
+							this="GG210019-D002-4000-B000000000000019"
+							uniqueguid="GG210019-D002-4000-B000000000000019"
+							componentimage="GG210019-D001-4000-B000000000000019"
+							offset="0.00,0.00"
+							width="15"
+							height="22"
+							margin="0.00,0.00,0.00,0.00"/>
+					</imagemetrics>
+					<transitionmap>
+						<transition
+							transition_m_target_state="GG21001B-D000-4000-B00000000000001B"/>
+					</transitionmap>
+				</standard>
+				<hover
+					this="GG21001B-D000-4000-B00000000000001B"
+					name="hover"
+					width="15"
+					height="22"
+					interactive="true"
+					uniqueguid="GG21001B-D000-4000-B00000000000001B">
+					<imagemetrics>
+						<image
+							this="GG210019-D004-4000-B000000000000019"
+							uniqueguid="GG210019-D004-4000-B000000000000019"
+							componentimage="GG210019-D003-4000-B000000000000019"
+							offset="0.00,0.00"
+							width="15"
+							height="22"
+							margin="0.00,0.00,0.00,0.00"/>
+					</imagemetrics>
+					<transitionmap>
+						<transition
+							index="1"
+							transition_m_target_state="GG21001A-D000-4000-B00000000000001A"/>
+					</transitionmap>
+				</hover>
+			</states>
+		</top>
+		<bottom
+			this="GG21001C-D000-4000-B00000000000001C"
+			id="bottom"
+			tooltipslocalised="true"
+			soundcategory="UI_GBL_TMP_Slider_Arrows"
+			uniqueguid="GG21001C-D000-4000-B00000000000001C"
+			currentstate="GG21001D-D000-4000-B00000000000001D"
+			defaultstate="GG21001D-D000-4000-B00000000000001D">
+			<callbackwithcontextlist>
+				<callback_with_context callback_id="SliderIncrementButton"/>
+			</callbackwithcontextlist>
+			<userproperties>
+				<property
+					name="stepSize"
+					value="10"/>
+			</userproperties>
+			<componentimages>
+				<component_image
+					this="GG21001C-D001-4000-B00000000000001C"
+					uniqueguid="GG21001C-D001-4000-B00000000000001C"
+					imagepath="ui/skins/default/slider_vertical_bottom_active.png"/>
+				<component_image
+					this="GG21001C-D003-4000-B00000000000001C"
+					uniqueguid="GG21001C-D003-4000-B00000000000001C"
+					imagepath="ui/skins/default/slider_vertical_bottom_hover.png"/>
+			</componentimages>
+			<states>
+				<standard
+					this="GG21001D-D000-4000-B00000000000001D"
+					name="standard"
+					width="15"
+					height="22"
+					interactive="true"
+					uniqueguid="GG21001D-D000-4000-B00000000000001D">
+					<imagemetrics>
+						<image
+							this="GG21001C-D002-4000-B00000000000001C"
+							uniqueguid="GG21001C-D002-4000-B00000000000001C"
+							componentimage="GG21001C-D001-4000-B00000000000001C"
+							offset="0.00,0.00"
+							width="15"
+							height="22"
+							margin="0.00,0.00,0.00,0.00"/>
+					</imagemetrics>
+					<transitionmap>
+						<transition
+							transition_m_target_state="GG21001E-D000-4000-B00000000000001E"/>
+					</transitionmap>
+				</standard>
+				<hover
+					this="GG21001E-D000-4000-B00000000000001E"
+					name="hover"
+					width="15"
+					height="22"
+					interactive="true"
+					uniqueguid="GG21001E-D000-4000-B00000000000001E">
+					<imagemetrics>
+						<image
+							this="GG21001C-D004-4000-B00000000000001C"
+							uniqueguid="GG21001C-D004-4000-B00000000000001C"
+							componentimage="GG21001C-D003-4000-B00000000000001C"
+							offset="0.00,0.00"
+							width="15"
+							height="22"
+							margin="0.00,0.00,0.00,0.00"/>
+					</imagemetrics>
+					<transitionmap>
+						<transition
+							index="1"
+							transition_m_target_state="GG21001D-D000-4000-B00000000000001D"/>
+					</transitionmap>
+				</hover>
+			</states>
+		</bottom>
 	</components>
 </layout>
