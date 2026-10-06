@@ -1,0 +1,11 @@
+key	icon	sort_order	show_in_ui	audio_switch	colour_hex
+#building_sets_tables;5;db/building_sets_tables/derpy_great_guilds					
+derpy_gg_set_guild_halls	ui/buildings/icons/derpy_gg_tab_halls.png	7	true	Advanced_Military	4B4158
+derpy_gg_set_guild_halls_emp	ui/buildings/icons/derpy_gg_tab_halls_emp.png	9	true	Advanced_Military	4B4158
+derpy_gg_set_guild_halls_dwf	ui/buildings/icons/derpy_gg_tab_halls_dwf.png	9	true	Advanced_Military	4B4158
+derpy_gg_set_guild_halls_brt	ui/buildings/icons/derpy_gg_tab_halls_brt.png	9	true	Military_Recruitment	781414
+derpy_gg_set_guild_halls_cth	ui/buildings/icons/derpy_gg_tab_halls_cth.png	7	true	Military_Recruitment	781414
+derpy_gg_set_guild_halls_ksl	ui/buildings/icons/derpy_gg_tab_halls_ksl.png	7	true	Advanced_Military	4B4158
+derpy_gg_set_guild_halls_def	ui/buildings/icons/derpy_gg_tab_halls_def.png	9	true	Military_Recruitment	781414
+derpy_gg_set_guild_halls_hef	ui/buildings/icons/derpy_gg_tab_halls_hef.png	9	true	Military_Recruitment	781414
+derpy_gg_set_guild_halls_skv	ui/buildings/icons/derpy_gg_tab_halls_skv.png	9	true	Advanced_Military	4B4158

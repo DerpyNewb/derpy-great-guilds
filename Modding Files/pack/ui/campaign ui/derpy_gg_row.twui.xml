@@ -26,7 +26,7 @@
 					this="GG210002-D000-4000-B000000000000002"
 					name="standard"
 					width="750"
-					height="40"
+					height="34"
 					uniqueguid="GG210002-D000-4000-B000000000000002">
 				</standard>
 			</states>
@@ -50,7 +50,7 @@
 					this="GG210005-D000-4000-B000000000000005"
 					name="standard"
 					width="750"
-					height="40"
+					height="34"
 					interactive="true"
 					uniqueguid="GG210005-D000-4000-B000000000000005">
 					<imagemetrics>
@@ -60,7 +60,7 @@
 							componentimage="GG210004-D001-4000-B000000000000004"
 							offset="0.00,0.00"
 							width="750"
-							height="40"
+							height="34"
 							colour="#00000055"
 							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
@@ -125,8 +125,8 @@
 				<standard
 					this="GG21000B-D000-4000-B00000000000000B"
 					name="standard"
-					width="36"
-					height="36"
+					width="30"
+					height="30"
 					interactive="true"
 					uniqueguid="GG21000B-D000-4000-B00000000000000B">
 					<imagemetrics>
@@ -135,8 +135,8 @@
 							uniqueguid="GG21000A-D002-4000-B00000000000000A"
 							componentimage="GG21000A-D001-4000-B00000000000000A"
 							offset="0.00,0.00"
-							width="36"
-							height="36"
+							width="30"
+							height="30"
 							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 				</standard>

@@ -11,7 +11,8 @@
 
 GG = GG or {}
 
-GG.GUILDS = {"brass", "immortals", "daemonsmiths", "khanate", "overseers", "slavers"}
+GG.GUILDS = {"brass", "immortals", "daemonsmiths", "khanate", "overseers", "slavers",
+             "temple"}
 GG.RANKS  = {0, 100, 300, 700, 1500}
 
 GG.state = GG.state or {}          -- [faction_key][guild] = {rep, fav}
@@ -108,6 +109,7 @@ function GG.apply_rank(faction, guild, old_rank, new_rank)
     if new_key then cm:apply_effect_bundle(new_key, faction, -1) end
     GG.asserted[faction] = GG.asserted[faction] or {}
     GG.asserted[faction][guild] = new_rank
+    GG.lock_halls(faction, guild)
 end
 
 -- WHO SITS ACROSS THE TABLE FROM WHOM. Three pairs, each written both ways, so the
@@ -342,7 +344,7 @@ end
 -- The caps are not decoration. Without them, income-scaled reputation lets a
 -- large empire max brass passively while a small one never climbs.
 GG.CAP = {brass = 40, immortals = 60, daemonsmiths = 0,
-          khanate = 40, overseers = 40, slavers = 80}
+          khanate = 40, overseers = 40, slavers = 80, temple = 40}
 
 -- WHAT EACH GUILD HAS PAID THIS FACTION SINCE ITS LAST TURN START, saved as it changes
 -- ("guild=n,..."). Session memory alone let a player at a limit save, reload and earn it
@@ -406,9 +408,14 @@ function GG.with_patron(faction, guild, amount)
 end
 
 -- The MCT-tunable cap, falling back to GG.CAP when no snapshot exists yet. 0 is no cap.
-function GG.guild_cap(guild)
+function GG.guild_cap(guild, faction)
     local cap = GG.setting("cap_" .. guild)
     if cap == nil then cap = GG.CAP[guild] or 0 end
+    -- THE SEAT, half again (spec 5). Integer multiply then divide: the game's Lua is
+    -- float32 and 1.5 is never written. 0 stays 0 - an uncapped guild stays uncapped.
+    if faction and cap > 0 and GG.has_seat and GG.has_seat(faction, guild) then
+        cap = math.floor(cap * 3 / 2)
+    end
     return cap
 end
 
@@ -419,7 +426,7 @@ function GG.capped_grant(faction, guild, amount, source)
     -- directly and is human-only, so it needs no gate of its own.
     if not GG.covered(faction) then return end
     amount = GG.with_patron(faction, guild, amount)
-    local cap = GG.guild_cap(guild)
+    local cap = GG.guild_cap(guild, faction)
     if cap > 0 then
         if not GG.turn_gain[faction] then GG.turn_gain[faction] = GG.load_gain(faction) end
         local so_far = GG.turn_gain[faction][guild] or 0
@@ -459,9 +466,32 @@ function GG.on_turn_start(faction, net_income)
 end
 
 -- WHAT A FACTION'S NEXT TURN START WILL PAY IT with this guild: the income, after the
--- patron's share and the cap, exactly as GG.capped_grant will pay it. Only the Brass
--- Tablets pay at turn start; every other guild is paid by events inside a turn.
+-- patron's share and the cap, exactly as GG.capped_grant will pay it. The Brass Tablets
+-- and the temple pay at turn start; every other guild is paid by events inside a turn.
 function GG.turn_start_pay(faction, guild)
+    -- THE TEMPLE'S DEVOUT, CHAOS AND TAINT ROUTES, each through the patron's share as
+    -- GG.temple_turn grants it, the sum held to the cap. Left out, GG.hold_lead reads a
+    -- leader that has not taken its turn as behind, and the lead swaps every round.
+    if guild == "temple" then
+        if not GG.covered(faction) then return 0 end
+        local r = GG.temple_routes(faction)
+        if not r or not (r.devout or r.chaos or r.taint) then return 0 end
+        local ok, devout, clean, tainted = pcall(function()
+            local f = cm:get_faction(faction)
+            if not f or f:is_null_interface() then return 0, 0, 0 end
+            return GG.temple_counts(f, r)
+        end)
+        if not ok then return 0 end
+        local n = GG.with_patron(faction, guild,
+                                 devout * (GG.setting("rate_temple_devout") or 1))
+                  + GG.with_patron(faction, guild,
+                                   clean * (GG.setting("rate_temple_chaos") or 2))
+                  + GG.with_patron(faction, guild,
+                                   tainted * (GG.setting("rate_temple_taint") or 2))
+        local cap = GG.guild_cap(guild, faction)
+        if cap > 0 and n > cap then n = cap end
+        return n
+    end
     if guild ~= "brass" then return 0 end
     local ok, income = pcall(function()
         local f = cm:get_faction(faction)
@@ -470,7 +500,7 @@ function GG.turn_start_pay(faction, guild)
     end)
     if not ok then return 0 end
     local n = GG.with_patron(faction, guild, GG.brass_from_income(income))
-    local cap = GG.guild_cap(guild)
+    local cap = GG.guild_cap(guild, faction)
     if cap > 0 and n > cap then n = cap end
     return n
 end
@@ -515,9 +545,126 @@ function GG.on_tech_count(faction, n)
     for _ = 1, n - seen do GG.on_tech(faction) end
 end
 
-function GG.on_agent_action(faction, success)
+-- `subtype`: the acting hero's agent subtype. A race's priests and wizards pay the temple
+-- at the spies' rate instead of the spies (temple spec §3.2).
+function GG.on_agent_action(faction, success, subtype)
     if not success then return end
-    GG.capped_grant(faction, "khanate", GG.setting("rate_khanate") or 8, "agents")
+    local guild, source = "khanate", "agents"
+    local r = GG.temple_routes(faction)
+    if r and r.priests and subtype then
+        for i = 1, #r.priests do
+            if r.priests[i] == subtype then guild, source = "temple", "priests" end
+        end
+    end
+    GG.capped_grant(faction, guild, GG.setting("rate_khanate") or 8, source)
+end
+
+-- THE TEMPLE'S ROUTES (temple spec §3.2, 2026-10-04), per culture. `devout`: a province in
+-- good order. `chaos`: a province with no Chaos corruption, and `vampiric` adds the undead's.
+-- `holy`: the cultures a won battle must be against. `priests`: the hero subtypes whose
+-- successful actions pay the temple instead of the spies. Not behind race_differences:
+-- this is the guild's base income. Mirrored by TEMPLE_ROUTES in tools/gen_great_guilds.py,
+-- which runs the block between the two marker lines under lua.exe and compares.
+-- BEGIN TEMPLE ROUTES
+GG.CHAOS_CULTURES = {"wh_main_chs_chaos", "wh3_main_kho_khorne", "wh3_main_nur_nurgle",
+                     "wh3_main_sla_slaanesh", "wh3_main_tze_tzeentch", "wh3_main_dae_daemons"}
+GG.TEMPLE_ROUTES = {
+    ["wh3_dlc23_chd_chaos_dwarfs"] = {devout = true, holy = {"wh_main_dwf_dwarfs"}},
+    ["wh_main_emp_empire"] = {chaos = true, priests = {
+        "wh_main_emp_bright_wizard", "wh_main_emp_celestial_wizard", "wh_main_emp_light_wizard",
+        "wh_dlc05_emp_jade_wizard", "wh_dlc05_emp_grey_wizard", "wh_dlc03_emp_amber_wizard",
+        "wh2_pro07_emp_amethyst_wizard", "wh3_dlc25_emp_gold_wizard"}},
+    ["wh_main_dwf_dwarfs"] = {devout = true,
+        holy = {"wh_main_grn_greenskins", "wh2_main_skv_skaven"}},
+    ["wh_main_brt_bretonnia"] = {devout = true, chaos = true, vampiric = true,
+        holy = {"wh_main_chs_chaos", "wh3_main_kho_khorne", "wh3_main_nur_nurgle",
+                "wh3_main_sla_slaanesh", "wh3_main_tze_tzeentch", "wh3_main_dae_daemons",
+                "wh_main_vmp_vampire_counts"}},
+    ["wh3_main_cth_cathay"] = {devout = true, chaos = true},
+    ["wh3_main_ksl_kislev"] = {devout = true, chaos = true, vampiric = true,
+        holy = {"wh_main_chs_chaos", "wh3_main_kho_khorne", "wh3_main_nur_nurgle",
+                "wh3_main_sla_slaanesh", "wh3_main_tze_tzeentch", "wh3_main_dae_daemons",
+                "wh_dlc08_nor_norsca"}},
+    ["wh2_main_def_dark_elves"] = {holy = {"wh2_main_hef_high_elves"},
+        priests = {"wh2_main_def_death_hag"}},
+    ["wh2_main_hef_high_elves"] = {devout = true, chaos = true,
+        holy = {"wh2_main_def_dark_elves"}},
+    -- THE GREY SEERS (skaven spec §3.2): no devout and no chaos route - the Under-Empire
+    -- SPREADS corruption - so `taint` pays per province carrying Skaven corruption. No
+    -- priests route: every Grey Seer subtype is a lord (faction_agent_permitted_subtypes).
+    ["wh2_main_skv_skaven"] = {taint = true,
+        holy = {"wh_main_dwf_dwarfs", "wh2_main_lzd_lizardmen"}},
+}
+-- END TEMPLE ROUTES
+
+function GG.temple_routes(faction)
+    return GG.TEMPLE_ROUTES[GG.culture_of(faction) or ""]
+end
+
+-- ONE COUNT PER PROVINCE, not per settlement: public order is the province's, so a region
+-- count would pay one province once per settlement in it. Corruption lives on the province
+-- too (CA reads region:province():pooled_resource_manager()). A missing resource is none.
+-- CHAOS IS FIVE RESOURCES, Undivided and one per god (CA's corruption_swing.lua): CA seeds
+-- Saphery with 75 Slaanesh, which Undivided alone would count as clean.
+function GG.temple_counts(f, r)
+    local taints = {"wh3_main_corruption_chaos", "wh3_main_corruption_khorne",
+                    "wh3_main_corruption_nurgle", "wh3_main_corruption_slaanesh",
+                    "wh3_main_corruption_tzeentch"}
+    if r.vampiric then taints[#taints + 1] = "wh3_main_corruption_vampiric" end
+    local devout, clean, tainted = 0, 0, 0
+    local pl = f:provinces()
+    for i = 0, pl:num_items() - 1 do
+        local fp = pl:item_at(i)
+        if r.devout then
+            local regs = fp:regions()
+            if regs:num_items() > 0 and regs:item_at(0):public_order() > 0 then
+                devout = devout + 1
+            end
+        end
+        if r.chaos then
+            local prm = fp:province():pooled_resource_manager()
+            local pure = true
+            for j = 1, #taints do
+                local res = prm:resource(taints[j])
+                if not res:is_null_interface() and res:value() > 0 then pure = false end
+            end
+            if pure then clean = clean + 1 end
+        end
+        -- THE SKAVEN'S TAINT: a province CARRYING their corruption, the reverse of clean.
+        if r.taint then
+            local res = fp:province():pooled_resource_manager():resource("wh3_main_corruption_skaven")
+            if not res:is_null_interface() and res:value() > 0 then tainted = tainted + 1 end
+        end
+    end
+    return devout, clean, tainted
+end
+
+-- At the faction's turn start, AI included. `f` is the faction interface the listener holds.
+function GG.temple_turn(faction, f)
+    local r = GG.temple_routes(faction)
+    if not r or not (r.devout or r.chaos or r.taint) or not f then return end
+    local ok, devout, clean, tainted = pcall(GG.temple_counts, f, r)
+    if not ok then return end
+    GG.capped_grant(faction, "temple", devout * (GG.setting("rate_temple_devout") or 1),
+                    "devout")
+    GG.capped_grant(faction, "temple", clean * (GG.setting("rate_temple_chaos") or 2),
+                    "chaos")
+    GG.capped_grant(faction, "temple", tainted * (GG.setting("rate_temple_taint") or 2),
+                    "taint")
+end
+
+-- A WON BATTLE AGAINST THE FAITH'S ENEMIES, off CA's pending-battle cache, which keeps the
+-- battle until the next one and so still answers after the commanders have died. Called
+-- from GG.battle_award, which the listener already deduplicates per battle.
+function GG.temple_holy(faction)
+    local r = GG.temple_routes(faction)
+    if not r or not r.holy then return end
+    local ok, won = pcall(function()
+        return cm:pending_battle_cache_faction_won_battle_against_culture(faction, r.holy)
+    end)
+    if ok and won == true then
+        GG.capped_grant(faction, "temple", GG.setting("rate_temple_holy") or 10, "holywar")
+    end
 end
 
 -- WHICH GUILD A BUILDING BELONGS TO.
@@ -579,12 +726,19 @@ end
 -- MATCHED AGAINST A LOWERCASED CHAIN. Some of CA's chain keys carry uppercase segments -
 -- wh2_main_EMPIRE_academy, and NORSCA, DWARFS, VAMPIRES and GREENSKIN elsewhere - so a
 -- case-sensitive match would miss any token that landed on one.
+--
+-- THE DWARF WORDS (2026-10-04). The list was tuned on Chaos Dwarf chains, and half of
+-- every Dwarf building's reputation fell through to the default - the Miners' Guild -
+-- while the Rangers and the Grudge-Settlers earned nothing from building at all. Slayer
+-- shrines, grudges and oaths now pay the Grudge-Settlers, ranger hubs the Rangers, taverns
+-- and beer halls the Merchant Clans. `oaths`, not `oath`: the bare word is inside every
+-- race's Galbaraz `oathgold`, which is gold and stays with brass.
 GG.BUILDING_THEME = {
-    {"slavers", {"slave", "scavanger", "prison", "dungeon"}},
+    {"slavers", {"slave", "scavanger", "prison", "dungeon", "slayer", "grudge", "oaths"}},
     {"daemonsmiths", {"forge", "smith", "furnace", "workshop", "engineer", "library",
                       "research", "assembly", "refinery", "drills", "alchem", "magic",
-                      "arcane", "observator", "college", "military_kdaai"}},
-    {"khanate", {"watch", "patrol", "assassin", "hobgoblin"}},
+                      "arcane", "observator", "college", "military_kdaai", "engines"}},
+    {"khanate", {"watch", "patrol", "assassin", "hobgoblin", "ranger"}},
     {"immortals", {"military", "barracks", "infantry", "cavalry", "ranged", "beast",
                    "monster", "garrison", "academy", "walls", "defence", "fortress",
                    "ballistic", "guardhouse", "gate", "drill", "war_machine",
@@ -592,23 +746,115 @@ GG.BUILDING_THEME = {
     {"brass", {"resource", "_port", "harbour", "market", "trade", "caravan",
                "tribute_hall", "treasur", "gold", "iron", "furs", "marble", "obsidian",
                "pottery", "salt", "spices", "wine", "ivory", "gems", "timber", "dyes",
-               "animals", "medicine", "pastures"}},
+               "animals", "medicine", "pastures", "tavern", "brewery", "drinking", "beer",
+               "counting"}},
     {"overseers", {"settlement", "growth", "city", "farm", "mine", "quarry", "living",
                    "residence", "overseer", "temple", "altar", "shrine", "camp",
                    "horde", "public", "road"}},
 }
 
+-- WORDS THAT MEAN ONE GUILD IN ONE RACE (temple spec §3.1, 2026-10-04), keyed by flavour tag
+-- (GG.tag). Checked BEFORE the shared list: a chain one of these matches belongs to that
+-- guild outright, so a word can mean the Thieves' Guild in the Empire and the Brass Tablets
+-- everywhere else. Every token is a whole readable run verified against that race's chains;
+-- the bare words temple and shrine are never used, because they catch the Chaos Dwarf Fane
+-- Guard and the foreign shrines a faction can hold. check_building_theme mirrors this.
+GG.BUILDING_THEME_RACE = {
+    [""] = {
+        {"temple", {"temple_of_hashut", "defaced_shrine"}},
+    },
+    ["_emp"] = {
+        {"temple", {"empire_wizards", "college_of_magic", "spiriters_study",
+                    "chamber_of_the_dark_lady", "elemental_temple",
+                    "convent_of_sorcery_emp", "tower_of_hoeth_emp"}},
+        {"daemonsmiths", {"nuln_gunnery"}},
+        {"khanate", {"empire_tavern", "ubersreik_inn"}},
+        {"slavers", {"shooting_range", "militia_of_morr", "emp_allied_outpost"}},
+        {"immortals", {"chapterhouse", "empire_stables", "empire_fort_emp",
+                       "castle_reikguard"}},
+    },
+    ["_dwf"] = {
+        {"temple", {"ancestors_hall", "dwarfs_slayers", "slayer_shrine"}},
+    },
+    ["_brt"] = {
+        {"temple", {"bretonnia_worship", "holy_monastery", "legendary_bretonnia"}},
+        {"daemonsmiths", {"carcassonne"}},
+        {"khanate", {"bretonnia_tavern"}},
+        {"immortals", {"bretonnia_stables", "parravon_peaks"}},
+        {"slavers", {"brt_allied_outpost", "copher_port"}},
+        {"brass", {"industry_extra"}},
+        {"overseers", {"bretonnia_smith"}},
+    },
+    ["_cth"] = {
+        {"temple", {"li_temple", "phoenix_temple", "two_moons"}},
+        {"daemonsmiths", {"jade_blood", "cth_gunners", "gunpowder", "cth_artillery"}},
+        {"khanate", {"cth_allied_outpost", "house_of_secrets", "foreign_slot_discovery_cth"}},
+        {"slavers", {"order_y", "peasants", "bastion_1"}},
+        {"immortals", {"cth_celestial", "armoury_tigers", "cth_den"}},
+        {"brass", {"income_y", "great_embassy"}},
+    },
+    ["_ksl"] = {
+        {"temple", {"ksl_gold", "kislev_city_temple", "ksl_kislev_2", "corruption_land"}},
+        {"daemonsmiths", {"ice_guard", "ksl_woods", "ostankyas_hut", "erengrad_1",
+                          "main_ksl_bears"}},
+        {"slavers", {"ksl_cavalry", "recruit_growth_xp"}},
+        {"immortals", {"ksl_stables"}},
+        {"khanate", {"growth_recruit_cost"}},
+    },
+    ["_def"] = {
+        {"temple", {"worship", "bombardment_a", "temple_of_khaine", "shrine_of_khaine",
+                    "hellebron_palace"}},
+        {"khanate", {"def_murder"}},
+        {"daemonsmiths", {"sorcery", "bombardment_b", "bombardment_c", "pleasure_cult"}},
+        {"slavers", {"def_port", "exiles", "horde_def_military", "lokhir_military",
+                     "dawns_harbour_def", "talon_of_agony", "underworld_sea_gate"}},
+        {"immortals", {"naggarond_blackguard", "aristocracy", "coldones"}},
+    },
+    ["_hef"] = {
+        {"temple", {"hef_worship", "shrine_of_asuryan_hef"}},
+        {"daemonsmiths", {"hef_mages", "tower_of_hoeth", "convent_of_sorcery_hef",
+                          "tower_of_the_stars", "yvresse_amphitheatre"}},
+        {"khanate", {"aesanar_camp", "field_hq"}},
+        {"slavers", {"stables", "tiranoc_palace"}},
+        {"brass", {"income_branch", "supplies_income", "economy_income"}},
+        {"overseers", {"hef_smith"}},
+    },
+    -- THE SKAVEN (skaven ruling 8). Order is Taskmaster's Platform and Overseer's Lookout
+    -- (the Slave-Masters); Plagues the Horned Rat's priesthood (the Grey Seers); the
+    -- under-city chains split by what they do.
+    ["_skv"] = {
+        {"temple", {"skv_plagues", "under_empire_annexation_plague_cauldron"}},
+        {"daemonsmiths", {"skv_engineers", "skv_weaponteams", "skv_energy", "skv_stormfiends",
+                          "under_empire_annexation_doomsday"}},
+        {"khanate", {"skv_assassins", "under_empire_discovery", "foreign_slot_discovery_skv"}},
+        {"slavers", {"skv_order", "under_empire_food"}},
+        {"brass", {"skv_resource", "skv_port", "under_empire_money", "under_empire_warpstone"}},
+        {"immortals", {"skv_clanrats", "skv_defence", "under_empire_annexation_war_camp",
+                       "under_empire_settlement_stronghold"}},
+        {"overseers", {"skv_farm", "skv_monsters", "skv_industry",
+                       "under_empire_settlement_warren"}},
+    },
+}
+
 -- The guild a chain belongs to, or nil when no word matches. nil is a real answer and the
 -- caller decides what to do with it - 39% of vanilla chains match nothing, most of them
 -- `special_*` landmarks and race-specific names like `tmb_ushabti` that share no
--- vocabulary with anything.
-function GG.guild_of_chain(chain)
+-- vocabulary with anything. `tag` is the owner's flavour; without it only the shared words
+-- apply.
+function GG.guild_of_chain(chain, tag)
     if type(chain) ~= "string" or chain == "" then return nil end
     chain = string.lower(chain)
+    local race = tag and GG.BUILDING_THEME_RACE[tag]
+    return (race and GG.longest_token(chain, race))
+           or GG.longest_token(chain, GG.BUILDING_THEME)
+end
+
+-- The guild of `theme`'s longest token found in `chain` (already lowercased), or nil.
+function GG.longest_token(chain, theme)
     local best, best_len = nil, 0
-    for rank = 1, #GG.BUILDING_THEME do
-        local guild = GG.BUILDING_THEME[rank][1]
-        local toks = GG.BUILDING_THEME[rank][2]
+    for rank = 1, #theme do
+        local guild = theme[rank][1]
+        local toks = theme[rank][2]
         for i = 1, #toks do
             local t = toks[i]
             -- MATCHED AS A PATTERN, WITH NO PLAIN FLAG. string.find's fourth argument
@@ -645,9 +891,32 @@ function GG.on_building(faction, level, chain)
     if tier > 10 then tier = 10 end
     -- The Overseers are the default and not merely a fallback: they are the guild of
     -- building things, so a chain whose name says nothing still belongs to them.
-    local guild = GG.guild_of_chain(chain) or "overseers"
+    local guild = GG.hall_guild(chain) or GG.guild_of_chain(chain, GG.tag(faction))
+                  or "overseers"
     GG.capped_grant(faction, guild, (GG.setting("rate_overseers") or 10) * tier,
                     "buildings")
+end
+
+-- AN UNDER-CITY BUILDING'S LEVEL KEY, "<chain>_<n>" (skaven ruling 6): CA's
+-- ForeignSlotBuildingCompleteEvent hands a level key string, not a building interface.
+function GG.level_of(key)
+    if type(key) ~= "string" then return nil end
+    local chain, n = string.match(key, "^(.-)_(%d+)$")
+    if not chain or chain == "" then return nil end
+    return chain, tonumber(n)
+end
+
+-- Founding an under-city pays the race route; GG.race_earn refuses any culture whose
+-- route is not "undercity", so Neferata's covens pay nobody.
+function GG.on_undercity_founded(name)
+    GG.load(name); GG.race_earn(name, "undercity"); GG.save(name)
+end
+
+-- An under-city building pays its guild like any building, by the OWNER's race words.
+function GG.on_undercity_building(name, key)
+    local chain, n = GG.level_of(key)
+    if not chain then return end
+    GG.load(name); GG.on_building(name, n, chain); GG.save(name)
 end
 
 function GG.on_settlement(faction, razed)
@@ -754,6 +1023,8 @@ GG.BOUNTY_KINDS = {
 GG.BOUNTIES = {
     brass = "region_take", immortals = "lord_kill", daemonsmiths = "region_sack",
     khanate = "lord_kill", overseers = "region_take", slavers = "region_sack",
+    -- THE HOLY WAR (temple spec §4): a lord of the race's holy-war cultures, GG.holy_pool.
+    temple = "lord_kill",
 }
 
 -- THE OTHER KINDS EACH GUILD MAY POST, after its military one (spec 5). Mirrored by
@@ -765,6 +1036,7 @@ GG.BOUNTY_EXTRA = {
     khanate      = {"hero_strike", "job_build"},
     overseers    = {"job_build"},
     slavers      = {"job_captives", "job_build"},
+    temple       = {"job_build"},
 }
 -- Where a job finds its target and whether it still stands; filled further down.
 GG.BOUNTY_PICK = GG.BOUNTY_PICK or {}
@@ -1308,6 +1580,10 @@ function GG.reassert_leaders()
             end
             if who then cm:apply_effect_bundle(key, who, -1) end
             GG.leaders_now[slot] = who
+            if type(was) == "string" then GG.lock_halls(was, guild) end
+            if who then GG.lock_halls(who, guild) end
+            if type(was) == "string" then GG.assert_seat(was, guild) end
+            if who then GG.assert_seat(who, guild) end
             -- AND SAY SO, if the player is one of the two parties. Losing a guild
             -- costs a permanent bundle and the monopoly on that guild's dearest
             -- service, and until now the only way to find out was to open the panel
@@ -1906,6 +2182,21 @@ function GG.bounty_pool(faction, war, human_ok)
     return out
 end
 
+-- THE TEMPLE'S BOUNTY IS A HOLY WAR (temple spec §4): its pool keeps only factions of the
+-- race's holy-war cultures. A race with none keeps the whole pool; one with none at war gets
+-- an empty pool, and the guild posts another kind.
+function GG.holy_pool(faction, pool)
+    local r = GG.temple_routes(faction)
+    if not r or not r.holy then return pool end
+    local want, out = {}, {}
+    for i = 1, #r.holy do want[r.holy[i]] = true end
+    for i = 1, #pool do
+        local ok, c = pcall(function() return pool[i]:culture() end)
+        if ok and want[c] then out[#out + 1] = pool[i] end
+    end
+    return out
+end
+
 -- THE FRONT LINE IS NEVER A BOUNTY (spec 3.2). Work the war finishes anyway is the
 -- exploit this whole pass removes. A region is on the front when you own it or it
 -- touches one you own; a character when it stands within GG.BOUNTY_FRONT_DIST2 (squared
@@ -2000,6 +2291,7 @@ function GG.bounty_target(faction, kind, used, war, guild, ai)
     local ok, target, owner = pcall(function()
         -- A RIVAL (ai) fights only the wars it has and may name a human.
         local pool = GG.bounty_pool(faction, war == true and not ai, ai)
+        if guild == "temple" then pool = GG.holy_pool(faction, pool) end
         if #pool == 0 then
             why = war and "nobody met and at peace" or "at war with nobody eligible"
             return nil
@@ -3082,6 +3374,21 @@ GG.SERVICES = {
     {key="whispers_at_court",   guild="khanate",      rank=2, cost=50,  cd=8,  kind="race",     value=30, race="wh2_main_hef_high_elves"},
     {key="phoenix_favour",      guild="brass",        rank=3, cost=150, cd=12, kind="resource", resource="wh3_dlc27_hef_favour", factor="faction", value=50, race="wh2_main_hef_high_elves"},
     {key="asuryans_grace",      guild="daemonsmiths", rank=4, cost=400, cd=16, kind="race",     value=150, value2=40, lead=true, race="wh2_main_hef_high_elves"},
+    -- THE TEMPLE (2026-10-04, temple spec §4). After every other row: cooldowns are saved by
+    -- position, so a row anywhere else would move every saved cooldown after it.
+    {key="hashut_blessing",     guild="temple",       rank=2, cost=50,  cd=8,  kind="army",       turns=5},
+    {key="forge_sermons",       guild="temple",       rank=2, cost=50,  cd=8,  kind="settlement", turns=8},
+    {key="temple_tithe",        guild="temple",       rank=2, cost=50,  cd=8,  kind="gold",       value=2000},
+    {key="zeal",                guild="temple",       rank=3, cost=150, cd=12, kind="army",       turns=5},
+    {key="purge_unclean",       guild="temple",       rank=3, cost=150, cd=12, kind="settlement", turns=8},
+    {key="anathema",            guild="temple",       rank=3, cost=150, cd=12, kind="enemy_settlement", turns=5},
+    {key="holy_war",            guild="temple",       rank=4, cost=400, cd=16, kind="bundle",     turns=10, lead=true},
+    {key="miracle",             guild="temple",       rank=4, cost=400, cd=16, kind="army",       turns=2, heal=true, lead=true},
+    {key="consecration",        guild="temple",       rank=4, cost=400, cd=16, kind="bundle",     turns=12, lead=true},
+    -- THE SKAVEN'S RACE SERVICES (2026-10-05), AFTER the temple rows: cooldowns are positional.
+    {key="food_tithe",          guild="slavers",      rank=2, cost=50,  cd=8,  kind="resource", resource="skaven_food", factor="missions", value=20, race="wh2_main_skv_skaven"},
+    {key="shadows_of_eshin",    guild="khanate",      rank=3, cost=150, cd=12, kind="race_army", room=true, units="wh2_main_skv_inf_gutter_runners_0,wh2_main_skv_inf_night_runners_0", race="wh2_main_skv_skaven"},
+    {key="breeding_season",     guild="overseers",    rank=4, cost=400, cd=16, kind="bundle",   turns=10, lead=true, race="wh2_main_skv_skaven"},
 }
 
 -- ONE UNIT PER CULTURE, NOT ONE UNIT. This was a single Chaos Dwarf key, and it was the
@@ -3109,6 +3416,7 @@ GG.HIRE_UNIT_BY_CULTURE = {
     ["wh2_main_def_dark_elves"]    = "wh2_main_def_inf_black_guard_0",
     -- Swordmasters over Phoenix Guard (1,400), chosen by the user on 2026-09-24.
     ["wh2_main_hef_high_elves"]    = "wh2_main_hef_inf_swordmasters_of_hoeth_0",
+    ["wh2_main_skv_skaven"]        = "wh2_main_skv_inf_stormvermin_0",
 }
 
 -- Kept because three other files still read it by name. It is the Chaos Dwarf entry of
@@ -3184,6 +3492,7 @@ GG.FLAVOURED = {
     ["wh3_main_ksl_kislev"] = {tag = "_ksl", feed = 60},
     ["wh2_main_def_dark_elves"] = {tag = "_def", feed = 70},
     ["wh2_main_hef_high_elves"] = {tag = "_hef", feed = 80},
+    ["wh2_main_skv_skaven"] = {tag = "_skv", feed = 90},
 }
 
 -- Cached in GG.CULTURE_OF, which until now was declared and never written to: a
@@ -3267,7 +3576,7 @@ local function is_chd(faction)
     return (GG.CULTURE_OF[faction] or GG.CHD_CULTURE) == GG.CHD_CULTURE
 end
 
-function GG.payload(faction, s, target)
+function GG.payload(faction, s, target, points)
     if s.kind == "bundle" then
         -- WRITTEN OUT, not as `(s.hostile and target) or faction`. That expression
         -- falls through to the BUYER when target is nil, so the one aggressive service
@@ -3307,8 +3616,19 @@ function GG.payload(faction, s, target)
         -- off, and an omitted boolean is nil. Notified for the player only: the AI runs
         -- this from a turn sweep, and a feed line per rival per technology would bury
         -- the player's own feed in other factions' research.
+        --
+        -- POINTS, NOT A FORCED COMPLETION, when the buyer's panel sent what is left.
+        -- instantly_research_technology on the tech IN PROGRESS is taken back by the engine
+        -- the next time the player re-plans the queue - left fully paid at "1 turn"
+        -- (measured live 2026-10-04: has_technology true, then false after a click on
+        -- another tech). grant_research_points pays it through the queue, completes it at
+        -- once and has held through a re-plan. The AI sends no points and keeps the old call.
         if target then
-            cm:instantly_research_technology(faction, target, GG.is_human(faction))
+            if points and points > 0 then
+                cm:grant_research_points(faction, points)
+            else
+                cm:instantly_research_technology(faction, target, GG.is_human(faction))
+            end
         end
 
     elseif s.kind == "shroud" then
@@ -3565,6 +3885,9 @@ GG.RACE_FIRE.electors_muster = function(faction, s, target)
     local lookup = cm:char_lookup_str(target)
     for unit in string.gmatch(s.units, "[^,]+") do cm:grant_unit_to_character(lookup, unit) end
 end
+-- SHADOWS OF ESHIN (skaven ruling 3): the Menace Below's charges are not a resource a
+-- script can add to, so Eshin lends its runners instead, through the Muster's grant.
+GG.RACE_FIRE.shadows_of_eshin = GG.RACE_FIRE.electors_muster
 
 -- ELECTOR'S FAVOUR: +1 Fealty to the least loyal Elector Count, through CA's own politics
 -- globals (wh2_dlc13_empire_politics.lua:949, :1943). The finder keeps only electors
@@ -3751,6 +4074,8 @@ GG.EARN_ROUTES = {
     chivalry   = {guild = "immortals",    per = 5},
     captives   = {guild = "slavers",      per = 20},
     court      = {guild = "khanate",      rep = 40},
+    -- UNDER-CITIES (skaven spec §4.2): Clan Eshin's trade is infiltration.
+    undercity  = {guild = "khanate",      rep = 40},
 }
 -- Which race earns by which route. CaravanCompleted is raised for Chaos Dwarf convoys and
 -- Cathay's caravans alike, so both earn by it.
@@ -3763,6 +4088,7 @@ GG.EARN_OF = {
     ["wh_main_brt_bretonnia"]      = "chivalry",
     ["wh2_main_def_dark_elves"]    = "captives",
     ["wh2_main_hef_high_elves"]    = "court",
+    ["wh2_main_skv_skaven"]        = "undercity",
 }
 -- The pools an earning listens to, and which of their factors count.
 GG.POOL_ROUTES = {wh3_dlc25_dwf_grudge_points = "grudges", brt_chivalry = "chivalry",
@@ -4103,8 +4429,18 @@ function GG.service_cost(faction, service_key)
     local p = GG.patrons[faction]
     if p and p.guild == svc.guild then mod = mod - GG.FAVOUR_PATRON end
 
+    -- HALLS: 3% a hall of this guild, at most 15 (spec 4.4). Before the clamp, so the
+    -- -30 floor still bounds everything stacked together.
+    local before = mod
+    mod = mod - GG.hall_discount(faction, svc.guild)
+
     if mod < GG.FAVOUR_MIN_MOD then mod = GG.FAVOUR_MIN_MOD end
     if mod > GG.FAVOUR_MAX_MOD then mod = GG.FAVOUR_MAX_MOD end
+    -- WHAT THE HALLS ACTUALLY TOOK, after the clamp: the price hover names it as a part of
+    -- the total, and against the -30 floor it is less than GG.hall_discount says.
+    if before < GG.FAVOUR_MIN_MOD then before = GG.FAVOUR_MIN_MOD end
+    if before > GG.FAVOUR_MAX_MOD then before = GG.FAVOUR_MAX_MOD end
+    local hall_cut = before - mod
 
     -- No floor here. The cheapest base is 50 and the deepest discount 30%, so the
     -- cheapest a service can ever be is 35; a runtime `cost < 1` guard could not fire.
@@ -4112,14 +4448,190 @@ function GG.service_cost(faction, service_key)
     local price = math.floor(svc.cost * (100 + mod) / 100)
     -- A SERVICE AIMED AT AN ENEMY, at the Dark Elves' price (GG.TWISTS hostile_price).
     -- After the clamps, so the twist is never lost to them, and the modifier returned is
-    -- the whole difference, so the card's tooltip explains the number it shows.
+    -- the whole difference, so the card's tooltip explains the number it shows. The
+    -- halls' share of it scales the same way, or the hover overstates their cut.
     local p = (svc.hostile or svc.kind == "enemy_settlement")
               and GG.twist(faction, "hostile_price") or 100
     if p ~= 100 then
         price = math.floor(price * p / 100)
         mod = math.floor(price * 100 / svc.cost) - 100
+        hall_cut = math.floor(hall_cut * p / 100)
     end
-    return price, mod
+    return price, mod, hall_cut
+end
+
+-- ------------------------------------------------------------------ guild halls --
+-- Spec: docs/superpowers/specs/2026-10-04-great-guilds-halls-design.md. Mirrored by HALL_*
+-- in tools/gen_great_guilds.py (check_hall_mirror). Six chains per race share one
+-- superchain capped at one instance, so a settlement holds one guild's hall - that is the
+-- DB's job. This block decides who may BUILD which level, counts what stands, and pays.
+GG.HALL_TAGS = {[""] = true, ["_emp"] = true, ["_dwf"] = true, ["_brt"] = true, ["_cth"] = true, ["_ksl"] = true, ["_def"] = true, ["_hef"] = true, ["_skv"] = true}          -- races with halls
+GG.HALL_RANK = {2, 4, 5}              -- rank for level 0, 1, 2; level 2 also needs the lead
+GG.HALL_REP = {4, 8, 15}              -- reputation per hall per turn, by level
+GG.HALL_OFF_MAX = 15                  -- most % a guild's halls take off its services
+
+function GG.hall_key(guild, n, tag) return "derpy_gg_hall_" .. guild .. "_" .. n .. (tag or "") end
+
+function GG.hall_tip_key(guild, n, tag)
+    return "derpy_gg_hall_tip_" .. (n == 2 and "lead" or tostring(n)) .. "_" .. guild .. (tag or "")
+end
+
+-- A RACE THAT HAS HALLS, covered or not: what the locks reach. An Empire player's campaign
+-- still has Chaos Dwarf factions in it, and an unlocked one could build all 18 levels on
+-- turn 1. An unreadable culture has no flavour, and is not a hall race.
+function GG.hall_culture(faction)
+    return GG.flavour_of(faction) ~= nil and GG.HALL_TAGS[GG.tag(faction)] == true
+end
+
+-- A hall race the mod COVERS: what counting, paying and the Seat reach.
+function GG.halls_here(faction)
+    return GG.covered(faction) and GG.hall_culture(faction)
+end
+
+function GG.hall_open(faction, guild, n)
+    if not GG.covered(faction) then return false end
+    if GG.setting("guild_halls") == false then return false end
+    local rank = GG.rank_of((GG.get(faction, guild)))
+    if rank < GG.HALL_RANK[n + 1] then return false end
+    if n == 2 then return GG.leader_of(guild, GG.culture_of(faction)) == faction end
+    return true
+end
+
+-- WHAT WAS LAST WRITTEN, per faction and level: session memory. Empty after a load, so the
+-- first sweep of a session writes every level once - the engine saves the records itself,
+-- but a save from before halls has none, and this is what gives it some.
+GG.halls_locked = GG.halls_locked or {}
+-- Which factions the turn-start sweep has done this session (all six guilds at once).
+GG.halls_swept = GG.halls_swept or {}
+
+function GG.lock_halls(faction, guild)
+    if not faction or not GG.hall_culture(faction) then return end
+    local tag = GG.tag(faction)
+    local memo = GG.halls_locked[faction] or {}
+    GG.halls_locked[faction] = memo
+    for n = 0, 2 do
+        local key = GG.hall_key(guild, n, tag)
+        local shut = not GG.hall_open(faction, guild, n)
+        if memo[key] ~= shut then
+            if shut then
+                cm:add_event_restricted_building_record_for_faction(key, faction,
+                    GG.hall_tip_key(guild, n, tag))
+            else
+                cm:remove_event_restricted_building_record_for_faction(key, faction)
+            end
+            memo[key] = shut
+        end
+    end
+end
+
+-- WHAT STANDS, counted at turn start and never saved: the map is the record, so a reload
+-- cannot desync it. A settlement holds one hall (the superchain is capped at one), so
+-- the walk stops at the first hit per region.
+GG.halls = GG.halls or {}
+
+function GG.count_halls(faction)
+    local out = {}
+    for i = 1, #GG.GUILDS do out[GG.GUILDS[i]] = {n = 0, best = -1, lv = {0, 0, 0}} end
+    GG.halls[faction] = out
+    if not faction or not GG.halls_here(faction) then return out end
+    local f = cm:get_faction(faction)
+    if not f or f:is_null_interface() then return out end
+    local tag = GG.tag(faction)
+    local rl = f:region_list()
+    for i = 0, rl:num_items() - 1 do
+        local r = rl:item_at(i)
+        local hit = false
+        for gi = 1, #GG.GUILDS do
+            local g = GG.GUILDS[gi]
+            for n = 2, 0, -1 do
+                if r:building_exists(GG.hall_key(g, n, tag)) then
+                    local c = out[g]
+                    c.n = c.n + 1
+                    c.lv[n + 1] = c.lv[n + 1] + 1
+                    if n > c.best then c.best = n end
+                    hit = true
+                    break
+                end
+            end
+            if hit then break end
+        end
+    end
+    return out
+end
+
+function GG.pay_halls(faction)
+    if GG.setting("guild_halls") == false then return end
+    local h = GG.halls[faction]
+    if not h then return end
+    local pct = tonumber(GG.setting("hall_rep")) or 100
+    for i = 1, #GG.GUILDS do
+        local g = GG.GUILDS[i]
+        local c = h[g]
+        local amt = c.lv[1] * GG.HALL_REP[1] + c.lv[2] * GG.HALL_REP[2] + c.lv[3] * GG.HALL_REP[3]
+        amt = math.floor(amt * pct / 100)
+        if amt > 0 then GG.capped_grant(faction, g, amt, "halls") end
+    end
+end
+
+function GG.hall_discount(faction, guild)
+    if GG.setting("guild_halls") == false then return 0 end
+    local c = GG.halls[faction] and GG.halls[faction][guild]
+    if not c or c.n <= 0 then return 0 end
+    local off = c.n * (tonumber(GG.setting("hall_off")) or 3)
+    if off > GG.HALL_OFF_MAX then off = GG.HALL_OFF_MAX end
+    return off
+end
+
+function GG.hall_guild(chain)
+    local g = chain and string.match(chain, "^derpy_gg_hall_(%l+)")
+    for i = 1, #GG.GUILDS do if GG.GUILDS[i] == g then return g end end
+    return nil
+end
+
+function GG.seat_key(guild, tag) return "derpy_gg_seat_" .. guild .. (tag or "") end
+
+function GG.has_seat(faction, guild)
+    if GG.setting("guild_halls") == false then return false end
+    local c = GG.halls[faction] and GG.halls[faction][guild]
+    if not c or c.lv[3] <= 0 then return false end
+    return GG.leader_of(guild, GG.culture_of(faction)) == faction
+end
+
+-- What was last applied, per faction and guild: session memory. Empty after a load, so
+-- the first assertion of a session applies or removes once, which heals a save either way.
+GG.seat_on = GG.seat_on or {}
+
+function GG.assert_seat(faction, guild)
+    if not faction or not GG.halls_here(faction) then return end
+    local want = GG.has_seat(faction, guild)
+    local k = faction .. "|" .. guild
+    if GG.seat_on[k] == want then return end
+    local key = GG.seat_key(guild, GG.tag(faction))
+    if want then cm:apply_effect_bundle(key, faction, -1)
+    else cm:remove_effect_bundle(key, faction) end
+    GG.seat_on[k] = want
+end
+
+-- EVERY FACTION OF A HALL RACE, covered or not, from the same source GG.load_all reads:
+-- GG.state is empty in a fresh campaign, so iterating it left every hall buildable until a
+-- faction earned something. scan_world buckets every present faction of every culture.
+function GG.first_halls()
+    local seen = {}
+    local function one(f)
+        if seen[f] then return end
+        seen[f] = true
+        if GG.hall_culture(f) then
+            GG.count_halls(f)
+            for i = 1, #GG.GUILDS do GG.lock_halls(f, GG.GUILDS[i]) end
+            for i = 1, #GG.GUILDS do GG.assert_seat(f, GG.GUILDS[i]) end
+        end
+    end
+    for _, list in pairs(GG.scan_world()) do
+        for i = 1, #list do one(list[i]) end
+    end
+    local ok, humans = pcall(function() return cm:get_human_factions() end)
+    for _, h in ipairs(ok and humans or {}) do one(h) end
+    for f, _ in pairs(GG.state) do one(f) end
 end
 
 function GG.can_buy(faction, service_key)
@@ -4266,7 +4778,9 @@ function GG.target_ok(faction, s, target)
     return okr and yes == true
 end
 
-function GG.buy(faction, service_key, target)
+-- `points`: research services only, what the buyer's panel read as left on the current
+-- research (see GG.payload). nil from the AI.
+function GG.buy(faction, service_key, target, points)
     local ok, why = GG.can_buy(faction, service_key)
     if not ok then return false, why end
     local s = GG.service(service_key)
@@ -4306,7 +4820,7 @@ function GG.buy(faction, service_key, target)
     -- carried the error into the caller: the click handler, the multiplayer handler, or
     -- the rivals' turn loop, which then skipped every faction after this one. Every
     -- machine runs the same payload on the same state, so every machine refunds alike.
-    local okp, err = pcall(GG.payload, faction, s, target)
+    local okp, err = pcall(GG.payload, faction, s, target, points)
     if not okp then
         GG.refund_purchase(faction, s, price, err)
         return false, "failed"
@@ -4358,6 +4872,7 @@ GG.TUNE_DEFAULTS = {
     cap_khanate = 40, cap_overseers = 40, cap_slavers = 80,
     ai_spending = true, hostile_services = true,
     guild_notices = true,
+    guild_halls = true, hall_rep = 100, hall_off = 3,
     -- RIVALS TAKE BOUNTIES (2026-09-29). Off, rivals never take one; ai_spending off
     -- stops them too, since it stops the whole AI round.
     ai_bounties = true,
@@ -4399,6 +4914,12 @@ GG.TUNE_DEFAULTS = {
     rate_bounty_stake = 25,
     -- THE PATRON. Extra reputation, as a percentage, for the guild the patron serves.
     rate_patron = 50,
+    -- THE TEMPLE'S ROUTES (temple spec §3.2). Per province in good order, per province free
+    -- of corruption, and per holy-war battle won.
+    rate_temple_devout = 1, rate_temple_chaos = 2, rate_temple_holy = 10,
+    cap_temple = 40,
+    -- THE GREY SEERS' TAINT (skaven spec §3.2): per province carrying Skaven corruption.
+    rate_temple_taint = 2,
 }
 
 -- Frozen order, so the packed string survives a defaults table that gains keys.
@@ -4430,6 +4951,14 @@ GG.TUNE_ORDER = {
     "ai_bounties",
     "rotate_turns",
     "race_differences",
+    "guild_halls",
+    "hall_rep",
+    "hall_off",
+    "rate_temple_devout",
+    "rate_temple_chaos",
+    "rate_temple_holy",
+    "cap_temple",
+    "rate_temple_taint",
 }
 
 GG.TUNE = GG.TUNE or nil
@@ -4483,6 +5012,9 @@ GG.PRESETS = {
         -- it would have paid rather than all of it.
         rate_decay = 50, decay_from = 40, rate_bounty_fail = 35,
         rate_bounty_stake = 15,
+        hall_rep = 120,
+        rate_temple_devout = 2, rate_temple_chaos = 3, rate_temple_holy = 15, cap_temple = 60,
+        rate_temple_taint = 3,
     },
 
     -- SLOWER, AND THE COURT PRESSES. About a quarter less per event against tighter caps,
@@ -4499,6 +5031,9 @@ GG.PRESETS = {
         -- Half again the upkeep from turn 20, and a failed bounty costs its full worth.
         rate_decay = 150, decay_from = 20, rate_bounty_fail = 100,
         rate_bounty_stake = 35,
+        hall_rep = 80,
+        rate_temple_devout = 1, rate_temple_chaos = 1, rate_temple_holy = 7, cap_temple = 30,
+        rate_temple_taint = 1,
     },
 
     -- CUTTHROAT. Standing is roughly half the default rate against caps to match, the
@@ -4518,6 +5053,9 @@ GG.PRESETS = {
         -- have paid - so taking a job you cannot finish is worse than never taking it.
         rate_decay = 200, decay_from = 12, rate_bounty_fail = 150,
         rate_bounty_stake = 50,
+        hall_rep = 60,
+        rate_temple_devout = 1, rate_temple_chaos = 1, rate_temple_holy = 5, cap_temple = 22,
+        rate_temple_taint = 1,
     },
 }
 
@@ -4586,6 +5124,8 @@ GG.TWISTS = {
     ["wh3_main_cth_cathay"]        = {rate_rivalry = 50},
     ["wh2_main_def_dark_elves"]    = {rate_rivalry = 150, hostile_price = 75},
     ["wh2_main_hef_high_elves"]    = {favour_cap = 150},
+    -- TREACHERY: a Skaven promise is worth nothing, and every clan takes from its rival.
+    ["wh2_main_skv_skaven"]        = {rate_rivalry = 150, demand_penalty = 0},
 }
 
 -- The percentage `faction`'s race puts on `key`: 100 when it bends nothing, when race
@@ -4602,6 +5142,9 @@ function GG.setting_for(faction, key)
     local v = GG.setting(key)
     local p = GG.twist(faction, key)
     if type(v) ~= "number" or v <= 0 or p == 100 then return v end
+    -- A TWIST OF EXACTLY 0 TURNS ITS RULE OFF ON PURPOSE (Treachery: an expired Skaven
+    -- demand costs nothing, 2026-10-05). Only a twist that ROUNDS below 1 is held at 1.
+    if p == 0 then return 0 end
     local n = math.floor(v * p / 100)
     if n < 1 then n = 1 end
     return n
@@ -4609,7 +5152,7 @@ end
 
 -- NUMBERS READ UNDER EVERY PRESET. The presets own the tuning; these are systems, sit in
 -- the systems section, and would otherwise look editable and be ignored off Custom.
-GG.EVERY_PRESET = {rotate_turns = true}
+GG.EVERY_PRESET = {rotate_turns = true, hall_off = true}
 
 function GG.read_mct_or_defaults()
     local t = {}
@@ -4784,6 +5327,14 @@ function GG.register()
         GG.snapshot_settings()
         GG.load(name)
         GG.assert_ranks(name)
+        -- EVERY HALL-RACE FACTION, swept once a session at its own turn start: one
+        -- first_halls never saw (emerged, confederated, new), and one GG.apply_rank wrote a
+        -- single guild for before it got here. Keyed on its own flag, not on halls_locked,
+        -- which that one guild already filled. lock_halls' memo makes a repeat free.
+        if not GG.halls_swept[name] and GG.hall_culture(name) then
+            for i = 1, #GG.GUILDS do GG.lock_halls(name, GG.GUILDS[i]) end
+            GG.halls_swept[name] = true
+        end
         GG.reset_turn(name)
         -- UPKEEP BEFORE INCOME, so the line below is what the turn NETTED. Charged before
         -- GG.on_turn_start rather than after because the two read as one transaction on the
@@ -4795,8 +5346,14 @@ function GG.register()
         -- THE CARDS, once a period (spec 2026-09-29 pools §4). Before income and grants,
         -- so a faction reads this period's cards for everything it does this turn.
         GG.rotate_cards(name, GG.turn_now())
+        GG.count_halls(name)
         local ok, income = pcall(function() return context:faction():net_income() end)
         GG.on_turn_start(name, ok and income or 0)
+        GG.pay_halls(name)
+        -- THE TEMPLE'S TURN-START ROUTES (temple spec §3.2), before the save below.
+        local okf, fi = pcall(function() return context:faction() end)
+        if okf then GG.temple_turn(name, fi) end
+        for i = 1, #GG.GUILDS do GG.assert_seat(name, GG.GUILDS[i]) end
         local human = false
         local okh, h = pcall(function() return context:faction():is_human() end)
         if okh then human = h end
@@ -5041,7 +5598,10 @@ function GG.register()
                 won = context:mission_result_success()
                       or context:mission_result_critial_success()
             end)
-            GG.load(name); GG.on_agent_action(name, won); GG.save(name)
+            -- The acting hero's subtype: a race's priests pay the temple (temple spec §3.2).
+            local sub
+            pcall(function() sub = context:character():character_subtype_key() end)
+            GG.load(name); GG.on_agent_action(name, won, sub); GG.save(name)
             -- HERO BOUNTIES (spec 5.5). The target is a settlement for a garrison action
             -- and a character otherwise. The action key is traced while a hero bounty is
             -- live, for the in-game check that it is agent_actions.unique_id.
@@ -5164,6 +5724,40 @@ function GG.register()
         if not name then return end
         GG.load(name); GG.race_earn(name, "court"); GG.save(name)
     end, true)
+
+    -- ForeignSlotManagerCreatedEvent carries requesting_faction() (CA's own listener,
+    -- victory_objectives_config.lua:7517). Vampire covens fire it too; race_earn refuses them.
+    -- So do ALLIED OUTPOSTS, which are no under-city: is_allied() tells them apart, as CA's
+    -- own achievement listener does (wh3_campaign_achievements.lua:291-300).
+    core:add_listener("gg_earn_undercity", "ForeignSlotManagerCreatedEvent", true,
+        function(context)
+            local oka, allied = pcall(function() return context:is_allied() end)
+            if oka and allied then return end
+            local name = faction_name_of(context, function()
+                return context:requesting_faction() end)
+            if name then GG.on_undercity_founded(name) end
+        end, true)
+
+    -- ForeignSlotBuildingCompleteEvent carries slot_manager():faction() and building(), a
+    -- level key (episode_neferata.lua:852-859). BuildingCompleted never fires for these.
+    -- ONLY AN UNDER-CITY PAYS (2026-10-05): the event fires for every foreign slot - allied
+    -- outposts, the Black Tower, Aislinn's sea patrols, cults. slot_set_key() tells them
+    -- apart; every under-city set has "_slot_set_underempire" in it, including
+    -- wh3_dlc29_slot_set_underempire_scruten_startpos, which CA's own two-prefix test misses.
+    core:add_listener("gg_undercity_building", "ForeignSlotBuildingCompleteEvent", true,
+        function(context)
+            local okb, key = pcall(function() return context:building() end)
+            if not okb or type(key) ~= "string" then return end
+            local oks, set = pcall(function() return context:slot_manager():slot_set_key() end)
+            if not oks or type(set) ~= "string"
+               or not string.find(set, "_slot_set_underempire") then   -- no magic characters;
+                -- never the plain flag, which breaks the string library game-wide
+                return
+            end
+            local name = faction_name_of(context, function()
+                return context:slot_manager():faction() end)
+            if name then GG.on_undercity_building(name, key) end
+        end, true)
 
     core:add_listener("gg_battle", "CharacterCompletedBattle", true, function(context)
         local ok, char = pcall(function() return context:character() end)
@@ -5297,10 +5891,14 @@ GG.FEED_INDEX_LEAD = 5003
 -- before. "withheld" is what the per-turn cap kept back; every other source was paid.
 GG.LEDGER_SOURCES = {"income", "battles", "research", "agents", "buildings",
                      "settlements", "missions", "bounties", "demands", "other",
-                     "withheld",
+                     "withheld", "halls",
                      -- THE RACE EARNINGS (stage 2), one per route, by name.
                      "caravan", "grudges", "reclaimed", "motherland", "chivalry",
-                     "captives", "court"}
+                     "captives", "court",
+                     -- THE TEMPLE'S ROUTES (2026-10-04).
+                     "devout", "chaos", "holywar", "priests",
+                     -- THE SKAVEN (2026-10-05).
+                     "undercity", "taint"}
 GG.LEDGER_KNOWN = {}
 for i = 1, #GG.LEDGER_SOURCES do GG.LEDGER_KNOWN[GG.LEDGER_SOURCES[i]] = true end
 
@@ -5561,6 +6159,9 @@ function GG.target_from_wire(faction, s, t)
     return t
 end
 
+-- A sent number above this is not a technology's cost; the old call is used instead.
+GG.RESEARCH_POINTS_MAX = 100000
+
 -- "service_key|target"
 GG.MP_OPS.buy = function(faction, arg)
     local key, t = string.match(arg or "", "^([^|]*)|?(.*)$")
@@ -5568,7 +6169,14 @@ GG.MP_OPS.buy = function(faction, arg)
     if not s then return end
     GG.load(faction)
     GG.load_research(faction)
-    GG.buy(faction, key, GG.target_from_wire(faction, s, t))
+    -- A RESEARCH SERVICE'S WIRE FIELD IS THE POINTS LEFT, read by the buyer's panel: the
+    -- one machine whose UI can read it. Every machine then grants the same number.
+    local points = nil
+    if s.kind == "research" then
+        points = math.floor(tonumber(t) or 0)
+        if points < 1 or points > GG.RESEARCH_POINTS_MAX then points = nil end
+    end
+    GG.buy(faction, key, GG.target_from_wire(faction, s, t), points)
     GG.save(faction)
 end
 
@@ -5676,8 +6284,16 @@ function GG.announce_rank(faction, guild, old_rank, new_rank)
             cm:set_saved_value(best_key, new_rank)
             local k = "message_event_text_text_derpy_gg_rank_"
                       .. guild .. "_" .. new_rank .. GG.tag(faction)
+            -- THE HALL LINE ("You may now raise a Lodge...") is its own key, read only
+            -- while halls are on: with guild_halls off the locks keep every level shut.
+            local primary = k .. "_primary"
+            if (not GG.setting or GG.setting("guild_halls") ~= false)
+               and GG.HALL_TAGS[GG.tag(faction)]
+               and (new_rank == GG.HALL_RANK[1] or new_rank == GG.HALL_RANK[2]) then
+                primary = k .. "_primary_hall"
+            end
             pcall(function()
-                cm:show_message_event(faction, k .. "_title", k .. "_primary",
+                cm:show_message_event(faction, k .. "_title", primary,
                                       -- true, not false: the record is a
                                       -- scripted_persistent_event and the flag has to
                                       -- agree with it or nothing draws.
@@ -5761,6 +6377,7 @@ function GG.battle_award(winner, outnumbered)
     if not winner then return end
     GG.load(winner)
     GG.on_battle(winner, outnumbered)
+    GG.temple_holy(winner)
     GG.save(winner)
 end
 
@@ -5813,6 +6430,7 @@ cm:add_first_tick_callback(function()
     GG.send_tune()
     GG.first_boards()
     GG.first_cards()
+    GG.first_halls()
 end)
 
 function GG.load(faction)

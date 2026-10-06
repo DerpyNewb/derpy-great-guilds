@@ -3,6 +3,43 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-10-05 - build C3140F92
+
+MD5 `C3140F927FDECD0974719610FCF729F9`, 45,700,250 bytes. Includes builds FBCC9948, 9FC1E42F
+(guild halls), 9E2DB00E (the temple) and 7F7423DC, 852975C1 and FE8EE639 (the Skaven), which
+were not released on their own. The Skaven panel has been looked at in game; the halls (except
+the Chaos Dwarf Guild Halls tab), the temple and the Skaven routes have not been tested in game yet.
+
+Three additions: guild halls, a seventh guild, and a ninth race.
+
+- **Guild halls.** Every guild has a building of its own, three levels deep, built from a
+  new Guild Halls tab in the building browser. One hall per settlement. A level needs a rank
+  with its guild (the top one also needs the lead). A hall pays its guild every turn, gives
+  a local bonus, trains a unit of the guild's trade, and makes that guild's services cheaper.
+  Lead a guild while holding its top hall to take its **Seat**: the bonus spreads to all your
+  lands at a third of its strength and the guild pays half again per turn. MCT can turn
+  halls off.
+- **The seventh guild, the temple.** The Temple of Hashut, the Colleges of Magic, the Ancestor
+  Temples, the Grail Pilgrims, the Celestial Temples, the Great Orthodoxy, the Brides of Khaine
+  and the Cult of Asuryan. It earns from devout provinces, provinces clean of Chaos, holy war
+  or priests' and wizards' actions, depending on the race. Its ranks raise public order, and
+  it has nine services and its own hall. It has no rival.
+- **The Skaven**, the ninth race: the Warpstone Traders, the Stormvermin, the Skryre Warlocks,
+  the Eshin Assassins, the Moulder Breeders, the Slave-Masters and the Grey Seers. Their twist
+  is Treachery: rivalry hits harder and an expired demand costs nothing. Founding an
+  under-city pays the Eshin Assassins, under-city buildings pay their guild, and the Grey
+  Seers earn from provinces carrying Skaven corruption. Three Skaven services of their own,
+  halls, and a panel built from Thanquol's and Ikit Claw's art.
+- **Every race:** services that apply an effect now open their description with the game's
+  own effect icon. The guild header no longer runs the name into the figures; it measures
+  both in the game's font and moves the rival into the hover when there is no room.
+  Locked services show the reason on a dark plate in red, and the price and Buy caption
+  turn red whenever you are short of favour.
+- Detail: `docs/history/HANDOFF_20261004_GUILDS_HALLS_STAGE1.md`,
+  `docs/history/HANDOFF_20261004_GUILDS_HALLS_STAGE2.md`,
+  `docs/history/HANDOFF_20261004_GUILDS_TEMPLE.md` and
+  `docs/history/HANDOFF_20261005_GUILDS_SKAVEN.md`.
+
 ## 2026-10-04 - build BB204325
 
 MD5 `BB2043255DC561FD6D82E247DCA04CCA`, 34,736,634 bytes. Includes builds 2EDAC23F and

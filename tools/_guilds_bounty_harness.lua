@@ -220,6 +220,8 @@ cm = {
         FIRST_TICK[#FIRST_TICK + 1] = fn
     end,
     apply_effect_bundle = function(_, k, f, turns) rec("bundle", k, f, turns) end,
+    add_event_restricted_building_record_for_faction = function() end,
+    remove_event_restricted_building_record_for_faction = function() end,
     get_character_by_cqi = function(_, cqi)
         if not C[tostring(cqi)] then return NULL() end
         return W.ci(cqi)
@@ -1386,7 +1388,7 @@ do
     local rolls = 0
     RANDOM = function(n) rolls = rolls + 1 return 1 end
     local keys = GG.cards_of("me")
-    assert(#keys == 18, "18 cards, got " .. #keys)
+    assert(#keys == 21, "21 cards, got " .. #keys)
     assert(keys[1] == "caravan_levy" and keys[4] == "oathbound_draft"
            and keys[18] == "great_coffle", "defaults are today's services in card order")
     local g = GG.guild_cards("me", "khanate")
@@ -1431,7 +1433,7 @@ do
            "GG.load must restore the drawn cards, got " .. tostring(GG.cards.me and GG.cards.me.keys[18]))
     -- A KEY THIS BUILD DOES NOT SELL, or one in the wrong slot, reads as that slot's
     -- default rather than nil.
-    cm:set_saved_value(GG.cards_key("me"), "4;gone_service" .. string.rep(",caravan_levy", 17))
+    cm:set_saved_value(GG.cards_key("me"), "4;gone_service" .. string.rep(",caravan_levy", #GG.GUILDS * #GG.CARD_RANKS - 1))
     GG.load_cards("me")
     assert(GG.cards.me.keys[1] == "caravan_levy" and GG.cards.me.keys[4] == "oathbound_draft",
            "an unknown or misplaced key reads as that slot's default")
@@ -1710,14 +1712,17 @@ do
     end
     local shared = 0
     for _, s in ipairs(GG.SERVICES) do if not s.race then shared = shared + 1 end end
-    assert(shared == 54, "54 shared services, got " .. shared)
-    for i = 19, 54 do
+    assert(shared == 63, "63 shared services, got " .. shared)
+    -- Every shared row after the first 18, the temple's nine (2026-10-04) included.
+    for i = 19, #GG.SERVICES do
         local s = GG.SERVICES[i]
-        assert(kinds[s.kind], s.key .. " has kind " .. tostring(s.kind))
-        assert((s.rank == 4) == (s.lead == true), s.key .. ": lead exactly on rank 4")
-        assert(s.cost == ({50, 150, 400})[s.rank - 1] and s.cd == ({8, 12, 16})[s.rank - 1],
-               s.key .. ": cost and cooldown follow its rank")
-        assert(s.kind ~= "bundle" or (s.turns or 0) > 0, s.key .. ": a bundle needs turns")
+        if not s.race then
+            assert(kinds[s.kind], s.key .. " has kind " .. tostring(s.kind))
+            assert((s.rank == 4) == (s.lead == true), s.key .. ": lead exactly on rank 4")
+            assert(s.cost == ({50, 150, 400})[s.rank - 1] and s.cd == ({8, 12, 16})[s.rank - 1],
+                   s.key .. ": cost and cooldown follow its rank")
+            assert(s.kind ~= "bundle" or (s.turns or 0) > 0, s.key .. ": a bundle needs turns")
+        end
     end
     ok("every card has three services, and every new one is a known shape")
 end
@@ -1813,6 +1818,8 @@ do
         ["wh3_main_cth_cathay"]        = {rate_rivalry = 20},
         ["wh2_main_def_dark_elves"]    = {rate_rivalry = 60},
         ["wh2_main_hef_high_elves"]    = {},
+        -- TREACHERY (skaven spec §2): rivalry half again, an expired demand nothing.
+        ["wh2_main_skv_skaven"]        = {rate_rivalry = 60, demand_penalty = 0},
     }
     for culture, bent in pairs(want) do
         race(culture)
@@ -1870,6 +1877,14 @@ do
     GG.demands.me = {guild = "brass", kind = "tribute", amount = 1, due = 5}
     assert(GG.demand_tick("me", 6) == "expired", "the demand expired")
     assert(GG.get("me", "brass") == 380, "a Dwarf's expired demand costs 120, got "
+           .. GG.get("me", "brass"))
+    -- TREACHERY: a Skaven's expired demand costs nothing, and nothing divides by the 0.
+    race("wh2_main_skv_skaven")
+    GG.state.me = {}
+    for _, g in ipairs(GG.GUILDS) do GG.state.me[g] = {rep = 500, fav = 0} end
+    GG.demands.me = {guild = "brass", kind = "tribute", amount = 1, due = 5}
+    assert(GG.demand_tick("me", 6) == "expired", "the Skaven demand expired")
+    assert(GG.get("me", "brass") == 500, "a Skaven's expired demand costs 0, got "
            .. GG.get("me", "brass"))
     GG.demands.me, GG.demand_last.me = nil, nil
     race("wh2_main_hef_high_elves")
@@ -2072,7 +2087,8 @@ do
 end
 
 do
-    -- THE CARD IS ROLLED among those whose pool holds one: roll 19 picks the second of
+    -- THE CARD IS ROLLED among those whose pool holds one: roll 22 (21 card rolls with the
+    -- temple, 2026-10-04, then this one) picks the second of
     -- two candidates, the overseers' rank-2 card (slot 13), not immortals rank 3 (slot 5).
     with_race_rows(function()
         race("wh_main_dwf_dwarfs")
@@ -2080,14 +2096,14 @@ do
         local calls = 0
         RANDOM = function(n)
             calls = calls + 1
-            if calls == 19 then return n end
+            if calls == 22 then return n end
             return 1
         end
         GG.draw_cards("me", 10, true)
         local keys = GG.cards_of("me")
         assert(keys[13] == "t_dwf_pool", "slot 13 was rolled, got " .. tostring(keys[13]))
         assert(keys[5] ~= "t_dwf_army", "and only that card changed")
-        assert(calls == 19, "18 card rolls and one for the card, got " .. calls)
+        assert(calls == 22, "21 card rolls and one for the card, got " .. calls)
     end)
     ok("the card rule 2 changes is rolled among those that can hold a race service")
 end
@@ -2102,7 +2118,7 @@ do
         RANDOM = function(n) calls = calls + 1 return n end
         GG.draw_cards("me", 10, true)
         assert(race_on_show() == 2, "both race rows drawn by the rolls themselves")
-        assert(calls == 18, "and no extra roll, got " .. calls)
+        assert(calls == 21, "one roll per card (21 with the temple) and no extra, got " .. calls)
     end)
     ok("rule 2 does nothing when the draw already shows a race service")
 end
@@ -3132,4 +3148,30 @@ do
     ok("a settlement service needs an enemy with a settlement")
 end
 
+do
+    -- THE TEMPLE'S BOUNTY IS A HOLY WAR (temple spec §4): its army bounty names a lord of the
+    -- race's holy-war cultures only (a Chaos Dwarf's: the Dwarfs), and nothing - no error -
+    -- when none of them is at war with the player. Other guilds keep the whole pool.
+    -- a_orcs sorts BEFORE foe, so an unfiltered pick lands on the greenskin first.
+    world4()
+    W.faction("a_orcs", {culture = "wh_main_grn_greenskins", regions = {}, lords = {51}})
+    W.char(51, {faction = "a_orcs", general = true, x = 4000, y = 4000, units = 10})
+    F.me.at_war.a_orcs, F.a_orcs.at_war = true, {me = true}
+    F.foe.culture = "wh_main_dwf_dwarfs"
+    for _ = 1, 10 do
+        local t, owner = GG.bounty_target("me", "lord_kill", {}, false, "temple")
+        assert(t == "31" and owner == "foe",
+               "the Temple's bounty names only a Dwarf lord, got " .. tostring(t))
+    end
+    local seen = {}
+    for _ = 1, 10 do
+        local t = GG.bounty_target("me", "lord_kill", {["31"] = true}, false, "immortals")
+        seen[tostring(t)] = true
+    end
+    assert(seen["51"], "other guilds keep the whole pool")
+    F.foe.culture = "wh3_dlc23_chd_chaos_dwarfs"
+    assert(GG.bounty_target("me", "lord_kill", {}, false, "temple") == nil,
+           "no holy enemy at war: no target, no error")
+    ok("the temple's bounty is a holy war")
+end
 print("bounty harness ok")

@@ -12,6 +12,7 @@
 				<card_desc_2 this="GG210010-D000-4000-B000000000000010"/>
 				<card_icon this="GG210013-D000-4000-B000000000000013"/>
 				<card_name this="GG210016-D000-4000-B000000000000016"/>
+				<card_need this="GG210019-D000-4000-B000000000000019"/>
 			</derpy_gg_card>
 		</root>
 	</hierarchy>
@@ -225,6 +226,10 @@
 					this="GG21000A-D003-4000-B00000000000000A"
 					uniqueguid="GG21000A-D003-4000-B00000000000000A"
 					imagepath="ui/skins/default/dlc25_book_of_grudges/book_of_grudges_unit_pack_frame.png"/>
+				<component_image
+					this="GG21000A-D005-4000-B00000000000000A"
+					uniqueguid="GG21000A-D005-4000-B00000000000000A"
+					imagepath="ui/skins/default/1x1_blank_white.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -251,6 +256,15 @@
 							width="138"
 							height="30"
 							margin="13.00,15.00,13.00,15.00"/>
+						<image
+							this="GG21000A-D006-4000-B00000000000000A"
+							uniqueguid="GG21000A-D006-4000-B00000000000000A"
+							componentimage="GG21000A-D005-4000-B00000000000000A"
+							offset="3.00,3.00"
+							width="132"
+							height="24"
+							colour="#000000D0"
+							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<component_text
 						texthalign="Center"
@@ -443,5 +457,87 @@
 				</derpy_gg_scale>
 			</animations>
 		</card_name>
+		<card_need
+			this="GG210019-D000-4000-B000000000000019"
+			id="card_need"
+			tooltipslocalised="true"
+			uniqueguid="GG210019-D000-4000-B000000000000019"
+			currentstate="GG21001A-D000-4000-B00000000000001A"
+			defaultstate="GG21001A-D000-4000-B00000000000001A">
+			<componentimages>
+				<component_image
+					this="GG210019-D001-4000-B000000000000019"
+					uniqueguid="GG210019-D001-4000-B000000000000019"
+					imagepath="ui/skins/default/1x1_blank_white.png"/>
+				<component_image
+					this="GG210019-D003-4000-B000000000000019"
+					uniqueguid="GG210019-D003-4000-B000000000000019"
+					imagepath="ui/skins/default/dlc25_book_of_grudges/book_of_grudges_unit_pack_frame.png"/>
+				<component_image
+					this="GG210019-D005-4000-B000000000000019"
+					uniqueguid="GG210019-D005-4000-B000000000000019"
+					imagepath="ui/skins/default/1x1_blank_white.png"/>
+			</componentimages>
+			<states>
+				<standard
+					this="GG21001A-D000-4000-B00000000000001A"
+					name="standard"
+					width="160"
+					height="26"
+					uniqueguid="GG21001A-D000-4000-B00000000000001A">
+					<imagemetrics>
+						<image
+							this="GG210019-D002-4000-B000000000000019"
+							uniqueguid="GG210019-D002-4000-B000000000000019"
+							componentimage="GG210019-D001-4000-B000000000000019"
+							offset="2.00,2.00"
+							width="156"
+							height="22"
+							colour="#140E0AE6"
+							margin="0.00,0.00,0.00,0.00"/>
+						<image
+							this="GG210019-D004-4000-B000000000000019"
+							uniqueguid="GG210019-D004-4000-B000000000000019"
+							componentimage="GG210019-D003-4000-B000000000000019"
+							offset="0.00,0.00"
+							width="160"
+							height="26"
+							margin="13.00,15.00,13.00,15.00"/>
+						<image
+							this="GG210019-D006-4000-B000000000000019"
+							uniqueguid="GG210019-D006-4000-B000000000000019"
+							componentimage="GG210019-D005-4000-B000000000000019"
+							offset="3.00,3.00"
+							width="154"
+							height="20"
+							colour="#000000D0"
+							margin="0.00,0.00,0.00,0.00"/>
+					</imagemetrics>
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="10.00,10.00"
+						textyoffset="4.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="14"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_14"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="26"
+							targetmetrics_m_width="160"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</card_need>
 	</components>
 </layout>

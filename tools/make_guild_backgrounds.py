@@ -110,10 +110,19 @@ CA_ART = {
     # Warriors, the far white tower to the Loremasters.
     "def": "ui/loading_ui/load_images/campaign_dark_elves1.png",
     "hef": "ui/loading_ui/load_images/campaign_high_elves1.png",
+    # THE SKAVEN (2026-10-05): their own loading screen, windows in the High Elf order.
+    "skv": "ui/loading_ui/load_images/campaign_skaven1.png",
+    # THE TEMPLE'S GROUND for the two races whose other six come from BACKGROUNDS and
+    # RACE_ART (2026-10-04): the seventh window of their own CA painting.
+    "chd": "ui/loading_ui/load_images/campaign_chaos_dwarfs1.png",
+    "dwf": "ui/loading_ui/load_images/campaign_dwarfs1.png",
 }
 WINDOWS = {
     1: (200, 200, 990, 900), 2: (565, 200, 1355, 900), 3: (930, 200, 1720, 900),
     4: (200, 330, 990, 1030), 5: (565, 330, 1355, 1030), 6: (930, 330, 1720, 1030),
+    # THE TEMPLE (2026-10-04): a seventh window between the two rows, centred, so it
+    # differs from all six and stays inside the 1080-tall Cathay and Kislev paintings.
+    7: (565, 265, 1355, 965),
 }
 CA_BACKGROUNDS = {
     "brass_emp": ("emp", 1), "overseers_emp": ("emp", 2),
@@ -139,6 +148,14 @@ CA_BACKGROUNDS = {
     "immortals_hef": ("hef", 1), "slavers_hef": ("hef", 2),
     "brass_hef": ("hef", 3), "khanate_hef": ("hef", 4),
     "overseers_hef": ("hef", 5), "daemonsmiths_hef": ("hef", 6),
+    "immortals_skv": ("skv", 1), "slavers_skv": ("skv", 2),
+    "brass_skv": ("skv", 3), "khanate_skv": ("skv", 4),
+    "overseers_skv": ("skv", 5), "daemonsmiths_skv": ("skv", 6),
+    # THE TEMPLE, every flavour's seventh window (the Chaos Dwarf one is plain "temple").
+    "temple": ("chd", 7), "temple_emp": ("emp", 7), "temple_dwf": ("dwf", 7),
+    "temple_brt": ("brt", 7), "temple_cth": ("cth", 7), "temple_ksl": ("ksl", 7),
+    "temple_def": ("def", 7), "temple_hef": ("hef", 7), "temple_skv": ("skv", 7),
+    "temple_gen": ("gen", 7),
 }
 _PICTURES = {}
 
@@ -391,19 +408,24 @@ def selftest():
         if os.path.isfile(backup):
             os.rename(backup, keep)
     # EVERY FLAVOUR has a ground per guild, each a different window of its race's picture,
-    # and every window is the panel's size and inside the painting.
+    # and every window is the panel's size and inside the painting: six windows for the six
+    # older guilds (BACKGROUNDS / RACE_ART for the Chaos Dwarfs and the Dwarfs), and the
+    # seventh window of that same CA picture for the temple (2026-10-04).
     for race in CA_ART:
         mine = dict((n[:-len(race) - 1], w) for n, (r, w) in CA_BACKGROUNDS.items()
-                    if r == race)
-        assert sorted(mine) == sorted(BACKGROUNDS), (race, sorted(mine))
+                    if r == race and n.endswith("_" + race))
+        if race in ("chd", "dwf"):
+            assert mine == ({"temple": 7} if race == "dwf" else {}), (race, mine)
+            continue
+        assert sorted(mine) == sorted(list(BACKGROUNDS) + ["temple"]), (race, sorted(mine))
         assert sorted(mine.values()) == sorted(WINDOWS), (race, mine)
-    # A RACE WITH ITS OWN PAINTINGS has all six guilds from them, and no window left over
-    # in CA_BACKGROUNDS that build() would write over one of them.
+    assert CA_BACKGROUNDS["temple"] == ("chd", 7), "the Chaos Dwarf temple ground"
+    # A RACE WITH ITS OWN PAINTINGS has all six older guilds from them, and only the temple
+    # in CA_BACKGROUNDS, which build() writes beside them.
     for race in set(n.rsplit("_", 1)[1] for n in RACE_ART):
         mine = [n[:-len(race) - 1] for n in RACE_ART if n.endswith("_" + race)]
         assert sorted(mine) == sorted(BACKGROUNDS), (race, sorted(mine))
-        assert race not in CA_ART, race
-        assert not [n for n in CA_BACKGROUNDS if n.endswith("_" + race)], race
+        assert [n for n in CA_BACKGROUNDS if n.endswith("_" + race)] == ["temple_" + race], race
     for x0, y0, x1, y1 in WINDOWS.values():
         assert (x1 - x0, y1 - y0) == (PANEL_W, PANEL_H), (x0, y0, x1, y1)
         assert 0 <= x0 and x1 <= 1920 and 0 <= y0 and y1 <= 1200, (x0, y0, x1, y1)

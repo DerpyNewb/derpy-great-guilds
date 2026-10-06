@@ -121,7 +121,52 @@ ICONS = {
     "high_elves_defence_major": "overseers_hef",
     "high_elves_stables": "slavers_hef",
     "hef_sea_patrol_outpost_beasts": "crest_hef",
+    # THE TEMPLE (2026-10-04), one CA temple or college icon per race, each measured a flat
+    # silhouette (100% one colour, 74x74) before it was picked.
+    "chd_tower_temple_of_hashut": "temple",
+    "empire_altdorf_college": "temple_emp",
+    "special_ancestors_hall": "temple_dwf",
+    "bretonnia_abbey_of_the_grail_companions": "temple_brt",
+    "wh3_main_special_cth_li_temple": "temple_cth",
+    "kislev_great_orthodoxy": "temple_ksl",
+    "special_har_ganeth_temple_of_khaine": "temple_def",
+    "high_elves_worship": "temple_hef",
+    "minor_cult_shallya": "temple_gen",
+    # THE SKAVEN (2026-10-05), CA's own Skaven building icons, each measured flat by build().
+    # Not the warpstone refinery: its commonest colour is 38% of its pixels, not a silhouette.
+    "skaven_resource_gold": "brass_skv",
+    "skaven_stormvermin": "immortals_skv",
+    "skaven_engineers": "daemonsmiths_skv",
+    "skaven_assassins": "khanate_skv",
+    "skaven_breeding": "overseers_skv",
+    "skaven_slaves": "slavers_skv",
+    "wh3_dlc29_skv_scruten_landmark": "temple_skv",
+    "wh2_main_special_skavenblight_council13": "crest_skv",
 }
+
+# THE SIX HALL ICONS (2026-10-04). building_culture_variants.icon names a file in
+# ui/buildings/icons/, which CA TINTS AT DRAW TIME - so these are CA's own flat silhouettes
+# copied under our names, not recoloured like the panel's cards above. Same six source
+# silhouettes as the cards, so a guild's hall and its card read as one trade. CA-derived art:
+# ships in the pack only, never in the public repo (.gitignore blocks images).
+HALL_ICONS = {
+    "chd_factory_port": "derpy_gg_hall_brass",
+    "chd_military_chaos_dwarf_infantry": "derpy_gg_hall_immortals",
+    "chd_factory_furnace": "derpy_gg_hall_daemonsmiths",
+    "chd_military_hobgoblins": "derpy_gg_hall_khanate",
+    "chd_outpost_overseer_hut": "derpy_gg_hall_overseers",
+    "chd_outpost_raiding_camp": "derpy_gg_hall_slavers",
+    "chd_tower_temple_of_hashut": "derpy_gg_hall_temple",
+}
+# STAGE 2: the other seven races' halls (42 icons). Each race's card icons above already come
+# from that race's own building line, so the hall takes the SAME source stem as its guild's
+# card - read off ICONS rather than retyped, so the two cannot drift apart.
+_CARD_STEM = {name: stem for stem, name in ICONS.items()}
+for _tag in ("_emp", "_dwf", "_brt", "_cth", "_ksl", "_def", "_hef", "_skv"):
+    for _g in ("brass", "immortals", "daemonsmiths", "khanate", "overseers", "slavers",
+               "temple"):
+        HALL_ICONS[_CARD_STEM[_g + _tag]] = "derpy_gg_hall_" + _g + _tag
+HALL_DST = os.path.join(ROOT, "Modding Files", "pack", "ui", "buildings", "icons")
 
 UI_PACK = os.path.join(r"F:\SteamLibrary\steamapps\common\Total War WARHAMMER III",
                        "data", "ui.pack")
@@ -244,6 +289,166 @@ def build(write=True):
     return out, made
 
 
+def build_halls(write=True):
+    """Copy each hall icon's CA source (fetched offline if missing) to ui/buildings/icons/."""
+    out = []
+    if write and not os.path.isdir(HALL_DST):
+        os.makedirs(HALL_DST)
+    for stem, name in sorted(HALL_ICONS.items()):
+        src = os.path.join(SRC, stem + ".png")
+        if not os.path.isfile(src) and write:
+            why = fetch(stem)
+            if why:
+                out.append("%s: %s" % (stem, why))
+                continue
+        if not os.path.isfile(src):
+            out.append("missing source icon: %s" % src)
+            continue
+        data = open(src, "rb").read()
+        if write:
+            with open(os.path.join(HALL_DST, name + ".png"), "wb") as fh:
+                fh.write(data)
+        elif not os.path.isfile(os.path.join(HALL_DST, name + ".png")):
+            out.append("hall icon not written: %s.png" % name)
+    return out
+
+
+# THE EIGHT TAB ICONS (2026-10-04). building_sets.icon of derpy_gg_set_guild_halls<tag> is a
+# construction-panel TAB and takes a FULL lowercase path (docs/sessions/
+# HANDOFF_20260902_ADMIRAL_AND_HERO_RECRUITMENT.md 9.1). Every CA category tab is a 64x64
+# parchment scroll with a glyph in the category's ink (red recruitment, purple support,
+# green civic). Each tab here is the race's OWN category scroll with the glyph painted out
+# and the race's guild crest drawn in GOLD, an ink no CA tab uses, so it reads as a tab of
+# that race and as a different tab from its neighbours. CA-derived: pack only.
+TAB_FRAME = {
+    "": "chd_cat_advanced_military", "_emp": "empire_cat_support",
+    "_dwf": "dwarf_cat_support", "_brt": "empire_cat_recruitment",
+    "_cth": "cathay_cat_military", "_ksl": "kislev_cat_support",
+    "_def": "dark_elves_cat_recruitment", "_hef": "high_elves_cat_recruitment",
+    "_skv": "skaven_cat_recruitment",
+}
+TAB_INK = (150, 100, 14)
+TAB_GLYPH = 36                  # px square the crest is fitted into, inside a 64px scroll
+TAB_DST = HALL_DST
+TAB_CAT_SRC = os.path.join(SRC, "cat")
+CA_TAB = "ui/buildings/icons/%s.png"
+
+
+def tab_name(tag):
+    return "derpy_gg_tab_halls" + tag
+
+
+def tab_path(tag):
+    """The building_sets.icon value: a full lowercase pack path."""
+    return "ui/buildings/icons/%s.png" % tab_name(tag)
+
+
+def _fetch_to(stem, folder):
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import read_pack_index as rpi
+    import read_vanilla_loc as rvl
+    want = CA_TAB % stem
+    hits = [h for h in rpi.read(UI_PACK, want) if h[0].lower() == want]
+    if not hits:
+        return "%s is not in %s" % (want, UI_PACK)
+    _p, comp, data = hits[0]
+    if comp:
+        data = rvl._decompress(data)
+    if not os.path.isdir(folder):
+        os.makedirs(folder)
+    with open(os.path.join(folder, stem + ".png"), "wb") as fh:
+        fh.write(data)
+    return None
+
+
+def paint_out_glyph(frame):
+    """The scroll with its glyph removed. Inside the paper box (between the rollers and the
+    side margins) a pixel far from the paper's own colour is glyph ink; the mask is grown by
+    two pixels and every masked pixel takes the mean of a straight-line fill across its gap
+    along the row and along the column, from the paper either side."""
+    import numpy as np
+    from PIL import Image, ImageFilter
+    im = frame.convert("RGBA")
+    w, h = im.size
+    arr = np.array(im).astype(float)
+    x0, x1, y0, y1 = int(w * 0.17), int(w * 0.83), int(h * 0.15), int(h * 0.86)
+    box = arr[y0:y1, x0:x1, :3]
+    lum = box.sum(axis=2)
+    ref = np.median(box[lum >= np.percentile(lum, 60)].reshape(-1, 3), axis=0)
+    dist = np.abs(box - ref).sum(axis=2)
+    mask = Image.fromarray(((dist > 40) * 255).astype("uint8")).filter(ImageFilter.MaxFilter(5))
+    mask = np.array(mask) > 0
+    fill = box.copy()
+    hh, ww = mask.shape
+    hor, ver = box.copy(), box.copy()
+    hv, vv = np.zeros(mask.shape, bool), np.zeros(mask.shape, bool)   # a line with paper left
+    for y in range(hh):
+        ok = ~mask[y]
+        if ok.any():
+            hv[y, :] = True
+            for c in range(3):
+                hor[y, :, c] = np.interp(np.arange(ww), np.nonzero(ok)[0], box[y, ok, c])
+    for x in range(ww):
+        ok = ~mask[:, x]
+        if ok.any():
+            vv[:, x] = True
+            for c in range(3):
+                ver[:, x, c] = np.interp(np.arange(hh), np.nonzero(ok)[0], box[ok, x, c])
+    # both directions where both have paper, else the one that has; a pixel with neither
+    # (a glyph wider than the box in both) keeps the paper reference colour
+    both = hv & vv
+    est = np.where(both[..., None], (hor + ver) / 2.0,
+                   np.where(hv[..., None], hor, np.where(vv[..., None], ver, ref)))
+    fill[mask] = est[mask]
+    arr[y0:y1, x0:x1, :3] = fill
+    return Image.fromarray(arr.round().clip(0, 255).astype("uint8"), "RGBA")
+
+
+def make_tab(tag):
+    from PIL import Image
+    frame = Image.open(os.path.join(TAB_CAT_SRC, TAB_FRAME[tag] + ".png"))
+    crest = Image.open(os.path.join(SRC, _CARD_STEM["crest" + tag] + ".png")).convert("RGBA")
+    out = paint_out_glyph(frame)
+    a = crest.getchannel("A")
+    bbox = a.point(lambda v: 255 if v > 32 else 0).getbbox()
+    a = a.crop(bbox)
+    k = TAB_GLYPH / float(max(a.size))
+    a = a.resize((max(1, int(round(a.size[0] * k))), max(1, int(round(a.size[1] * k)))),
+                 Image.LANCZOS)
+    # the paper's centre, same box paint_out_glyph used
+    w, h = out.size
+    cx, cy = w // 2, (int(h * 0.15) + int(h * 0.86)) // 2
+    ink = Image.new("RGBA", a.size, TAB_INK + (255,))
+    ink.putalpha(a.point(lambda v: v))
+    out.alpha_composite(ink, (cx - a.size[0] // 2, cy - a.size[1] // 2))
+    return out
+
+
+def build_tabs(write=True):
+    out = []
+    if write and not os.path.isdir(TAB_DST):
+        os.makedirs(TAB_DST)
+    for tag in sorted(TAB_FRAME):
+        fr = os.path.join(TAB_CAT_SRC, TAB_FRAME[tag] + ".png")
+        if not os.path.isfile(fr) and write:
+            why = _fetch_to(TAB_FRAME[tag], TAB_CAT_SRC)
+            if why:
+                out.append(why)
+                continue
+        crest = os.path.join(SRC, _CARD_STEM["crest" + tag] + ".png")
+        if not os.path.isfile(crest) and write:
+            why = fetch(_CARD_STEM["crest" + tag])
+            if why:
+                out.append(why)
+                continue
+        dst = os.path.join(TAB_DST, tab_name(tag) + ".png")
+        if write:
+            make_tab(tag).save(dst)
+        elif not os.path.isfile(dst):
+            out.append("tab icon not written: %s.png" % tab_name(tag))
+    return out
+
+
 def selftest():
     from PIL import Image
     # alpha shape is preserved exactly in relative terms, and the peak goes opaque
@@ -271,10 +476,12 @@ def selftest():
     # EVERY FLAVOUR has all six guild icons and a crest, each from its own source.
     names = set(ICONS.values())
     assert len(names) == len(ICONS), "two sources ship under one name"
-    for tag in ("", "_emp", "_dwf", "_brt", "_cth", "_ksl", "_def", "_hef", "_gen"):
+    for tag in ("", "_emp", "_dwf", "_brt", "_cth", "_ksl", "_def", "_hef", "_skv", "_gen"):
         for g in ("brass", "immortals", "daemonsmiths", "khanate", "overseers",
-                  "slavers", "crest"):
+                  "slavers", "temple", "crest"):
             assert g + tag in names, "no icon ships as " + g + tag
+    assert len(set(HALL_ICONS.values())) == len(HALL_ICONS) == 63
+    assert all(v == v.lower() for v in HALL_ICONS.values()), "a pack path must be lowercase"
     print("selftest ok: alpha preserved, peak opaque, detailed source refused")
 
 
@@ -283,6 +490,8 @@ if __name__ == "__main__":
         selftest()
         sys.exit(0)
     problems, made = build(write="--check" not in sys.argv)
+    problems += build_halls(write="--check" not in sys.argv)
+    problems += build_tabs(write="--check" not in sys.argv)
     for p in problems:
         print("PROBLEM: " + p)
     for path, w, h in made:

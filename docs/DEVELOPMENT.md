@@ -25,18 +25,24 @@ The code calls reputation *standing*; the player never sees that word. Reputatio
 saved values rather than pooled resources. That keeps it culture-blind: a pooled resource
 needs a row per campaign group, and a missing row fails silently.
 
-**Coverage is the player's race, and only the eight races the mod writes guilds for**
+**Coverage is the player's race, and only the nine races the mod writes guilds for**
 (`GG.covered`, `GG.FLAVOURED`). Every faction of the human's culture earns, if that culture
-is one of the eight. Any other culture gets nothing, not even when a human plays it: no
+is one of the nine. Any other culture gets nothing, not even when a human plays it: no
 opener, no reputation, no messages. Before 2026-09-24 any culture a human played was
 covered.
 
-**Flavours.** Each of the eight races has a tag (`""` Chaos Dwarfs, `_emp`, `_dwf`, `_brt`,
-`_cth`, `_ksl`, `_def`, `_hef`) appended to every key a player reads, and a feed offset
-(0, 10, 20, 40, 50, 60, 70, 80) added to the feed indexes. A ninth, `_gen` at offset 30
+**Flavours.** Each of the nine races has a tag (`""` Chaos Dwarfs, `_emp`, `_dwf`, `_brt`,
+`_cth`, `_ksl`, `_def`, `_hef`, `_skv`) appended to every key a player reads, and a feed offset
+(0, 10, 20, 40, 50, 60, 70, 80, 90) added to the feed indexes. A tenth, `_gen` at offset 30
 (`GG.GENERIC`), is read only by a message to a human of an uncovered race whom a hostile
 service hit in multiplayer. `GG.FLAVOURED` is mirrored by `FLAVOURS` in
 `gen_great_guilds.py`, and `check_flavour_mirror()` refuses a mismatch.
+
+**Seven guilds.** `GG.GUILDS` is brass, immortals, daemonsmiths, khanate, overseers, slavers,
+temple. The temple was appended last everywhere on 2026-10-04 and has no rival. Adding a
+tenth race touches about forty declaration points across the Lua and the tools; the list,
+with the check that catches each omission, is in
+`docs/history/HANDOFF_20261005_GUILDS_SKAVEN.md`.
 
 ## 2. Where reputation comes from
 
@@ -47,14 +53,23 @@ service hit in multiplayer. `GG.FLAVOURED` is mirrored by `FLAVOURS` in
 | `gg_tech` | `ResearchCompleted` | Daemonsmiths, **for human factions only** (see section 7). |
 | `gg_research_started` | `ResearchStarted` | Nothing. It records the current technology of a covered faction for Bound Blueprint. |
 | `gg_agent_*` | `CharacterCharacterTargetAction`, `CharacterGarrisonTargetAction` | Khanate. Also counts progress on a taken hero bounty (`GG.hero_progress`). |
-| `gg_building` | `BuildingCompleted` | The guild the building's chain belongs to (`GG.BUILDING_THEME`, longest token match), scaled by level. |
+| `gg_building` | `BuildingCompleted` | The guild the building's chain belongs to (`GG.BUILDING_THEME_RACE[tag]` first, then `GG.BUILDING_THEME`, longest token match), scaled by level. |
 | `gg_sack_*` | `CharacterSackedSettlement`, `CharacterRazedSettlement` | Slavers, more for a raze. |
-| `gg_mission` | `MissionSucceeded` | All six guilds, or instead the payout for a bounty mission (a bounty is not also paid the blanket rate). |
+| `gg_earn_*` | `CaravanCompleted`, `PooledResourceChanged`, `RegionFactionChangeEvent`, `ScriptEventFactionPerformsMotherlandRitual`, `RitualCompletedEvent`, `ForeignSlotManagerCreatedEvent` | The race earn routes (`GG.EARN_ROUTES`). `gg_earn_undercity` pays the Skaven's Eshin Assassins for an under-city founded, never for an allied outpost (`context:is_allied()`). |
+| `gg_undercity_building` | `ForeignSlotBuildingCompleteEvent` | An under-city building, by its owner's race words, the same as `gg_building`. Only slot sets containing `_slot_set_underempire` pay, so allied outposts, the Black Tower and sea patrols do not. |
+| `gg_mission` | `MissionSucceeded` | Every guild, or instead the payout for a bounty mission (a bounty is not also paid the blanket rate). |
 | `gg_bounty_MissionCancelled` | `MissionCancelled` | Nothing. A bounty the mod voided gets its favour stake back. |
 | `gg_bounty_MissionFailed` | `MissionFailed` | A failed bounty takes back reputation (`rate_bounty_fail`), and its stake is lost. |
 | `gg_character_destroyed` | `CharacterDestroyed` | Nothing. It withdraws a bounty whose target character is dead. |
 | `gg_ai_turn` | `FactionTurnStart` (in `GGAI`) | Nothing. The AI's purchases, demands and patrons. |
 | `gg_mp` | `UITrigger` | Nothing. The receiving end of the multiplayer transport (section 5). |
+
+**The temple** earns through `GG.TEMPLE_ROUTES`, per race: devout provinces, provinces clean
+of all five Chaos corruptions (and Vampiric, for Bretonnia and Kislev), holy war against named
+cultures (`cm:pending_battle_cache_faction_won_battle_against_culture`), priest and wizard hero
+actions, and for the Skaven `taint`, per province carrying Skaven corruption. The turn-start
+routes are also previewed in `GG.turn_start_pay`, so the lead hold sees them. Cap `cap_temple`
+40.
 
 Every earn route goes through `GG.grant`, which applies the per-turn cap, the patron share
 and the rivalry term, and records the amount by source in the human's ledger (the "Reputation
@@ -77,7 +92,7 @@ mission is issued for the AI. A rival's targets are on its own front, and a boun
 human's land warns them with a transient located feed message (index 5005). The MCT switch is
 `ai_bounties`. Design: `docs/design/2026-09-29-great-guilds-ai-bounties-design.md`.
 
-**Services and cards.** `GG.SERVICES` has 83 rows. It is append-only, because cooldowns are
+**Services and cards.** `GG.SERVICES` has 95 rows. It is append-only, because cooldowns are
 saved by position (section 3). Each guild shows one card at each of ranks 2, 3 and 4
 (`GG.CARD_RANKS`), drawn from that guild-and-rank pool by `GG.draw_cards`. Cards are drawn in
 a fixed order, one `GG.roll` each, so every machine draws the same cards. A card never shows
@@ -89,7 +104,7 @@ kinds of row:
 - a row whose `needs` check fails;
 - a row tagged `race = <culture>` for any other race.
 
-Twenty-nine rows are race services. `GG.show_race_service` keeps at least one on show each
+Thirty-two rows are race services, and nine are the temple's. `GG.show_race_service` keeps at least one on show each
 period.
 
 **Race differences** (MCT `race_differences`, on by default) gate three things beyond the race
@@ -113,7 +128,8 @@ Default rates (every one can be changed through MCT's Custom preset):
 | Khanate | 8 per agent action | 40 |
 | Overseers | 10 x building level | 40 |
 | Slavers | 25 per sack, more per raze | 80 |
-| All six | 10 per mission completed | - |
+| Temple | 1 per devout province, 2 per clean province, 10 per holy-war battle, 2 per tainted province (Skaven) | 40 |
+| Every guild | 10 per mission completed | - |
 
 ## 3. Save state
 
@@ -121,7 +137,7 @@ All keys are `cm:set_saved_value` strings.
 
 | Key | Holds |
 |---|---|
-| `derpy_gg_<faction>` | six `rep,fav` pairs in `GG.GUILDS` order (brass, immortals, daemonsmiths, khanate, overseers, slavers), then `;`, then one cooldown per `GG.SERVICES` row, by position |
+| `derpy_gg_<faction>` | seven `rep,fav` pairs in `GG.GUILDS` order (brass, immortals, daemonsmiths, khanate, overseers, slavers, temple; a save from before the temple reads it as 0,0), then `;`, then one cooldown per `GG.SERVICES` row, by position |
 | `derpy_gg_cards_<faction>` | the service cards on show: `<turn drawn>;<key>,<key>,...`. Keys, not indexes, so a key survives the table growing; a key this build does not sell reads as its slot's default |
 | `derpy_gg_gain_<faction>` | what each guild has paid since the faction's last turn start (`guild=n,...`), so saving and reloading cannot earn a turn's limit twice |
 | `derpy_gg_carry_<faction>_<route>` | the remainder of a points-based race route (one per `per`) not yet paid out |
@@ -155,22 +171,40 @@ applied a bundle.
 | Patron bundle | `derpy_gg_patron`, applied to a force, untagged |
 | Bounty mission | `derpy_gg_<family>_<guild><tag>`, family `bounty`, `job`, `build` or `hero`; one live mission per key per faction |
 | Building-card line | `derpy_gg_built_<guild><tag>`, a dummy effect on every building level that pays that guild |
+| Guild hall | superchain `derpy_gg_hall<tag>`, chain `derpy_gg_hall_<guild><tag>`, levels `_0`..`_2`, building set `derpy_gg_set_guild_halls<tag>`, one shared instance key `derpy_gg_hall` |
+| Seat bundle | `derpy_gg_seat_<guild><tag>` |
 | Feed messages | `message_event_text_text_derpy_gg_<stem>_title` / `_primary` / `_secondary` |
 | Feed indexes | 5001 hostile hit, 5002 demand, 5003 leadership, 5004 rank, 5005 a rival's bounty on your land (transient, located), 5006 services changed, each plus the receiver's flavour offset (`GG.feed`) |
 | Panel text | `derpy_gg_<key>`, resolved by `GGUI.loc` at draw time |
 
-The DB side is ten tables plus the loc. Row counts as of build BB204325:
+The DB side is twenty-four tables plus the loc. Row counts as of build C3140F92:
 
 | Table | Rows | Why |
 |---|---|---|
-| `effect_bundles` | 690 | rank 216, leader 54, service 419, patron 1 |
-| `effect_bundles_to_effects_junctions` | 756 | |
-| `effects` | 49 | the building-card lines, six guilds by eight races, plus one Kislev war-machine effect |
+| `effect_bundles` | 960 | rank, leader, service, Seat and patron bundles |
+| `effect_bundles_to_effects_junctions` | 1,061 | |
+| `effects` | 64 | the building-card lines, seven guilds by nine races, plus one Kislev war-machine effect |
 | `effect_bonus_value_ids_unit_sets` | 2 | that effect's two bonus values, bound to CA's `ksl_war_sleds_little_grom` unit set (Kislev's artillery) |
-| `building_effects_junction` | 1,726 | one per building level that pays a guild. `gen_great_guilds.py` runs the Lua's own building-to-guild matching and refuses a line that names a different guild than the one paid |
-| `missions` | 171 | 19 guild-and-family pairs by nine flavours |
-| `event_feed_message_events` | 54 | six indexes by nine offsets |
-| `campaign_groups`, `campaign_group_members`, `campaign_group_member_criteria_values` | 54 each | only to make the feed indexes resolve (section 7) |
+| `building_effects_junction` | 2,305 | one per building level that pays a guild, plus the halls' own effects. `gen_great_guilds.py` runs the Lua's own building-to-guild matching and refuses a line that names a different guild than the one paid |
+| `missions` | 210 | the bounty missions, guild by family by flavour |
+| `event_feed_message_events` | 60 | six indexes by ten offsets |
+| `campaign_groups`, `campaign_group_members`, `campaign_group_member_criteria_values` | 60 each | only to make the feed indexes resolve (section 7) |
+| `building_superchains`, `building_sets` | 9 each | one hall superchain and one Guild Halls browser tab per race |
+| `building_chains`, `building_set_to_building_junctions`, `cai_construction_system_building_values` | 63 each | seven hall chains by nine races |
+| `building_levels`, `building_culture_variants` | 189 each | three levels per chain |
+| `building_upgrades_junction`, `building_chain_set_items` | 126 each | |
+| `building_chain_availability_sets` | 98 | the race sets, plus extra sets for Lokhir, Aislinn, Bhashiva, Thanquol and the Vermintide |
+| `building_units_allowed` | 174 | each hall's unit; a DLC unit gets a base-game fallback on the same level |
+| `building_instances` | 1 | `derpy_gg_hall`, so a settlement holds one hall |
+| `settlement_type_to_building_chains_junctions` | 21 | the Chaos Dwarfs only: their slots offer only chains listed for `factory`, `outpost` and `tower` |
+
+**Halls** (`HALLS` block in `zzz_derpy_guilds.lua`). A hall level is locked per faction with
+`cm:add_event_restricted_building_record_for_faction` until the faction has the rank it needs
+(Indebted, Favoured, Exalted and the lead). At each turn start the halls are counted with
+`region:building_exists`, pay their guild through `GG.capped_grant` (MCT `hall_rep`), and
+take `hall_off` (3%) a hall off that guild's services, at most 15%. A faction that leads a
+guild and holds its top hall gets the Seat bundle and a cap x1.5. The whole system is behind
+MCT `guild_halls`. Design: `docs/design/2026-10-04-great-guilds-halls-design.md`.
 
 ## 5. The panel
 
@@ -181,7 +215,7 @@ The panel is **our own `.twui.xml`, created at runtime**. No CA layout is overri
 - The engine ignores `dockpoint` on a runtime-created component. `GGUI` positions
   everything with `MoveTo`, which is why the layout files carry no offsets and a plain
   viewer stacks the panel in one corner.
-- The tabs, in screen order: Guilds, Leaderboard, Bounties, Court, Log, Help. The code
+- The guild bar holds seven buttons. The tabs, in screen order: Guilds, Leaderboard, Bounties, Court, Log, Help. The code
   still calls the Leaderboard `standings`. The Help and Log tabs share 21 text slots
   (`gg_help_01`..`gg_help_21`) and one pager.
 - The frames are CA's own art, referenced by path where the game already ships it. The
@@ -236,7 +270,7 @@ Run everything from the repo root.
 | Parse | `luac -p <file>` for the four scripts | Lua 5.1.5 |
 | Test | `lua tools/_guilds_harness.lua` | Runs the shipped Lua against a stubbed campaign and panel. Prints `harness ok`. |
 | Bounties | `lua tools/_guilds_bounty_harness.lua` | The bounty board against a stubbed world. Prints `bounty harness ok`. |
-| Mutation | `py tools/mutate_guilds.py` | Breaks the rules 174 ways, one at a time, in the shipped Lua; a harness must fail on each. Restores the file byte for byte. A mutant whose anchor no longer matches is reported, not skipped. |
+| Mutation | `py tools/mutate_guilds.py` | Breaks the rules 239 ways, one at a time, in the shipped Lua; a harness must fail on each. Restores the file byte for byte. A mutant whose anchor no longer matches is reported, not skipped. |
 | Opener maths | `py tools/check_guilds_anchor.py` | Extracts `GGUI.btn_anchor` from the shipped script and runs it against measured HUD geometry. |
 | Data | `py tools/gen_great_guilds.py --check`, then `--write` | Builds every DB row and loc line, and `zzz_derpy_guilds_bounty_data.lua`, and refuses on a broken rule (below). |
 | Layouts | `py tools/gen_guilds_ui.py --check`, then `--write` | Its XML emitter is `gen_guilds_emitter.py`, a deliberate copy of the Zharr Exchange's, so a fix made here cannot change that mod's output. |
@@ -329,8 +363,9 @@ Each of these cost a bug or a build to learn. Most fail silently.
 ## 8. Where the design lives
 
 - [docs/design/2026-09-10-great-guilds-design.md](design/2026-09-10-great-guilds-design.md):
-  the original design. Parts are superseded: reputation now falls as well as rises, eight
-  races take part rather than any culture, and the bounty rules are the v2 spec's.
+  the original design. Parts are superseded: reputation now falls as well as rises, nine
+  races take part rather than any culture, there are seven guilds, and the bounty rules are
+  the v2 spec's.
 - [docs/design/2026-09-23-great-guilds-flavours-design.md](design/2026-09-23-great-guilds-flavours-design.md):
   Empire and Dwarf versions of the guilds, and the tag and feed-offset machinery every
   later race reuses. Built 2026-09-23.
@@ -345,7 +380,13 @@ Each of these cost a bug or a build to learn. Most fail silently.
 - [docs/design/2026-09-29-great-guilds-service-pools-and-races-design.md](design/2026-09-29-great-guilds-service-pools-and-races-design.md):
   service pools and rotating cards, then each race's own services, earn route and twist.
   Built 2026-09-29 in two stages.
+- [docs/design/2026-10-04-great-guilds-halls-design.md](design/2026-10-04-great-guilds-halls-design.md):
+  guild halls, the Seat, and the Guild Halls browser tab. Built 2026-10-04 in two stages.
+- [docs/design/2026-10-04-great-guilds-temple-guild-design.md](design/2026-10-04-great-guilds-temple-guild-design.md):
+  the seventh guild, faith and magic, with its four routes. Built 2026-10-04.
+- [docs/design/2026-10-05-great-guilds-skaven-design.md](design/2026-10-05-great-guilds-skaven-design.md):
+  the Skaven, the ninth race: the Great Clans, Treachery, under-cities and taint. Built 2026-10-05.
 - `docs/plans/`: the plans the ladder, panel, AI, notices, flavours, bounties v2, AI
-  bounties and service pools were built from.
+  bounties, service pools, halls, temple and Skaven were built from.
 - `docs/history/`: dated handoffs, the most recent last. When a handoff and the code
   disagree, the code wins.

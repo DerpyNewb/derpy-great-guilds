@@ -96,6 +96,34 @@ o_aib:set_default_value(true)
 o_aib:set_assigned_section("systems")
 if IN_CAMPAIGN then o_aib:set_locked(true, LOCK_REASON) end
 
+local o_halls = m:add_new_option("guild_halls", "checkbox")
+o_halls:set_text("Guild halls")
+o_halls:set_tooltip_text("Lets factions raise guild halls in their settlements, for the "
+    .. "races that have them. Off locks them; halls already built stay but do nothing.")
+o_halls:set_default_value(true)
+o_halls:set_assigned_section("systems")
+if IN_CAMPAIGN then o_halls:set_locked(true, LOCK_REASON) end
+
+local o_hrep = m:add_new_option("hall_rep", "slider")
+o_hrep:set_text("Reputation from halls (%)")
+o_hrep:set_tooltip_text("How much Reputation each hall pays every turn, as a percentage. "
+    .. "100 is the standard amount, 0 means halls pay none.")
+o_hrep:slider_set_min_max(0, 300)
+o_hrep:slider_set_step_size(10)
+o_hrep:set_default_value(100)
+o_hrep:set_assigned_section("systems")
+if IN_CAMPAIGN then o_hrep:set_locked(true, LOCK_REASON) end
+
+local o_hoff = m:add_new_option("hall_off", "slider")
+o_hoff:set_text("Price cut per hall (%)")
+o_hoff:set_tooltip_text("How much each hall takes off the price of its guild's services. "
+    .. "The cut stops growing at 15%.")
+o_hoff:slider_set_min_max(0, 10)
+o_hoff:slider_set_step_size(1)
+o_hoff:set_default_value(3)
+o_hoff:set_assigned_section("systems")
+if IN_CAMPAIGN then o_hoff:set_locked(true, LOCK_REASON) end
+
 local o_rot = m:add_new_option("rotate_turns", "slider")
 o_rot:set_text("Services change every")
 o_rot:set_tooltip_text("The guilds change the services they offer every this many turns. "
@@ -214,6 +242,14 @@ local RATES = {
      .. "belongs to - its card names the guild."},
     {"rate_slavers", "The Raiders' Guild", 25, 1, 100,
      "Points per settlement sacked. A raze pays 60% more."},
+    {"rate_temple_devout", "The Faith Guild: provinces in good order", 1, 0, 10,
+     "Points per province with public order above zero, every turn."},
+    {"rate_temple_chaos", "The Faith Guild: provinces free of corruption", 2, 0, 10,
+     "Points per province with no Chaos corruption, every turn."},
+    {"rate_temple_holy", "The Faith Guild: holy wars", 10, 0, 60,
+     "Points per battle won against the faith's sworn enemies."},
+    {"rate_temple_taint", "The Faith Guild: tainted provinces", 2, 0, 10,
+     "Points per province carrying Skaven corruption, every turn. Skaven only."},
     -- Not a guild: the one signal that pays ALL SIX. Each guild's own per-turn cap
     -- still applies, so this cannot be used to outrun them.
     {"rate_missions", "Missions (every guild)", 10, 0, 60,
@@ -255,6 +291,7 @@ local CAPS = {
     {"cap_khanate", "The Shadow Guild", 40},
     {"cap_overseers", "The Builders' Guild", 40},
     {"cap_slavers", "The Raiders' Guild", 80},
+    {"cap_temple", "The Faith Guild", 40},
 }
 
 for i = 1, #CAPS do
@@ -324,6 +361,9 @@ local PRESET_OWNED = {
     "rate_missions", "rate_bounty", "rate_rivalry", "rate_patron",
     "demand_every", "demand_turns", "demand_reward", "demand_penalty",
     "rate_decay", "decay_from", "rate_bounty_fail", "rate_bounty_stake",
+    "hall_rep",
+    "rate_temple_devout", "rate_temple_chaos", "rate_temple_holy", "cap_temple",
+    "rate_temple_taint",
 }
 -- SAYS THE NUMBER IS NOT THE ONE USED: a greyed slider keeps showing its Default (or an
 -- earlier Custom) value while the preset plays its own (logic audit, 2026-09-29).

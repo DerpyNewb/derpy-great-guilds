@@ -94,25 +94,26 @@ PANEL_LAYOUT = {
 }
 for _i, _name in enumerate(TABS):
     PANEL_LAYOUT[_name] = (20 + _i * TAB_W, 56, TAB_W, TAB_H)
-# ONE CLICK TO ANY GUILD: six glyph buttons between the arrows, the pager's own size and
-# row, centred on the panel (256..534 around 395). The bar above them marks the page on
+# ONE CLICK TO ANY GUILD: seven glyph buttons between the arrows, the pager's own size
+# and row, centred on the panel (232..558 around 395). The bar above them marks the page on
 # screen; GGUI.draw_guild_buttons moves it along, so its x here is only where it starts.
-GUILD_BTNS = ["gg_gtab_%d" % (_i + 1) for _i in range(6)]
+GUILD_BTNS = ["gg_gtab_%d" % (_i + 1) for _i in range(len(G.GUILDS))]
 GTAB_W, GTAB_STEP = 38, 48
 for _i, _name in enumerate(GUILD_BTNS):
-    PANEL_LAYOUT[_name] = (256 + _i * GTAB_STEP, 596, GTAB_W, GTAB_W)
-PANEL_LAYOUT["gg_gsel"] = (256, 590, GTAB_W, 4)
-# The Hell-Forge's bronze button bar behind the six, 80px past each end, drawn first
+    PANEL_LAYOUT[_name] = (232 + _i * GTAB_STEP, 596, GTAB_W, GTAB_W)
+PANEL_LAYOUT["gg_gsel"] = (232, 590, GTAB_W, 4)
+# The Hell-Forge's bronze button bar behind the seven, 80px past each end, drawn first
 # (gg_gbar sorts before gg_gtab_*) so the buttons sit on it.
 # 438 WIDE, NOT 310 (2026-09-30). At 310 only 16px of bar showed past each end button, and
 # every race bar with end ornaments - the culture bar_small_buttons, Kislev's horse heads,
 # the High Elf griffins, the Vows scrolls - drew them UNDER the first and last button. 438
 # at x=176 clears them all (the widest, Kislev's heads, end at column 75) and stays clear
-# of the pager (20..58, 732..770).
+# of the pager (20..58, 732..770). 486 WIDE AT x=152 since the seventh guild (2026-10-04):
+# still 80px past each end button, clear of the pager.
 # 40 TALL, CENTRED on the plates' rings (rows 2..35 of 38, so y 598..631) with 3-4px of bar
 # above and below. At 34 tall and y=598 the ring ended on the bar's last row and read as
 # sliced off; see GBAR_LAYERS for why the bar now has a bottom rim at all.
-PANEL_LAYOUT["gg_gbar"] = (176, 595, 438, 40)
+PANEL_LAYOUT["gg_gbar"] = (152, 595, 486, 40)
 # THE LOG'S FILTERS, in the band the reputation bar and its track use on the Guilds tab -
 # both are hidden on the Log, and the first of its 21 lines starts at y=168.
 LOG_FILTERS = ["gg_lf_all", "gg_lf_mine", "gg_lf_rivals", "gg_lf_ranks"]
@@ -140,6 +141,9 @@ CARD_W, CARD_H = 750, 120
 CARD_LAYOUT = {
     "card_icon": (8, 7, 100, 106),
     "card_name": (114, 12, 440, 26),
+    # WHAT SHUTS A SERVICE, on its own plate (2026-10-05). The Lua moves it to just past
+    # the measured name and widens it to its text; this is only its starting box.
+    "card_need": (114, 12, 160, 26),
     "card_desc_1": (114, 44, 480, 20),
     "card_desc_2": (114, 64, 480, 20),
     "card_cost": (596, 10, 138, 30),
@@ -147,7 +151,10 @@ CARD_LAYOUT = {
 }
 
 # One standings row: guild, the player's rank, and who leads.
-ROW_W, ROW_H = 750, 40
+ROW_W, ROW_H = 750, 34
+# Seven rows inside 170..436: the last ends at 170 + 6 * 38 + 34 = 432 (2026-10-04; six
+# rows ran 40 tall at a 44 step).
+ROW_STEP = 38
 # REBALANCED TOWARDS THE LEADER COLUMN. That cell now carries the holder, their rank,
 # what they gained on the round just past and a mark when the guild changed hands -
 # which is the whole point of this tab - and at 250px it had about 37 characters, which
@@ -155,19 +162,19 @@ ROW_W, ROW_H = 750, 40
 # the ones with room: a guild name is at most 22 characters and "You: Ironmaster (1240)"
 # is 22.
 #
-# THE GUILD'S GLYPH OPENS THE ROW, at 36 in a 40-tall row - the largest square that
+# THE GUILD'S GLYPH OPENS THE ROW, at 30 in a 34-tall row - the largest square that
 # fits. The name gives up 32px for it: the longest guild name is 22 characters.
 ROW_LAYOUT = {
-    "row_icon":   (6, 2, 36, 36),
+    "row_icon":   (6, 2, 30, 30),
     # 170, not 160 (2026-10-04): "The Erengrad Merchants" and "The Naggarond Builders"
     # ran 3-4px past the cell once the preview measured it. The rank column had the room.
-    "row_guild":  (46, 8, 170, 24),
-    "row_rank":   (222, 8, 186, 24),
-    "row_leader": (416, 8, 324, 24),
+    "row_guild":  (46, 5, 170, 24),
+    "row_rank":   (222, 5, 186, 24),
+    "row_leader": (416, 5, 324, 24),
 }
 
 # ------------------------------------------------- the standings faction list ----
-# WHERE IT GOES. The six standings rows run y=170..430 (44 step, 40 tall) and the pager
+# WHERE IT GOES. The seven standings rows run y=170..432 (38 step, 34 tall) and the pager
 # sits at y=596, so 440..590 is the only clear band on this tab and the list is exactly
 # that band. It is not on the Guilds tab because three service cards already fill that
 # one to y=550, which leaves 46px - two rows short of being worth a scrollbar.
@@ -685,6 +692,13 @@ GSEL_LAYERS = [
 # A standings row is a BAND, not a button - a flat tint, the same idiom as the
 # reputation track. It was a 750px-wide stretched button plate, which is the exact
 # smear the cards were, six times over.
+# A DARK WASH OVER A PLATE'S ART, inset 3px so its rim still shows, on every race's reason
+# plate and price box. CA's red (FF2D2D) - "Needs Sworn", and a price favour cannot meet -
+# measured 2.3:1 to 4.49:1 on six races' plate art (2026-10-05), ui_colours has no brighter
+# red, and at #000000A0 four still failed. The near-black Chaos Dwarf box barely changes.
+PLATE_WASH = {"path": "ui/skins/default/1x1_blank_white.png", "offset": (3, 3),
+              "dw": -6, "dh": -6, "margin": 0, "colour": "#000000D0", "dock": None}
+
 ROW_LAYERS = [
     {"path": "ui/skins/default/1x1_blank_white.png",
      "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "colour": "#00000055",
@@ -724,7 +738,7 @@ def back_layers(h):
 # one picture (2026-10-04) and held by the preview's contrast check, which measured the
 # figures on every ornament at a single 48.
 RANK_STATS_PAD = {"": 48, "_emp": 84, "_dwf": 48, "_brt": 84, "_cth": 104, "_ksl": 74,
-                  "_def": 66, "_hef": 94}
+                  "_def": 66, "_hef": 94, "_skv": 48}
 
 
 # The pager and the close button are round: a chevron and a cross both want a disc,
@@ -850,6 +864,7 @@ _TUTGLOW = _D + "tutglow_square.png"
 _DIM = "#B4B4B4FF"
 _HEF_TAB = _D + "dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"
 _BRT_TILE = "ui/skins/wh_main_brt_bretonnia/legacy/panel_back_tile.png"
+_CP = _D + "dlc29_skv_chaotic_plans/"
 
 
 def _L(path, margin=0, tile=False, colour=None, offset=(0, 0), dw=0, dh=0):
@@ -1162,6 +1177,52 @@ FRAMES = {
                      offset=(0, 2), dh=-4)],
         "fill": [_L(_W2 + "murderous_prowess_fill.png")],
     },
+    # THE SKAVEN (2026-10-05), briefed against Thanquol's Chaotic Plans panel and Ikit
+    # Claw's workshop, both measured off the files and CA's own slicing of them.
+    "_skv": {
+        # Chaotic Plans' small panel at CA's own 58/98 slices, tiled as CA tiles it (mean
+        # luminance 20 under the text), inside its unlit green frame.
+        # DRAWN 8px PAST THE CARD ON EVERY SIDE (2026-10-05): the art's line sits 10-15px
+        # inside the file, so at the card's own size it ran through the title in game.
+        # The 8px that land outside peak at alpha 23 - its soft shadow, nothing drawn -
+        # which overhang_faint measures before check() lets it through.
+        "card": _L(_CP + "skv_small_panels_bgr.png", (58, 98, 58, 98), True,
+                   offset=(-8, -8), dw=16, dh=16),
+        "card_extra": [_L(_CP + "skv_small_panels_bgr_frame.png", (58, 98, 58, 98),
+                          offset=(-8, -8), dw=16, dh=16)],
+        # CA's `green` (ui_colours_tables, 160/255/55), the warp-stone colour.
+        "heat": (_GLOW, "#A0FF3750"),
+        # NOT the lit frame: the rim slot is clear.png (128px) in the file, and the frame's
+        # marks at columns 56 and 88 would stretch 7x through any slice that fits it.
+        "rim": (_TUTGLOW, (16, 16, 16, 16), "#A0FF37C0"),
+        # The schemer's portrait ring, 107x108, drawn just under its size.
+        "holder": (_CP + "skv_portrait_frame.png", 0.5, 0.5),
+        # The plan plate at CA's 24px ends, NOT tiled: a 46-row file tiled into 30 rows
+        # would lose its lower rim.
+        "cost": [_L(_CP + "skv_plate.png", (0, 24, 0, 24))],
+        # The sub-title chip at its native 36 rows, centred in the 46px strip, CA's 280px
+        # fading right end kept native and the middle tiled. It fades out on the right,
+        # so the figures there sit on the panel ground and RANK_STATS_PAD needs no ornament.
+        "rank": [_L(_CP + "sub_title_bgr.png", (0, 280, 0, 14), True, offset=(0, 5), dh=-10)],
+        "rank_tx": "56.00,0.00", "rank_ty": "0.00,0.00",
+        # The Skaven HUD bar at CA's 85px ends, not tiled: 467x71 into 486x40 only squeezes
+        # the height, and its ornaments (columns 15..75) sit outside the end buttons.
+        "gbar": [_L("ui/skins/wh2_main_skv_skaven/bar_small_buttons.png", (0, 85, 0, 85))],
+        # Ikit's workshop buttons, 246x52: flat along the length with 3px ends and a
+        # highlight in the top 12 and bottom 10 rows, which stay native. The open tab is the
+        # pressed button ringed by the tutorial glow in CA's green.
+        "tab": {"layers": [_L(_W2 + "ikit_button_active.png", (12, 3, 10, 3)),
+                           _L(CLEAR, 16, colour="#A0FF37C0")],
+                "hover": [_L(_W2 + "ikit_button_hover.png", (12, 3, 10, 3)),
+                          _L(CLEAR, 16, colour="#A0FF37C0")],
+                "selected": [_W2 + "ikit_button_down.png", _TUTGLOW],
+                "selected_hover": [_W2 + "ikit_button_down.png", _TUTGLOW]},
+        # Ikit's dark trough, tiled at its own size as CA tiles it, and his warp-green fill
+        # at CA's 2px ends. NOT his frame: it is 88 rows with ornaments far above and below a
+        # 19-row trough, and fitted into 29 rows the trough would be 6.
+        "track": [_L(_W2 + "ikit_panel_bar_background.png", 0, True)],
+        "fill": [_L(_W2 + "ikit_panel_bar_fill.png", (0, 2, 0, 2))],
+    },
 }
 FRAME_TAGS = sorted(t for t in FRAMES if t)
 
@@ -1223,6 +1284,8 @@ def tab_layers(tag, state):
 # So: every component that a label is ever written onto asks for text=True, and the
 # text offset stays small and local to the component.
 LABEL_TX, LABEL_TY = "6.00,0.00", "4.00,0.00"
+# The reason plate's text inset each side; GGUI.NEED_PAD mirrors it.
+NEED_PAD = 10
 # leading=0: a caption is ONE line, and per-line leading on one line is just an
 # offset that drops the glyphs onto the plate's bottom rim. See EU._state.
 BTN_TEXT = {"text": True, "size": 12, "align": "Center", "valign": "Center",
@@ -1329,9 +1392,17 @@ def _card(tag=""):
         elif name == "card_name":
             kw = {"text": True, "size": 14, "align": "Left", "valign": "Center",
                   "fontcat": "header_14", "tx": LABEL_TX, "ty": LABEL_TY}
+        elif name == "card_need":
+            # "Needs Sworn" in the name's colour on the bare card blended into it, and
+            # red there measured 2.2:1. On the race's own cost-box plate the padlock and
+            # CA's red read, and the plate says "this is a condition", not a title.
+            kw = {"layers": f["cost"] + [PLATE_WASH],
+                  "text": True, "size": 14, "align": "Left",
+                  "valign": "Center", "fontcat": "header_14",
+                  "tx": "%.2f,%.2f" % (NEED_PAD, NEED_PAD), "ty": LABEL_TY}
         elif name == "card_cost":
             # The number reads better against the Buy button below it when centred.
-            kw = {"layers": f["cost"],
+            kw = {"layers": f["cost"] + [PLATE_WASH],
                   "text": True, "size": 14, "align": "Center", "valign": "Center",
                   "tx": "0.00,0.00", "ty": "0.00,0.00"}
         else:
@@ -1910,29 +1981,57 @@ _TEX_SIZES = {}
 
 def tex_size(path):
     """(w, h) of a texture: ours from where it is staged, CA's out of the ui packs."""
-    if path in _TEX_SIZES:
-        return _TEX_SIZES[path]
+    if path not in _TEX_SIZES:
+        im = tex_image(path)
+        _TEX_SIZES[path] = im.size if im else None
+    return _TEX_SIZES[path]
+
+
+def tex_image(path):
+    """The texture itself, or None: ours from where it is staged, CA's out of the ui packs."""
     from PIL import Image
     local = os.path.join(ROOT, "Modding Files", "pack", path.replace("/", os.sep))
-    size = None
     if os.path.isfile(local):
-        size = Image.open(local).size
-    else:
-        import read_pack_index as RP
-        from read_vanilla_loc import _decompress
-        game = r"F:\SteamLibrary\steamapps\common\Total War WARHAMMER III\data"
-        for pk in ("ui.pack", "ui2.pack", "ui3.pack", "ui_3.pack"):
-            fp = os.path.join(game, pk)
-            if not os.path.isfile(fp):
-                continue
-            for _p, comp, blob in RP.read(fp, path):
-                if _p == path:
-                    size = Image.open(io.BytesIO(_decompress(blob) if comp else blob)).size
-                    break
-            if size:
-                break
-    _TEX_SIZES[path] = size
-    return size
+        return Image.open(local)
+    import read_pack_index as RP
+    from read_vanilla_loc import _decompress
+    game = r"F:\SteamLibrary\steamapps\common\Total War WARHAMMER III\data"
+    for pk in ("ui.pack", "ui2.pack", "ui3.pack", "ui_3.pack"):
+        fp = os.path.join(game, pk)
+        if not os.path.isfile(fp):
+            continue
+        for _p, comp, blob in RP.read(fp, path):
+            if _p == path:
+                return Image.open(io.BytesIO(_decompress(blob) if comp else blob))
+    return None
+
+
+# WHAT MAY HANG OUTSIDE A COMPONENT: rows the texture leaves next to empty. The engine
+# does not clip, so an overhang is only safe when what it draws there cannot be seen.
+OVERHANG_ALPHA = 32
+
+
+def overhang_faint(lay, ox, oy, w, h, cw, ch):
+    """True when every side that reaches past the component draws only faint pixels.
+
+    Each overhanging band must sit inside that side's nine-slice margin (so it is drawn
+    at the file's own size, not stretched) and its alpha must stay at or under
+    OVERHANG_ALPHA in the texture.
+    """
+    over = (max(0, -oy), max(0, ox + w - cw), max(0, oy + h - ch), max(0, -ox))
+    if not any(over):
+        return True
+    im = tex_image(lay["path"])
+    if im is None:
+        return False
+    a = im.convert("RGBA").split()[3]
+    tw, th = a.size
+    boxes = ((0, 0, tw, over[0]), (tw - over[1], 0, tw, th),
+             (0, th - over[2], tw, th), (0, 0, over[3], th))
+    for n, m, box in zip(over, _margins(lay), boxes):
+        if n and (n > m or a.crop(box).getextrema()[1] > OVERHANG_ALPHA):
+            return False
+    return True
 
 
 def _margins(lay):
@@ -2429,10 +2528,11 @@ def check():
     # THE LIST MUST NOT LAND ON THE ROWS ABOVE IT OR THE PAGER BELOW. Everything on this
     # panel is placed by absolute MoveTo, so an overlap is not a layout error the engine
     # reports - it is two things drawn on top of each other.
-    rows_end = 170 + (6 - 1) * 44 + ROW_H
+    rows_end = 170 + (len(G.GUILDS) - 1) * ROW_STEP + ROW_H
     if LIST_XY[1] < rows_end:
-        out.append("the faction list starts at y=%d and the six standings rows end at "
-                   "y=%d - it would draw on top of them" % (LIST_XY[1], rows_end))
+        out.append("the faction list starts at y=%d and the %d standings rows end at "
+                   "y=%d - it would draw on top of them"
+                   % (LIST_XY[1], len(G.GUILDS), rows_end))
     pager_top = PANEL_LAYOUT["gg_prev"][1]
     if LIST_XY[1] + LIST_H > pager_top:
         out.append("the faction list ends at y=%d and the pager starts at y=%d"
@@ -2483,9 +2583,16 @@ def check():
     if cards != per_guild:
         out.append("%d card slots but %d ranks per guild" % (cards, per_guild))
 
-    # Six guild pages, six pager stops.
-    if len(G.GUILDS) != 6:
-        out.append("the pager assumes six guild pages, generator has %d" % len(G.GUILDS))
+    # ONE PAGE PER GUILD, IN THE GENERATOR'S ORDER. The pager and the guild buttons walk
+    # GGUI.GUILD_ORDER, so a guild missing from it has no page at all.
+    _ui = os.path.join(ROOT, "Modding Files", "pack", "script", "campaign", "mod",
+                       "zzz_derpy_guilds_ui.lua")
+    order = re.search(r"GGUI\.GUILD_ORDER = \{(.*?)\}",
+                      io.open(_ui, encoding="utf-8").read(), re.S)
+    names = re.findall(r'"([a-z]+)"', order.group(1)) if order else []
+    if names != G.GUILDS:
+        out.append("GGUI.GUILD_ORDER %s is not the generator's GUILDS %s"
+                   % (names, G.GUILDS))
 
     if len(PANEL_TITLE) > 19:
         out.append("panel title plate clips silently past ~19 chars: %r" % PANEL_TITLE)
@@ -2544,7 +2651,8 @@ def check():
         for lay in layers:
             ox, oy = lay.get("offset", (0, 0))
             w, h = cw + lay.get("dw", 0), ch + lay.get("dh", 0)
-            if ox < 0 or oy < 0 or ox + w > cw or oy + h > ch:
+            if (ox < 0 or oy < 0 or ox + w > cw or oy + h > ch) and \
+                    not overhang_faint(lay, ox, oy, w, h, cw, ch):
                 out.append("%s layer %s draws (%d,%d %dx%d) outside its %dx%d component - "
                            "the engine does not clip, so this lands on whatever is behind "
                            "the panel" % (lname, lay["path"].rsplit("/", 1)[-1],
@@ -2597,6 +2705,7 @@ def check():
             out.append("GGUI.CARD_OFF is %r but the generator says %r"
                        % (m and m.group(1), CARD_OFF))
         out += check_frame_mirror(src)
+        out += check_header_inset(src)
 
     out += check_frame_files(files)
     out += check_pulses(files)
@@ -2689,6 +2798,27 @@ def check_frame_mirror(src):
                                    "it would draw a blank" % (tag, k, p))
     except Exception as e:                                          # noqa: BLE001
         out.append("could not verify GGUI.FRAME's art: %r" % (e,))
+    return out
+
+
+def check_header_inset(src):
+    """GGUI.HEADER_INSET must be each frame's rank_tx plus its RANK_STATS_PAD.
+
+    GGUI.header_fits takes it off the bar's width to find the room beside the guild's
+    name. Too small and the rival is drawn over the name, the Skaven bug of 2026-10-05.
+    """
+    m = re.search(r"GGUI\.HEADER_INSET\s*=\s*\{(.*?)\}", src, re.S)
+    if not m:
+        return ["zzz_derpy_guilds_ui.lua declares no GGUI.HEADER_INSET"]
+    got = {}
+    for k, v in re.findall(r'(\[""\]|_\w+)\s*=\s*([\d.]+)', m.group(1)):
+        got["" if k == '[""]' else k] = float(v)
+    out = []
+    for tag in [""] + FRAME_TAGS:
+        want = float(frame(tag)["rank_tx"].split(",")[0]) + RANK_STATS_PAD[tag]
+        if got.get(tag) != want:
+            out.append("GGUI.HEADER_INSET[%r] is %r but rank_tx + RANK_STATS_PAD is %r"
+                       % (tag, got.get(tag), want))
     return out
 
 
@@ -2823,8 +2953,22 @@ def selftest():
         "<card_cost this=", "<card_price this=", 1)
     assert any("hierarchy" in m for m in check_frame_files(broken)), \
         "a Dwarf card with a renamed part was not reported"
+    # THE SKAVEN CARD'S LINE CLEARS THE TITLE (2026-10-05): its art hangs 8px past the
+    # card, which only its faint shadow may do. The same layer pushed 20px out reaches
+    # the drawn line and must be refused, as must a band wider than its margin.
+    skv = card_layers("_skv")[0]
+    assert skv["offset"][1] <= -8, "the Skaven card art is back inside the card: %r" % (skv,)
+    assert overhang_faint(skv, -8, -8, CARD_W + 16, CARD_H + 16, CARD_W, CARD_H)
+    assert not overhang_faint(skv, -20, -20, CARD_W + 40, CARD_H + 40, CARD_W, CARD_H), \
+        "an overhang onto the drawn line was let through"
+    assert not overhang_faint(dict(skv, margin=4), -8, -8, CARD_W + 16, CARD_H + 16,
+                              CARD_W, CARD_H), "an overhang past its margin was let through"
     if os.path.isfile(lua_path):
         assert not check_frame_mirror(lua), check_frame_mirror(lua)
+        assert not check_header_inset(lua), check_header_inset(lua)
+        assert any("['_skv']" in m for m in check_header_inset(
+            lua.replace("_skv = 104}", "_skv = 56}"))), \
+            "a Skaven inset short of its pad was not reported"
         assert any("no '_hef' entry" in m for m in check_frame_mirror(
             re.sub(r"\n    _hef = \{.*?\n    \},", "", lua, flags=re.S))), \
             "a Lua frame table without the High Elves was not reported"

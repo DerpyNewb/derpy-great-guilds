@@ -31,6 +31,8 @@ cm = {
   apply_effect_bundle = function(_, b, f, t) applied[#applied + 1] = {b, f, t} end,
   remove_effect_bundle = function(_, b, f) removed[#removed + 1] = {b, f} end,
   add_first_tick_callback = function(_, fn) FIRST_TICKS[#FIRST_TICKS + 1] = fn end,
+  add_event_restricted_building_record_for_faction = function() end,
+  remove_event_restricted_building_record_for_faction = function() end,
   repeat_real_callback = function(_, fn, ms, name)
     REAL_TIMERS = REAL_TIMERS or {}
     REAL_TIMERS[#REAL_TIMERS + 1] = {fn = fn, ms = ms, name = name}
@@ -303,7 +305,7 @@ dofile("Modding Files/pack/script/campaign/mod/zzz_derpy_guilds.lua")
 MODEL_TICKS = #FIRST_TICKS
 
 -- Shape.
-assert(#GG.GUILDS == 6, "six guilds")
+assert(#GG.GUILDS == 7, "seven guilds")
 assert(GG.rank_of(0) == 1, "zero is rank 1")
 assert(GG.rank_of(99) == 1, "99 is still rank 1")
 assert(GG.rank_of(100) == 2, "100 is rank 2")
@@ -869,7 +871,7 @@ GG.state = {a = {brass = {rep = 500, fav = 0}}, b = {brass = {rep = 900, fav = 0
 -- needs to know whose league it is drawing or it draws nobody's.
 GG.CULTURE_OF["a"], GG.CULTURE_OF["b"] = GG.CHD_CULTURE, GG.CHD_CULTURE
 local L = GGUI.leaders("a")
-assert(#L == 6, "one leader row per guild, got " .. #L)
+assert(#L == 7, "one leader row per guild, got " .. #L)
 assert(L[1].guild == "brass", "first row is brass")
 assert(L[1].faction_key == "b", "highest reputation leads, got "
        .. tostring(L[1].faction_key))
@@ -1314,10 +1316,13 @@ GG.reset_turn(RV)
 local seen = 0
 for _, guild in ipairs(GG.GUILDS) do
     local r = GG.RIVALS[guild]
-    assert(r, guild .. " has no rival")
-    assert(r ~= guild, guild .. " is its own rival")
-    assert(GG.RIVALS[r] == guild,
-           guild .. "/" .. r .. " is a one-way rivalry")
+    -- THE TEMPLE HAS NO RIVAL (temple spec §1); every other guild has exactly one.
+    assert(r or guild == "temple", guild .. " has no rival")
+    if r then
+        assert(r ~= guild, guild .. " is its own rival")
+        assert(GG.RIVALS[r] == guild,
+               guild .. "/" .. r .. " is a one-way rivalry")
+    end
     seen = seen + 1
 end
 assert(seen == #GG.GUILDS, "not every guild was checked")
@@ -5681,6 +5686,82 @@ end
 end)()
 
 -- ---------------------------------------------------------------------------
+-- A RESEARCH SERVICE PAYS POINTS, NOT A FORCED COMPLETION (2026-10-04).
+--
+-- cm:instantly_research_technology on the tech IN PROGRESS is taken back by the engine the
+-- next time the player re-plans the queue: measured live, has_technology true and then
+-- false, the tech left fully paid at "1 turn". cm:grant_research_points pays it through the
+-- queue and held. The buyer's panel reads what is left (CCO, local only) and sends it on
+-- the wire, so every machine grants the same number; the AI sends nothing and keeps the
+-- old call; a number no technology costs is not trusted.
+;(function()
+    local F = "cr_points"
+    local prev_humans = cm.get_human_factions
+    cm.get_human_factions = function() return {F} end
+    GG.humans, GG.player_cultures_cache = nil, nil
+    GG.CULTURE_OF[F] = GG.CHD_CULTURE
+    local granted = {}
+    cm.grant_research_points = function(_, f, n) granted[#granted + 1] = {f, n} end
+    local function fresh()
+        GG.state[F], GG.cooldowns[F] = nil, nil
+        GG.grant(F, "daemonsmiths", 1000)
+        GG.save(F)
+        GG.set_research(F, "tech_points")
+        GG.save_research(F)
+    end
+
+    -- the panel read 300 left: points, and no forced completion
+    fresh()
+    local r0 = #research
+    GG.MP_OPS.buy(F, "bound_blueprint|300")
+    assert(#granted == 1 and granted[1][1] == F and granted[1][2] == 300,
+           "Bound Blueprint with 300 left on the wire must grant exactly 300 research points")
+    assert(#research == r0, "a purchase that sent its points must not ALSO force the "
+           .. "completion - that is the call the engine takes back on a queue re-plan")
+    assert(GG.cooldown_left(F, "bound_blueprint") > 0, "the purchase went through")
+
+    -- nothing readable on the wire: the old call, as before
+    fresh()
+    GG.MP_OPS.buy(F, "bound_blueprint|")
+    assert(#granted == 1, "no points sent, none granted")
+    assert(#research == r0 + 1 and research[#research][2] == "tech_points",
+           "with no points sent the service must still complete the research the old way")
+
+    -- a number no technology costs is not trusted
+    fresh()
+    GG.MP_OPS.buy(F, "bound_blueprint|99999999")
+    assert(#granted == 1, "an absurd point count off the wire must not be granted")
+    assert(#research == r0 + 2, "and the purchase falls back to the old call")
+
+    -- THE PANEL'S HALF: what it puts on the wire is what CCO says is left
+    local prev_common, prev_get = common, cm.get_faction
+    cm.get_faction = function(self, k)
+        if k ~= F then return prev_get(self, k) end
+        return {is_null_interface = function() return false end,
+                command_queue_index = function() return 77 end}
+    end
+    common = {get_context_value = function(kind, cqi, expr)
+        assert(kind == "CcoCampaignFaction" and cqi == 77)
+        if string.find(expr, "ResearchPointsCost", 1, true) then return 300 end
+    end}
+    local s = GG.service("bound_blueprint")
+    assert(GGUI.wire_target(s, F) == "300", "the panel must send the points left, got "
+           .. tostring(GGUI.wire_target(s, F)))
+    common = {get_context_value = function() return 0 end}
+    assert(GGUI.wire_target(s, F) == "", "nothing left to pay sends nothing")
+    common = {get_context_value = function() error("no CCO") end}
+    assert(GGUI.wire_target(s, F) == "", "an unreadable CCO sends nothing, never a throw")
+    common, cm.get_faction = prev_common, prev_get
+
+    cm.grant_research_points = nil
+    GG.clear_research(F)
+    GG.state[F], GG.cooldowns[F] = nil, nil
+    GG.CULTURE_OF[F] = nil
+    cm.get_human_factions = prev_humans
+    GG.humans, GG.player_cultures_cache = nil, nil
+end)()
+
+-- ---------------------------------------------------------------------------
 -- WHO IS SELECTED ON THE CAMPAIGN MAP.
 --
 -- THE STUB IS CA'S OWN OBJECT, MEMBER FOR MEMBER, and that is the whole point of this
@@ -5901,6 +5982,7 @@ end)()
         {"cr_flav_def", "wh2_main_def_dark_elves", "_def", 70, "wh2_main_def_inf_black_guard_0"},
         {"cr_flav_hef", "wh2_main_hef_high_elves", "_hef", 80,
          "wh2_main_hef_inf_swordmasters_of_hoeth_0"},
+        {"cr_flav_skv", "wh2_main_skv_skaven", "_skv", 90, "wh2_main_skv_inf_stormvermin_0"},
     }
     for _, c in ipairs(cases) do
         local f, culture, tag, off, unit = c[1], c[2], c[3], c[4], c[5]
@@ -6257,7 +6339,8 @@ end)()
     find_uicomponent, is_uicomponent = prev_find, prev_is
     assert(moved.gg_title == (100 + 55 * 2) .. "," .. (50 + 0 * 2),
            "gg_title at 2x, got " .. tostring(moved.gg_title))
-    assert(moved.derpy_gg_row_2 == (100 + 20 * 2) .. "," .. (50 + (170 + 44) * 2),
+    -- 38: seven standings rows at a 38 step since the temple (2026-10-04); was 44.
+    assert(moved.derpy_gg_row_2 == (100 + 20 * 2) .. "," .. (50 + (170 + 38) * 2),
            "the second standings row at 2x, got " .. tostring(moved.derpy_gg_row_2))
     assert(moved.vslider == (100 + (20 + 732) * 2) .. "," .. (50 + (440 + 24) * 2),
            "the list's slider at 2x, got " .. tostring(moved.vslider))
@@ -6292,6 +6375,32 @@ end)()
     assert(flat == base, "at 2x, measured at the design size, the lines must match 1x")
     assert(grown == base, "at 2x, measured at the scaled size, the lines must match 1x")
     GGUI.S, GGUI.PROBE_W0 = 1, nil
+
+    -- AN [[img:]] IS ONE WORD, WHATEVER ITS PATH SAYS (2026-10-05). CA's effect icons
+    -- live under "ui/campaign ui/", so a split on spaces could break the markup over
+    -- two lines and draw the path as text. Its width is the picture's, GGUI.FLAG_W,
+    -- not fifty characters of path.
+    k = 1
+    local ICON = "[[img:ui/campaign ui/effect_bundles/melee.png]][[/img]]"
+    local words = ICON .. " +6 melee attack for the army you select, for 5 turns."
+    local fits = #GGUI.bare(words) * 10 + GGUI.FLAG_W
+    local one = GGUI.wrap(cell(fits), words)
+    assert(#one == 1 and one[1] == words,
+           "an icon and its sentence fit on one line, got " .. table.concat(one, "|"))
+    assert(#GGUI.wrap(cell(fits - 1), words) > 1, "the icon's width is paid for")
+    -- Mid-line, where a split at the path's space would put a break between its halves.
+    local mid = "abcdefghi " .. ICON
+    local got = GGUI.wrap(cell(#GGUI.bare(mid) * 10 + GGUI.FLAG_W), mid)
+    assert(#got == 1 and got[1] == mid, "an icon after a word stays on its line, got "
+           .. table.concat(got, "|"))
+    local many = GGUI.wrap(cell(120), words)
+    assert(#many > 1, "a narrow cell breaks the sentence")
+    for _, l in ipairs(many) do
+        local _, opens = l:gsub("%[%[img:", "")
+        local _, shuts = l:gsub("%[%[/img%]%]", "")
+        assert(opens == shuts, "a line cut an icon's markup in two: " .. l)
+    end
+    assert(table.concat(many, " ") == words, "the wrap lost or changed a word")
 end)()
 
 -- ------------------------------------------------ multiplayer: clicks travel --
@@ -6749,7 +6858,7 @@ end)()
     assert(texts.cap_slavers == "The Free Companies limit", tostring(texts.cap_slavers))
     local n = 0
     for _ in pairs(texts) do n = n + 1 end
-    assert(n == 12, "six rate and six cap sliders, got " .. n)
+    assert(n == 14, "seven rate and seven cap renames, got " .. n)
     texts = {}
     who = "cr_mct_chd"
     GG.CULTURE_OF[who] = GG.CHD_CULTURE
@@ -7160,6 +7269,8 @@ end)()
                     or string.match(key, "^root/([^/]+)")
         return made[top] == true
     end
+    -- THE TEXT WIDTH RULE the fakes answer with; a test swaps it to force fit or overflow.
+    local measure = function(s) return #s * 7 end
     local function fake(key, name, up)
         if fakes[key] then return fakes[key] end
         local f = setmetatable({}, {__index = function() return function() return nil end end})
@@ -7177,6 +7288,9 @@ end)()
             if self.key == "root" then return 1920, 1080 end
             if sized[self.key] then return sized[self.key][1], sized[self.key][2] end
             if SIZE and SIZE[self.nm] then return SIZE[self.nm][1], SIZE[self.nm][2] end
+            -- The header's two parts, as gen_guilds_ui sizes them: GGUI.header_fits reads
+            -- the bar's width to decide what fits beside the guild's name.
+            if self.nm == "gg_rank_line" or self.nm == "gg_rank_stats" then return 750, 46 end
             return 100, 20
         end
         f.MoveTo = function(self, x, y) moved[self.key] = {x, y} end
@@ -7188,7 +7302,7 @@ end)()
         f.Visible = function(self) return vis[self.key] ~= false end
         f.SetDisabled = function(self, b) dis[self.key] = b end
         f.SetImagePath = function(self, p, i) imgs[self.key .. "#" .. tostring(i)] = p end
-        f.TextDimensionsForText = function(_, s) return #s * 7, 18 end
+        f.TextDimensionsForText = function(_, s) return measure(s), 18 end
         f.CreateComponent = function(self, n)
             if self.key == "root" and not refuse[n] then made[n] = true end
             gone[norm(self.key, n)] = nil
@@ -7810,16 +7924,64 @@ end)()
             end
         end
         -- Sworn and above are locked at 150 reputation, so the Guilds tab shows a lock.
+        -- THE REASON ON ITS OWN PLATE, IN RED (2026-10-05, asked in game): "Needs Sworn"
+        -- in the name's colour blended into the card. It sits on card_need, a plate in
+        -- the race's cost-box art, placed after the name as the game measures it.
         open_on(1)
-        local lock, red = false, false
+        local seen, r = 0, GGUI.text_ratio()
         for i = 1, 3 do
-            local t = texts["P/" .. GGUI.CARD .. "_" .. i .. "/card_name"] or ""
-            if has(t, GGUI.loc("needs")) then
-                lock = lock or has(t, "[[img:" .. GGUI.LOCK_ICON .. "]]")
-                red = red or has(t, "[[col:red]]")
+            local base = "P/" .. GGUI.CARD .. "_" .. i
+            local name = texts[base .. "/card_name"] or ""
+            local need = texts[base .. "/card_need"] or ""
+            assert(not has(name, GGUI.loc("needs")), "the reason is off the name, got " .. name)
+            if has(need, GGUI.loc("needs")) then
+                seen = seen + 1
+                assert(vis[base .. "/card_need"] ~= false, "card " .. i .. ": a reason shows its plate")
+                assert(has(need, "[[img:" .. GGUI.LOCK_ICON .. "]]") and has(need, "[[col:red]]"),
+                       "card " .. i .. ": the padlock and the reason in red, got " .. need)
+                local nx, cx = moved[base .. "/card_need"][1], moved[base][1]
+                local name_end = cx + GGUI.px(GGUI.CARD_CHILD_XY.card_name[1])
+                                 + measure(name) / r * GGUI.S
+                assert(nx >= name_end, "card " .. i .. ": the plate starts after the name, at "
+                       .. nx .. " against " .. name_end)
+            else
+                assert(vis[base .. "/card_need"] == false, "card " .. i .. ": no reason, no plate")
             end
         end
-        assert(lock and not red, "a locked service shows the padlock and no red tag")
+        assert(seen == 2, "Sworn and Favoured both carry the plate, saw " .. seen)
+        -- A re-layout (GGUI.layout runs on every open and refresh) keeps it past the name.
+        local need3 = "P/" .. GGUI.CARD .. "_3/card_need"
+        local before = moved[need3][1]
+        GGUI.layout()
+        assert(moved[need3][1] == before, "a re-layout moved the plate from "
+               .. before .. " to " .. moved[need3][1])
+        -- SHORT OF FAVOUR IS RED WHATEVER ELSE LOCKS IT (2026-10-05, asked in game): the
+        -- third card costs more than the 150 held and is rank-locked too, and only the
+        -- first reason used to colour anything.
+        local c2 = texts["P/" .. GGUI.CARD .. "_2/card_cost"] or ""
+        local c3 = texts["P/" .. GGUI.CARD .. "_3/card_cost"] or ""
+        assert(has(c3, "[[col:red]]") and not has(c2, "[[col:red]]"),
+               "the price is red only where favour falls short, got " .. c2 .. " | " .. c3)
+        local b2 = texts["P/" .. GGUI.CARD .. "_2/card_buy"] or ""
+        local b3 = texts["P/" .. GGUI.CARD .. "_3/card_buy"] or ""
+        assert(has(b3, "[[col:red]]") and has(b2, "[[col:" .. GGUI.LOCK_COL .. "]]"),
+               "the Buy caption is red where favour falls short, orange where only the "
+               .. "rank does, got " .. b2 .. " | " .. b3)
+        -- And the Buy caption is red where favour is what stops it.
+        standing({brass = {150, 10}})
+        open_on(1)
+        local b1 = texts["P/" .. GGUI.CARD .. "_1/card_buy"] or ""
+        assert(has(b1, "[[col:red]]"), "short of favour, the Buy caption is red, got " .. b1)
+        standing({brass = {150, 150}})
+        -- Every other use of the card has no reason to show, a real offer included.
+        GG.bounties[ME] = {{guild = "khanate", kind = "region_take", target = "wh3_qol_r",
+                            posted = 1, taken = true, gold = 100, rep = 10}}
+        open_on(3)
+        GG.bounties[ME] = nil
+        for i = 1, 3 do
+            assert(vis["P/" .. GGUI.CARD .. "_" .. i .. "/card_need"] == false,
+                   "the bounty board hides card " .. i .. "'s reason plate")
+        end
         local key = GGUI.services_of(g1)[1].key
         GG.cooldowns[ME] = {[key] = 7}
         open_on(1)
@@ -7827,6 +7989,115 @@ end)()
         assert(has(t, "7 " .. GGUI.loc("bounty_turns")) and not has(t, "7t"),
                "a cooldown is counted in turns, got " .. t)
         GG.cooldowns[ME] = {}
+        GGUI.close()
+
+        -- ---- GUILD HALLS ON THE PANEL (task 6) ----
+        -- The header counts this guild's halls once one stands, the price hover names the
+        -- cut, the Leaderboard hover says who holds the Seat, and a race with halls reads
+        -- one help chapter more.
+        local prev_halls, prev_leader = GG.halls[ME], GG.leader_of
+        local keep_measure = measure
+        measure = function(s) return #s * 2 end   -- room on the bar for the figure
+        GG.halls[ME] = nil
+        open_on(1)
+        assert(not has(texts["P/gg_rank_stats"], "Halls "), "no hall, no halls figure")
+        GG.halls[ME] = {[g1] = {n = 2, best = 1, lv = {1, 1, 0}}}
+        open_on(1)
+        assert(has(texts["P/gg_rank_stats"], "Halls 2"),
+               "two halls show as Halls 2, got " .. tostring(texts["P/gg_rank_stats"]))
+        -- WHAT FITS IN THE HEADER IS MEASURED (2026-10-05): the game's font runs about a
+        -- quarter wider than the preview's, so a per-race list chosen from the preview
+        -- put a Skaven name on top of its figures. The rival, then the Halls figure, give
+        -- way to the hover when the guild's name and the figures would meet.
+        local riv = GGUI.loc_guild(GG.RIVALS[g1])
+        local riv_short = string.gsub(riv, "^The ", "")
+        assert(riv_short ~= riv, "the rival's name carries an article to drop: " .. riv)
+        local function bar() return texts["P/gg_rank_stats"] or "" end
+        local function hover() return tips["P/gg_rank_stats"] or "" end
+        measure = function(s) return #s * 2 end                  -- a narrow font
+        open_on(1)
+        assert(has(bar(), "Halls 2") and has(bar(), riv) and not has(hover(), "Halls 2"),
+               "room for all: rival and halls on the bar, got " .. bar())
+        measure = function(s)                                   -- only the short rival fits
+            if has(s, riv) or has(s, "Halls") then return 100000 end
+            return #s * 2
+        end
+        open_on(1)
+        assert(has(bar(), riv_short) and not has(bar(), riv) and not has(bar(), "Halls 2")
+               and has(hover(), "Halls 2"),
+               "the rival shortens and halls move to the hover, got " .. bar())
+        measure = function(s) return #s * 40 end                 -- a wide font
+        open_on(1)
+        assert(not has(bar(), GGUI.loc("rival"))
+               and has(hover(), GGUI.loc("rival") .. " " .. riv)
+               and not has(bar(), "Halls 2") and has(hover(), "Halls 2"),
+               "nothing fits: rival and halls in the hover, got " .. bar())
+        assert(has(bar(), GGUI.loc("reputation")), "the reputation figure always stays")
+        -- THE ROOM, to the pixel: the 750px bar less the race's inset and the gap. Two
+        -- texts of half the room each fit exactly; one pixel more does not. Only the two
+        -- test strings are faked, so the font probe text_ratio reads keeps its width.
+        measure = keep_measure
+        local ratio, scale = GGUI.text_ratio(), GGUI.S
+        for tag, inset in pairs({[""] = 98, _cth = 202}) do
+            local half = (750 / scale - inset - GGUI.HEADER_GAP) * ratio / 2
+            measure = function(s) if s == "a" or s == "b" then return half end
+                                  return keep_measure(s) end
+            assert(GGUI.header_fits("a", "b", tag) == true, "[" .. tag .. "] exactly the room fits")
+            measure = function(s) if s == "a" or s == "b" then return half + 0.5 end
+                                  return keep_measure(s) end
+            assert(GGUI.header_fits("a", "b", tag) == false, "[" .. tag .. "] a pixel over does not")
+        end
+        -- UNMEASURABLE (the engine throws): the rival stays on the bar as it always did,
+        -- and the Halls figure goes to the hover, where it cannot overlap anything.
+        measure = function() error("no font") end
+        open_on(1)
+        assert(has(bar(), riv) and not has(hover(), GGUI.loc("rival") .. " " .. riv)
+               and not has(bar(), "Halls 2") and has(hover(), "Halls 2"),
+               "unmeasurable: rival on the bar, halls in the hover, got " .. bar())
+        measure = keep_measure
+        local off = GG.hall_discount(ME, g1)
+        assert(off == 6, "two halls at 3% a hall cut 6, got " .. tostring(off))
+        local seen_cut = false
+        for i = 1, 3 do
+            local ct = tips["P/" .. GGUI.CARD .. "_" .. i .. "/card_cost"]
+            if has(ct, GGUI.loc("price_halls") .. ": -6%") then seen_cut = true end
+        end
+        assert(seen_cut, "a card's price hover names the halls term, -6%")
+        GG.halls[ME] = {[g1] = {n = 1, best = 2, lv = {0, 0, 1}}}
+        GG.leader_of = function(g) if g == g1 then return ME, 150 end return nil, 0 end
+        open_on(2)
+        local held = false
+        for i = 1, #GG.GUILDS do
+            if has(tips["P/" .. GGUI.ROW .. "_" .. i], GGUI.loc("holds_seat")) then
+                held = held or GGUI.leaders(ME)[i].guild == g1
+                assert(GGUI.leaders(ME)[i].guild == g1, "only the seated guild's row says so")
+            end
+        end
+        assert(held, "the Leaderboard hover says the leader holds the seat")
+        GG.halls[ME] = nil
+        open_on(2)
+        for i = 1, #GG.GUILDS do
+            assert(not has(tips["P/" .. GGUI.ROW .. "_" .. i], GGUI.loc("holds_seat")),
+                   "no hall, no seat line")
+        end
+        GGUI.TAB = 5
+        assert(GGUI.page_max() == GGUI.HELP_PAGES + 1, "a halls race reads one chapter more")
+        GG.CULTURE_OF[ME] = "wh_main_emp_empire"
+        assert(GGUI.page_max() == GGUI.HELP_PAGES, "an uncovered faction reads the base count")
+        GG.CULTURE_OF[ME] = GG.CHD_CULTURE
+        -- THE SWITCH OFF: halls standing, and still no figure and no seventh chapter.
+        local prev_set = GG.setting
+        GG.halls[ME] = {[g1] = {n = 2, best = 1, lv = {1, 1, 0}}}
+        GG.setting = function(k) if k == "guild_halls" then return false end return prev_set(k) end
+        open_on(1)
+        assert(not has(texts["P/gg_rank_stats"], "Halls "),
+               "guild_halls off: no Halls figure, got " .. tostring(texts["P/gg_rank_stats"]))
+        GGUI.TAB = 5
+        assert(GGUI.page_max() == GGUI.HELP_PAGES, "guild_halls off: the halls chapter is gone")
+        GG.setting = prev_set
+        GGUI.TAB = 5
+        assert(GGUI.page_max() == GGUI.HELP_PAGES + 1, "guild_halls on: the chapter is back")
+        GG.halls[ME], GG.leader_of = prev_halls, prev_leader
         GGUI.close()
     end)()
 
@@ -7841,6 +8112,11 @@ end)()
     if DUMP then
         GG.demands[ME] = {guild = "slavers", kind = "tribute", amount = 900, due = 2}
         GG.patrons[ME] = {guild = "brass", cqi = 77}
+        -- Halls standing in every guild, so every header is drawn with its longest figure.
+        GG.halls[ME] = {}
+        -- GG_DUMP_NOHALLS draws the same panel with none, to tell what the halls figure costs.
+        local n_halls = os.getenv("GG_DUMP_NOHALLS") and 0 or 6
+        for _, g in ipairs(GG.GUILDS) do GG.halls[ME][g] = {n = n_halls, best = 2, lv = {2, 2, 2}} end
         -- The longest Chaos Dwarf faction name, so a line that fits here fits in game.
         LOC["factions_screen_name_" .. RIVAL] = "Slaves of the Black Dwarf"
         -- GG_DUMP_TAG: draw it as that race reads it (its loc and its services).
@@ -7848,6 +8124,12 @@ end)()
         for culture, fl in pairs(GG.FLAVOURED) do
             if fl.tag == want then GG.CULTURE_OF[ME], GG.CULTURE_OF[RIVAL] = culture, culture end
         end
+        -- THE READER IS THE HUMAN. The covered races come from the human factions, and these were
+        -- still THE_PLAYER (Chaos Dwarf): an Empire reader was uncovered, so its Help tab counted
+        -- six chapters and drew the halls chapter as 7 of 6.
+        local keep_humans = cm.get_human_factions
+        cm.get_human_factions = function() return {ME} end
+        GG.player_cultures_cache = nil
         local log = {}
         for n = 0, 3 do
             for i, e in ipairs({"buy,brass,caravan_levy,50", "ai_buy,khanate,knife_in_dark," .. RIVAL,
@@ -7873,7 +8155,11 @@ end)()
         local stub_log = GG.log_entries
         GG.log_entries, GGUI.LOG_FILTER = keep_g.log, "all"
         for tab = 1, 6 do
-            GGUI.TAB, GGUI.PAGE, GGUI.HELP_PAGE, GGUI.LOG_PAGE = tab, 1, 1, 1
+            -- GG_DUMP_HELP_PAGE draws that Help chapter; unset, page 1 as always.
+            -- GG_DUMP_PAGE draws that guild's page; unset, page 1.
+            GGUI.TAB, GGUI.PAGE, GGUI.LOG_PAGE
+                = tab, tonumber(os.getenv("GG_DUMP_PAGE")) or 1, 1
+            GGUI.HELP_PAGE = tonumber(os.getenv("GG_DUMP_HELP_PAGE")) or 1
             GGUI.close()
             GGUI.open()
             reset()
@@ -7895,8 +8181,9 @@ end)()
             out:close()
         end
         GGUI.close()
-        GG.patrons[ME], SIZE, GG.log_entries = nil, nil, stub_log
+        GG.patrons[ME], SIZE, GG.log_entries, GG.halls[ME] = nil, nil, stub_log, nil
         GG.CULTURE_OF[ME], GG.CULTURE_OF[RIVAL] = GG.CHD_CULTURE, GG.CHD_CULTURE
+        cm.get_human_factions, GG.player_cultures_cache = keep_humans, nil
         saved["derpy_gg_log_" .. ME] = nil
     end
     GG.demands[ME], GG.bounties[ME] = nil, nil
@@ -8578,4 +8865,1046 @@ end)()
     assert(queued == 1, "and the panel is redrawn")
 end)()
 
+-- GUILD HALLS: LOCKS (spec 2026-10-04 s4.1). One record per level whose answer changed.
+;(function()
+    local adds, rems = {}, {}
+    local prev_add = cm.add_event_restricted_building_record_for_faction
+    local prev_rem = cm.remove_event_restricted_building_record_for_faction
+    cm.add_event_restricted_building_record_for_faction = function(_, b, f, tip)
+        adds[#adds + 1] = {b, f, tip}
+    end
+    cm.remove_event_restricted_building_record_for_faction = function(_, b, f)
+        rems[#rems + 1] = {b, f}
+    end
+    local prev_halls, prev_state = GG.halls_locked, GG.state[THE_PLAYER]
+    local F = THE_PLAYER
+    assert(GG.covered(F) and GG.tag(F) == "", "the harness player is a covered Chaos Dwarf")
+    GG.halls_locked[F] = nil
+    GG.state[F] = nil; GG.load(F)
+    GG.state[F] = GG.state[F] or {}
+    GG.state[F].brass = GG.state[F].brass or {rep = 0, fav = 0}
+    GG.state[F].brass.rep = 0
+    GG.lock_halls(F, "brass")
+    assert(#adds == 3 and #rems == 0, "an Unmarked faction has all three levels shut")
+    assert(adds[1][3] == "derpy_gg_hall_tip_0_brass", "with the level-0 tooltip key")
+    adds, rems = {}, {}
+    GG.lock_halls(F, "brass")
+    assert(#adds == 0 and #rems == 0, "a second sweep with no change writes nothing")
+    GG.state[F].brass.rep = 700                       -- Favoured
+    GG.lock_halls(F, "brass")
+    assert(#rems == 2, "Favoured opens levels 0 and 1, got " .. #rems)
+    local prev = GG.leader_of
+    GG.leader_of = function(g) return g == "brass" and F or nil end
+    GG.state[F].brass.rep = 1500
+    adds, rems = {}, {}
+    GG.lock_halls(F, "brass")
+    assert(#rems == 1 and rems[1][1] == "derpy_gg_hall_brass_2", "Exalted and leading opens 2")
+    GG.leader_of = function() return "someone_else" end
+    adds, rems = {}, {}
+    GG.lock_halls(F, "brass")
+    assert(#adds == 1 and adds[1][3] == "derpy_gg_hall_tip_lead_brass",
+           "losing the lead shuts level 2 with the leader tooltip")
+    GG.leader_of = prev
+    -- guild_halls off shuts everything (Review Focus 5)
+    local prev_s = GG.setting
+    GG.setting = function(k) if k == "guild_halls" then return false end return prev_s(k) end
+    adds = {}
+    GG.lock_halls(F, "brass")
+    assert(#adds == 2, "switch off shuts the two levels still open, got " .. #adds)
+    GG.setting = prev_s
+    -- A race without halls is never touched
+    adds, rems = {}, {}
+    local prev_t = GG.tag
+    GG.tag = function() return "_gen" end      -- the generic flavour: no hall race since stage 2
+    GG.lock_halls(F, "immortals")
+    assert(#adds == 0 and #rems == 0, "no records for a race with no halls")
+    GG.tag = prev_t
+
+    -- REVIEW FOCUS 1: A SAVE FROM BEFORE HALLS. No lock records at all, Exalted and leading:
+    -- the first tick writes every level once.
+    GG.halls_locked = {}
+    GG.state[F].brass.rep = 1500
+    GG.leader_of = function(g) return g == "brass" and F or nil end
+    adds, rems = {}, {}
+    GG.first_halls()
+    local n = 0
+    for i = 1, #rems do
+        if rems[i][2] == F and string.find(rems[i][1], "^derpy_gg_hall_brass_") then n = n + 1 end
+    end
+    assert(n == 3, "a pre-halls Exalted leader has all three brass levels written open, got " .. n)
+    for i = 1, #adds do assert(not (adds[i][2] == F and string.find(adds[i][1], "^derpy_gg_hall_brass_")),
+                               "and none of them shut") end
+    local before = #rems
+    GG.first_halls()
+    assert(#rems == before, "a second pass writes nothing")
+
+    -- REVIEW FOCUS 3: LEADERSHIP TO AN AI FACTION. The player held brass; cr_ai takes it.
+    local prev_cip, prev_al, prev_now = GG.cultures_in_play, GG.announce_lead, GG.leaders_now
+    GG.cultures_in_play = function() return {[GG.CHD_CULTURE] = true} end
+    GG.announce_lead = function() end
+    GG.leaders_now = {}
+    for i = 1, #GG.GUILDS do GG.leaders_now[GG.lead_slot(GG.GUILDS[i], GG.CHD_CULTURE)] = false end
+    GG.leaders_now[GG.lead_slot("brass", GG.CHD_CULTURE)] = F
+    GG.state.cr_ai = {brass = {rep = 1500, fav = 0}}
+    GG.state.cr_third = {brass = {rep = 1500, fav = 0}}
+    GG.halls_locked.cr_ai = {derpy_gg_hall_brass_0 = false, derpy_gg_hall_brass_1 = false,
+                             derpy_gg_hall_brass_2 = true}
+    -- Exalted, not the leader, level 2 recorded OPEN: a stray sweep of cr_third would shut it.
+    GG.halls_locked.cr_third = {derpy_gg_hall_brass_0 = false, derpy_gg_hall_brass_1 = false,
+                                derpy_gg_hall_brass_2 = false}
+    GG.leader_of = function(g) return g == "brass" and "cr_ai" or nil end
+    adds, rems = {}, {}
+    GG.reassert_leaders()
+    assert(#adds == 1 and adds[1][1] == "derpy_gg_hall_brass_2" and adds[1][2] == F,
+           "the loser's level 2 shuts, got " .. #adds)
+    assert(#rems == 1 and rems[1][1] == "derpy_gg_hall_brass_2" and rems[1][2] == "cr_ai",
+           "the winner's level 2 opens, got " .. #rems)
+    for _, r in ipairs(adds) do assert(r[2] ~= "cr_third", "no add names cr_third") end
+    for _, r in ipairs(rems) do assert(r[2] ~= "cr_third", "no remove names cr_third") end
+    GG.state.cr_ai, GG.state.cr_third = nil, nil
+    GG.halls_locked.cr_ai, GG.halls_locked.cr_third = nil, nil
+
+    -- FRESH CAMPAIGN: no saved state anywhere, so GG.state is empty. first_halls must still
+    -- reach every covered faction (scan_world + humans) and shut all 18 levels.
+    local prev_sw = GG.scan_world
+    GG.scan_world = function() return {[GG.CHD_CULTURE] = {F}} end
+    GG.leader_of = function() return nil end
+    GG.state[F] = nil
+    GG.halls_locked = {}
+    adds, rems = {}, {}
+    GG.first_halls()
+    local mine, tips = 0, {}
+    for i = 1, #adds do
+        if adds[i][2] == F then mine = mine + 1; tips[adds[i][3]] = true end
+    end
+    assert(mine == 21, "a fresh Unmarked faction has 21 hall levels shut, got " .. mine)
+    for _, g in ipairs(GG.GUILDS) do
+        for _, k in ipairs({"0", "1", "lead"}) do
+            assert(tips["derpy_gg_hall_tip_" .. k .. "_" .. g], "tooltip " .. k .. " for " .. g)
+        end
+    end
+    local opened = 0
+    for i = 1, #rems do if rems[i][2] == F then opened = opened + 1 end end
+    assert(opened == 0, "and none opened")
+
+    -- A FACTION first_halls NEVER SAW is swept at its own turn start, once, by the real handler.
+    local L = "cr_late"
+    GG.halls_locked = {}
+    adds, rems = {}, {}
+    GG.first_halls()
+    for i = 1, #adds do assert(adds[i][2] ~= L, "first_halls does not reach " .. L) end
+    local function ctx()
+        return {faction = function()
+            return {is_null_interface = function() return false end,
+                    name = function() return L end, net_income = function() return 0 end,
+                    is_human = function() return false end,
+                    num_completed_technologies = function() return 0 end}
+        end}
+    end
+    handlers["gg_turn"](ctx())
+    local late = 0
+    for i = 1, #adds do if adds[i][2] == L then late = late + 1 end end
+    assert(late == 21, "its own turn start shuts all 21 levels, got " .. late)
+    handlers["gg_turn"](ctx())
+    local again = 0
+    for i = 1, #adds do if adds[i][2] == L then again = again + 1 end end
+    assert(again == 21, "and a second turn start writes nothing more, got " .. again)
+    GG.state[L] = nil
+    GG.scan_world = prev_sw
+
+    GG.cultures_in_play, GG.announce_lead, GG.leaders_now = prev_cip, prev_al, prev_now
+    GG.leader_of = prev
+    GG.halls_locked, GG.state[THE_PLAYER] = prev_halls, prev_state
+    cm.add_event_restricted_building_record_for_faction = prev_add
+    cm.remove_event_restricted_building_record_for_faction = prev_rem
+end)()
+
+-- GUILD HALLS: COUNTING, REPUTATION, DISCOUNT (spec 4.2-4.4). The region offers ONLY
+-- building_exists - a stub richer than CA's interface hid a dead listener for 13 days.
+;(function()
+    local F = THE_PLAYER
+    local function region(has) return {building_exists = function(_, k) return has[k] == true end} end
+    local regions = {region({derpy_gg_hall_brass_2 = true}),
+                     region({derpy_gg_hall_brass_0 = true}),
+                     region({derpy_gg_hall_slavers_1 = true}),
+                     region({})}
+    local prev_gf = cm.get_faction
+    cm.get_faction = function(self, k)
+        local f = prev_gf(self, k)
+        if k == F then f.region_list = function() return LIST(regions) end end
+        return f
+    end
+    local h = GG.count_halls(F)
+    assert(h.brass.n == 2 and h.brass.best == 2 and h.brass.lv[3] == 1 and h.brass.lv[1] == 1,
+           "two brass halls, one of each counted level")
+    assert(h.slavers.n == 1 and h.immortals.n == 0, "the others counted apart")
+    -- Reputation: 15 + 4 brass, 8 slavers, through the capped funnel with source "halls"
+    local grants = {}
+    local prev_cg = GG.capped_grant
+    GG.capped_grant = function(f, g, amt, src) grants[#grants + 1] = {g, amt, src} end
+    GG.pay_halls(F)
+    GG.capped_grant = prev_cg
+    local got = {}
+    for _, x in ipairs(grants) do assert(x[3] == "halls"); got[x[1]] = x[2] end
+    assert(got.brass == 19 and got.slavers == 8, "pays 4/8/15 per hall by level")
+    -- Discount: 2 halls x 3% = 6; capped at 15
+    assert(GG.hall_discount(F, "brass") == 6, "3% a hall")
+    GG.halls[F].brass.n = 9
+    assert(GG.hall_discount(F, "brass") == 15, "capped at HALL_OFF_MAX")
+    -- Completion pays the hall's own guild, ahead of the theme match
+    assert(GG.hall_guild("derpy_gg_hall_khanate") == "khanate")
+    assert(GG.hall_guild("derpy_gg_hall_nonsense") == nil)
+    assert(GG.hall_guild("wh3_dlc23_chd_military_kdaai") == nil)
+    -- A hall the faction could not have built still counts (Review Focus 4): counting
+    -- never asks the locks.
+    GG.state[F].slavers.rep = 0
+    assert(GG.count_halls(F).slavers.n == 1, "an inherited hall still counts")
+    -- Switch off: no reputation, no discount (Review Focus 5)
+    local prev_s = GG.setting
+    GG.setting = function(k) if k == "guild_halls" then return false end return prev_s(k) end
+    grants = {}
+    GG.capped_grant = function(f, g, amt, src) grants[#grants + 1] = {g, amt, src} end
+    GG.pay_halls(F)
+    GG.capped_grant = prev_cg
+    assert(#grants == 0 and GG.hall_discount(F, "brass") == 0, "switch off pays nothing")
+    GG.setting = prev_s
+    cm.get_faction = prev_gf
+end)()
+
+-- GUILD HALLS: THE SEAT (spec 4.5). Lead + a level-2 hall, or no bundle.
+;(function()
+    local F = THE_PLAYER
+    local prev_l = GG.leader_of
+    GG.leader_of = function(g) return g == "brass" and F or nil end
+    GG.halls[F] = GG.halls[F] or {}
+    GG.halls[F].brass = {n = 1, best = 2, lv = {0, 0, 1}}
+    GG.seat_on = {}
+    local before = #applied
+    GG.assert_seat(F, "brass")
+    assert(#applied == before + 1 and applied[#applied][1] == "derpy_gg_seat_brass"
+           and applied[#applied][3] == -1, "lead + seat applies the bundle, indefinitely")
+    GG.assert_seat(F, "brass")
+    assert(#applied == before + 1, "and only once")
+    assert(GG.guild_cap("brass", F) == 60, "seated cap is half again")
+    assert(GG.guild_cap("brass") == 40, "no faction, no seat term")
+    GG.halls[F].brass = {n = 0, best = -1, lv = {0, 0, 0}}
+    local rb = #removed
+    GG.assert_seat(F, "brass")
+    assert(#removed == rb + 1 and removed[#removed][1] == "derpy_gg_seat_brass",
+           "a lost Seat takes the bundle off")
+    GG.halls[F].brass = {n = 1, best = 2, lv = {0, 0, 1}}
+    GG.assert_seat(F, "brass")
+    GG.leader_of = function() return "someone_else" end
+    rb = #removed
+    GG.assert_seat(F, "brass")
+    assert(#removed == rb + 1, "losing the lead takes it off")
+    GG.leader_of = prev_l
+
+    -- fix round 1: seated, then guild_halls off, uncapped guild, the real funnel, the panel
+    GG.leader_of = function(g) return (g == "brass" or g == "daemonsmiths") and F or nil end
+    GG.halls[F].brass = {n = 1, best = 2, lv = {0, 0, 1}}
+    GG.halls[F].daemonsmiths = {n = 1, best = 2, lv = {0, 0, 1}}
+    GG.seat_on = {}
+    GG.assert_seat(F, "brass")
+    assert(GG.has_seat(F, "brass") == true, "seated")
+    assert(GG.guild_cap("daemonsmiths", F) == 0, "an uncapped guild stays uncapped when seated")
+    local ptip = GGUI.earned_tip({}, {}, "brass", F)
+    assert(string.find(ptip, "earned_limit 60", 1, true) and not string.find(ptip, "earned_limit 40", 1, true),
+           "the panel must show the seated limit: " .. ptip)
+    local pmiss = GGUI.earned_tip({}, {}, "brass")
+    assert(string.find(pmiss, "earned_limit 40", 1, true), "no faction, the plain limit: " .. pmiss)
+    local saved_gain = GG.turn_gain[F]
+    GG.turn_gain[F] = {}
+    GG.capped_grant(F, "brass", 100, "income")
+    assert(GG.turn_gain[F].brass == 60, "capped_grant lets a seated leader earn 60, got "
+           .. tostring(GG.turn_gain[F].brass))
+    GG.turn_gain[F] = saved_gain
+    -- guild_halls off
+    local prev_set = GG.setting
+    GG.setting = function(k) if k == "guild_halls" then return false end return prev_set(k) end
+    assert(GG.has_seat(F, "brass") == false, "halls off, no seat")
+    rb = #removed
+    GG.assert_seat(F, "brass")
+    assert(#removed == rb + 1 and removed[#removed][1] == "derpy_gg_seat_brass",
+           "halls off removes an applied Seat bundle")
+    GG.setting = prev_set
+    GG.leader_of = prev_l
+    GG.seat_on = {}
+end)()
+
+-- GUILD HALLS: TWO WIRES THE FIRST THREE BLOCKS NEVER DROVE (task 6 mutants). A rank change
+-- must sweep that guild's locks, and a hall completion pays the HALL's guild.
+;(function()
+    GG.halls = {}                                   -- the Seat block above leaves it set
+    local F = THE_PLAYER
+    local adds, rems = {}, {}
+    local prev_add = cm.add_event_restricted_building_record_for_faction
+    local prev_rem = cm.remove_event_restricted_building_record_for_faction
+    cm.add_event_restricted_building_record_for_faction = function(_, b, f, tip)
+        adds[#adds + 1] = {b, f, tip}
+    end
+    cm.remove_event_restricted_building_record_for_faction = function(_, b, f)
+        rems[#rems + 1] = {b, f}
+    end
+    local prev_halls, prev_state, prev_l = GG.halls_locked, GG.state[F], GG.leader_of
+    GG.leader_of = function() return nil end
+    GG.halls_locked = {}
+    GG.state[F] = nil; GG.load(F)
+    GG.state[F] = GG.state[F] or {}
+    GG.state[F].brass = GG.state[F].brass or {rep = 0, fav = 0}
+    GG.state[F].brass.rep = 700                     -- Favoured: levels 0 and 1 open
+    GG.apply_rank(F, "brass", 2, 4)
+    assert(#adds + #rems == 3 and #rems == 2 and #adds == 1,
+           "a rank change writes the guild's three locks, got " .. #adds .. " shut, " .. #rems .. " open")
+    -- A hall completing pays ITS guild. Brass has no theme match for its chain name, so a
+    -- payer that skips GG.hall_guild lands on the Overseers' fallback instead.
+    GG.state[F] = nil
+    GG.reset_turn(F)
+    GG.on_building(F, 1, "derpy_gg_hall_immortals")
+    assert(select(1, GG.get(F, "immortals")) > 0, "a hall completion pays its own guild")
+    assert(select(1, GG.get(F, "overseers")) == 0, "and not the Overseers")
+    cm.add_event_restricted_building_record_for_faction = prev_add
+    cm.remove_event_restricted_building_record_for_faction = prev_rem
+    GG.halls_locked, GG.state[F], GG.leader_of = prev_halls, prev_state, prev_l
+end)()
+
+-- GUILD HALLS: AN UNCOVERED HALL RACE IS LOCKED TOO (final review F1). With an Empire player
+-- the Chaos Dwarf AIs are not covered, so they earn nothing and could build all 18 levels on
+-- turn 1 if the locks only reached covered factions. Counting, pay and the Seat stay covered.
+;(function()
+    GG.halls = {}
+    local adds, rems = {}, {}
+    local prev_add = cm.add_event_restricted_building_record_for_faction
+    local prev_rem = cm.remove_event_restricted_building_record_for_faction
+    cm.add_event_restricted_building_record_for_faction = function(_, b, f, tip)
+        adds[#adds + 1] = {b, f, tip}
+    end
+    cm.remove_event_restricted_building_record_for_faction = function(_, b, f)
+        rems[#rems + 1] = {b, f}
+    end
+    local prev_getter, prev_sw, prev_l = cm.get_human_factions, GG.scan_world, GG.leader_of
+    local prev_locked, prev_swept, prev_seat = GG.halls_locked, GG.halls_swept, GG.seat_on
+    local prev_state = GG.state[THE_PLAYER]
+    local EMP, AI, LATE = "cr_f1_empire", "cr_f1_chd_ai", "cr_f1_chd_late"
+    CULTURE[EMP] = "wh_main_emp_empire"
+    GG.CULTURE_OF[EMP], GG.CULTURE_OF[AI], GG.CULTURE_OF[LATE] = nil, nil, nil
+    cm.get_human_factions = function() return {EMP} end
+    GG.player_cultures_cache = nil
+    assert(GG.covered(AI) == false and GG.hall_culture(AI) == true,
+           "setup: an uncovered Chaos Dwarf AI")
+    assert(GG.covered(EMP) == true and GG.hall_culture(EMP) == true,
+           "setup: a covered Empire player (a hall race since stage 2)")
+    -- Standing an older build left on it, Exalted and leading every guild: still all shut,
+    -- because an uncovered faction is never open (hall_open), whatever its numbers say.
+    GG.state[AI] = {}
+    for _, g in ipairs(GG.GUILDS) do GG.state[AI][g] = {rep = 1500, fav = 0} end
+    GG.leader_of = function() return AI end
+    GG.scan_world = function()
+        return {[GG.CHD_CULTURE] = {AI}, wh_main_emp_empire = {EMP}}
+    end
+    GG.halls_locked, GG.halls_swept, GG.seat_on = {}, {}, {}
+    local function shut_for(f)
+        local n, tips = 0, {}
+        for i = 1, #adds do
+            if adds[i][2] == f then n = n + 1; tips[adds[i][1]] = adds[i][3] end
+        end
+        return n, tips
+    end
+    local seats = #applied
+    GG.first_halls()
+    local n, tips = shut_for(AI)
+    assert(n == 21, "first_halls shuts all 21 levels of an uncovered Chaos Dwarf AI, got " .. n)
+    for _, g in ipairs(GG.GUILDS) do
+        for lv, why in pairs({[0] = "0", [1] = "1", [2] = "lead"}) do
+            local want = "derpy_gg_hall_tip_" .. why .. "_" .. g
+            assert(tips[GG.hall_key(g, lv)] == want, GG.hall_key(g, lv) .. " shut with "
+                   .. want .. ", got " .. tostring(tips[GG.hall_key(g, lv)]))
+        end
+    end
+    for i = 1, #rems do assert(rems[i][2] ~= AI, "nothing opened for an uncovered faction") end
+    -- The Empire player is a hall race now: it is locked too, by ITS OWN keys and never a
+    -- Chaos Dwarf one (the race with no halls is the generic flavour, pinned in the locks block).
+    local en, etips = shut_for(EMP)
+    assert(en == 21, "an Empire player's own 21 levels are shut, got " .. en)
+    for k, tip in pairs(etips) do
+        assert(string.find(k, "_emp$") and string.find(tip, "_emp$"),
+               "an Empire level is locked by its own key and tooltip: " .. k .. " / " .. tostring(tip))
+    end
+    assert(#applied == seats, "no Seat bundle on an uncovered faction")
+    assert(GG.count_halls(AI).brass.n == 0, "an uncovered faction counts nothing")
+    -- ITS OWN TURN START reaches one first_halls never saw.
+    local function ctx(name)
+        return {faction = function()
+            return {is_null_interface = function() return false end,
+                    name = function() return name end, net_income = function() return 0 end,
+                    is_human = function() return false end,
+                    num_completed_technologies = function() return 0 end}
+        end}
+    end
+    handlers["gg_turn"](ctx(LATE))
+    assert(shut_for(LATE) == 21, "the turn-start sweep shuts an uncovered late faction's 21, got "
+           .. shut_for(LATE))
+    -- A COVERED ONE IS UNCHANGED: back to the Chaos Dwarf player, Favoured with brass.
+    cm.get_human_factions = prev_getter
+    GG.player_cultures_cache = nil
+    GG.leader_of = function() return nil end
+    GG.halls_locked = {}
+    GG.state[THE_PLAYER] = {brass = {rep = 700, fav = 0}}
+    adds, rems = {}, {}
+    GG.lock_halls(THE_PLAYER, "brass")
+    assert(#rems == 2 and #adds == 1 and adds[1][3] == "derpy_gg_hall_tip_lead_brass",
+           "a covered Favoured faction: Lodge and Hall open, the Ziggurat shut, got "
+           .. #rems .. " open, " .. #adds .. " shut")
+    GG.state[AI], GG.state[LATE], GG.state[THE_PLAYER] = nil, nil, prev_state
+    GG.halls[AI], GG.halls[LATE] = nil, nil
+    GG.scan_world, GG.leader_of = prev_sw, prev_l
+    GG.halls_locked, GG.halls_swept, GG.seat_on = prev_locked, prev_swept, prev_seat
+    cm.add_event_restricted_building_record_for_faction = prev_add
+    cm.remove_event_restricted_building_record_for_faction = prev_rem
+end)()
+
+-- GUILD HALLS: A SECOND RACE (stage 2 task 3). Every key an Empire faction reads, writes or
+-- counts carries _emp, and a foreign race's hall is never its own: Review Focus 1, 3 and 4.
+;(function()
+    GG.halls = {}
+    local adds, rems = {}, {}
+    local prev_add = cm.add_event_restricted_building_record_for_faction
+    local prev_rem = cm.remove_event_restricted_building_record_for_faction
+    cm.add_event_restricted_building_record_for_faction = function(_, b, f, tip)
+        adds[#adds + 1] = {b, f, tip}
+    end
+    cm.remove_event_restricted_building_record_for_faction = function(_, b, f)
+        rems[#rems + 1] = {b, f}
+    end
+    local prev_getter, prev_sw, prev_l = cm.get_human_factions, GG.scan_world, GG.leader_of
+    local prev_locked, prev_swept, prev_seat = GG.halls_locked, GG.halls_swept, GG.seat_on
+    local prev_state, prev_gf = GG.state[THE_PLAYER], cm.get_faction
+    local EF, EAI, CF = "cr_h2_emp", "cr_h2_emp_ai", THE_PLAYER
+    CULTURE[EF], CULTURE[EAI] = "wh_main_emp_empire", "wh_main_emp_empire"
+    GG.CULTURE_OF[EF], GG.CULTURE_OF[EAI] = nil, nil
+    GG.leader_of = function() return nil end
+    local function reset()
+        GG.halls_locked, GG.halls_swept, GG.seat_on = {}, {}, {}
+        adds, rems = {}, {}
+    end
+    local function names(list, f)
+        local out = {}
+        for i = 1, #list do if list[i][2] == f then out[list[i][1]] = list[i][3] or true end end
+        return out
+    end
+
+    -- LOCKS: an Empire faction, covered, Indebted with brass. Level 0 opens, 1 and 2 stay shut.
+    cm.get_human_factions = function() return {EF} end
+    GG.player_cultures_cache = nil
+    assert(GG.covered(EF) and GG.tag(EF) == "_emp", "setup: a covered Empire faction")
+    GG.state[EF] = {}
+    for _, g in ipairs(GG.GUILDS) do GG.state[EF][g] = {rep = 0, fav = 0} end
+    GG.state[EF].brass.rep = 100
+    reset()
+    GG.lock_halls(EF, "brass")
+    local shut, open = names(adds, EF), names(rems, EF)
+    assert(shut.derpy_gg_hall_brass_1_emp == "derpy_gg_hall_tip_1_brass_emp",
+           "Indebted shuts the Guildhall with the _emp tooltip, got " .. tostring(shut.derpy_gg_hall_brass_1_emp))
+    assert(shut.derpy_gg_hall_brass_2_emp == "derpy_gg_hall_tip_lead_brass_emp",
+           "and the Grand Guildhall with the _emp leader tooltip, got " .. tostring(shut.derpy_gg_hall_brass_2_emp))
+    assert(open.derpy_gg_hall_brass_0_emp, "and opens the Guildhouse")
+    assert(#adds == 2 and #rems == 1, "two shut, one open, nothing untagged: " .. #adds .. "/" .. #rems)
+
+    -- COUNTING: ONLY building_exists. Its own key counts; a Chaos Dwarf hall in its region does not.
+    local function region(has) return {building_exists = function(_, k) return has[k] == true end} end
+    local regions = {}
+    cm.get_faction = function(self, k)
+        local f = prev_gf(self, k)
+        if k == EF then f.region_list = function() return LIST(regions) end end
+        return f
+    end
+    regions = {region({derpy_gg_hall_brass_0_emp = true})}
+    assert(GG.count_halls(EF).brass.n == 1, "an _emp hall counts for the Empire faction")
+    regions = {region({derpy_gg_hall_brass_0 = true})}
+    assert(GG.count_halls(EF).brass.n == 0, "a Chaos Dwarf hall in the region is not the Empire's")
+
+    -- THE SEAT: an Empire leader of brass with a level-2 hall wears the _emp bundle.
+    GG.halls[EF] = {}
+    for _, g in ipairs(GG.GUILDS) do GG.halls[EF][g] = {n = 0, best = -1, lv = {0, 0, 0}} end
+    GG.halls[EF].brass = {n = 1, best = 2, lv = {0, 0, 1}}
+    GG.leader_of = function(g) return g == "brass" and EF or nil end
+    GG.seat_on = {}
+    local before = #applied
+    GG.assert_seat(EF, "brass")
+    assert(#applied == before + 1 and applied[#applied][1] == "derpy_gg_seat_brass_emp"
+           and applied[#applied][3] == -1, "the Empire Seat is derpy_gg_seat_brass_emp, got "
+           .. tostring(applied[#applied] and applied[#applied][1]))
+    GG.leader_of = function() return nil end
+
+    -- REVIEW FOCUS 3: a Chaos Dwarf game. An Empire AI is not covered, and all 18 levels are shut.
+    cm.get_faction = prev_gf
+    cm.get_human_factions = function() return {CF} end
+    GG.player_cultures_cache = nil
+    GG.scan_world = function() return {wh_main_emp_empire = {EAI}} end
+    GG.state[EAI] = {}
+    for _, g in ipairs(GG.GUILDS) do GG.state[EAI][g] = {rep = 1500, fav = 0} end
+    assert(GG.covered(EAI) == false and GG.hall_culture(EAI) == true,
+           "setup: an uncovered Empire AI that is a hall race")
+    reset()
+    local seats = #applied
+    GG.first_halls()
+    local ai = names(adds, EAI)
+    local n = 0
+    for k, tip in pairs(ai) do
+        n = n + 1
+        assert(string.find(k, "_emp$") and string.find(tip, "_emp$"),
+               "an Empire AI is shut by its own keys: " .. k .. " / " .. tostring(tip))
+    end
+    assert(n == 21, "an uncovered Empire AI in a Chaos Dwarf game has 21 levels shut, got " .. n)
+    assert(next(names(rems, EAI)) == nil, "and none opened")
+    assert(#applied == seats, "and no Seat")
+    -- ... and it counts and earns nothing, even with its own race's halls standing in its
+    -- regions: counting, pay and the Seat reach covered factions only.
+    cm.get_faction = function(self, k)
+        local f = prev_gf(self, k)
+        if k == EAI then
+            f.region_list = function()
+                return LIST({region({derpy_gg_hall_brass_0_emp = true}),
+                             region({derpy_gg_hall_brass_2_emp = true})})
+            end
+        end
+        return f
+    end
+    local ch = GG.count_halls(EAI)
+    assert(ch.brass.n == 0 and ch.brass.lv[1] == 0 and ch.brass.lv[3] == 0,
+           "an uncovered Empire AI counts none of its own halls, got n=" .. ch.brass.n)
+    local paid = {}
+    local prev_cg = GG.capped_grant
+    GG.capped_grant = function(f, g, amt, src) paid[#paid + 1] = {f, g, amt, src} end
+    GG.pay_halls(EAI)
+    GG.capped_grant = prev_cg
+    assert(#paid == 0, "and is paid nothing for them, got " .. #paid .. " grants")
+    cm.get_faction = prev_gf
+    GG.state[EAI], GG.halls[EAI] = nil, nil
+
+    -- REVIEW FOCUS 4: two humans of different hall races. Each is locked by its own keys.
+    cm.get_human_factions = function() return {CF, EF} end
+    GG.player_cultures_cache = nil
+    GG.state[CF] = {}
+    for _, g in ipairs(GG.GUILDS) do GG.state[CF][g] = {rep = 0, fav = 0} end
+    assert(GG.covered(CF) and GG.covered(EF), "setup: both humans are covered")
+    GG.state[EF].brass.rep = 0
+    reset()
+    GG.lock_halls(CF, "brass")
+    GG.lock_halls(EF, "brass")
+    local c, e = names(adds, CF), names(adds, EF)
+    assert(c.derpy_gg_hall_brass_0 and c.derpy_gg_hall_brass_1 and c.derpy_gg_hall_brass_2,
+           "the Chaos Dwarf human is shut by the plain keys")
+    assert(e.derpy_gg_hall_brass_0_emp and e.derpy_gg_hall_brass_1_emp
+           and e.derpy_gg_hall_brass_2_emp, "the Empire human is shut by the _emp keys")
+    for k in pairs(c) do assert(not string.find(k, "_emp$"), "no _emp key on the Chaos Dwarfs: " .. k) end
+    for k in pairs(e) do assert(string.find(k, "_emp$"), "no plain key on the Empire: " .. k) end
+
+    GG.state[EF], GG.halls[EF], GG.state[CF] = nil, nil, prev_state
+    CULTURE[EF], CULTURE[EAI] = nil, nil
+    GG.CULTURE_OF[EF], GG.CULTURE_OF[EAI] = nil, nil
+    cm.get_faction, cm.get_human_factions = prev_gf, prev_getter
+    GG.player_cultures_cache = nil
+    GG.scan_world, GG.leader_of = prev_sw, prev_l
+    GG.halls_locked, GG.halls_swept, GG.seat_on = prev_locked, prev_swept, prev_seat
+    cm.add_event_restricted_building_record_for_faction = prev_add
+    cm.remove_event_restricted_building_record_for_faction = prev_rem
+end)()
+
+-- GUILD HALLS: THE SESSION SWEEP HAS ITS OWN FLAG (final review F9). GG.apply_rank writes one
+-- guild's three records before the faction's first turn start; keyed on halls_locked, the
+-- sweep then saw a memo and skipped the other five guilds for the whole session.
+;(function()
+    GG.halls = {}
+    local seen = {}
+    local prev_add = cm.add_event_restricted_building_record_for_faction
+    local prev_rem = cm.remove_event_restricted_building_record_for_faction
+    local F9 = "cr_f9_chd"
+    cm.add_event_restricted_building_record_for_faction = function(_, b, f)
+        if f == F9 then seen[b] = true end
+    end
+    cm.remove_event_restricted_building_record_for_faction = function(_, b, f)
+        if f == F9 then seen[b] = true end
+    end
+    local prev_locked, prev_swept, prev_l = GG.halls_locked, GG.halls_swept, GG.leader_of
+    GG.halls_locked, GG.halls_swept = {}, {}
+    GG.leader_of = function() return nil end
+    GG.CULTURE_OF[F9] = nil
+    assert(GG.covered(F9), "setup: a covered Chaos Dwarf faction")
+    GG.state[F9] = {}
+    for _, g in ipairs(GG.GUILDS) do GG.state[F9][g] = {rep = 0, fav = 0} end
+    GG.state[F9].brass.rep = 700
+    GG.apply_rank(F9, "brass", 2, 4)
+    local function count() local n = 0; for _ in pairs(seen) do n = n + 1 end; return n end
+    assert(count() == 3, "apply_rank writes brass alone, got " .. count())
+    handlers["gg_turn"]({faction = function()
+        return {is_null_interface = function() return false end,
+                name = function() return F9 end, net_income = function() return 0 end,
+                is_human = function() return false end,
+                num_completed_technologies = function() return 0 end}
+    end})
+    assert(count() == 21, "its first turn start still sweeps all seven guilds, got " .. count())
+    assert(GG.halls_swept[F9] == true, "and says so")
+    GG.state[F9], GG.halls[F9] = nil, nil
+    GG.halls_locked, GG.halls_swept, GG.leader_of = prev_locked, prev_swept, prev_l
+    cm.add_event_restricted_building_record_for_faction = prev_add
+    cm.remove_event_restricted_building_record_for_faction = prev_rem
+end)()
+
+-- GUILD HALLS: THE PROMOTION'S HALL LINE ONLY WHILE HALLS ARE ON (final review F5). Ranks 2
+-- and 4 open a hall level; with guild_halls off the locks keep every level shut, so the
+-- message must not promise one.
+;(function()
+    local prims = {}
+    local prev_sme, prev_getter, prev_set = cm.show_message_event, cm.get_human_factions, GG.setting
+    cm.show_message_event = function(_, _f, _title, primary) prims[#prims + 1] = primary end
+    local H = "cr_f5_chd"
+    cm.get_human_factions = function() return {H} end
+    GG.player_cultures_cache = nil
+    local K = "message_event_text_text_derpy_gg_rank_"
+    GG.announce_rank(H, "brass", 1, 2)
+    assert(prims[#prims] == K .. "brass_2_primary_hall",
+           "Indebted opens the Lodge: the hall key, got " .. tostring(prims[#prims]))
+    GG.announce_rank(H, "brass", 2, 3)
+    assert(prims[#prims] == K .. "brass_3_primary", "rank 3 opens no hall: the plain key, got "
+           .. tostring(prims[#prims]))
+    GG.announce_rank(H, "brass", 3, 4)
+    assert(prims[#prims] == K .. "brass_4_primary_hall", "Favoured opens the Hall")
+    GG.setting = function(k) if k == "guild_halls" then return false end return prev_set(k) end
+    GG.announce_rank(H, "slavers", 1, 2)
+    assert(prims[#prims] == K .. "slavers_2_primary",
+           "guild_halls off: the plain key, got " .. tostring(prims[#prims]))
+    assert(#prims == 4, "four promotions, four messages, got " .. #prims)
+    GG.setting = prev_set
+    cm.show_message_event, cm.get_human_factions = prev_sme, prev_getter
+    GG.player_cultures_cache = nil
+end)()
+
+-- GUILD HALLS: THE CUT THE HALLS ACTUALLY TOOK (final review F6). GG.service_cost's third
+-- value is what the price hover names; against the -30 floor it is less than the discount.
+;(function()
+    local F6 = "cr_f6_chd"
+    GG.halls[F6] = nil
+    GG.state[F6] = {daemonsmiths = {rep = 700, fav = 0}, immortals = {rep = 0, fav = 0}}
+    local _, m0, c0 = GG.service_cost(F6, "forge_rite")
+    assert(m0 == -2 * GG.FAVOUR_LOYALTY and c0 == 0, "setup: rank 4 and no halls, got "
+           .. m0 .. " / " .. tostring(c0))
+    GG.halls[F6] = {daemonsmiths = {n = 2, best = 0, lv = {2, 0, 0}}}
+    local _, m1, c1 = GG.service_cost(F6, "forge_rite")
+    assert(m1 == GG.FAVOUR_MIN_MOD and c1 == 6, "room for all 6: got " .. m1 .. " / " .. c1)
+    GG.halls[F6].daemonsmiths.n = 5
+    assert(GG.hall_discount(F6, "daemonsmiths") == 15, "setup: five halls are a 15% discount")
+    local _, m2, c2 = GG.service_cost(F6, "forge_rite")
+    assert(m2 == GG.FAVOUR_MIN_MOD and c2 == 6,
+           "the floor leaves room for 6 of the 15, got " .. m2 .. " / " .. c2)
+    GG.state[F6].daemonsmiths.rep = 1500
+    local _, m3, c3 = GG.service_cost(F6, "forge_rite")
+    assert(m3 == GG.FAVOUR_MIN_MOD and c3 == 0, "already on the floor, the halls take nothing, got "
+           .. c3)
+    GG.state[F6], GG.halls[F6] = nil, nil
+end)()
+
+-- GUILD HALLS UNDER THE DARK ELVES' PRICE (final fix M1). hostile_price rescales the price
+-- and the modifier; the halls' share of that modifier must shrink with them, or the hover
+-- names a cut bigger than the whole discount it is part of.
+;(function()
+    local FM = "cr_m1_def"
+    local rep = 0
+    while GG.rank_of(rep) < 3 do rep = rep + 10 end
+    GG.state[FM] = {khanate = {rep = rep, fav = 0}, brass = {rep = 0, fav = 0}}
+    GG.halls[FM] = {khanate = {n = 5, best = 0, lv = {5, 0, 0}}}
+    local prev_twist = GG.twist
+    local pct = 100
+    GG.twist = function(f, k) if k == "hostile_price" then return pct end return prev_twist(f, k) end
+    local _, m0, c0 = GG.service_cost(FM, "sow_discord")
+    assert(m0 == -15 and c0 == 15, "setup: rank 3, five halls, no twist, got " .. m0 .. " / " .. c0)
+    pct = 75
+    local p1, m1, c1 = GG.service_cost(FM, "sow_discord")
+    assert(p1 == math.floor(math.floor(150 * 85 / 100) * 75 / 100) and c1 == 11,
+           "hostile_price 75 scales the halls' cut to 11 of 15, got " .. p1 .. " / " .. m1
+           .. " / " .. c1)
+    GG.twist = prev_twist
+    GG.state[FM], GG.halls[FM] = nil, nil
+end)()
+
+;(function()
+    -- THE SEVENTH GUILD (temple spec 2026-10-04): appended last, and an old save reads.
+    assert(#GG.GUILDS == 7 and GG.GUILDS[7] == "temple", "temple is the seventh guild")
+    assert(GG.RIVALS.temple == nil, "the temple has no rival")
+    assert(GG.CAP.temple == 40, "the temple's cap mirrors RATES")
+    local keys = {}
+    for i = 1, #GG.SERVICES do
+        if GG.SERVICES[i].guild == "temple" then keys[#keys + 1] = GG.SERVICES[i].key end
+    end
+    assert(table.concat(keys, ",") == "hashut_blessing,forge_sermons,temple_tithe,zeal,"
+        .. "purge_unclean,anathema,holy_war,miracle,consecration", "nine temple services")
+    -- ROW 92, positionally: the Skaven's three race rows (2026-10-05) come after it.
+    assert(GG.SERVICES[92].key == "consecration" and #GG.SERVICES == 95,
+           "the temple's rows end at row 92, before the Skaven's three")
+    -- AN OLD SAVE: six standing pairs and the 83 cooldowns it had before the temple.
+    local F = "cr_temple_oldsave"
+    local cds = {}
+    for i = 1, 83 do cds[i] = "0" end
+    cds[83] = "5"                                -- asuryans_grace, the old last row
+    assert(GG.SERVICES[83].key == "asuryans_grace", "row 83 is the old last row")
+    saved["derpy_gg_" .. F] = "10,1|20,2|30,3|40,4|50,5|60,6;" .. table.concat(cds, "|")
+    GG.state[F], GG.cooldowns[F] = nil, nil
+    GG.load(F)
+    assert(select(1, GG.get(F, "slavers")) == 60, "the six pairs load where they were")
+    local r, f = GG.get(F, "temple")
+    assert(r == 0 and f == 0, "the temple starts at 0,0 in an old save")
+    assert(GG.cooldowns[F].asuryans_grace == 5, "cooldowns keep their positions")
+    assert((GG.cooldowns[F].consecration or 0) == 0, "a new row has no cooldown")
+    -- A CAMPAIGN FROZEN BEFORE THE TEMPLE: its settings string lacks the four new keys.
+    local fields = {}
+    for v in string.gmatch(GG.pack_tune(GG.TUNE_DEFAULTS), "[^|]+") do fields[#fields + 1] = v end
+    local t = GG.unpack_tune(table.concat(fields, "|", 1, #fields - 4))
+    assert(t.rate_temple_devout == 1 and t.rate_temple_chaos == 2
+           and t.rate_temple_holy == 10 and t.cap_temple == 40,
+           "an old settings string reads the temple's defaults")
+    for _, src in ipairs({"devout", "chaos", "holywar", "priests"}) do
+        assert(GG.LEDGER_KNOWN[src], "ledger source " .. src)
+    end
+    GG.state[F], GG.cooldowns[F], saved["derpy_gg_" .. F] = nil, nil, nil
+end)()
+;(function()
+    -- RACE WORDS (temple spec §3.1): checked before the shared list, per flavour tag.
+    local G = GG.guild_of_chain
+    assert(G("wh3_dlc23_chd_tower_temple_of_hashut", "") == "temple", "CHD temple")
+    assert(G("wh3_dlc23_chd_tower_temple_of_hashut") == "overseers", "no tag, shared words")
+    assert(G("wh3_dlc23_chd_tower_temple_guardhouse", "") == "immortals", "Fane Guard stays")
+    assert(G("wh2_main_special_ancestors_hall", "_dwf") == "temple", "Ancestors' Hall")
+    assert(G("wh_main_DWARFS_slayers", "_dwf") == "temple", "Slayer shrine")
+    -- REVIEW FOCUS 5: a foreign shrine a Dwarf holds is not the Ancestor Temples'.
+    assert(G("wh2_main_special_shrine_of_asuryan_other", "_dwf") ~= "temple",
+           "a foreign shrine a Dwarf holds is not the Ancestor Temples'")
+    assert(G("wh_main_empire_worship", "_emp") ~= "temple", "Shrines of Sigmar stay Masons")
+    assert(G("wh2_main_def_worship", "_def") == "temple", "Altar of Khaine")
+    assert(G("wh_main_EMPIRE_tavern", "_emp") == "khanate", "the Thieves' Guild's tap room")
+    assert(G("wh_main_EMPIRE_tavern", "_brt") == "brass", "other races keep the shared word")
+    assert(G("wh_main_EMPIRE_tavern", "_gen") == "brass", "a tag with no list reads the shared one")
+    -- What a completed building pays, with the owner's tag.
+    local F = "cr_temple_build_chd"
+    GG.CULTURE_OF[F] = "wh3_dlc23_chd_chaos_dwarfs"
+    GG.state[F] = nil
+    GG.reset_turn(F)
+    GG.on_building(F, 1, "wh3_dlc23_chd_tower_temple_of_hashut")
+    assert(select(1, GG.get(F, "temple")) == 10, "a CHD temple pays the Temple of Hashut, got "
+           .. tostring(select(1, GG.get(F, "temple"))))
+    assert(select(1, GG.get(F, "overseers")) == 0, "and not the Overseers")
+    GG.state[F], GG.CULTURE_OF[F] = nil, nil
+end)()
+;(function()
+    -- THE TEMPLE'S FOUR ROUTES (temple spec §3.2), each per race, each a no for a race
+    -- without it.
+    local function L(t)
+        return {num_items = function() return #t end,
+                item_at = function(_, i) return t[i + 1] end,
+                is_empty = function() return #t == 0 end}
+    end
+    local function prov(order, chaos, vamp, extra)
+        local amounts = {wh3_main_corruption_chaos = chaos, wh3_main_corruption_vampiric = vamp}
+        for k, v in pairs(extra or {}) do amounts[k] = v end
+        return {
+            regions = function() return L({{public_order = function() return order end}}) end,
+            province = function() return {pooled_resource_manager = function() return {
+                resource = function(_, key)
+                    local v = amounts[key]
+                    return {is_null_interface = function() return v == nil end,
+                            value = function() return v or 0 end}
+                end} end} end,
+        }
+    end
+    -- One province in good order and clean; one at order 0 with only vampiric taint; one in
+    -- disorder with Chaos taint.
+    local world = {prov(10, 0, 0), prov(0, 0, 5), prov(-5, 3, 0)}
+    local f = {provinces = function() return L(world) end}
+    local keep = GG.TUNE
+    GG.TUNE = nil
+    local function earned(culture, fn)
+        local F = "cr_temple_" .. culture
+        GG.CULTURE_OF[F] = culture
+        GG.state[F], GG.turn_gain[F] = nil, {}
+        -- A human of that race, so GG.covered lets the race earn.
+        local keep_pc = GG.player_cultures
+        GG.player_cultures = function() return {[culture] = true} end
+        fn(F)
+        GG.player_cultures = keep_pc
+        local r = GG.get(F, "temple")
+        local k = GG.get(F, "khanate")
+        GG.state[F], GG.turn_gain[F], GG.CULTURE_OF[F] = nil, nil, nil
+        return r, k
+    end
+    assert(earned("wh3_dlc23_chd_chaos_dwarfs", function(F) GG.temple_turn(F, f) end) == 1,
+           "CHD: devout only, 1 x 1")
+    assert(earned("wh_main_emp_empire", function(F) GG.temple_turn(F, f) end) == 4,
+           "Empire: no devout route, chaos 2 provinces x 2")
+    assert(earned("wh3_main_ksl_kislev", function(F) GG.temple_turn(F, f) end) == 1 + 2,
+           "Kislev: devout 1, and only one province free of BOTH taints x 2")
+    assert(earned("wh2_main_def_dark_elves", function(F) GG.temple_turn(F, f) end) == 0,
+           "Dark Elves earn nothing at turn start")
+    -- Holy war: the cache is asked with the race's cultures; a race without any is not asked.
+    local asked
+    cm.pending_battle_cache_faction_won_battle_against_culture = function(_, fk, cultures)
+        asked = cultures
+        return true
+    end
+    assert(earned("wh2_main_def_dark_elves", function(F) GG.temple_holy(F) end) == 10,
+           "a Dark Elf win against the asur pays 10")
+    assert(asked and asked[1] == "wh2_main_hef_high_elves", "asked with the High Elf culture")
+    asked = nil
+    assert(earned("wh3_main_cth_cathay", function(F) GG.temple_holy(F) end) == 0
+           and asked == nil, "Cathay has no holy war and is never asked")
+    cm.pending_battle_cache_faction_won_battle_against_culture = function() return false end
+    assert(earned("wh2_main_def_dark_elves", function(F) GG.temple_holy(F) end) == 0,
+           "a win against anyone else pays nothing")
+    -- Priests: a listed subtype pays the temple instead of the spies.
+    local r, k = earned("wh_main_emp_empire", function(F)
+        GG.on_agent_action(F, true, "wh_main_emp_bright_wizard") end)
+    assert(r == 8 and k == 0, "a Bright Wizard pays the Colleges, not the Thieves")
+    r, k = earned("wh_main_emp_empire", function(F)
+        GG.on_agent_action(F, true, "wh_main_emp_warrior_priest") end)
+    assert(r == 0 and k == 8, "a Warrior Priest still pays the Thieves")
+    r, k = earned("wh3_dlc23_chd_chaos_dwarfs", function(F)
+        GG.on_agent_action(F, true, "wh_main_emp_bright_wizard") end)
+    assert(r == 0 and k == 8, "a race without the priests route pays the spies")
+    r, k = earned("wh2_main_def_dark_elves", function(F)
+        GG.on_agent_action(F, false, "wh2_main_def_death_hag") end)
+    assert(r == 0 and k == 0, "a failed action pays nobody")
+    -- The cap: 40 a turn, whatever the routes add up to.
+    local big = {}
+    for i = 1, 60 do big[i] = prov(10, 0, 0) end
+    assert(earned("wh2_main_hef_high_elves", function(F)
+        GG.temple_turn(F, {provinces = function() return L(big) end}) end) == 40,
+        "the temple's cap binds its routes")
+    -- EVERY CHAOS GOD'S CORRUPTION, not Undivided alone (final review, 2026-10-05): CA seeds
+    -- Saphery with 75 Slaanesh, and a province under any one god is not held clean.
+    for _, god in ipairs({"khorne", "nurgle", "slaanesh", "tzeentch"}) do
+        local tainted = prov(10, 0, 0, {["wh3_main_corruption_" .. god] = 75})
+        assert(earned("wh_main_emp_empire", function(F)
+            GG.temple_turn(F, {provinces = function() return L({tainted}) end}) end) == 0,
+            "a province under " .. god .. " corruption alone is not clean")
+    end
+    -- THE HOLD SEES THE TEMPLE'S TURN START (final review): GG.hold_lead adds the leader's
+    -- unpaid turn-start income to its margin, so a guild paid at turn start must report it
+    -- or two close factions swap the lead every round.
+    local keep_gf, keep_pc = cm.get_faction, GG.player_cultures
+    local T = "cr_temple_pay"
+    local held = world
+    cm.get_faction = function(self, k)
+        if k == T then
+            return {is_null_interface = function() return false end,
+                    provinces = function() return L(held) end}
+        end
+        return keep_gf(self, k)
+    end
+    GG.CULTURE_OF[T] = "wh3_main_ksl_kislev"
+    GG.player_cultures = function() return {wh3_main_ksl_kislev = true} end
+    assert(GG.turn_start_pay(T, "temple") == 1 + 2,
+           "Kislev's turn start pays the temple devout 1 and chaos 2, got "
+           .. GG.turn_start_pay(T, "temple"))
+    held = big
+    assert(GG.turn_start_pay(T, "temple") == 40,
+           "held to the temple's cap, got " .. GG.turn_start_pay(T, "temple"))
+    GG.CULTURE_OF[T] = "wh2_main_def_dark_elves"
+    assert(GG.turn_start_pay(T, "temple") == 0, "the Dark Elves have no turn-start route")
+    cm.get_faction, GG.player_cultures, GG.CULTURE_OF[T] = keep_gf, keep_pc, nil
+    cm.pending_battle_cache_faction_won_battle_against_culture = nil
+    -- THE SKAVEN'S TAINT (skaven spec §4.1): paid per province CARRYING Skaven corruption,
+    -- nothing for a clean one, and the Skaven have no devout or chaos route.
+    local skv1 = prov(10, 0, 0, {wh3_main_corruption_skaven = 12})
+    local skv2 = prov(-5, 4, 0, {wh3_main_corruption_skaven = 1})
+    local clean = prov(10, 0, 0)
+    -- The resource present at exactly 0 is clean too (mutation: ">= 0" survived without it).
+    local zero = prov(10, 0, 0, {wh3_main_corruption_skaven = 0})
+    assert(earned("wh2_main_skv_skaven", function(F)
+        GG.temple_turn(F, {provinces = function() return L({skv1, skv2, clean, zero}) end}) end)
+        == 2 * 2, "two tainted provinces x 2, the clean ones nothing")
+    -- AND THE HOLD SEES IT: the Skaven turn start previews the same 4.
+    local keep_gf2 = cm.get_faction
+    cm.get_faction = function(self, k)
+        if k == "cr_skv_pay" then
+            return {is_null_interface = function() return false end,
+                    provinces = function() return L({skv1, skv2, clean}) end}
+        end
+        return keep_gf2(self, k)
+    end
+    local keep_pc2 = GG.player_cultures
+    GG.CULTURE_OF["cr_skv_pay"] = "wh2_main_skv_skaven"
+    GG.player_cultures = function() return {wh2_main_skv_skaven = true} end
+    assert(GG.turn_start_pay("cr_skv_pay", "temple") == 4,
+           "the Skaven turn-start preview includes taint, got "
+           .. GG.turn_start_pay("cr_skv_pay", "temple"))
+    cm.get_faction, GG.player_cultures, GG.CULTURE_OF["cr_skv_pay"] = keep_gf2, keep_pc2, nil
+    -- Holy war: the cache is asked with the Dwarfs and the Lizardmen.
+    local asked2
+    cm.pending_battle_cache_faction_won_battle_against_culture = function(_, fk, cultures)
+        asked2 = cultures
+        return true
+    end
+    assert(earned("wh2_main_skv_skaven", function(F) GG.temple_holy(F) end) == 10,
+           "a Skaven win against the Dwarfs pays 10")
+    assert(asked2[1] == "wh_main_dwf_dwarfs" and asked2[2] == "wh2_main_lzd_lizardmen",
+           "asked with the Dwarf and Lizardman cultures")
+    cm.pending_battle_cache_faction_won_battle_against_culture = nil
+    -- NO PRIESTS ROUTE (ruling 1): a Grey Seer is a lord, so no hero action pays the Seers.
+    assert(GG.TEMPLE_ROUTES["wh2_main_skv_skaven"].priests == nil, "no Skaven priests route")
+    GG.TUNE = keep
+end)()
+;(function()
+    -- THE SKAVEN (skaven spec, 2026-10-05): a ninth flavour, its twist, its earn route and
+    -- its three race services appended AFTER the temple's nine.
+    local SKV = "wh2_main_skv_skaven"
+    assert(GG.FLAVOURED[SKV] and GG.FLAVOURED[SKV].tag == "_skv"
+           and GG.FLAVOURED[SKV].feed == 90, "the Skaven flavour, feed 90")
+    assert(GG.HIRE_UNIT_BY_CULTURE[SKV] == "wh2_main_skv_inf_stormvermin_0",
+           "the Skaven hire the Stormvermin")
+    assert(GG.EARN_OF[SKV] == "undercity" and GG.EARN_ROUTES.undercity.guild == "khanate"
+           and GG.EARN_ROUTES.undercity.rep == 40, "under-cities pay Clan Eshin 40")
+    assert(GG.TWISTS[SKV].rate_rivalry == 150 and GG.TWISTS[SKV].demand_penalty == 0,
+           "Treachery: rivalry half again, an expired demand costs nothing")
+    assert(GG.HALL_TAGS["_skv"], "the Skaven have halls")
+    assert(GG.TUNE_DEFAULTS.rate_temple_taint == 2
+           and GG.TUNE_ORDER[#GG.TUNE_ORDER] == "rate_temple_taint",
+           "the taint rate, appended last")
+    assert(GG.LEDGER_KNOWN.undercity and GG.LEDGER_KNOWN.taint, "two new ledger sources")
+    -- APPENDED AFTER THE TEMPLE: cooldowns are saved by position.
+    local n = #GG.SERVICES
+    assert(GG.SERVICES[n - 2].key == "food_tithe" and GG.SERVICES[n - 1].key == "shadows_of_eshin"
+           and GG.SERVICES[n].key == "breeding_season", "the Skaven rows are last")
+    assert(GG.SERVICES[n - 3].key == "consecration", "the temple's last row sits before them")
+    assert(GG.RACE_FIRE.shadows_of_eshin == GG.RACE_FIRE.electors_muster,
+           "Shadows of Eshin grants units the way the Elector's Muster does")
+    -- A SAVE FROM BEFORE THE SKAVEN: a Skaven faction with no saved state loads blank.
+    local F = "cr_skv_old"
+    GG.CULTURE_OF[F] = SKV
+    GG.state[F] = nil
+    GG.load(F)
+    for _, g in ipairs(GG.GUILDS) do
+        local rep, fav = GG.get(F, g)
+        assert(rep == 0 and fav == 0, "a Skaven faction loads blank on " .. g)
+    end
+    GG.state[F], GG.CULTURE_OF[F] = nil, nil
+end)()
+;(function()
+    -- UNDER-CITIES (skaven spec §4.2, §4.3).
+    local keep_pc = GG.player_cultures
+    GG.player_cultures = function() return {wh2_main_skv_skaven = true} end
+    local S, V = "cr_skv_uc", "cr_vmp_coven"
+    GG.CULTURE_OF[S], GG.CULTURE_OF[V] = "wh2_main_skv_skaven", "wh_main_vmp_vampire_counts"
+    GG.state[S], GG.state[V], GG.turn_gain[S], GG.turn_gain[V] = nil, nil, {}, {}
+    -- The level key splits into its chain and level.
+    local c, n = GG.level_of("wh2_dlc12_under_empire_money_thieves_3")
+    assert(c == "wh2_dlc12_under_empire_money_thieves" and n == 3, "level key splits")
+    assert(GG.level_of("no_number_here") == nil, "a key without a level is refused")
+    assert(GG.level_of(nil) == nil, "a missing key is refused")
+    assert(GG.level_of("_3") == nil, "a key with a level and no chain is refused")
+    -- FOUNDING pays Clan Eshin 40, and a vampire coven pays nobody.
+    GG.on_undercity_founded(S)
+    assert(select(1, GG.get(S, "khanate")) == 40, "an under-city founded pays Eshin 40, got "
+           .. tostring(select(1, GG.get(S, "khanate"))))
+    GG.on_undercity_founded(V)
+    for _, g in ipairs(GG.GUILDS) do
+        assert(select(1, GG.get(V, g)) == 0, "a vampire coven pays no guild: " .. g)
+    end
+    -- AND THE EVENTS REACH THEM: the registered handlers, driven with CA's context shapes.
+    local S2 = "cr_skv_uc_event"
+    GG.CULTURE_OF[S2], GG.state[S2], GG.turn_gain[S2] = "wh2_main_skv_skaven", nil, {}
+    local function fac(name)
+        return {is_null_interface = function() return false end, name = function() return name end}
+    end
+    assert(handlers["gg_earn_undercity"], "no ForeignSlotManagerCreatedEvent listener")
+    handlers["gg_earn_undercity"]({requesting_faction = function() return fac(S2) end})
+    assert(select(1, GG.get(S2, "khanate")) == 40, "the founding event pays Eshin 40, got "
+           .. tostring(select(1, GG.get(S2, "khanate"))))
+    -- AN ALLIED OUTPOST IS NOT AN UNDER-CITY (final review): the same event fires for it,
+    -- told apart by is_allied() as CA's achievement listener does.
+    local S3 = "cr_skv_uc_allied"
+    GG.CULTURE_OF[S3], GG.state[S3], GG.turn_gain[S3] = "wh2_main_skv_skaven", nil, {}
+    handlers["gg_earn_undercity"]({requesting_faction = function() return fac(S3) end,
+                                   is_allied = function() return true end})
+    assert(select(1, GG.get(S3, "khanate")) == 0, "an allied outpost pays Eshin nothing, got "
+           .. tostring(select(1, GG.get(S3, "khanate"))))
+    GG.CULTURE_OF[S3], GG.state[S3], GG.turn_gain[S3] = nil, nil, nil
+    assert(handlers["gg_undercity_building"], "no ForeignSlotBuildingCompleteEvent listener")
+    local before2 = 0
+    for _, g in ipairs(GG.GUILDS) do before2 = before2 + select(1, GG.get(S2, g)) end
+    local function built(set)
+        GG.reset_turn(S2)   -- the per-turn building cap would answer 0 for anything
+        handlers["gg_undercity_building"]({
+            building = function() return "wh2_dlc12_under_empire_money_thieves_2" end,
+            slot_manager = function()
+                return {faction = function() return fac(S2) end,
+                        slot_set_key = function() return set end}
+            end})
+        local after2 = 0
+        for _, g in ipairs(GG.GUILDS) do after2 = after2 + select(1, GG.get(S2, g)) end
+        local paid = after2 - before2
+        before2 = after2
+        return paid
+    end
+    assert(built("wh2_dlc12_slot_set_underempire") == 20, "the building event pays 20")
+    -- ONLY AN UNDER-CITY PAYS (deferred minor, fixed 2026-10-05): the event fires for every
+    -- foreign slot. Told apart by slot_set_key, every under-city set included - one is
+    -- wh3_dlc29_, which CA's own two-prefix test (wh3_campaign_achievements) misses.
+    assert(built("wh3_dlc29_slot_set_underempire_scruten_startpos") == 20,
+           "Scruten's start under-city pays like any other")
+    for _, set in ipairs({"wh3_main_slot_set_allied_building", "wh3_dlc25_slot_set_black_tower",
+                          "wh3_dlc27_slot_set_hef_sea_patrol_outpost_focus_outposts_the_star_tower"}) do
+        assert(built(set) == 0, set .. " is no under-city and pays nothing")
+    end
+    GG.CULTURE_OF[S2], GG.state[S2], GG.turn_gain[S2] = nil, nil, nil
+    -- AN UNDER-CITY BUILDING pays like any building: level 2 at the building rate x 2. WHICH
+    -- guild it pays rides on the Skaven words, so Task 4 pins the Traders; here the total.
+    GG.reset_turn(S)
+    local function total()
+        local t = 0
+        for _, g in ipairs(GG.GUILDS) do t = t + select(1, GG.get(S, g)) end
+        return t
+    end
+    local before = total()
+    GG.on_undercity_building(S, "wh2_dlc12_under_empire_money_thieves_2")
+    assert(total() - before == 20, "a level-2 under-city building pays 20, got "
+           .. (total() - before))
+    before = total()
+    GG.on_undercity_building(S, "garbage")
+    assert(total() == before, "a key without a level pays nothing")
+    GG.state[S], GG.state[V], GG.CULTURE_OF[S], GG.CULTURE_OF[V] = nil, nil, nil, nil
+    GG.turn_gain[S], GG.turn_gain[V] = nil, nil
+    GG.player_cultures = keep_pc
+end)()
+;(function()
+    -- THE SKAVEN WORDS (skaven ruling 8), read from CA's display names.
+    local want = {
+        wh2_main_skv_resource_gold = "brass", wh2_main_skv_port = "brass",
+        wh2_dlc12_under_empire_money_thieves = "brass",
+        wh2_dlc12_under_empire_warpstone_refinery = "brass",
+        wh2_main_skv_clanrats = "immortals", wh2_main_skv_defence_major = "immortals",
+        wh2_dlc12_under_empire_annexation_war_camp = "immortals",
+        wh2_main_skv_engineers = "daemonsmiths", wh2_main_skv_weaponteams = "daemonsmiths",
+        wh2_main_skv_energy = "daemonsmiths", wh3_dlc29_skv_stormfiends = "daemonsmiths",
+        wh2_dlc12_under_empire_annexation_doomsday = "daemonsmiths",
+        wh2_main_skv_assassins_eshin = "khanate",
+        wh2_dlc12_under_empire_discovery_deeper_tunnels = "khanate",
+        wh2_main_skv_farm = "overseers", wh2_main_skv_monsters = "overseers",
+        wh2_main_skv_order = "slavers", wh2_dlc12_under_empire_food_kidnappers = "slavers",
+        wh2_main_skv_plagues = "temple",
+        wh2_dlc14_under_empire_annexation_plague_cauldron = "temple",
+    }
+    for chain, g in pairs(want) do
+        assert(GG.guild_of_chain(chain, "_skv") == g,
+               chain .. " should pay " .. g .. ", got " .. tostring(GG.guild_of_chain(chain, "_skv")))
+    end
+    -- AND THE UNDER-CITY PATH USES THEM (moved here from Task 3): a level-2 Thieving den
+    -- pays the Warpstone Traders 20.
+    local keep_pc = GG.player_cultures
+    GG.player_cultures = function() return {wh2_main_skv_skaven = true} end
+    local S = "cr_skv_words"
+    GG.CULTURE_OF[S], GG.state[S], GG.turn_gain[S] = "wh2_main_skv_skaven", nil, {}
+    GG.on_undercity_building(S, "wh2_dlc12_under_empire_money_thieves_2")
+    assert(select(1, GG.get(S, "brass")) == 20, "a level-2 Thieving pays the Traders 20, got "
+           .. tostring(select(1, GG.get(S, "brass"))))
+    GG.CULTURE_OF[S], GG.state[S], GG.turn_gain[S] = nil, nil, nil
+    GG.player_cultures = keep_pc
+end)()
 print("harness ok")

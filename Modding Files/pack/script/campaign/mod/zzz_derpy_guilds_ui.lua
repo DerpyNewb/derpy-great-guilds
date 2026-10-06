@@ -28,10 +28,10 @@ GGUI.PATH_OPENER = "ui/campaign ui/derpy_gg_opener"
 -- position: the Log sits left of Help on screen but took the next free number, so no
 -- existing TAB test had to move.
 GGUI.TAB  = 1
-GGUI.PAGE = 1     -- which guild, 1..6
+GGUI.PAGE = 1     -- which guild, 1..#GGUI.GUILD_ORDER
 
 GGUI.GUILD_ORDER = {"brass", "immortals", "daemonsmiths", "khanate",
-                    "overseers", "slavers"}
+                    "overseers", "slavers", "temple"}
 
 -- Card slot geometry, mirroring PANEL_LAYOUT in tools/gen_guilds_ui.py.
 GGUI.CARD_XY = {{20, 170}, {20, 300}, {20, 430}}
@@ -79,18 +79,33 @@ function GGUI.wrap(c, text, max_lines)
     -- The box is GGUI.S times its design width and so is the text drawn in it, so the
     -- lines break where they break at 1x. The budget is put in whatever units the
     -- measurement below comes back in; see GGUI.text_ratio.
-    w = w * GGUI.text_ratio() / GGUI.S
+    local r = GGUI.text_ratio()
+    w = w * r / GGUI.S
+    -- AN [[img:]] IS ONE WORD, AS WIDE AS ITS PICTURE (2026-10-05). CA's effect icons
+    -- live under "ui/campaign ui/", so its spaces are held as \1 while the words are
+    -- split, and the markup is charged GGUI.FLAG_W rather than measured as its path.
+    text = string.gsub(text, "%[%[img:.-%]%]", function(m) return (string.gsub(m, " ", "\1")) end)
+    local function measure(s)
+        local bare, n = string.gsub(s, "%[%[img:.-%]%]%[%[/img%]%]", "")
+        local ok, need = pcall(function() return c:TextDimensionsForText(bare) end)
+        if not ok or type(need) ~= "number" then return nil end
+        return need + n * GGUI.FLAG_W * r
+    end
+    local function restore(out)
+        for i, l in ipairs(out) do out[i] = (string.gsub(l, "\1", " ")) end
+        return out
+    end
     local lines, cur = {}, nil
     for word in string.gmatch(text, "%S+") do
         local try = cur and (cur .. " " .. word) or word
-        local ok, need = pcall(function() return c:TextDimensionsForText(try) end)
-        if ok and need and need > w and cur then
+        local need = measure(try)
+        if need and need > w and cur then
             lines[#lines + 1] = cur
             if max_lines and #lines >= max_lines then
                 -- Out of room: mark the cut rather than ending mid-sentence as if
                 -- that were the whole thought.
                 lines[#lines] = cur .. " ..."
-                return lines
+                return restore(lines)
             end
             cur = word
         else
@@ -98,7 +113,7 @@ function GGUI.wrap(c, text, max_lines)
         end
     end
     if cur then lines[#lines + 1] = cur end
-    return lines
+    return restore(lines)
 end
 
 local function set_named_text(name, text)
@@ -140,6 +155,33 @@ end
 -- ------------------------------------------------------------------- loc ---
 -- Every call below reads localisation and therefore may ONLY be reached from a
 -- draw path. Nothing in zzz_derpy_guilds.lua calls into this file.
+
+-- THE HEADER'S INSETS, per race, in design px: where the guild's name starts (the frame's
+-- rank_tx) plus how far short of the right end the figures stop (RANK_STATS_PAD). Mirrored
+-- from tools/gen_guilds_ui.py, whose check_header_inset compares the two.
+GGUI.HEADER_INSET = {[""] = 98, _brt = 148, _cth = 202, _def = 122, _dwf = 98, _emp = 134,
+                     _hef = 158, _ksl = 152, _skv = 104}
+GGUI.HEADER_GAP = 24
+
+-- WHETHER THE GUILD'S NAME AND THESE FIGURES FIT SIDE BY SIDE, measured in the game's own
+-- font (2026-10-05). It replaced a per-race list chosen from the preview, whose font runs
+-- about a quarter narrower than the game's: "The Warpstone Traders" was drawn over the
+-- start of its figures in game. nil when the engine will not measure.
+function GGUI.header_fits(head, stats, tag)
+    local hc, sc = comp("gg_rank_line"), comp("gg_rank_stats")
+    if not hc or not sc then return nil end
+    local ok1, hw = pcall(function() return hc:TextDimensionsForText(head) end)
+    local ok2, sw = pcall(function() return sc:TextDimensionsForText(stats) end)
+    local ok3, bw = pcall(function() return sc:Dimensions() end)
+    if not (ok1 and ok2 and ok3) or type(hw) ~= "number" or type(sw) ~= "number"
+       or type(bw) ~= "number" or bw <= 0 then
+        return nil
+    end
+    -- Design px, then the units the measurement comes back in (see GGUI.wrap).
+    local room = (bw / GGUI.S - (GGUI.HEADER_INSET[tag] or 202) - GGUI.HEADER_GAP)
+                 * GGUI.text_ratio()
+    return hw + sw <= room
+end
 
 -- WHOSE FLAVOUR THE PANEL SPEAKS: the local player's. Forced read, because an unforced
 -- get_local_faction_name throws in multiplayer; nil when it cannot be read.
@@ -286,15 +328,16 @@ GGUI.PANEL_XY = {
     gg_card_3     = {20, 430},
     gg_prev       = {20, 596},
     gg_next       = {732, 596},
-    -- The six guild buttons between the arrows, and the bar that marks the page.
-    gg_gtab_1     = {256, 596},
-    gg_gtab_2     = {304, 596},
-    gg_gtab_3     = {352, 596},
-    gg_gtab_4     = {400, 596},
-    gg_gtab_5     = {448, 596},
-    gg_gtab_6     = {496, 596},
-    gg_gsel       = {256, 590},
-    gg_gbar       = {176, 595},
+    -- The seven guild buttons between the arrows, and the bar that marks the page.
+    gg_gtab_1     = {232, 596},
+    gg_gtab_2     = {280, 596},
+    gg_gtab_3     = {328, 596},
+    gg_gtab_4     = {376, 596},
+    gg_gtab_5     = {424, 596},
+    gg_gtab_6     = {472, 596},
+    gg_gtab_7     = {520, 596},
+    gg_gsel       = {232, 590},
+    gg_gbar       = {152, 595},
     -- The Log's filters, in the band the reputation bar uses on the Guilds tab.
     gg_lf_all     = {20, 138},
     gg_lf_mine    = {140, 138},
@@ -330,6 +373,7 @@ GGUI.HELP_SLOTS = 21
 GGUI.CARD_CHILD_XY = {
     card_icon = {8, 7},
     card_name = {114, 12},
+    card_need = {114, 12},
     card_desc_1 = {114, 44},
     card_desc_2 = {114, 64},
     card_cost = {596, 10},
@@ -353,6 +397,7 @@ GGUI.GUILD_ICON = {
     khanate      = "ui/campaign ui/derpy_gg_icons/khanate.png",
     overseers    = "ui/campaign ui/derpy_gg_icons/overseers.png",
     slavers      = "ui/campaign ui/derpy_gg_icons/slavers.png",
+    temple       = "ui/campaign ui/derpy_gg_icons/temple.png",
 }
 
 -- WHICH IMAGE IS THE GLYPH. The card icon and the header's icon are CA's round bronze
@@ -411,6 +456,14 @@ GGUI.FRAME = {
         hover = {"ui/skins/warhammer2/malus_parchment_button_square_hover.png"},
         selected = {"ui/skins/warhammer2/malus_parchment_button_square_pressed.png"},
         selected_hover = {"ui/skins/warhammer2/malus_parchment_button_square_pressed.png"},
+    },
+    _skv = {
+        heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
+        rim = "ui/skins/default/tutglow_square.png",
+        active = {"ui/skins/warhammer2/ikit_button_active.png", "ui/campaign ui/derpy_gg_icons/clear.png"},
+        hover = {"ui/skins/warhammer2/ikit_button_hover.png", "ui/campaign ui/derpy_gg_icons/clear.png"},
+        selected = {"ui/skins/warhammer2/ikit_button_down.png", "ui/skins/default/tutglow_square.png"},
+        selected_hover = {"ui/skins/warhammer2/ikit_button_down.png", "ui/skins/default/tutglow_square.png"},
     },
     _dwf = {
         heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
@@ -530,6 +583,7 @@ GGUI.PANEL_BG = {
     khanate      = "ui/campaign ui/derpy_gg_bg/khanate.png",
     overseers    = "ui/campaign ui/derpy_gg_bg/overseers.png",
     slavers      = "ui/campaign ui/derpy_gg_bg/slavers.png",
+    temple       = "ui/campaign ui/derpy_gg_bg/temple.png",
 }
 -- The reputation bar's FULL width, matching PANEL_LAYOUT["gg_rep_bar"] in
 -- tools/gen_guilds_ui.py, which check() pins. The bar is drawn at full width in the
@@ -548,10 +602,13 @@ GGUI.REP_BAR_H = 13
 -- the holder.
 GGUI.ROW_CHILD_XY = {
     row_icon   = {6, 2},
-    row_guild  = {46, 8},
-    row_rank   = {222, 8},
-    row_leader = {416, 8},
+    row_guild  = {46, 5},
+    row_rank   = {222, 5},
+    row_leader = {416, 5},
 }
+-- One standings row per guild, 34 tall at a 38 step: seven end at y=432 (ROW_STEP in
+-- tools/gen_guilds_ui.py).
+GGUI.ROW_STEP = 38
 
 -- ------------------------------------------- the standings faction list ---
 -- WHO ELSE IS IN THE RACE. The Standings tab named the leader of each guild and where
@@ -720,7 +777,9 @@ function GGUI.place_card(card, x, y)
     local cx, cy = card:Position()
     for name, xy in pairs(GGUI.CARD_CHILD_XY) do
         local c = comp(name, card)
-        if c then c:MoveTo(cx + GGUI.px(xy[1]), cy + GGUI.px(xy[2])) end
+        local x = xy[1]
+        if name == "card_need" then x = GGUI.NEED_DX[GGUI.card_id(card)] or x end
+        if c then c:MoveTo(cx + GGUI.px(x), cy + GGUI.px(xy[2])) end
     end
 end
 
@@ -768,7 +827,7 @@ function GGUI.layout()
     for i = 1, #GG.GUILDS do
         local row = comp(GGUI.ROW .. "_" .. i, panel)
         if row then
-            row:MoveTo(px + P(20), py + P(170 + (i - 1) * 44))
+            row:MoveTo(px + P(20), py + P(170 + (i - 1) * GGUI.ROW_STEP))
             local rx, ry = row:Position()
             for name, xy in pairs(GGUI.ROW_CHILD_XY) do
                 local c = comp(name, row)
@@ -913,6 +972,7 @@ function GGUI.draw_card(faction, i, s)
     local card = GGUI.card(i)
     if not card then return end
     GGUI.light_card(card, GGUI.service_running(faction, s))
+    GGUI.show_need(card)
     if not s then
         set_text(comp("card_name", card), "")
         set_text(comp("card_desc_1", card), "")
@@ -931,6 +991,7 @@ function GGUI.draw_card(faction, i, s)
     -- NO TARGET, BUT ONE CAN BE PICKED: the button is live and steps the panel aside.
     local pick = not ok and why == "target" and GGUI.can_pick(s)
     local label = GGUI.loc_service(s.key)
+    local need
     local rep_now = GG.get(faction, s.guild)
     local need_rep = GG.RANKS[s.rank] or 0
     if not ok and why == "rank" then
@@ -938,33 +999,37 @@ function GGUI.draw_card(faction, i, s)
         -- drops the colour rather than erroring, so this uses a known one.
         -- "Needs Indebted" rather than "Indebted": the bare rank name reads as a
         -- property of the service, not as the thing standing in your way.
-        label = label .. GGUI.lock_tag(GGUI.loc("needs") .. " " .. GGUI.loc_rank(s.rank))
+        need = GGUI.loc("needs") .. " " .. GGUI.loc_rank(s.rank)
     elseif not ok and why == "lead" then
         -- The monopoly. Red, like the rank gate, because it is the same kind of thing:
         -- something standing between the player and a service they can otherwise afford.
-        label = label .. GGUI.lock_tag(GGUI.loc("needs_lead"))
+        need = GGUI.loc("needs_lead")
     elseif not ok and why == "cooldown" then
         label = label .. "  " .. GG.cooldown_left(faction, s.key) .. " "
                 .. GGUI.loc("bounty_turns")
     elseif not ok and why == "target" then
         label = label .. "  [[col:yellow]]" .. GGUI.loc("needs_target_short") .. "[[/col]]"
     elseif not ok and why == "unavailable" then
-        label = label .. GGUI.lock_tag(GGUI.loc("unavailable_short"))
+        need = GGUI.loc("unavailable_short")
     end
     set_text(comp("card_name", card), label)
+    if need then GGUI.show_need(card, label, GGUI.need_tag(need)) end
 
     -- THE LIVE PRICE, from the same call GG.buy charges through. A guild that knows
     -- you charges less; one whose rival you have been courting charges more, so the
     -- number on this card is not the number in the data and must never be read from
     -- there.
-    local cost_now, cost_mod = GG.service_cost(faction, s.key)
+    local cost_now, cost_mod, hall_cut = GG.service_cost(faction, s.key)
     local cost_text = tostring(cost_now)
     if cost_mod < 0 then
         cost_text = "[[col:green]]" .. cost_text .. "[[/col]]"
     elseif cost_mod > 0 then
         cost_text = "[[col:yellow]]" .. cost_text .. "[[/col]]"
     end
-    if not ok and why == "favour" then
+    -- SHORT OF FAVOUR IS RED WHATEVER ELSE SHUTS IT (2026-10-05, asked in game): can_buy
+    -- names the rank first, so a card both locked and unaffordable never went red.
+    local _, fav_now = GG.get(faction, s.guild)
+    if (fav_now or 0) < cost_now then
         cost_text = "[[col:red]]" .. tostring(cost_now) .. "[[/col]]"
     end
     GGUI.set_cost(card, cost_text)
@@ -1026,6 +1091,12 @@ function GGUI.draw_card(faction, i, s)
                    .. (cost_mod < 0 and GGUI.loc("cost_loyal") or GGUI.loc("cost_rival"))
                    .. "  " .. string.format("%+d", cost_mod) .. "%"
     end
+    -- THE HALLS' SHARE OF THAT TOTAL, not a cut on top of it: what they actually took
+    -- after the -30 floor, which GG.service_cost returns. Nothing when it took nothing.
+    hall_cut = hall_cut or 0
+    if hall_cut > 0 then
+        cost_tip = cost_tip .. "||" .. GGUI.loc("price_halls") .. ": -" .. hall_cut .. "%"
+    end
     set_tooltip(comp("card_cost", card), cost_tip)
     local btn = comp("card_buy", card)
     if btn then
@@ -1034,6 +1105,11 @@ function GGUI.draw_card(faction, i, s)
             cap = GGUI.loc("pick_button")
         elseif asking then
             cap = "[[col:yellow]]" .. GGUI.loc("confirm") .. "[[/col]]"
+        elseif not ok and (fav_now or 0) < cost_now then
+            -- RED WHERE FAVOUR FALLS SHORT, as it read before 2026-10-04 and as the price
+            -- does, whatever else shuts it (asked in game 2026-10-05). CA's red measures
+            -- 3.2:1 on the button art, under the 4.5:1 rule - chosen for the hue asked for.
+            cap = "[[col:red]]" .. cap .. "[[/col]]"
         elseif not ok then
             cap = "[[col:" .. GGUI.LOCK_COL .. "]]" .. cap .. "[[/col]]"
         end
@@ -1065,17 +1141,69 @@ function GGUI.card_body(s, tip)
     return body
 end
 
--- WHAT STANDS BETWEEN THE PLAYER AND A SERVICE, after its name: CA's padlock, then the
--- reason in the name's own colour - CA's locked-item look. It was red until 2026-10-04: red
--- measured 2.2:1 on the card's bronze and CA's orange 4.4:1, both under the 4.5:1 every text
--- cell here is held to. LOCK_COL (db/ui_colours "orange", FFAD5B; CA's own loc uses the
--- name) marks the dead Buy caption and the Court's deadline, where it measures clear.
--- A full path, as the faction list's flags are written.
+-- WHAT STANDS BETWEEN THE PLAYER AND A SERVICE: CA's padlock, then the reason in red, on
+-- its own plate just past the name (card_need). Red on the bare bronze measured 2.2:1, so
+-- from 2026-10-04 the reason went in the name's colour - and blended into the card, seen
+-- in game 2026-10-05. The plate is the race's cost-box art, which red reads on.
+-- LOCK_COL (db/ui_colours "orange", FFAD5B) marks a dead Buy caption that favour does not
+-- explain, and the Court's deadline. A full path, as the faction list's flags are written.
 GGUI.LOCK_ICON = "ui/skins/default/icon_padlock.png"
 GGUI.LOCK_COL = "orange"
 
-function GGUI.lock_tag(text)
-    return "  [[img:" .. GGUI.LOCK_ICON .. "]][[/img]]" .. text
+function GGUI.need_tag(text)
+    return "[[img:" .. GGUI.LOCK_ICON .. "]][[/img]] [[col:red]]" .. text .. "[[/col]]"
+end
+
+-- THE PLATE'S PLACE, in design px from the card: the name's start, LABEL_TX's 6px inset,
+-- the name as the game measures it, then NEED_GAP. Never past NEED_RIGHT, the price box's
+-- edge less its 6px; a name too long for both lets the plate cover its end instead.
+-- NEED_PAD mirrors gen_guilds_ui.NEED_PAD, the text inset each side. NEED_DX remembers the
+-- place per card, so a re-layout (place_card) does not drop the plate on the name.
+GGUI.NEED_PAD, GGUI.NEED_GAP, GGUI.NEED_RIGHT = 10, 8, 590
+GGUI.NEED_DX = {}
+
+function GGUI.card_id(card)
+    local ok, id = pcall(function() return card:Id() end)
+    return ok and id or tostring(card)
+end
+
+-- Design px a string draws at in c's font: markup out, each [[img:]] as GGUI.FLAG_W.
+function GGUI.text_w(c, s)
+    local bare, n = string.gsub(s, "%[%[img:.-%]%]%[%[/img%]%]", "")
+    bare = string.gsub(bare, "%[%[/?col[^%]]*%]%]", "")
+    local ok, w = pcall(function() return c:TextDimensionsForText(bare) end)
+    if not ok or type(w) ~= "number" then return nil end
+    return w / GGUI.text_ratio() + n * GGUI.FLAG_W
+end
+
+-- text nil hides the plate, as every card that is not a shut service needs.
+function GGUI.show_need(card, name, text)
+    local c = comp("card_need", card)
+    if not c then return end
+    local id = GGUI.card_id(card)
+    if not text then
+        GGUI.NEED_DX[id] = nil
+        set_text(c, "")
+        pcall(function() c:SetVisible(false) end)
+        return
+    end
+    local w = math.floor((GGUI.text_w(c, text) or 140) + 2 * GGUI.NEED_PAD + 0.5)
+    local nw = GGUI.text_w(comp("card_name", card) or c, name)
+    local dx = GGUI.NEED_RIGHT - w
+    if nw then
+        dx = math.min(math.floor(GGUI.CARD_CHILD_XY.card_name[1] + 6 + nw
+                                 + GGUI.NEED_GAP + 0.5), dx)
+    end
+    GGUI.NEED_DX[id] = dx
+    set_text(c, text)
+    pcall(function()
+        local _, h = c:Dimensions()
+        c:SetCanResizeWidth(true)
+        c:Resize(GGUI.px(w), h)
+        c:SetVisible(true)
+        local cx, cy = card:Position()
+        c:MoveTo(cx + GGUI.px(dx), cy + GGUI.px(GGUI.CARD_CHILD_XY.card_need[2]))
+    end)
 end
 
 function GGUI.card_state(faction, s)
@@ -1253,6 +1381,7 @@ function GGUI.draw_bounties(faction)
             local eb = comp("card_buy", card)
             if eb then pcall(function() eb:SetVisible(false) end) end
         elseif card then
+            GGUI.show_need(card)
             set_text(comp("card_name", card), GGUI.bounty_title(o))
             set_text(comp("card_desc_1", card), GGUI.bounty_target_label(o))
 
@@ -1354,6 +1483,7 @@ end
 -- The same six children on any card, including the pick card on the root.
 function GGUI.fill_card(card, icon, name, l1, l2, right, button, enabled, tip)
     if not card then return end
+    GGUI.show_need(card)
     set_text(comp("card_name", card), name or "")
     set_text(comp("card_desc_1", card), l1 or "")
     set_text(comp("card_desc_2", card), l2 or "")
@@ -1625,28 +1755,57 @@ function GGUI.refresh()
             -- Empire's lighter bar. The words carry it, and the hover says the rest.
             line = line .. "   -" .. upkeep .. GGUI.loc("per_turn")
         end
+        local head, tag = GGUI.loc_guild(guild), GG.tag(faction)
+        -- THE RIVAL GIVES WAY BEFORE IT OVERLAPS: its full name, then without the article,
+        -- then into the hover. Unmeasurable keeps it on the bar, as it always was.
+        local rival_tip = ""
         local rival = GG.RIVALS[guild]
         local share = GG.setting("rate_rivalry") or 0
         if rival and share > 0 then
-            line = line .. "   " .. GGUI.loc("rival") .. " " .. GGUI.loc_guild(rival)
+            local name = GGUI.loc_guild(rival)
+            local full = line .. "   " .. GGUI.loc("rival") .. " " .. name
+            local short = line .. "   " .. GGUI.loc("rival") .. " "
+                          .. (string.gsub(name, "^The ", ""))
+            if GGUI.header_fits(head, full, tag) ~= false then
+                line = full
+            elseif GGUI.header_fits(head, short, tag) then
+                line = short
+            else
+                rival_tip = "||" .. GGUI.loc("rival") .. " " .. name
+            end
+        end
+        -- HALLS STANDING for this guild, once there is one (GG.count_halls, turn start).
+        --
+        -- IN THE HEADER ONLY WHERE IT FITS, measured (GGUI.header_fits); otherwise, and
+        -- whenever the engine will not measure, in the hover.
+        local hh = GG.halls[faction] and GG.halls[faction][guild]
+        local halls_tip = ""
+        if hh and hh.n > 0 and GG.setting("guild_halls") ~= false then
+            local stat = string.format(GGUI.loc("halls_stat"), hh.n)
+            local with = line .. "   " .. stat
+            if GGUI.header_fits(head, with, tag) then
+                line = with
+            else
+                halls_tip = "||" .. stat
+            end
         end
         -- THE GUILD'S OWN DESCRIPTION, then what the upkeep is and when it starts. Said
         -- even before it bites, so a player reads the rule in the first twenty turns
         -- rather than discovering it as a rank quietly going backwards on turn 26.
         local tip = GGUI.loc_guild_desc(guild)
-        tip = tip .. GGUI.upkeep_tip(upkeep, GG.turn_now())
-        set_header(GGUI.loc_guild(guild), line, tip)
+        tip = tip .. GGUI.upkeep_tip(upkeep, GG.turn_now()) .. rival_tip .. halls_tip
+        set_header(head, line, tip)
         -- WHAT THIS GUILD PAID, AND FOR WHAT. See GGUI.earned_line.
         local now, last = GG.earned(faction)
         set_named_text("gg_earned", GGUI.earned_line(now, last, guild))
-        set_tooltip(comp("gg_earned"), GGUI.earned_tip(now, last, guild))
+        set_tooltip(comp("gg_earned"), GGUI.earned_tip(now, last, guild, faction))
     elseif GGUI.TAB == 5 then
         -- The Help tab's header is its table of contents: which chapter, and how many
         -- there are, so the arrows read as pages rather than as something that might
         -- change the subject.
         set_header(GGUI.loc("help_t" .. GGUI.HELP_PAGE),
                    GGUI.loc("hdr_help") .. "   " .. GGUI.HELP_PAGE .. " "
-                   .. GGUI.loc("help_of") .. " " .. GGUI.HELP_PAGES,
+                   .. GGUI.loc("help_of") .. " " .. GGUI.help_page_count(),
                    GGUI.loc("standing_help"))
     elseif GGUI.TAB == 6 then
         set_header(GGUI.loc("tab_log"),
@@ -1654,11 +1813,12 @@ function GGUI.refresh()
                    .. GGUI.loc("help_of") .. " " .. GGUI.log_pages(faction),
                    GGUI.loc("log_help"))
     elseif GGUI.TAB == 4 then
-        -- The Court pages, but its header names the view AND the guild the arrows are
-        -- pointing at, because two of its three cards are about that guild.
+        -- The Court pages, but its header names the guild the arrows are pointing at,
+        -- because two of its three cards are about that guild. NO TAGLINE in the figures:
+        -- "The Daemonsmiths" beside it plus a four-digit reputation ran the two cells into
+        -- each other in game (2026-10-04); the tab button names the view already.
         set_header(GGUI.loc_guild(guild),
-                   GGUI.loc("hdr_court") .. "   " .. GGUI.loc_rank(rank) .. "   "
-                   .. GGUI.loc("reputation") .. " " .. rep,
+                   GGUI.loc_rank(rank) .. "   " .. GGUI.loc("reputation") .. " " .. rep,
                    GGUI.loc("court_intro"))
     else
         -- A header that names the view, not a guild the view does not show. The
@@ -2105,7 +2265,7 @@ function GGUI.earned_line(now, last, guild)
            .. (ltotal > 0 and ("+" .. ltotal) or GGUI.loc("earned_none"))
 end
 
-function GGUI.earned_tip(now, last, guild)
+function GGUI.earned_tip(now, last, guild, faction)
     local function block(head, by)
         local parts, total, held = earned_parts(by)
         local out = head .. " " .. (total > 0 and ("+" .. total) or GGUI.loc("earned_none"))
@@ -2116,8 +2276,7 @@ function GGUI.earned_tip(now, last, guild)
         end
         return out
     end
-    local cap = GG.setting("cap_" .. guild)
-    if cap == nil then cap = GG.CAP[guild] or 0 end
+    local cap = GG.guild_cap(guild, faction)
     local limit = GGUI.loc("earned_no_limit")
     if cap > 0 then
         limit = GGUI.loc("earned_limit") .. " " .. cap .. ". " .. GGUI.loc("earned_help")
@@ -2393,6 +2552,9 @@ function GGUI.draw_standings(faction)
             -- description followed it and made 14 lines (2026-09-28); it is one click
             -- away, on the Guilds tab's rank line.
             local tip = GGUI.table_lines(L.guild, faction)
+            if L.faction_key and GG.has_seat(L.faction_key, L.guild) then
+                tip = tip .. "||" .. GGUI.loc("holds_seat")
+            end
             local note = GGUI.lead_note(L.guild, faction)
             if note ~= "" then tip = tip .. "||" .. GGUI.loc(note) end
             if w.moved and w.moved[slot] then
@@ -2428,8 +2590,17 @@ function GGUI.page_now()
     return GGUI.PAGE
 end
 
+-- GGUI.HELP_PAGES is the count every race has; a race with halls reads one chapter more.
+function GGUI.help_page_count()
+    local me = GGUI.me()
+    if me and GG.halls_here(me) and GG.setting("guild_halls") ~= false then
+        return GGUI.HELP_PAGES + 1
+    end
+    return GGUI.HELP_PAGES
+end
+
 function GGUI.page_max()
-    if GGUI.TAB == 5 then return GGUI.HELP_PAGES end
+    if GGUI.TAB == 5 then return GGUI.help_page_count() end
     if GGUI.TAB == 6 then
         local ok, me = pcall(function() return cm:get_local_faction_name(true) end)
         return GGUI.log_pages(ok and me or nil)
@@ -2566,8 +2737,23 @@ end
 
 -- THE TARGET AS IT TRAVELS. GG.target_from_wire rebuilds it on every machine: a
 -- building as the selected region, research as nothing, the rest as the key or cqi.
+-- WHAT IS LEFT TO PAY ON THE CURRENT RESEARCH, read where only the buyer's UI can read it,
+-- and sent with the purchase so every machine grants the same points (GG.payload). nil
+-- when unreadable, which falls back to the old instant-research call.
+function GGUI.research_left(faction)
+    local ok, left = pcall(function()
+        local f = cm:get_faction(faction)
+        if not f or f:is_null_interface() then return nil end
+        return tonumber(common.get_context_value("CcoCampaignFaction", f:command_queue_index(),
+            "TechnologyManagerContext.CurrentResearchingTechnologyContext.ResearchPointsCost"))
+    end)
+    if ok and left and left > 0 then return math.floor(left) end
+    return nil
+end
+
 function GGUI.wire_target(s, faction)
-    if not s or s.kind == "research" then return "" end
+    if not s then return "" end
+    if s.kind == "research" then return tostring(GGUI.research_left(faction) or "") end
     if s.kind == "building" and not s.hostile then return GGUI.selected_region() or "" end
     local t = GGUI.pick_target(s, faction)
     if t == nil then return "" end
@@ -3500,6 +3686,7 @@ GGUI.MCT_NAMES = {
         khanate = "The Khanate",
         overseers = "The Overseers",
         slavers = "The Slavers",
+        temple = "The Temple of Hashut",
     },
     ["_emp"] = {
         brass = "The Merchant Guilds",
@@ -3508,6 +3695,7 @@ GGUI.MCT_NAMES = {
         khanate = "The Thieves' Guild",
         overseers = "The Masons' Guild",
         slavers = "The Free Companies",
+        temple = "The Colleges of Magic",
     },
     ["_dwf"] = {
         brass = "The Merchant Clans",
@@ -3516,6 +3704,7 @@ GGUI.MCT_NAMES = {
         khanate = "The Rangers",
         overseers = "The Miners' Guild",
         slavers = "The Grudge-Settlers",
+        temple = "The Ancestor Temples",
     },
     ["_brt"] = {
         brass = "The Wine Merchants",
@@ -3524,6 +3713,7 @@ GGUI.MCT_NAMES = {
         khanate = "The Forest Outlaws",
         overseers = "The Castle-Wrights",
         slavers = "The Crusaders",
+        temple = "The Grail Pilgrims",
     },
     ["_cth"] = {
         brass = "The Caravan Masters",
@@ -3532,6 +3722,7 @@ GGUI.MCT_NAMES = {
         khanate = "The Crow Society",
         overseers = "The Bastion Builders",
         slavers = "The Punitive Host",
+        temple = "The Celestial Temples",
     },
     ["_ksl"] = {
         brass = "The Erengrad Merchants",
@@ -3540,6 +3731,7 @@ GGUI.MCT_NAMES = {
         khanate = "The Oblast Smugglers",
         overseers = "The Stanitsa Builders",
         slavers = "The Ungol Raiders",
+        temple = "The Great Orthodoxy",
     },
     ["_def"] = {
         brass = "The Karond Kar Traders",
@@ -3548,6 +3740,7 @@ GGUI.MCT_NAMES = {
         khanate = "The Khainite Assassins",
         overseers = "The Naggarond Builders",
         slavers = "The Black Ark Corsairs",
+        temple = "The Brides of Khaine",
     },
     ["_hef"] = {
         brass = "The Lothern Merchants",
@@ -3556,6 +3749,16 @@ GGUI.MCT_NAMES = {
         khanate = "The Shadow Warriors",
         overseers = "The Ulthuan Masons",
         slavers = "The Ellyrian Reavers",
+        temple = "The Cult of Asuryan",
+    },
+    ["_skv"] = {
+        brass = "The Warpstone Traders",
+        immortals = "The Stormvermin",
+        daemonsmiths = "The Skryre Warlocks",
+        khanate = "The Eshin Assassins",
+        overseers = "The Moulder Breeders",
+        slavers = "The Slave-Masters",
+        temple = "The Grey Seers",
     },
     ["_gen"] = {
         brass = "The Merchant Houses",
@@ -3564,6 +3767,7 @@ GGUI.MCT_NAMES = {
         khanate = "The Shadow Guild",
         overseers = "The Builders' Guild",
         slavers = "The Raiders' Guild",
+        temple = "The Faith Guild",
     },
 }
 -- END GENERATED: GGUI.MCT_NAMES

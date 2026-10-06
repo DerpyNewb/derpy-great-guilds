@@ -38,7 +38,7 @@ UI_FILES = [
     "Modding Files/pack/ui/campaign ui/derpy_gg_opener.twui.xml",
     # Each race's own panel and card (gen_guilds_ui.FRAMES); GGUI.frame_path creates them.
 ] + ["Modding Files/pack/ui/campaign ui/derpy_gg_%s_%s.twui.xml" % (kind, race)
-     for race in ("brt", "cth", "def", "dwf", "emp", "hef", "ksl")
+     for race in ("brt", "cth", "def", "dwf", "emp", "hef", "ksl", "skv")
      for kind in ("panel", "card")]
 MCT_FILE = "Modding Files/pack/script/mct/settings/derpy_great_guilds.lua"
 MODEL_LUA = SCRIPTS[0]
@@ -57,6 +57,42 @@ ART_DIRS = [
 # packs only our own files out of it - never the whole folder the way ART_DIRS does.
 BUNDLE_ICON_DIR = "ui/campaign ui/effect_bundles"
 BUNDLE_ICON_PREFIX = "derpy_gg_"
+
+
+# THE HALL ICONS live in the shared building icon folder, so only derpy_gg_hall_*.png is
+# packed out of it. building_culture_variants.icon names the stem; a missing file draws
+# no building picture.
+HALL_ICON_DIR = "ui/buildings/icons"
+HALL_ICON_PREFIX = "derpy_gg_hall_"
+# The Guild Halls tab icons (building_sets.icon, a full path) live in the same folder.
+TAB_ICON_PREFIX = "derpy_gg_tab_halls"
+
+
+def _check_hall_icons():
+    """Every icon stem hall_tables() writes into a variant row must be staged."""
+    rows = G.build().get("building_culture_variants", [])
+    stems = {r["icon"] for r in rows if r.get("icon", "").startswith(HALL_ICON_PREFIX)}
+    if not stems:
+        raise SystemExit("REFUSING: build() emits no hall building_culture_variants icons")
+    bad = sorted(s for s in stems if not os.path.isfile(
+        "Modding Files/pack/%s/%s.png" % (HALL_ICON_DIR, s)))
+    if bad:
+        raise SystemExit("REFUSING: hall icon(s) not staged under %s: %s"
+                         % (HALL_ICON_DIR, ", ".join(bad)))
+
+
+def _check_tab_icons():
+    """Every building_sets.icon build() emits must be a staged file under this folder, or the
+    tab draws the magenta placeholder square."""
+    rows = G.build().get("building_sets", [])
+    if len(rows) != len(G.HALL_TAGS):
+        raise SystemExit("REFUSING: build() emits %d building_sets rows, wanted %d"
+                         % (len(rows), len(G.HALL_TAGS)))
+    bad = sorted(r["icon"] for r in rows if not (
+        r["icon"].startswith(HALL_ICON_DIR + "/" + TAB_ICON_PREFIX)
+        and os.path.isfile("Modding Files/pack/" + r["icon"])))
+    if bad:
+        raise SystemExit("REFUSING: Guild Halls tab icon(s) not staged: " + ", ".join(bad))
 
 
 def _check_bundle_icons():
@@ -133,7 +169,14 @@ LOC_DEST = "text/db/derpy_great_guilds.loc"
 
 for _t in ("campaign_groups", "campaign_group_members",
            "campaign_group_member_criteria_values", "event_feed_message_events",
-           "effects", "building_effects_junction", "effect_bonus_value_ids_unit_sets"):
+           "effects", "building_effects_junction", "effect_bonus_value_ids_unit_sets",
+           # The guild halls (stage 1): the eleven tables hall_tables() adds.
+           "building_superchains", "building_chains", "building_levels",
+           "building_upgrades_junction", "building_culture_variants",
+           "building_chain_set_items", "building_set_to_building_junctions",
+           "building_chain_availability_sets", "building_instances", "building_sets",
+           "building_units_allowed", "cai_construction_system_building_values",
+           "settlement_type_to_building_chains_junctions"):
     DB_DEST[_t] = "db/%s_tables/derpy_great_guilds" % _t
 
 
@@ -381,6 +424,12 @@ def _pack_files():
             for name in sorted(os.listdir(disk)):
                 out.append((os.path.abspath(os.path.join(disk, name)),
                             folder + "/" + name))
+    disk = "Modding Files/pack/" + HALL_ICON_DIR
+    if os.path.isdir(disk):
+        for name in sorted(os.listdir(disk)):
+            if name.startswith((HALL_ICON_PREFIX, TAB_ICON_PREFIX)) and name.endswith(".png"):
+                out.append((os.path.abspath(os.path.join(disk, name)),
+                            HALL_ICON_DIR + "/" + name))
     disk = "Modding Files/pack/" + BUNDLE_ICON_DIR
     if os.path.isdir(disk):
         for name in sorted(os.listdir(disk)):
@@ -572,6 +621,8 @@ if __name__ == "__main__":
     _check_ui_file_list()
     _check_art_dirs()
     _check_bundle_icons()
+    _check_hall_icons()
+    _check_tab_icons()
     bad = verify()
     for b in bad:
         print("REFUSING: " + b)

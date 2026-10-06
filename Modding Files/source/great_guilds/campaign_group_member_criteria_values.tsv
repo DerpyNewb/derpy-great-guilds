@@ -48,6 +48,12 @@ derpy_gg_event_feed_lead_hef	5083
 derpy_gg_event_feed_rank_hef	5084
 derpy_gg_event_feed_hunted_hef	5085
 derpy_gg_event_feed_rotation_hef	5086
+derpy_gg_event_feed_hit_skv	5091
+derpy_gg_event_feed_demand_skv	5092
+derpy_gg_event_feed_lead_skv	5093
+derpy_gg_event_feed_rank_skv	5094
+derpy_gg_event_feed_hunted_skv	5095
+derpy_gg_event_feed_rotation_skv	5096
 derpy_gg_event_feed_hit_gen	5031
 derpy_gg_event_feed_demand_gen	5032
 derpy_gg_event_feed_lead_gen	5033
