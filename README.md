@@ -9,8 +9,8 @@ the AI factions of your own race to lead each guild.
 It is script-driven and self-contained. It overrides no CA file, and every DB row it adds
 has its own key.
 
-**Status:** playable, and tested live in Chaos Dwarf and Empire campaigns. It is not on the Steam
-Workshop yet. Nine races take part, each with its own guild names, ranks, services and
+**Status:** playable, and tested live in Chaos Dwarf and Empire campaigns. It is on the Steam
+Workshop as [Derpy's Great Guilds](https://steamcommunity.com/sharedfiles/filedetails/?id=3815248936). Nine races take part, each with its own guild names, ranks, services and
 bounties (see [Which races take part](#which-races-take-part)).
 
 ## The seven guilds
