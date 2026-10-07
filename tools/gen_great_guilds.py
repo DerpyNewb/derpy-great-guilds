@@ -219,186 +219,173 @@ SERVICES = [
     {"key": "alms_and_bribes", "guild": "brass", "rank": 2, "cost": 50, "cd": 8,
      "kind": "bundle", "turns": 8, "name": "Temple Bribes",
      "effects": [("wh3_main_effect_corruption_reduction_events", "faction_to_province_own", -5)],
-     "text": "{v0:+d} corruption in every province you hold, for {turns} turns.",
+     "text": '{v0:+d} corruption in every province you own for {turns} turns.',
      # The Chaos Dwarfs gain public order FROM Chaos corruption (RACE_UNWANTED_EFFECTS).
      "for_tag": {"": {
          "effects": [("wh3_main_effect_corruption_chaos_events", "faction_to_province_own", 5)],
-         "text": "{v0:+d} Chaos corruption in every province you hold, for {turns} turns."},
+         "text": '{v0:+d} Chaos corruption in every province you own for {turns} turns.'},
          # The Grey Seers EARN from Skaven corruption: CA's own +5 pair
          # (wh3_dlc29_skv_magic_pull_moon_filler_token_skaven_corruption).
          "_skv": {
          "effects": [("wh3_main_effect_corruption_skaven_events", "faction_to_province_own", 5)],
-         "text": "{v0:+d} Skaven corruption in every province you hold, for {turns} turns."}}},
+         "text": '{v0:+d} Skaven corruption in every province you own for {turns} turns.'}}},
     {"key": "mercenary_contract", "guild": "brass", "rank": 2, "cost": 50, "cd": 8,
      "kind": "bundle", "turns": 6, "name": "Hobgoblin Contracts",
      "effects": [("wh_main_effect_force_all_campaign_recruitment_cost_all", "faction_to_force_own", -15)],
-     "text": "{v0:+d}% recruitment cost in all your armies, for {turns} turns."},
+     "text": '{v0:+d}% recruitment cost in all your armies for {turns} turns.'},
     {"key": "guild_loan", "guild": "brass", "rank": 3, "cost": 150, "cd": 12,
      "kind": "gold", "value": 6000, "turns": 10, "with_bundle": True, "drawback": True,
      "name": "Brass Loan",
      "effects": [("wh_main_effect_economy_gdp_mod_all", "faction_to_region_own", -10)],
-     "text": "Adds {value:,} gold to your treasury at once. Repaid as {v0:+d}% income from "
-             "all buildings, for {turns} turns."},
+     "text": 'Adds {value:,} gold to your treasury at once. Repaid as {v0:+d}% income from all buildings for {turns} turns.'},
     {"key": "industry_charter", "guild": "brass", "rank": 3, "cost": 150, "cd": 12,
      "kind": "bundle", "turns": 10, "name": "Furnace Charter",
      "effects": [("wh_dlc07_effect_economy_gdp_mod_industry", "faction_to_region_own", 20)],
-     "text": "{v0:+d}% income from industry buildings, for {turns} turns."},
+     "text": '{v0:+d}% income from industry buildings for {turns} turns.'},
     {"key": "treasury_seal", "guild": "brass", "rank": 4, "cost": 400, "cd": 16,
      "kind": "bundle", "turns": 12, "name": "The Tablet Seal",
      "effects": [("wh_main_effect_force_all_campaign_upkeep", "faction_to_force_own", -20)],
-     "text": "{v0:+d}% upkeep for all your units, for {turns} turns."},
+     "text": '{v0:+d}% upkeep for all your units for {turns} turns.'},
     {"key": "bought_peace", "guild": "brass", "rank": 4, "cost": 400, "cd": 16,
      "kind": "bundle", "turns": 12, "name": "Bought Obedience",
      "effects": [("wh_main_effect_public_order_events", "faction_to_province_own", 3)],
-     "text": "{v0:+d} public order in every province you hold, for {turns} turns."},
+     "text": '{v0:+d} public order in every province you own for {turns} turns.'},
     {"key": "forced_march", "guild": "immortals", "rank": 2, "cost": 50, "cd": 8,
      "kind": "army", "turns": 3, "name": "Forced March",
      "effects": [("wh_main_effect_force_all_campaign_movement_range", "force_to_force_own", 20)],
-     "text": "{v0:+d}% campaign movement for the army you select, for {turns} turns."},
+     "text": '{v0:+d}% campaign movement for the army you select for {turns} turns.'},
     {"key": "drillmasters", "guild": "immortals", "rank": 2, "cost": 50, "cd": 8,
      "kind": "bundle", "turns": 8, "name": "Drillmasters",
      "effects": [("wh_main_effect_force_all_campaign_experience_base_all", "faction_to_force_own", 1)],
-     "text": "Units you recruit start {v0:+d} rank higher, for {turns} turns."},
+     "text": 'Units you recruit start {v0:+d} rank higher for {turns} turns.'},
     {"key": "battle_standard", "guild": "immortals", "rank": 3, "cost": 150, "cd": 12,
      "kind": "army", "turns": 5, "name": "Bull Standard",
      "effects": [("wh_main_effect_force_stat_leadership", "force_to_force_own", 8)],
-     "text": "{v0:+d} leadership for the army you select, for {turns} turns."},
+     "text": '{v0:+d} leadership for the army you select for {turns} turns.'},
     {"key": "field_surgeons", "guild": "immortals", "rank": 3, "cost": 150, "cd": 12,
      "kind": "army", "turns": 2, "heal": True, "name": "Flesh-Menders",
      "effects": [("wh_main_effect_force_all_campaign_replenishment_rate", "force_to_force_own", 30)],
-     "text": "Heals the army you select at once, then {v0:+d}% replenishment for it, for "
-             "{turns} turns."},
+     "text": 'Heals the army you select at once, then {v0:+d}% replenishment for it for {turns} turns.'},
     {"key": "veteran_cadre", "guild": "immortals", "rank": 4, "cost": 400, "cd": 16,
      "kind": "bundle", "turns": 10, "name": "Blooded Cadre",
      "effects": [("wh_main_effect_force_all_campaign_experience_base_all", "faction_to_force_own", 3)],
-     "text": "Units you recruit start {v0:+d} ranks higher, for {turns} turns."},
+     "text": 'Units you recruit start {v0:+d} ranks higher for {turns} turns.'},
     {"key": "warlords_honour", "guild": "immortals", "rank": 4, "cost": 400, "cd": 16,
      "kind": "ranks", "value": 5, "name": "Honour of the Immortals",
      "text": "Adds {value} ranks to the lord or hero you select."},
     {"key": "ward_runes", "guild": "daemonsmiths", "rank": 2, "cost": 50, "cd": 8,
      "kind": "army", "turns": 5, "name": "Daemonic Wards",
      "effects": [("wh_main_effect_force_stat_ward_save", "force_to_force_own", 10)],
-     "text": "{v0:+d}% ward save for the army you select, for {turns} turns."},
+     "text": '{v0:+d}% ward save for the army you select for {turns} turns.'},
     {"key": "spirit_siphon", "guild": "daemonsmiths", "rank": 2, "cost": 50, "cd": 8,
      "kind": "bundle", "turns": 8, "name": "Siphon the Winds",
      "effects": [("wh3_main_effect_winds_of_magic_events", "faction_to_force_own", 5)],
-     "text": "{v0:+d} Winds of Magic power reserve for all your armies, for {turns} turns.",
+     "text": '{v0:+d} Winds of Magic power reserve for all your armies for {turns} turns.',
      # The Dwarfs have no spellcasters (RACE_UNWANTED_EFFECTS): runes against magic instead.
      "for_tag": {"_dwf": {
          "effects": [("wh_main_effect_force_stat_magic_resistance", "faction_to_force_own", 10)],
-         "text": "{v0:+d}% spell resistance for all your armies, for {turns} turns."}}},
+         "text": '{v0:+d}% spell resistance for all your armies for {turns} turns.'}}},
     {"key": "forged_arms", "guild": "daemonsmiths", "rank": 3, "cost": 150, "cd": 12,
      "kind": "bundle", "turns": 8, "name": "Daemon-Forged Arms",
      "effects": [("wh_main_effect_force_stat_weapon_strength", "faction_to_force_own", 10)],
-     "text": "{v0:+d}% weapon strength for all your armies, for {turns} turns."},
+     "text": '{v0:+d}% weapon strength for all your armies for {turns} turns.'},
     {"key": "master_gunners", "guild": "daemonsmiths", "rank": 3, "cost": 150, "cd": 12,
      "kind": "bundle", "turns": 10, "name": "Gunnery Masters",
      "effects": [("wh_main_effect_force_stat_missile_damage_artillery", "faction_to_force_own", 20)],
-     "text": "{v0:+d}% missile damage for all your artillery, for {turns} turns.",
+     "text": '{v0:+d}% missile damage for all your artillery for {turns} turns.',
      # all_land_artillery misses these two rosters (RACE_UNWANTED_EFFECTS): their war
      # machines are class chariot. CA's own Chaos Dwarf artillery effect, and for Kislev
      # the minted clone of it on CA's War Sleds and Little Grom set (MINTED_EFFECTS).
      "for_tag": {
          "": {"effects": [("wh3_dlc23_effect_force_stat_missile_strength_chd_artillery",
                            "faction_to_force_own", 20)],
-              "text": "{v0:+d}% missile damage for all your artillery and Iron Daemons, "
-                      "for {turns} turns."},
+              "text": '{v0:+d}% missile damage for all your artillery and Iron Daemons for {turns} turns.'},
          "_ksl": {"effects": [("derpy_gg_effect_missile_strength_ksl_war_machines",
                                "faction_to_force_own", 20)],
-                  "text": "{v0:+d}% missile damage for all your War Sleds and Little Grom, "
-                          "for {turns} turns."}}},
+                  "text": '{v0:+d}% missile damage for all your War Sleds and Little Grom for {turns} turns.'}}},
     {"key": "great_work", "guild": "daemonsmiths", "rank": 4, "cost": 400, "cd": 16,
      "kind": "research", "turns": 10, "with_bundle": True, "name": "The Great Work",
      "effects": [("wh_main_effect_technology_research_rate_mod", "faction_to_faction_own", 30)],
-     "text": "Completes the technology you are researching at once, then {v0:+d}% research "
-             "rate, for {turns} turns."},
+     "text": 'Completes the technology you are researching at once, then {v0:+d}% research rate for {turns} turns.'},
     {"key": "arsenal", "guild": "daemonsmiths", "rank": 4, "cost": 400, "cd": 16,
      "kind": "bundle", "turns": 10, "name": "Arsenal of Zharr",
      "effects": [("wh_main_effect_force_stat_missile_damage", "faction_to_force_own", 15)],
-     "text": "{v0:+d}% missile damage for all your armies, for {turns} turns."},
+     "text": '{v0:+d}% missile damage for all your armies for {turns} turns.'},
     {"key": "bribed_guards", "guild": "khanate", "rank": 2, "cost": 50, "cd": 8,
      "kind": "bundle", "turns": 8, "name": "Bribed Guards",
      "effects": [("wh_main_effect_agent_action_success_chance", "faction_to_character_own", 15)],
-     "text": "{v0:+d}% success chance for your heroes' actions, for {turns} turns."},
+     "text": "{v0:+d}% success chance for your heroes' actions for {turns} turns."},
     {"key": "blooded_agents", "guild": "khanate", "rank": 2, "cost": 50, "cd": 8,
      "kind": "bundle", "turns": 10, "name": "Blooded Agents",
      "effects": [("wh_main_effect_agent_recruitment_xp_all_agents", "faction_to_province_own", 2)],
-     "text": "Heroes you recruit start {v0:+d} ranks higher, for {turns} turns."},
+     "text": 'Heroes you recruit start {v0:+d} ranks higher for {turns} turns.'},
     {"key": "hired_blade", "guild": "khanate", "rank": 3, "cost": 150, "cd": 12,
      "kind": "ranks", "value": 3, "name": "Hired Blade",
      "text": "Adds {value} ranks to the lord or hero you select."},
     {"key": "sow_discord", "guild": "khanate", "rank": 3, "cost": 150, "cd": 12,
      "kind": "enemy_settlement", "turns": 5, "name": "Sow Discord",
      "effects": [("wh_main_effect_public_order_events", "region_to_province_own_unseen", -8)],
-     "text": "{v0:+d} public order in the enemy province you select, for {turns} turns."},
+     "text": '{v0:+d} public order in the enemy province you select for {turns} turns.'},
     {"key": "web_of_whispers", "guild": "khanate", "rank": 4, "cost": 400, "cd": 16,
      "kind": "bundle", "turns": 15, "name": "Web of Whispers",
      "effects": [("wh2_main_effect_agent_cap_increase_all_heroes", "faction_to_faction_own_unseen", 1)],
-     "text": "{v0:+d} to the number of each kind of hero you may recruit, for {turns} turns."},
+     "text": '{v0:+d} to the number of each kind of hero you may recruit for {turns} turns.'},
     {"key": "poisoned_wells", "guild": "khanate", "rank": 4, "cost": 400, "cd": 16,
      "kind": "enemy_settlement", "turns": 8, "name": "Poisoned Wells",
      "effects": [("wh_main_effect_province_growth_events", "region_to_province_own", -25),
                  ("wh_main_effect_force_all_campaign_replenishment_rate", "region_to_force_own", -25)],
-     "text": "{v0:+d} growth in the enemy province you select, and {v1:+d}% replenishment "
-             "for armies there, for {turns} turns."},
+     "text": '{v0:+d} growth in the enemy province you select, and {v1:+d}% replenishment for armies there for {turns} turns.'},
     {"key": "granaries", "guild": "overseers", "rank": 2, "cost": 50, "cd": 8,
      "kind": "settlement", "turns": 8, "name": "Fattened Herds",
      "effects": [("wh_main_effect_province_growth_events", "region_to_province_own", 25)],
-     "text": "{v0:+d} growth in the province of the settlement you select, for {turns} turns."},
+     "text": '{v0:+d} growth in the province of the settlement you select for {turns} turns.'},
     {"key": "road_gangs", "guild": "overseers", "rank": 2, "cost": 50, "cd": 8,
      "kind": "bundle", "turns": 8, "name": "Road Gangs",
      "effects": [("wh_main_effect_force_all_campaign_movement_range", "faction_to_force_own", 10)],
-     "text": "{v0:+d}% campaign movement for all your armies, for {turns} turns."},
+     "text": '{v0:+d}% campaign movement for all your armies for {turns} turns.'},
     {"key": "enforcers", "guild": "overseers", "rank": 3, "cost": 150, "cd": 12,
      "kind": "settlement", "turns": 8, "name": "Overseer Enforcers",
      "effects": [("wh_main_effect_public_order_events", "region_to_province_own_unseen", 6)],
-     "text": "{v0:+d} public order in the province of the settlement you select, for "
-             "{turns} turns."},
+     "text": '{v0:+d} public order in the province of the settlement you select for {turns} turns.'},
     {"key": "fortify", "guild": "overseers", "rank": 3, "cost": 150, "cd": 12,
      "kind": "settlement", "turns": 8, "name": "Fortify the Walls",
      "effects": [("wh_main_effect_force_stat_melee_defence", "region_to_force_own", 10),
                  ("wh_main_effect_force_army_campaign_siege_defend_attrition", "region_to_force_own", -20)],
-     "text": "{v0:+d} melee defence for the defenders of the settlement you select, and "
-             "{v1:+d}% attrition for them under siege, for {turns} turns."},
+     "text": '{v0:+d} melee defence for the defenders of the settlement you select, and {v1:+d}% attrition for them under siege for {turns} turns.'},
     {"key": "master_builders", "guild": "overseers", "rank": 4, "cost": 400, "cd": 16,
      "kind": "bundle", "turns": 10, "name": "Master Builders",
      "effects": [("wh3_main_effect_building_construction_time_add_mod_all", "faction_to_region_own", -1)],
-     "text": "{v0:+d} turn to every building's construction time (never below one), for "
-             "{turns} turns."},
+     "text": "{v0:+d} turn to every building's construction time (never below one) for {turns} turns."},
     {"key": "public_works", "guild": "overseers", "rank": 4, "cost": 400, "cd": 16,
      "kind": "bundle", "turns": 10, "name": "Monuments to Hashut",
      "effects": [("wh_main_effect_public_order_events", "faction_to_province_own", 4),
                  ("wh_main_effect_province_growth_events", "faction_to_province_own", 30)],
-     "text": "{v0:+d} public order and {v1:+d} growth in every province you hold, for "
-             "{turns} turns."},
+     "text": '{v0:+d} public order and {v1:+d} growth in every province you own for {turns} turns.'},
     {"key": "raiding_parties", "guild": "slavers", "rank": 2, "cost": 50, "cd": 8,
      "kind": "bundle", "turns": 8, "name": "Raiding Parties",
      "effects": [("wh_main_effect_force_all_campaign_raid_income", "faction_to_force_own", 50)],
-     "text": "{v0:+d}% income from raiding for all your armies, for {turns} turns."},
+     "text": '{v0:+d}% income from raiding for all your armies for {turns} turns.'},
     {"key": "captive_markets", "guild": "slavers", "rank": 2, "cost": 50, "cd": 8,
      "kind": "bundle", "turns": 8, "name": "Captive Markets",
      "effects": [("wh_main_effect_force_all_campaign_post_battle_loot_mod", "faction_to_faction_own", 20)],
-     "text": "{v0:+d}% gold from battles you win, for {turns} turns."},
+     "text": '{v0:+d}% gold from battles you win for {turns} turns.'},
     {"key": "slave_levy", "guild": "slavers", "rank": 3, "cost": 150, "cd": 12,
      "kind": "bundle", "turns": 6, "name": "Slave Levy",
      "effects": [("wh_main_effect_unit_recruitment_points", "faction_to_province_own", 1)],
-     "text": "{v0:+d} local recruitment capacity in every province you hold, for "
-             "{turns} turns."},
+     "text": '{v0:+d} local recruitment capacity in every province you own for {turns} turns.'},
     {"key": "pit_fights", "guild": "slavers", "rank": 3, "cost": 150, "cd": 12,
      "kind": "bundle", "turns": 10, "name": "Pit Fights",
      "effects": [("wh3_dlc20_effect_xp_gain_all_units", "faction_to_force_own", 25)],
-     "text": "{v0:+d}% experience from battle for all your units, for {turns} turns."},
+     "text": '{v0:+d}% experience from battle for all your units for {turns} turns.'},
     {"key": "great_hunt", "guild": "slavers", "rank": 4, "cost": 400, "cd": 16,
      "kind": "bundle", "turns": 10, "name": "The Great Hunt",
      "effects": [("wh_main_effect_force_all_campaign_movement_range", "faction_to_force_own", 15),
                  ("wh_main_effect_force_all_campaign_raid_income", "faction_to_force_own", 50)],
-     "text": "{v0:+d}% campaign movement and {v1:+d}% raiding income for all your armies, "
-             "for {turns} turns."},
+     "text": '{v0:+d}% campaign movement and {v1:+d}% raiding income for all your armies for {turns} turns.'},
     {"key": "scorched_earth", "guild": "slavers", "rank": 4, "cost": 400, "cd": 16,
      "kind": "enemy_settlement", "turns": 8, "name": "Scorched Earth",
      "effects": [("wh_main_effect_economy_gdp_mod_all", "region_to_region_own", -25)],
-     "text": "{v0:+d}% income from buildings in the enemy settlement you select, for "
-             "{turns} turns."},
+     "text": '{v0:+d}% income from buildings in the enemy settlement you select for {turns} turns.'},
     # ------------------------------------------------------------ race services ---
     # RACE SERVICES (2026-09-29 spec §6): drawn for their own race only, named and written
     # in that race's words. Mirrors the Lua rows field for field (check_service_mirror).
@@ -433,20 +420,18 @@ SERVICES = [
      "effects": [("wh_main_effect_public_order_events", "region_to_province_own_unseen", 8),
                  ("wh3_main_effect_corruption_reduction_events",
                   "region_to_province_own_unseen", -5)],
-     "text": "{v0:+d} public order and {v1:+d} corruption in the province of the settlement "
-             "you select, for {turns} turns."},
+     "text": '{v0:+d} public order and {v1:+d} corruption in the province of the settlement you select for {turns} turns.'},
     {"key": "electors_muster", "guild": "immortals", "rank": 3, "cost": 150, "cd": 12,
      "kind": "race_army", "room": True, "race": "wh_main_emp_empire",
      "units": "wh_main_emp_inf_swordsmen,wh_main_emp_inf_handgunners",
      "name": "Elector's Muster",
-     "text": "A regiment of Swordsmen and one of Handgunners join the army you select, as "
-             "far as it has room."},
+     "text": 'A regiment of Swordsmen and one of Handgunners join the army you select, if there is room.'},
     {"key": "unity_of_empire", "guild": "brass", "rank": 4, "cost": 400, "cd": 16,
      "kind": "bundle", "turns": 15, "race": "wh_main_emp_empire",
      "name": "Unity of the Empire",
      "effects": [("wh_main_faction_political_diplomacy_mod_empire",
                   "faction_to_faction_own", 30)],
-     "text": "{v0:+d} relations with every Empire faction, for {turns} turns."},
+     "text": '{v0:+d} relations with every Empire faction for {turns} turns.'},
     {"key": "electors_favour", "guild": "khanate", "rank": 3, "cost": 150, "cd": 12,
      "kind": "race", "race": "wh_main_emp_empire", "value": 1, "lord": "Karl Franz",
      "name": "Elector's Favour",
@@ -467,8 +452,7 @@ SERVICES = [
     {"key": "supply_train", "guild": "brass", "rank": 3, "cost": 150, "cd": 12,
      "kind": "race", "race": "wh_main_emp_empire", "lord": "Markus Wulfhart",
      "name": "Imperial Supply Train",
-     "text": "Imperial Supply arrives now: the choice of reinforcements it brings, at your "
-             "current Acclaim."},
+     "text": 'Receive Imperial Supply now, with reinforcement choices based on your current Acclaim.'},
     {"key": "prayers_motherland", "guild": "daemonsmiths", "rank": 2, "cost": 50, "cd": 8,
      "kind": "resource", "race": "wh3_main_ksl_kislev", "resource": "wh3_main_ksl_devotion",
      "factor": "events", "value": 75, "name": "Prayers to the Motherland",
@@ -484,13 +468,12 @@ SERVICES = [
              "Orthodoxy."},
     {"key": "ladys_blessing", "guild": "immortals", "rank": 2, "cost": 50, "cd": 8,
      "kind": "race_army", "race": "wh_main_brt_bretonnia", "name": "The Lady's Blessing",
-     "text": "The army you select receives the Blessing of the Lady, as if it had won a "
-             "battle. Not an army already blessed."},
+     "text": 'Bless your selected army as if it had won a battle. It must not already have the Blessing of the Lady.'},
     {"key": "peasant_levies", "guild": "brass", "rank": 3, "cost": 150, "cd": 12,
      "kind": "bundle", "turns": 10, "race": "wh_main_brt_bretonnia", "name": "Peasant Levies",
      "effects": [("wh_dlc07_effect_peasant_increase_base_amount",
                   "faction_to_faction_own_unseen", 3)],
-     "text": "{v0:+d} peasants available to your faction, for {turns} turns."},
+     "text": '{v0:+d} peasants available to your faction for {turns} turns.'},
     {"key": "tales_of_valour", "guild": "daemonsmiths", "rank": 4, "cost": 400, "cd": 16,
      "kind": "race", "race": "wh_main_brt_bretonnia", "value": 150,
      "name": "Tales of Valour", "text": "Adds {value} Chivalry."},
@@ -499,13 +482,12 @@ SERVICES = [
      "text": "The Winds of Magic compass can be turned again at once."},
     {"key": "ivory_cargo", "guild": "brass", "rank": 3, "cost": 150, "cd": 12,
      "kind": "race", "race": "wh3_main_cth_cathay", "value": 200, "name": "Ivory Road Cargo",
-     "text": "Adds {value} cargo to every caravan of yours still on its way."},
+     "text": 'Adds {value} cargo to each of your caravans still travelling.'},
     {"key": "mandate_of_heaven", "guild": "overseers", "rank": 4, "cost": 400, "cd": 16,
      "kind": "bundle", "turns": 10, "race": "wh3_main_cth_cathay", "name": "Mandate of Heaven",
      "effects": [("wh_main_effect_public_order_events", "faction_to_province_own", 4),
                  ("wh3_main_effect_corruption_reduction_events", "faction_to_province_own", -8)],
-     "text": "{v0:+d} public order and {v1:+d} corruption in every province you hold, for "
-             "{turns} turns."},
+     "text": '{v0:+d} public order and {v1:+d} corruption in every province you own for {turns} turns.'},
     {"key": "slave_coffles", "guild": "slavers", "rank": 2, "cost": 50, "cd": 8,
      "kind": "resource", "race": "wh2_main_def_dark_elves", "resource": "def_slaves",
      "factor": "missions", "value": 500, "name": "Slave Coffles",
@@ -519,7 +501,7 @@ SERVICES = [
      "kind": "bundle", "turns": 10, "race": "wh2_main_def_dark_elves", "name": "Black Ark Tithe",
      "effects": [("wh3_main_pooled_resource_def_slaves_buildings_gained",
                   "faction_to_faction_own_unseen", 80)],
-     "text": "{v0:+d} Slaves every turn, for {turns} turns."},
+     "text": '{v0:+d} Slaves every turn for {turns} turns.'},
     {"key": "whispers_at_court", "guild": "khanate", "rank": 2, "cost": 50, "cd": 8,
      "kind": "race", "race": "wh2_main_hef_high_elves", "value": 30,
      # NOT "Whispers at Court" (the spec's name): the High Elf flavour already calls the
@@ -539,12 +521,11 @@ SERVICES = [
     {"key": "hashut_blessing", "guild": "temple", "rank": 2, "cost": 50, "cd": 8,
      "kind": "army", "turns": 5, "name": "Blessing of Hashut",
      "effects": [("wh_main_effect_force_stat_leadership", "force_to_force_own", 6)],
-     "text": "{v0:+d} leadership for the army you select, for {turns} turns."},
+     "text": '{v0:+d} leadership for the army you select for {turns} turns.'},
     {"key": "forge_sermons", "guild": "temple", "rank": 2, "cost": 50, "cd": 8,
      "kind": "settlement", "turns": 8, "name": "Sermons in the Forge",
      "effects": [("wh_main_effect_public_order_events", "region_to_province_own_unseen", 4)],
-     "text": "{v0:+d} public order in the province of the settlement you select, for "
-             "{turns} turns."},
+     "text": '{v0:+d} public order in the province of the settlement you select for {turns} turns.'},
     {"key": "temple_tithe", "guild": "temple", "rank": 2, "cost": 50, "cd": 8,
      "kind": "gold", "value": 2000, "name": "The Tithe",
      "text": "Adds {value:,} gold to your treasury at once."},
@@ -552,45 +533,39 @@ SERVICES = [
      "kind": "army", "turns": 5, "name": "Zeal",
      "effects": [("wh_main_effect_force_stat_melee_attack", "force_to_force_own", 6),
                  ("wh_main_effect_force_stat_charge_bonus_pct", "force_to_force_own", 10)],
-     "text": "{v0:+d} melee attack and {v1:+d}% charge bonus for the army you select, for "
-             "{turns} turns."},
+     "text": '{v0:+d} melee attack and {v1:+d}% charge bonus for the army you select for {turns} turns.'},
     {"key": "purge_unclean", "guild": "temple", "rank": 3, "cost": 150, "cd": 12,
      "kind": "settlement", "turns": 8, "name": "Purge the Unclean",
      "effects": [("wh3_main_effect_corruption_reduction_events",
                   "region_to_province_own_unseen", -6)],
-     "text": "{v0:+d} corruption in the province of the settlement you select, for "
-             "{turns} turns.",
+     "text": '{v0:+d} corruption in the province of the settlement you select for {turns} turns.',
      # The Chaos Dwarfs gain public order FROM Chaos corruption (RACE_UNWANTED_EFFECTS).
      "for_tag": {"": {
          "effects": [("wh_main_effect_public_order_events",
                       "region_to_province_own_unseen", 6)],
-         "text": "{v0:+d} public order in the province of the settlement you select, for "
-                 "{turns} turns."}}},
+         "text": '{v0:+d} public order in the province of the settlement you select for {turns} turns.'}}},
     {"key": "anathema", "guild": "temple", "rank": 3, "cost": 150, "cd": 12,
      "kind": "enemy_settlement", "turns": 5, "name": "Anathema",
      "effects": [("wh_main_effect_public_order_events", "region_to_province_own_unseen", -6)],
-     "text": "{v0:+d} public order in the enemy province you select, for {turns} turns."},
+     "text": '{v0:+d} public order in the enemy province you select for {turns} turns.'},
     {"key": "holy_war", "guild": "temple", "rank": 4, "cost": 400, "cd": 16,
      "kind": "bundle", "turns": 10, "name": "The Holy War",
      "effects": [("wh_main_effect_force_stat_leadership", "faction_to_force_own", 6),
                  ("wh_main_effect_force_all_campaign_replenishment_rate",
                   "faction_to_force_own", 10)],
-     "text": "{v0:+d} leadership and {v1:+d}% replenishment in all your armies, for "
-             "{turns} turns."},
+     "text": '{v0:+d} leadership and {v1:+d}% replenishment in all your armies for {turns} turns.'},
     {"key": "miracle", "guild": "temple", "rank": 4, "cost": 400, "cd": 16,
      "kind": "army", "turns": 2, "heal": True, "name": "Miracle",
      "effects": [("wh_main_effect_force_stat_leadership", "force_to_force_own", 10)],
-     "text": "Heals the army you select at once, then {v0:+d} leadership for it, for "
-             "{turns} turns."},
+     "text": 'Heals the army you select at once, then {v0:+d} leadership for it for {turns} turns.'},
     {"key": "consecration", "guild": "temple", "rank": 4, "cost": 400, "cd": 16,
      "kind": "bundle", "turns": 12, "name": "Consecration",
      "effects": [("wh_main_effect_public_order_events", "faction_to_province_own", 4),
                  ("wh3_main_effect_corruption_reduction_events", "faction_to_province_own", -3)],
-     "text": "{v0:+d} public order and {v1:+d} corruption in every province you hold, for "
-             "{turns} turns.",
+     "text": '{v0:+d} public order and {v1:+d} corruption in every province you own for {turns} turns.',
      "for_tag": {"": {
          "effects": [("wh_main_effect_public_order_events", "faction_to_province_own", 4)],
-         "text": "{v0:+d} public order in every province you hold, for {turns} turns."}}},
+         "text": '{v0:+d} public order in every province you own for {turns} turns.'}}},
     # THE SKAVEN'S RACE SERVICES (2026-10-05), AFTER the temple rows: cooldowns are saved
     # by position. Food Tithe's 20 is CA's own quest payload; Breeding Season's 3 is CA's
     # rite bundle value; Shadows of Eshin replaces the Menace Below (not a resource).
@@ -601,14 +576,13 @@ SERVICES = [
      "kind": "race_army", "room": True, "race": "wh2_main_skv_skaven",
      "units": "wh2_main_skv_inf_gutter_runners_0,wh2_main_skv_inf_night_runners_0",
      "name": "Shadows of Eshin",
-     "text": "A unit of Gutter Runners and one of Night Runners join the army you select, as "
-             "far as it has room."},
+     "text": 'A unit of Gutter Runners and one of Night Runners join the army you select, if there is room.'},
     {"key": "breeding_season", "guild": "overseers", "rank": 4, "cost": 400, "cd": 16,
      "kind": "bundle", "turns": 10, "race": "wh2_main_skv_skaven",
      "name": "Breeding Season",
      "effects": [("wh2_main_pooled_resource_skaven_food_rite",
                   "faction_to_faction_own_unseen", 3)],
-     "text": "{v0:+d} Food every turn, for {turns} turns."},
+     "text": '{v0:+d} Food every turn for {turns} turns.'},
 ]
 # THE GREY SEERS EARN FROM SKAVEN CORRUPTION (skaven spec §4.1), so the two temple services
 # that reduce corruption take the Chaos Dwarf override: public order only.
@@ -762,8 +736,7 @@ DEMAND_KINDS = {
     "tribute":  {"name": "Tribute",
                  "blurb": "The guild wants gold, and it wants it now."},
     "renounce": {"name": "Renunciation",
-                 "blurb": "The guild wants you to burn what you have built with its "
-                          "rival. The favour goes; the reputation stays."},
+                 "blurb": 'The guild demands your Favour with its rival. You lose that Favour, but keep your Reputation.'},
 }
 
 
@@ -930,20 +903,17 @@ SERVICE_BLURB = {
     "writ_monopoly":   None,
     "long_ledger":     None,
     "oathbound_draft": None,
-    "hire_immortals":  "A company already sworn and already armed. Adds one unit of "
-                       "Infernal Guard (Great Weapons) to an army of your choosing.",
+    "hire_immortals":  'Armed and under oath. Adds one unit of Infernal Guard (Great Weapons) to an army you choose.',
     "astragoths_levy": None,
     "forge_rite":      None,
-    "bound_blueprint": "The Daemonsmiths hand over work already done. Completes the "
-                       "technology you are currently researching, at once.",
+    "bound_blueprint": 'The Daemonsmiths deliver their findings. Instantly completes the technology you are researching.',
     "bound_ordnance":  None,
     "hobgoblin_eyes":  "Hobgoblin scouts sell what they have seen. Reveals one region "
                        "through the shroud for this turn.",
     "knife_in_dark":   None,
     "khans_price":     None,
     "lash_the_gangs":  None,
-    "raise_ziggurat":  "Overseer gangs work through the night. Upgrades one of your "
-                       "buildings to its next level at once, and free.",
+    "raise_ziggurat":  'Overseer gangs work through the night. Instantly upgrades one of your buildings to its next level for free.',
     "works_of_zharr":  None,
     "coffle_drive":    None,
     "slave_tithe":     "A column of slaves, delivered. Adds 400 armaments and 800 raw "
@@ -954,28 +924,13 @@ SERVICE_BLURB = {
 
 # What each guild is, how you earn its reputation, and what its ladder pays.
 GUILD_DESC = {
-    "brass":        "Tally-keepers and caravan masters. They record every debt in the "
-                    "Dark Lands and forgive none of them.||You earn reputation from your "
-                    "income every turn, and from their own buildings.",
-    "immortals":    "The oath-sworn companies who fight for whoever holds their bond, "
-                    "and never break it.||You earn reputation from battles you win - double "
-                    "when you win outnumbered - and from their own buildings.",
-    "daemonsmiths": "Those who bind daemons into iron. They sell knowledge, never "
-                    "cheaply.||You earn reputation from technologies you complete, and "
-                    "from their own buildings.",
-    "khanate":      "Hobgoblin knives and hobgoblin eyes, for hire to anyone, "
-                    "including against you.||You earn reputation when your heroes succeed "
-                    "at an action, and from their own buildings.",
-    "overseers":    "The gang-masters who drive the building of Zharr Naggrund and "
-                    "everything like it.||You earn reputation when a settlement grows a "
-                    "level, and from any building no other guild claims.",
-    "slavers":      "The coffle-drivers. Their ledger is measured in bodies, and it is "
-                    "always growing.||You earn reputation from settlements you sack - more "
-                    "from those you raze - and from their own buildings.",
-    "temple":       "The priests of the Father of Darkness, who tend his altars and feed his "
-                    "fires with whatever the forges cannot use.||You earn reputation from "
-                    "provinces in good order, from battles won against the Dwarfs, and from "
-                    "their own buildings.",
+    "brass":        'Tally-keepers and caravan masters. They record every debt in the Dark Lands and forgive none.||Earn Reputation from your income each turn and by completing their buildings.',
+    "immortals":    'Oath-sworn companies. They fight for whoever holds their bond and never break it.||Earn Reputation by winning battles, double when outnumbered, and completing their buildings.',
+    "daemonsmiths": 'They bind daemons into iron and charge dearly for their knowledge.||Earn Reputation by researching technologies and completing their buildings.',
+    "khanate":      'Hobgoblin spies and killers for hire. Your enemies can pay them too.||Earn Reputation through successful hero actions and by completing their buildings.',
+    "overseers":    'Gang-masters building Zharr Naggrund and the works beyond it.||Earn Reputation when a settlement grows a level and by completing buildings no other guild claims.',
+    "slavers":      'Coffle-drivers counting bodies in their ledgers.||Earn Reputation by sacking settlements, more by razing them, and by completing their buildings.',
+    "temple":       'Priests of the Father of Darkness. What the forges cannot use feeds his altar fires.||Earn Reputation from provinces in good order, victories against the Dwarfs and their buildings.',
 }
 # THE TWO HALVES. The flavour sentence is written per race in FLAVOURS below; the earn
 # sentence is mechanical and every race shares it.
@@ -1064,17 +1019,14 @@ BOUNTIES = {
     "immortals":    ("lord_kill", "Break Their Champion",
                      "A general is being spoken of with respect. Correct that."),
     "daemonsmiths": ("region_sack", "Strip the Works",
-                     "Everything in that place that was forged can be forged again, "
-                     "here. Bring it back in pieces."),
+                     'What was forged there can be forged again here. Bring it back in pieces.'),
     "khanate":      ("lord_kill", "A Knife for a Name",
-                     "The Khanate does not care how it is done, only that the name "
-                     "stops being used."),
+                     'The Khanate cares nothing for the method. Make sure the name is no longer spoken.'),
     "overseers":    ("region_take", "Hands, Not Ashes",
                      "Take it whole. Ashes cannot be put to work, and the Overseers "
                      "are counting hands."),
     "slavers":      ("region_sack", "Fill the Coffles",
-                     "Empty it. The column that leaves is the payment, and it is "
-                     "measured in bodies."),
+                     'Empty it. The slaves you march out are the payment.'),
     "temple":       ("lord_kill", "An Offering for Hashut",
                      "A general of the Dwarfs leads an army in the open. The priests want "
                      "that life on the altar."),
@@ -1106,31 +1058,19 @@ def family_kind(g, fam):
 # the plan: the spec asked for each race's own voice; the guild's name carries it, and
 # 117 hand-written lines can replace any of these later as data only).
 BOUNTY_TEXT = {
-    "job_coffers":   ("Fill the Coffers", "{guild} want to see your treasury full, and "
-                      "kept full. Hold the sum named on the Great Guilds panel."),
-    "job_champion":  ("Prove a Champion", "{guild} want a champion worth the name. Raise "
-                      "one of your lords or heroes to the rank named on the Great Guilds "
-                      "panel."),
-    "job_research":  ("Commissioned Work", "{guild} have paid in advance for a piece of "
-                      "learning. Research the technology named on the Great Guilds panel."),
-    "job_captives":  ("Fill the Pens", "{guild} are short of hands. Take the number of "
-                      "captives named on the Great Guilds panel in your battles."),
-    "job_build":     ("A Commission", "{guild} want one of their own buildings raised in "
-                      "your lands. It is named on the Great Guilds panel."),
-    "hero_sabotage": ("Crack the Walls", "{guild} want a settlement weakened from inside. "
-                      "Send your heroes against the one named on the Great Guilds panel."),
-    "hero_harry":    ("Harry Their March", "{guild} want an army slowed and bled before it "
-                      "arrives. Send your heroes against the one named on the Great Guilds "
-                      "panel."),
-    "hero_strike":   ("A Quiet Word", "{guild} want a name to stop being spoken. Wound or "
-                      "kill the lord or hero named on the Great Guilds panel with a hero."),
+    "job_coffers":   ("Fill the Coffers", '{guild} demand full coffers. Hold the amount shown on the Great Guilds panel.'),
+    "job_champion":  ("Prove a Champion", '{guild} need a proven champion. Raise a lord or hero to the rank shown on the Great Guilds panel.'),
+    "job_research":  ("Commissioned Work", '{guild} have commissioned new research. Complete the technology shown on the Great Guilds panel.'),
+    "job_captives":  ("Fill the Pens", '{guild} need more hands. Take the number of battle captives shown on the Great Guilds panel.'),
+    "job_build":     ("A Commission", '{guild} have ordered a building in your lands. The Great Guilds panel names it.'),
+    "hero_sabotage": ("Crack the Walls", '{guild} want a settlement weakened from within. Send heroes against the one shown on the Great Guilds panel.'),
+    "hero_harry":    ("Harry Their March", '{guild} want an army delayed and bloodied. Send heroes against the one shown on the Great Guilds panel.'),
+    "hero_strike":   ("A Quiet Word", '{guild} have marked someone for death. Use a hero to wound or kill the lord or hero shown on the Great Guilds panel.'),
 }
 HERO_OBJECTIVE_TEXT = {
-    "sabotage": "Succeed with two hero actions against the settlement named on the Great "
-                "Guilds panel.",
-    "harry": "Succeed with two hero actions against the army named on the Great Guilds "
-             "panel.",
-    "strike": "Wound or kill the character named on the Great Guilds panel with a hero.",
+    "sabotage": 'Complete two successful hero actions against the settlement shown on the Great Guilds panel.',
+    "harry": 'Complete two successful hero actions against the army shown on the Great Guilds panel.',
+    "strike": 'Use a hero to wound or kill the character shown on the Great Guilds panel.',
 }
 
 
@@ -1195,17 +1135,11 @@ FLAVOURS = {
         # The unit name matches vanilla's land_units_onscreen_name for
         # wh_main_emp_inf_greatswords, read with read_vanilla_loc on 2026-09-23.
         "blurbs": {
-            "caravan_levy": "The Merchant Guilds call in what they are owed. Adds 2,500 "
-                            "gold to your treasury at once.",
-            "hire_immortals": "A company already sworn and already armed. Adds one unit "
-                              "of Greatswords to an army of your choosing.",
-            "bound_blueprint": "The Engineers' School hands over work already done. "
-                               "Completes the technology you are currently researching, "
-                               "at once.",
-            "hobgoblin_eyes": "The Thieves' Guild sells what its ears have heard. Reveals "
-                              "one region through the shroud for this turn.",
-            "raise_ziggurat": "The Masons' Guild works through the night. Upgrades one of "
-                              "your buildings to its next level at once, and free.",
+            "caravan_levy": "The Merchant Guilds call in what they are owed. Adds 2,500 gold to your treasury now.",
+            "hire_immortals": "A sworn company, armed and ready. Adds one unit of Greatswords to your chosen army.",
+            "bound_blueprint": "The Engineers' School hands over its finished plans. Finishes your current research immediately.",
+            "hobgoblin_eyes": "The Thieves' Guild sells what its ears have heard. Reveals one region through the shroud this turn.",
+            "raise_ziggurat": "The Masons' Guild works through the night. Upgrades one of your buildings to its next level now, at no cost.",
             "slave_tithe": "The Free Companies send you your share of the take. Adds "
                            "3,000 gold to your treasury.",
         },
@@ -1215,29 +1149,24 @@ FLAVOURS = {
                      "books.",
             "immortals": "Veterans who swore their lives to an Elector Count's banner. "
                          "They sell that oath now, to whoever can carry it.",
-            "daemonsmiths": "Altdorf's engineers, who build what should not work and make "
-                            "it fire. They sell what they know, in instalments.",
-            "khanate": "Every tavern has a back room, and every back room has an ear. "
-                       "Their knives are for hire to anyone, including against you.",
+            "daemonsmiths": "Altdorf's engineers build what should not work and make it fire. Their knowledge comes in costly instalments.",
+            "khanate": "Every tavern has a back room, and every back room has an ear. Their knives are for hire, even against you.",
             "overseers": "The builders of every wall and temple from the Reikland to "
                          "Ostland, and the only ones who know where the foundations are "
                          "weak.",
-            "slavers": "Sell-swords and road-wardens paid in plunder. Their ledger is "
-                       "measured in what they carry home.",
+            "slavers": "Sell-swords and road-wardens paid in plunder. They count their earnings on the road home.",
         },
         "bounties": {
             "brass": ("Open the Market",
                       "The Merchant Guilds want that town's tolls paid in Altdorf. Take "
                       "it intact."),
             "immortals": ("A Duel for the Banner",
-                          "A general is being spoken of with respect. The Greatswords "
-                          "would like that corrected."),
+                          "A general has earned respect. The Greatswords mean to put an end to that."),
             "daemonsmiths": ("Salvage the Works",
                              "Whatever that place has built, the School wants on its own "
                              "benches. Bring it back in pieces."),
             "khanate": ("A Name Crossed Out",
-                        "The Guild does not care how it is done, only that the name "
-                        "stops being used."),
+                        "The Guild wants the bearer of that name silenced. The method is your choice."),
             "overseers": ("Stone Still Standing",
                           "Take it whole. The Masons want the walls left up, so they can "
                           "be paid to mend them."),
@@ -1279,29 +1208,21 @@ FLAVOURS = {
         # The unit name matches vanilla's land_units_onscreen_name for
         # wh_main_dwf_inf_hammerers, read with read_vanilla_loc on 2026-09-23.
         "blurbs": {
-            "caravan_levy": "The Merchant Clans collect on every road between the holds. "
-                            "Adds 2,500 gold to your treasury at once.",
-            "hire_immortals": "A company already sworn and already armed. Adds one unit "
-                              "of Hammerers to an army of your choosing.",
-            "bound_blueprint": "The Engineers' Guild parts with a secret, once. Completes "
-                               "the technology you are currently researching, at once.",
-            "hobgoblin_eyes": "The Rangers report what they have seen from the high "
-                              "passes. Reveals one region through the shroud "
-                              "for this turn.",
-            "raise_ziggurat": "The Miners' Guild works a double shift. Upgrades one of "
-                              "your buildings to its next level at once, and free.",
+            "caravan_levy": "The Merchant Clans collect on every road between the holds. Adds 2,500 gold to your treasury now.",
+            "hire_immortals": "Oathsworn warriors, armed and ready. Adds one unit of Hammerers to your chosen army.",
+            "bound_blueprint": "The Engineers' Guild sells you one guarded secret. Finishes your current research immediately.",
+            "hobgoblin_eyes": "The Rangers report what they have seen from the high passes. Reveals one region through the shroud this turn.",
+            "raise_ziggurat": "The Miners' Guild works a double shift. Upgrades one of your buildings to its next level now, at no cost.",
             "slave_tithe": "Oathgold paid to settle a grudge, and passed on to you. "
                            "Adds 250 Oathgold.",
         },
         "desc": {
-            "brass": "The traders of the Karaks, who remember every debt for as long as "
-                     "there is stone to write it on.",
+            "brass": "The traders of the Karaks remember every debt for as long as there is stone to write it on.",
             "immortals": "The king's own guard, sworn to the throne of their hold. Their "
                          "oath can be lent, never broken.",
             "daemonsmiths": "Keepers of secrets guarded since the first hold was dug. They "
                             "share them slowly, and never twice.",
-            "khanate": "Dwarfs who left the holds to watch the passes. They see "
-                       "everything that moves above ground, and sell it dearly.",
+            "khanate": "Dwarfs who left the holds to watch the passes. News of every movement above ground comes at a price.",
             "overseers": "The delvers and stone-cutters who carved every hold. Nothing is "
                          "built in the mountains without them.",
             "slavers": "The clans who take the Book of Grudges at its word. Every line "
@@ -1312,13 +1233,12 @@ FLAVOURS = {
                       "The Merchant Clans want that place back in their ledgers. Take it "
                       "intact."),
             "immortals": ("A Grudge on a Name",
-                          "A general has been boasting. The Hammerers would like that "
-                          "settled."),
+                          "A general boasts. The Hammerers want that settled."),
             "daemonsmiths": ("Recover the Craft",
                              "Whatever was forged in that place was likely stolen from us "
                              "first. Bring it back in pieces."),
             "khanate": ("Silence in the Passes",
-                        "The Rangers want the name stopped. How is their affair."),
+                        "The Rangers want that name silenced. Choose the method."),
             "overseers": ("Reclaim the Hold",
                           "Take it whole. The Miners' Guild wants tunnels, not rubble."),
             "slavers": ("Strike a Line",
@@ -1362,19 +1282,11 @@ FLAVOURS = {
             "great_coffle": "The Errantry War",
         },
         "blurbs": {
-            "caravan_levy": "The Wine Merchants collect the duties owed on every cask. "
-                            "Adds 2,500 gold to your treasury at once.",
-            "hire_immortals": "A lance of knights, already sworn and already horsed. "
-                              "Adds one unit of Knights of the Realm to an army of your "
-                              "choosing.",
-            "bound_blueprint": "The Grail Damsels share what the Lady has shown them. "
-                               "Completes the technology you are currently researching, "
-                               "at once.",
-            "hobgoblin_eyes": "The Forest Outlaws sell what they have seen from the "
-                              "trees. Reveals one region through the shroud "
-                              "for this turn.",
-            "raise_ziggurat": "The Castle-Wrights work through the night. Upgrades one "
-                              "of your buildings to its next level at once, and free.",
+            "caravan_levy": "The Wine Merchants collect the duties owed on every cask. Adds 2,500 gold to your treasury now.",
+            "hire_immortals": "A lance of knights, sworn and horsed. Adds one unit of Knights of the Realm to your chosen army.",
+            "bound_blueprint": "The Grail Damsels share what the Lady has shown them. Finishes your current research immediately.",
+            "hobgoblin_eyes": "The Forest Outlaws sell what they have seen from the trees. Reveals one region through the shroud this turn.",
+            "raise_ziggurat": "The Castle-Wrights work through the night. Upgrades one of your buildings to its next level now, at no cost.",
             "slave_tithe": "The Crusaders send home your share of the spoils. Adds 3,000 "
                            "gold to your treasury.",
         },
@@ -1387,8 +1299,7 @@ FLAVOURS = {
                             "They share it only with those they judge worthy.",
             "khanate": "Poachers and cutpurses who live beyond the law in the deep "
                        "forests. They will rob anyone, including you.",
-            "overseers": "The master masons who raise every keep and curtain wall in the "
-                         "dukedoms, and who know where each one is weak.",
+            "overseers": "Master masons who raise every keep and curtain wall in the dukedoms. They know where each is weak.",
             "slavers": "Knights and men-at-arms back from the Errantry Wars, paid in "
                        "what they carry home.",
         },
@@ -1397,14 +1308,11 @@ FLAVOURS = {
                       "The Wine Merchants want that town's trade flowing to Bordeleaux. "
                       "Take it intact."),
             "immortals": ("A Challenge of Honour",
-                          "A general is being spoken of with respect. The Knights Errant "
-                          "would like to test that."),
+                          "A general has earned respect. The Knights Errant mean to test it."),
             "daemonsmiths": ("Out of Unworthy Hands",
-                             "Whatever that place keeps, the Damsels want it taken from "
-                             "those who should not have it. Bring it back in pieces."),
+                             "The Damsels want that place's treasures taken from unworthy hands. Bring them back in pieces."),
             "khanate": ("A Name in the Forest",
-                        "The Outlaws do not care how it is done, only that the name "
-                        "stops being used."),
+                        "The Outlaws want that name silenced. They leave the method to you."),
             "overseers": ("A Keep Worth Keeping",
                           "Take it whole. The Castle-Wrights want a keep to improve, not "
                           "rubble."),
@@ -1444,17 +1352,11 @@ FLAVOURS = {
             "great_coffle": "The Great Expedition",
         },
         "blurbs": {
-            "caravan_levy": "The Caravan Masters collect on every road they travel. Adds "
-                            "2,500 gold to your treasury at once.",
-            "hire_immortals": "A company already sworn and already armed. Adds one unit "
-                              "of Celestial Dragon Guard to an army of your choosing.",
-            "bound_blueprint": "The Imperial Academy hands over work already done. "
-                               "Completes the technology you are currently researching, "
-                               "at once.",
-            "hobgoblin_eyes": "The Crow Society sells what its crows have seen. Reveals "
-                              "one region through the shroud for this turn.",
-            "raise_ziggurat": "The Bastion Builders work through the night. Upgrades one "
-                              "of your buildings to its next level at once, and free.",
+            "caravan_levy": "The Caravan Masters collect on every road they travel. Adds 2,500 gold to your treasury now.",
+            "hire_immortals": "A sworn company, armed and ready. Adds one unit of Celestial Dragon Guard to your chosen army.",
+            "bound_blueprint": "The Imperial Academy hands over its finished plans. Finishes your current research immediately.",
+            "hobgoblin_eyes": "The Crow Society sells what its crows have seen. Reveals one region through the shroud this turn.",
+            "raise_ziggurat": "The Bastion Builders work through the night. Upgrades one of your buildings to its next level now, at no cost.",
             "slave_tithe": "The Punitive Host sends back your share of the spoils. Adds "
                            "3,000 gold to your treasury.",
         },
@@ -1463,12 +1365,9 @@ FLAVOURS = {
                      "and come back heavier. Every province pays their tolls.",
             "immortals": "The Emperor's own warriors, sworn to the Celestial Court. "
                          "Their oath is lent to whoever the Court favours.",
-            "daemonsmiths": "The scholars and astromancers who keep the Empire's "
-                            "learning. They teach it slowly, and never for free.",
-            "khanate": "Informers, poisoners and watchers who sell what they learn at "
-                       "court. They work for anyone, including against you.",
-            "overseers": "The engineers who keep the Great Bastion standing, and who "
-                         "know where every wall is weak.",
+            "daemonsmiths": "The scholars and astromancers preserve the Empire's learning. Their lessons come slowly, never free.",
+            "khanate": "Informers, poisoners and watchers sell what they learn at court. They work for anyone, even against you.",
+            "overseers": "The engineers who keep the Great Bastion intact. They know the weakness of every wall.",
             "slavers": "Soldiers sent beyond the Bastion to punish the Emperor's "
                        "enemies. Their pay is what they bring back.",
         },
@@ -1477,14 +1376,12 @@ FLAVOURS = {
                       "The Caravan Masters want that town's markets on the Ivory Road. "
                       "Take it intact."),
             "immortals": ("A Lesson in Respect",
-                          "A general is being spoken of with respect. The Dragon Guard "
-                          "would like that corrected."),
+                          "A general has earned respect. The Dragon Guard mean to put an end to that."),
             "daemonsmiths": ("Collect the Texts",
                              "Whatever that place has written down, the Academy wants in "
                              "its archive. Bring it back in pieces."),
             "khanate": ("A Name Forgotten",
-                        "The Society does not care how it is done, only that the name "
-                        "stops being used."),
+                        "The Society wants that name forgotten. How you do it is your affair."),
             "overseers": ("Walls for the Empire",
                           "Take it whole. The Bastion Builders want walls to strengthen, "
                           "not rubble."),
@@ -1525,18 +1422,11 @@ FLAVOURS = {
             "great_coffle": "The Long Raid",
         },
         "blurbs": {
-            "caravan_levy": "The Erengrad Merchants collect on every ship and sledge. "
-                            "Adds 2,500 gold to your treasury at once.",
-            "hire_immortals": "A company already sworn and already armed. Adds one unit "
-                              "of Tzar Guard (Great Weapons) to an army of your "
-                              "choosing.",
-            "bound_blueprint": "The Ice Court parts with a secret, once. Completes the "
-                               "technology you are currently researching, at once.",
-            "hobgoblin_eyes": "The Oblast Smugglers sell what they have seen on the "
-                              "trails. Reveals one region through the shroud "
-                              "for this turn.",
-            "raise_ziggurat": "The Stanitsa Builders work before the thaw. Upgrades one "
-                              "of your buildings to its next level at once, and free.",
+            "caravan_levy": "The Erengrad Merchants collect on every ship and sledge. Adds 2,500 gold to your treasury now.",
+            "hire_immortals": "A sworn company, armed and ready. Adds one unit of Tzar Guard (Great Weapons) to your chosen army.",
+            "bound_blueprint": "The Ice Court sells you one guarded secret. Finishes your current research immediately.",
+            "hobgoblin_eyes": "The Oblast Smugglers sell what they have seen on the trails. Reveals one region through the shroud this turn.",
+            "raise_ziggurat": "The Stanitsa Builders work before the thaw. Upgrades one of your buildings to its next level now, at no cost.",
             "slave_tithe": "The Ungol Raiders send back your share of the take. Adds 150 "
                            "Devotion, or 3,000 gold to a faction without Devotion.",
         },
@@ -1545,28 +1435,22 @@ FLAVOURS = {
                      "and gold north. Every boyar owes them something.",
             "immortals": "The Tzar's own guard, the finest warriors in Kislev. Their "
                          "oath can be lent, never broken.",
-            "daemonsmiths": "The witches of the Ice Court, who keep what the winter "
-                            "teaches. They part with it slowly, and never for free.",
-            "khanate": "Smugglers who know every trail across the oblast and every ear "
-                       "in every stanitsa. They work for anyone, including against you.",
-            "overseers": "The builders of every palisade and stanitsa that holds the "
-                         "north, and the only ones who know where each is weak.",
-            "slavers": "Horse-raiders of the steppe who ride for pay and plunder. Their "
-                       "ledger is measured in what they carry home.",
+            "daemonsmiths": "The witches of the Ice Court keep the winter's secrets. They part with them slowly, and never for free.",
+            "khanate": "Smugglers who know every trail across the oblast and every ear in every stanitsa. They take work even against you.",
+            "overseers": "The builders of the palisades and stanitsas that hold the north. Only they know where each is weak.",
+            "slavers": "Horse-raiders of the steppe who ride for pay and plunder. They reckon their wages in what they carry home.",
         },
         "bounties": {
             "brass": ("Open the Market",
                       "The Erengrad Merchants want that town's trade in their ledgers. "
                       "Take it intact."),
             "immortals": ("A Duel in the Snow",
-                          "A general is being spoken of with respect. The Tzar Guard "
-                          "would like that corrected."),
+                          "A general has earned respect. The Tzar Guard mean to put an end to that."),
             "daemonsmiths": ("Claim the Lore",
                              "Whatever that place knows, the Ice Court wants. Bring it "
                              "back in pieces."),
             "khanate": ("Lost in the Snow",
-                        "The Smugglers do not care how it is done, only that the name "
-                        "stops being used."),
+                        "The Smugglers want that name silenced. They leave the method to you."),
             "overseers": ("Hold the Line",
                           "Take it whole. The Stanitsa Builders want walls that hold, "
                           "not rubble."),
@@ -1611,19 +1495,11 @@ FLAVOURS = {
             "great_coffle": "The Black Ark Raid",
         },
         "blurbs": {
-            "caravan_levy": "The Karond Kar Traders take their cut of every sale. Adds "
-                            "2,500 gold to your treasury at once.",
-            "hire_immortals": "A company already sworn and already armed. Adds one unit "
-                              "of Black Guard of Naggarond to an army of your choosing.",
-            "bound_blueprint": "The Convent of Ghrond parts with a secret, once. "
-                               "Completes the technology you are currently researching, "
-                               "at once.",
-            "hobgoblin_eyes": "The Khainite Assassins sell what they have seen from the "
-                              "shadows. Reveals one region through the shroud "
-                              "for this turn.",
-            "raise_ziggurat": "The Naggarond Builders drive the thralls through the "
-                              "night. Upgrades one of your buildings to its next level "
-                              "at once, and free.",
+            "caravan_levy": "The Karond Kar Traders take their cut of every sale. Adds 2,500 gold to your treasury now.",
+            "hire_immortals": "A sworn company, armed and ready. Adds one unit of Black Guard of Naggarond to your chosen army.",
+            "bound_blueprint": "The Convent of Ghrond sells you one guarded secret. Finishes your current research immediately.",
+            "hobgoblin_eyes": "The Khainite Assassins sell what they have seen from the shadows. Reveals one region through the shroud this turn.",
+            "raise_ziggurat": "The Naggarond Builders drive the thralls through the night. Upgrades one of your buildings to its next level now, at no cost.",
             "slave_tithe": "The Black Ark Corsairs send home your share of the plunder. "
                            "Adds 1,000 Slaves.",
         },
@@ -1633,13 +1509,10 @@ FLAVOURS = {
                      "something.",
             "immortals": "The Witch King's own guard, sworn to Naggarond and nothing "
                          "else. Their oath is lent only to those Malekith favours.",
-            "daemonsmiths": "The sorceresses of Ghrond, who keep the dark arts and "
-                            "answer to Morathi alone. They part with what they know "
-                            "slowly, and never for free.",
+            "daemonsmiths": "The sorceresses of Ghrond keep the dark arts and answer to Morathi alone. They part with secrets slowly, never free.",
             "khanate": "Assassins of the Temple of Khaine, who kill for the Lord of "
                        "Murder and for pay. They work for anyone, including against you.",
-            "overseers": "The builders of every tower and wall in Naggaroth, raised by "
-                         "thralls in the cold. They know where each one is weak.",
+            "overseers": "The builders of Naggaroth's towers and walls drive thralls through the cold. They know where each wall is weak.",
             "slavers": "The crews of the Black Arks, who raid every shore they can "
                        "reach. Their pay is what they carry home.",
         },
@@ -1648,14 +1521,12 @@ FLAVOURS = {
                       "The Karond Kar Traders want that town's trade in their ledgers. "
                       "Take it intact."),
             "immortals": ("A Test of Blades",
-                          "A general is being spoken of with respect. The Black Guard "
-                          "would like that corrected."),
+                          "A general has earned respect. The Black Guard mean to put an end to that."),
             "daemonsmiths": ("Plunder the Lore",
                              "Whatever that place knows, the Convent wants. Bring it "
                              "back in pieces."),
             "khanate": ("A Name for Khaine",
-                        "The Assassins do not care how it is done, only that the name "
-                        "stops being used."),
+                        "The Assassins want that name silenced. They leave the method to you."),
             "overseers": ("A Tower Worth Taking",
                           "Take it whole. The Naggarond Builders want walls to raise "
                           "higher, not rubble."),
@@ -1695,16 +1566,11 @@ FLAVOURS = {
             "great_coffle": "Ulthuan's Vengeance",
         },
         "blurbs": {
-            "caravan_levy": "The Lothern Merchants collect on every ship that docks. "
-                            "Adds 2,500 gold to your treasury at once.",
-            "hire_immortals": "A company already sworn and already armed. Adds one unit "
-                              "of Swordmasters of Hoeth to an army of your choosing.",
-            "bound_blueprint": "The Loremasters hand over work already done. Completes "
-                               "the technology you are currently researching, at once.",
-            "hobgoblin_eyes": "The Shadow Warriors share what they have seen. Reveals "
-                              "one region through the shroud for this turn.",
-            "raise_ziggurat": "The Ulthuan Masons work through the night. Upgrades one "
-                              "of your buildings to its next level at once, and free.",
+            "caravan_levy": "The Lothern Merchants collect on every ship that docks. Adds 2,500 gold to your treasury now.",
+            "hire_immortals": "A sworn company, armed and ready. Adds one unit of Swordmasters of Hoeth to your chosen army.",
+            "bound_blueprint": "The Loremasters hand over their finished plans. Finishes your current research immediately.",
+            "hobgoblin_eyes": "The Shadow Warriors share what they have seen. Reveals one region through the shroud this turn.",
+            "raise_ziggurat": "The Ulthuan Masons work through the night. Upgrades one of your buildings to its next level now, at no cost.",
             "slave_tithe": "The Ellyrian Reavers send back your share of the take. Adds "
                            "3,000 gold to your treasury.",
         },
@@ -1714,12 +1580,10 @@ FLAVOURS = {
             "immortals": "The warriors of the White Tower of Hoeth, sworn to the blade "
                          "for centuries. Their oath is lent to whoever the Tower "
                          "favours.",
-            "daemonsmiths": "The Loremasters of Hoeth, who keep the greatest library in "
-                            "the world. They teach it slowly, and never for free.",
+            "daemonsmiths": "The Loremasters of Hoeth keep the world's greatest library. Its lessons are neither quick nor free.",
             "khanate": "The scouts of Nagarythe, who fight a secret war nobody else "
                        "sees. They work for anyone, including against you.",
-            "overseers": "The masons who raise every tower and sea wall in Ulthuan, and "
-                         "who know where each one is weak.",
+            "overseers": "The masons who raise Ulthuan's towers and sea walls know where each is weak.",
             "slavers": "The riders of Ellyrion, who range far past the borders and bring "
                        "back what they find. Their pay is what they carry home.",
         },
@@ -1728,14 +1592,12 @@ FLAVOURS = {
                       "The Lothern Merchants want that town's trade on their ships. Take "
                       "it intact."),
             "immortals": ("A Lesson in Blades",
-                          "A general is being spoken of with respect. The Swordmasters "
-                          "would like that corrected."),
+                          "A general has earned respect. The Swordmasters mean to put an end to that."),
             "daemonsmiths": ("Recover the Lore",
                              "Whatever that place knows, the Loremasters want kept safe. "
                              "Bring it back in pieces."),
             "khanate": ("A Shadow Falls",
-                        "The Shadow Warriors do not care how it is done, only that the "
-                        "name stops being used."),
+                        "The Shadow Warriors want that name silenced. They leave the method to you."),
             "overseers": ("Walls for Ulthuan",
                           "Take it whole. The Masons want walls to strengthen, not "
                           "rubble."),
@@ -1777,48 +1639,36 @@ FLAVOURS = {
             "great_coffle": "The Great Taking",
         },
         "blurbs": {
-            "caravan_levy": "The Warpstone Traders call in what they are owed, and some of "
-                            "what they are not. Adds 2,500 gold to your treasury at once.",
-            "hire_immortals": "Black-furred and loyal for as long as the pay holds. Adds "
-                              "one unit of Stormvermin to an army of your choosing.",
-            "bound_blueprint": "Clan Skryre sells you work it stole from someone else. "
-                               "Completes the technology you are currently researching, "
-                               "at once.",
-            "hobgoblin_eyes": "Clan Eshin's watchers tell you what they saw. Reveals one "
-                              "region through the shroud for this turn.",
-            "raise_ziggurat": "Clan Moulder's packs dig through the night. Upgrades one of "
-                              "your buildings to its next level at once, and free.",
+            "caravan_levy": "The Warpstone Traders call in what they are owed, and some of what they are not. Adds 2,500 gold to your treasury now.",
+            "hire_immortals": "Black-furred and loyal for as long as the pay holds. Adds one unit of Stormvermin to your chosen army.",
+            "bound_blueprint": "Clan Skryre sells you work it stole from someone else. Finishes your current research immediately.",
+            "hobgoblin_eyes": "Clan Eshin's watchers tell you what they saw. Reveals one region through the shroud this turn.",
+            "raise_ziggurat": "Clan Moulder's packs dig through the night. Upgrades one of your buildings to its next level now, at no cost.",
             "slave_tithe": "The Slave-Masters send back your share of the take. Adds 3,000 "
                            "gold to your treasury.",
         },
         "desc": {
             "brass": "The brokers of the Under-Empire, who buy warpstone from one clan and "
                      "sell it to the next. Every warlord owes them something.",
-            "immortals": "The black-furred guard of the great warlords: the biggest, the "
-                         "best armed, and loyal for exactly as long as they are paid.",
-            "daemonsmiths": "The warlock engineers of Skavenblight, who bind warp-lightning "
-                            "into guns and engines. They sell their secrets slowly, and "
-                            "never for free.",
+            "immortals": "The black-furred guard of the great warlords: the biggest rats, the best armed, and loyal only while paid.",
+            "daemonsmiths": "The warlock engineers of Skavenblight bind warp-lightning into guns and engines. They part with secrets slowly, and never for free.",
             "khanate": "The assassins of the hidden clan, who serve whoever pays and "
                        "remember everyone who ever did.",
             "overseers": "The breeders and flesh-crafters of Hell Pit, who grow monsters, "
                          "food and warrens alike.",
-            "slavers": "The packmasters and raiders who drive the slaves, and who are paid "
-                       "in whatever they drag home.",
+            "slavers": "The packmasters and raiders drive the slaves. Their pay is whatever they drag home.",
         },
         "bounties": {
             "brass": ("Seize the Warpstone",
                       "The Warpstone Traders want that town's stores in their tunnels. Take "
                       "it intact."),
             "immortals": ("A Warlord's Rival",
-                          "A general is spoken of as a threat. The Stormvermin would like "
-                          "that corrected."),
+                          "A general threatens us. The Stormvermin want the threat dead."),
             "daemonsmiths": ("Steal the Secrets",
                              "Whatever that place knows, Clan Skryre wants it. Bring it "
                              "back in pieces."),
             "khanate": ("A Name to Silence",
-                        "Clan Eshin does not care how it is done, only that the name stops "
-                        "being spoken."),
+                        "Clan Eshin wants that name silenced. The method is your choice."),
             "overseers": ("New Warrens",
                           "Take it whole. Clan Moulder wants tunnels to dig, not rubble."),
             "slavers": ("Take Them All",
@@ -1878,48 +1728,36 @@ FLAVOURS = {
         # them and the refusal line says why. The blurb still has to say what the service
         # is, and must not promise a unit by name.
         "blurbs": {
-            "caravan_levy": "The Merchant Houses collect on every road they keep a ledger "
-                            "for. Adds 2,500 gold to your treasury at once.",
-            "hire_immortals": "A company already sworn and already armed. Adds one unit "
-                              "of your people's elite infantry to an army of your "
-                              "choosing, where the Company keeps one.",
-            "bound_blueprint": "The Artisans' Guild hands over work already done. "
-                               "Completes the technology you are currently researching, "
-                               "at once.",
-            "hobgoblin_eyes": "The Shadow Guild sells what its spies have seen. Reveals "
-                              "one region through the shroud for this turn.",
-            "raise_ziggurat": "The Builders' Guild works through the night. Upgrades one "
-                              "of your buildings to its next level at once, and free.",
+            "caravan_levy": "The Merchant Houses collect on every road they keep a ledger for. Adds 2,500 gold to your treasury now.",
+            "hire_immortals": "A sworn company, armed and ready. Adds one unit of your people's elite infantry to your chosen army, where the Company keeps one.",
+            "bound_blueprint": "The Artisans' Guild hands over its finished plans. Finishes your current research immediately.",
+            "hobgoblin_eyes": "The Shadow Guild sells what its spies have seen. Reveals one region through the shroud this turn.",
+            "raise_ziggurat": "The Builders' Guild works through the night. Upgrades one of your buildings to its next level now, at no cost.",
             "slave_tithe": "The Raiders' Guild sends you your share of the take. Adds "
                            "3,000 gold to your treasury.",
         },
         "desc": {
             "brass": "Traders and money-lenders who keep a ledger on every road. They "
                      "forget no debt and forgive fewer.",
-            "immortals": "Old soldiers who sell their oath to whoever can pay for it, and "
-                         "keep it once it is sold.",
+            "immortals": "Old soldiers who sell their oath to whoever can pay, and keep it once sold.",
             "daemonsmiths": "Craftsmen and inventors who build what others only draw. They "
                             "sell what they know, a piece at a time.",
             "khanate": "Spies, smugglers and knives for hire. They work for anyone, "
                        "including against you.",
-            "overseers": "The builders of every wall and tower worth the name, and the "
-                         "only ones who know where each one is weak.",
-            "slavers": "Raiders paid in plunder. Their ledger is measured in what they "
-                       "carry home.",
+            "overseers": "The builders of every wall and tower worth the name. Only they know where each is weak.",
+            "slavers": "Raiders paid in plunder. They reckon their wages in what they carry home.",
         },
         "bounties": {
             "brass": ("Take the Market",
                       "The Merchant Houses want that town's tolls paid to them. Take it "
                       "intact."),
             "immortals": ("A Challenge Answered",
-                          "A general is being spoken of with respect. The Company would "
-                          "like that corrected."),
+                          "A general has earned respect. The Company means to put an end to that."),
             "daemonsmiths": ("Strip the Workshops",
                              "Whatever that place has built, the Artisans want on their "
                              "own benches. Bring it back in pieces."),
             "khanate": ("A Quiet Removal",
-                        "The Guild does not care how it is done, only that the name "
-                        "stops being used."),
+                        "The Guild wants that name silenced. They leave the method to you."),
             "overseers": ("Leave the Walls Standing",
                           "Take it whole. The Builders want walls to work on, not "
                           "rubble."),
@@ -2079,59 +1917,49 @@ TEMPLE_FLAVOUR = {
              "Witch Hunters. Their Battle Wizards march for whoever pays.",
              ("Proof of the Art", "The Colleges want a general of your enemies brought "
               "down by an army that marches with their wizards."),
-             "You earn reputation from provinces free of Chaos corruption, from successful "
-             "actions by your Battle Wizards, and from their own buildings.",
+             "Earn Reputation from provinces free of Chaos corruption, successful actions by your Battle Wizards, and the Colleges' buildings.",
              "clean provinces, wizards' actions"),
     "_dwf": ("The Ancestor Temples",
              "The keepers of the shrines of Grungni, Valaya and Grimnir, and the Slayers who "
              "walk out of them to die well.",
              ("Hunt for the Slayers", "A general of the greenskins or the ratmen leads an "
               "army in the open. The temples want that general brought down."),
-             "You earn reputation from provinces in good order, from battles won against "
-             "greenskins and skaven, and from their own buildings.",
+             "Earn Reputation from provinces in good order, victories over greenskins and skaven, and the temples' buildings.",
              "loyal provinces, wins over greenskins and skaven"),
     "_brt": ("The Grail Pilgrims",
              "Peasants who left their fields to follow the Grail, and the shrines where they "
              "wait for the Lady's sign.",
              ("The Grail Quest", "A general of the Ruinous Powers or the restless dead walks "
               "the land. The pilgrims pray for that general's end."),
-             "You earn reputation from provinces in good order, from provinces free of Chaos "
-             "and undead corruption, from battles won against Chaos and the undead, and from "
-             "their own buildings.",
+             "Earn Reputation from provinces in good order, provinces free of Chaos and undead corruption, victories over Chaos and the undead, and the pilgrims' buildings.",
              "loyal and clean provinces, wins over Chaos and the undead"),
     "_cth": ("The Celestial Temples",
              "The priests of the Celestial Dragon and the ancestors, keepers of the temple "
              "guardians of stone.",
              ("Heaven's Judgement", "A general of your enemies offends the Celestial Dragon. "
               "The temples ask that the general be brought down."),
-             "You earn reputation from provinces in good order, from provinces free of Chaos "
-             "corruption, and from their own buildings.",
+             "Earn Reputation from provinces in good order, provinces free of Chaos corruption, and the temples' buildings.",
              "loyal and clean provinces"),
     "_ksl": ("The Great Orthodoxy",
              "Ursun's priests and the Patriarch's church, who bless the bears, the bells and "
              "the border forts.",
              ("Ursun's Hunt", "A general of the north leads an army against the Motherland. "
               "The Orthodoxy wants that general dead."),
-             "You earn reputation from provinces in good order, from provinces free of Chaos "
-             "and undead corruption, from battles won against Chaos and Norsca, and from "
-             "their own buildings.",
+             "Earn Reputation from provinces in good order, provinces free of Chaos and undead corruption, victories over Chaos and Norsca, and the Orthodoxy's buildings.",
              "loyal and clean provinces, wins over Chaos and Norsca"),
     "_def": ("The Brides of Khaine",
              "The witch elves of Khaine's temples, who bathe in blood and answer to the hag "
              "queens alone.",
              ("A Gift for Khaine", "An asur general still lives. The Brides want that heart "
               "on the altar."),
-             "You earn reputation from battles won against the High Elves, from successful "
-             "actions by your Death Hags, and from their own buildings.",
+             "Earn Reputation from victories over the High Elves, successful actions by your Death Hags, and the Brides' buildings.",
              "wins over the asur, Death Hags' actions"),
     "_hef": ("The Cult of Asuryan",
              "The guardians of Asuryan's sacred flame, who see what is to come and speak of "
              "it to no one.",
              ("Asuryan's Judgement", "A druchii general leads an army in the open. The Cult "
               "wants that general brought down."),
-             "You earn reputation from provinces in good order, from provinces free of Chaos "
-             "corruption, from battles won against the Dark Elves, and from their own "
-             "buildings.",
+             "Earn Reputation from provinces in good order, provinces free of Chaos corruption, victories over the Dark Elves, and the Cult's buildings.",
              "loyal and clean provinces, wins over the druchii"),
     "_skv": ("The Grey Seers",
              "The horned prophets of the Great Horned Rat, who sit at the Council's right "
@@ -2139,15 +1967,14 @@ TEMPLE_FLAVOUR = {
              ("The Seers' Doom",
               "A Dwarf or Lizardman general leads an army in the open. The Grey Seers have "
               "foreseen that general's death. Make it so."),
-             "You earn reputation from provinces where the Under-Empire's taint spreads, from "
-             "battles won against the Dwarfs and the Lizardmen, and from their own buildings.",
+             "Earn Reputation from provinces where the Under-Empire's taint spreads, victories over the Dwarfs and the Lizardmen, and the Seers' buildings.",
              "tainted provinces, wins over Dwarfs and Lizardmen"),
     "_gen": ("The Faith Guild",
              "The priests and holy orders of the land, whose word moves crowds and whose "
              "blessings move armies.",
              ("The Holy War", "A general of the faith's enemies leads an army in the open. "
               "The priests want that general brought down."),
-             "You earn reputation from the faith's own routes, and from their own buildings.",
+             "Earn Reputation through the faith's own routes and buildings.",
              "the faith's own routes"),
 }
 TEMPLE_TEXT = {"": {"earn": GUILD_EARN["temple"],
@@ -2644,8 +2471,7 @@ HALL_SET_NAME = "Guild Halls"
 def hall_set_desc(tag):
     """The race's own word for the rank at which a guild's halls unlock (Indebted for the
     Chaos Dwarfs, Apprentice for the Empire)."""
-    return ("Raise halls for the guilds that favour you. A guild's halls appear here "
-            "once you are %s with it." % FLAVOURS[tag]["ranks"][1])
+    return ('Build halls for your guilds. Their halls appear here once you reach %s with them.' % FLAVOURS[tag]["ranks"][1])
 
 
 def hall_set_key(tag):
@@ -2807,9 +2633,9 @@ def hall_tables():
             t["loc"].append({"key": "effect_bundles_localised_title_" + sk,
                              "text": seat_title, "tooltip": "false"})
             t["loc"].append({"key": "effect_bundles_localised_description_" + sk,
-                             "text": "You lead %s and hold their Seat: the hall's bonus "
-                                     "spreads to all your lands at a third of its strength, "
-                                     "and the most they pay you in one turn rises by half."
+                             "text": "You lead %s and hold their Seat. The hall's bonus "
+                                     "applies to all your lands at a third of its strength. "
+                                     "Your earnings limit each turn rises by half."
                                      % _with_article(g, tag),
                              "tooltip": "false"})
     return t
@@ -2855,10 +2681,10 @@ def hall_desc(guild, n, tag=""):
     if extra:
         out += " %s." % (extra[3] % extra[2][n])
     if here == [unit, fb]:
-        out += " Trains %s, or %s without the pack that adds %s." % (
+        out += ' Trains %s, or %s if you lack the pack for %s.' % (
             unit_name(unit), unit_name(fb), unit_name(unit))
     elif fb and here == [unit]:     # the pack unit alone: a player without the pack has none yet
-        out += " Trains %s, if you own the pack that adds it." % unit_name(unit)
+        out += ' Trains %s if you own the pack that adds it.' % unit_name(unit)
     elif here:
         out += " Trains %s." % unit_name(here[0])
     return out
@@ -3013,12 +2839,12 @@ RANK_NAME_MAX = 12
 # The one-line version of each guild's earn route. GUILD_DESC carries the full sentence
 # and it is one hover away on the Guilds tab; this is the four-word form a list needs.
 EARN_SHORT = {
-    "brass": "your income, every turn",
+    "brass": "income each turn",
     "immortals": "battles won, doubled when outnumbered",
     "daemonsmiths": "technologies completed",
     "khanate": "successful hero actions",
-    "overseers": "settlements growing a level, and buildings no other guild claims",
-    "slavers": "settlements sacked, more when razed",
+    "overseers": "settlement growth and buildings no other guild claims",
+    "slavers": "sacking settlements; razing pays more",
     # The Chaos Dwarf line; every other flavour's is TEMPLE_TEXT[tag]["short"].
     "temple": TEMPLE_TEXT[""]["short"],
 }
@@ -3064,23 +2890,23 @@ def help_pages(tag=""):
     ranks = " / ".join("%s %d" % (RANK_NAMES[i], RANK_THRESHOLDS[i]) for i in range(5))
 
     page1 = [
-        "#Two numbers, per guild",
-        "-REPUTATION is earned by playing and is never spent. It alone sets your rank.",
-        "-It can also fall: to a rival you have been feeding, to a "
-        + ("" if expiry_free(tag) else "demand you let expire, to a ")
-        + "bounty you took and did not finish, and to the "
-        "upkeep every guild charges to keep you on its books.",
-        "-FAVOUR is earned alongside it and is the currency services are bought with. "
-        "Spending it never costs you rank, so there is no reason to hoard it.",
+        "#Two numbers per guild",
+        "-Earn Reputation as you play. You never spend it; it alone sets your rank.",
+        "-It falls through rival earnings, a "
+        + ("" if expiry_free(tag) else "demand you let expire, a ")
+        + "bounty you took and failed, and the "
+        "upkeep each guild charges to keep you on its books.",
+        "-You earn Favour alongside Reputation and spend it on services. "
+        "Spending Favour never lowers your rank.",
         "#The five ranks",
         "-" + ranks,
-        "-Each rank gives a bonus that lasts exactly as long as the rank "
-        "does. The Guilds tab names the one you hold.",
+        "-Each rank grants a bonus for as long as you hold it. The Guilds tab "
+        "shows your current bonus.",
         "#Services",
-        "-Each guild sells three, each opened by a rank and paid for in favour. Each "
+        "-Each guild sells three services. Each needs a rank, costs Favour and "
         "has a cooldown.",
-        "-The price moves with your reputation: a guild that knows you charges less, one "
-        "whose rival you have been courting charges more.",
+        "-Prices change with your Reputation: a guild that knows you charges less; one "
+        "whose rival you court charges more.",
     ]
 
     page2 = ["#What each guild pays for"]
@@ -3090,8 +2916,8 @@ def help_pages(tag=""):
     page2 += [
         # Derived per flavour, so an Empire page names the Engineers' School and not the
         # Daemonsmiths. Same three guilds, same order as the Chaos Dwarf sentence.
-        "-A finished BUILDING pays its own guild - a forge the %s, a dock the %s, a "
-        "barracks the %s. Higher levels pay more, and its card names the guild."
+        "-Completing a building pays its guild: a forge the %s, a dock the %s, a "
+        "barracks the %s. Higher levels pay more. The building card names its guild."
         % (short_name("daemonsmiths", tag), short_name("brass", tag),
            short_name("immortals", tag)),
         # ONE LINE, NOT TWO (2026-09-23). The Empire's rivalry bullet below wraps where
@@ -3099,7 +2925,7 @@ def help_pages(tag=""):
         # bullet is the fix the flavours spec names, and it applies to every race. Its
         # "#Every guild at once" heading went with the seventh guild (2026-10-04): the
         # temple's bullet above costs the line.
-        "-Every completed MISSION raises your reputation with every guild.",
+        "-Completing any mission raises your Reputation with every guild.",
         "#Rivalry",
         # Names shortened for this one line only. At full length the three pairs run to
         # 105 characters and wrap to "The Overseers and The / Slavers", which is worse
@@ -3109,84 +2935,84 @@ def help_pages(tag=""):
                          for a, b in RIVAL_PAIRS),
         # Mirrors GG.rival_cost: floored at the rank held, and nothing at all below
         # Indebted (2026-09-23). Folded into this bullet because page 2 has no spare line.
-        "-Earning with one takes reputation from its rival once you reach %s there - "
-        "never a rank." % RANK_NAMES[1],
+        "-Earning with one takes Reputation from its rival once you reach %s there, "
+        "but never a rank." % RANK_NAMES[1],
         "#A limit each turn",
-        "-Most guilds pay only so much each turn. The Guilds tab shows what each paid.",
+        "-Most guilds limit earnings each turn. The Guilds tab shows what each paid.",
     ]
 
     page3 = [
         "#The board",
-        "-Three offers at a time, drawn from every guild. Taking one turns it into a "
-        "real mission.",
-        "-Taking one puts up FAVOUR with that guild - the number on its plate. You get "
-        "it back when you finish, and lose it if you fail or hand it back.",
-        "-Finish it and that guild pays gold and a large amount of reputation.",
+        "-Three offers at a time, drawn from all guilds. Accept one to make it a "
+        "mission.",
+        "-Accepting costs a Favour deposit with that guild, shown on the offer. Finish "
+        "the bounty to reclaim it; fail or hand it back and you lose it.",
+        "-Finish the bounty for gold and a large Reputation reward from that guild.",
         "#What the guilds ask for",
-        "-Never your front line: land or a lord far from your borders and armies, or of "
-        "a faction you are at peace with. That last kind means war, and pays far more.",
-        "-Or a job: hold gold, raise a champion, research, build one of the guild's own "
+        "-Targets: land or a lord far from your borders and armies, or from "
+        "a faction at peace with you. The latter means war, and pays far more.",
+        "-Other jobs: hold gold, raise a champion, research, build one of the guild's own "
         "buildings, or take captives.",
         "-Or hero work: send your heroes against a named settlement, army or character.",
         "#The price",
-        "-Read off the target and the distance, rated Routine, Hard or Grim. An offer "
-        "you have NOT taken re-prices as the world moves; one you HAVE taken keeps its "
+        "-Target and distance set the price: Routine, Hard or Grim. An offer "
+        "changes price until you accept it. Once accepted, it keeps its "
         "price.",
     ]
 
     page4 = [
         "#Leading a guild",
-        "-Held by whichever faction in the world has the most reputation with it - you "
+        "-The faction with the most Reputation in a guild leads it, whether you "
         "or a rival.",
-        "-The leader carries an extra bonus, and, unless the settings say otherwise, "
-        "the guild's dearest service is sold to nobody else.",
+        "-The leader gains an extra bonus. Unless the settings say otherwise, "
+        "only the leader can buy the guild's dearest service.",
         "-It can be taken from you. The Leaderboard tab shows who leads each guild.",
         "#Demands",
-        "-Every so often a guild that already knows you asks for something, with a "
-        "deadline on it.",
-        "-It wants either gold, or the favour you hold with its own rival.",
-        ("-Pay it and your reputation jumps. Let the deadline pass and nothing is lost: "
-         "no Skaven ever expected the promise kept." if expiry_free(tag) else
-         "-Pay it and your reputation jumps. Let the deadline pass and it falls, which "
+        "-From time to time, a guild that knows you makes a demand with a "
+        "deadline.",
+        "-It asks for gold or Favour held with its rival.",
+        ("-Pay it to gain Reputation. Miss the deadline and you lose nothing: "
+         "no Skaven expected you to keep your promise." if expiry_free(tag) else
+         "-Pay it to gain Reputation. Miss the deadline and it falls, which "
          "can cost you a rank."),
         "#A patron",
-        "-One of your lords, bound to one guild. Select them on the campaign map, then "
+        "-Appoint one of your lords to a guild. Select them on the campaign map, then "
         "press Appoint.",
         "-Their army gains replenishment and campaign movement.",
-        "-That guild's reputation pays more, and its services cost up to %d%% less."
+        "-You earn more Reputation with that guild, and its services cost up to %d%% less."
         % PATRON_DISCOUNT,
-        "-One lord, one guild. Appointing a second moves the post.",
+        "-One lord, one guild. A new appointment replaces the old one.",
     ]
 
     page5 = [
         "#Reputation can fall",
-        "-It is earned by playing and never spent - but four things take it back. Three "
-        "can cost you a rank and the bonus that came with it.",
+        "-You never spend Reputation, but four things reduce it. Three "
+        "can cost you a rank and its bonus.",
         "#Upkeep, every turn",
-        "-After the opening turns, every guild you hold reputation with takes a little "
+        "-After the opening turns, each guild you have Reputation with takes a little "
         "of it back each turn.",
-        "-The higher your rank there, the more it costs to hold. A guild you stop "
-        "feeding slides back down the ladder on its own.",
-        "-The Guilds tab names the figure, in red, beside your reputation.",
-        "#A rival you have been feeding",
-        "-Earning with a guild takes reputation from the guild it argues with, though "
+        "-Higher ranks cost more upkeep. Stop earning with a guild and you "
+        "lose ranks over time.",
+        "-The Guilds tab shows upkeep in red beside your Reputation.",
+        "#Earning with a rival",
+        "-Earning with a guild takes Reputation from its rival, though "
         "never a rank you have reached. You cannot court them all at once.",
     ] + ([] if expiry_free(tag) else [
         "#A demand you let expire",
-        "-The Court tab holds the terms and the deadline. Silence costs more than the "
+        "-The Court tab shows the terms and deadline. Ignoring it costs more than the "
         "demand asked for.",
     ]) + [
         "#A bounty you took and failed",
-        "-Handing one back costs the favour you put up to take it.",
-        "-Failing one costs that too, plus reputation. Each card says how much.",
+        "-Handing one back costs your Favour deposit.",
+        "-Failing one costs the deposit and Reputation. Each card shows how much.",
     ]
 
     # YOUR RACE (stage 2): the changing services, and what this race alone gets.
     page6 = [
         "#Services change",
-        "-Every few turns - ten, unless the settings say otherwise - each guild changes the "
-        "three services it offers. The footer counts down to the next change.",
-        "-A service that goes keeps its cooldown, and comes back showing what is left of it.",
+        "-Every ten turns, unless the settings say otherwise, each guild changes its "
+        "three services. The footer counts down to the next change.",
+        "-A service keeps its cooldown while away and shows the time left when it returns.",
     ]
     culture = FLAVOURS[tag]["culture"]
     R = RACE_TEXT[tag]
@@ -3199,17 +3025,17 @@ def help_pages(tag=""):
         lords = [s["lord"] for s in own if s.get("lord")]
         listed = ", ".join(names[:-1]) + " and " + names[-1]
         page6 += ["#Services of your own",
-                  "-Your race alone is offered %s, each marked %s on its card. At least "
-                  "one is always on show." % (listed, R["label"])]
+                  "-Only your race can buy %s, each marked %s on its card. At least "
+                  "one is always available." % (listed, R["label"])]
         if lords:
             page6.append("-%s and %s each add one more of their own."
                          % (", ".join(lords[:-1]), lords[-1]))
         page6 += [
             "#What else pays",
             "-" + R["earn"].format(g=short_name(EARN_ROUTES[EARN_OF[culture]], tag)),
-            "#One rule bent",
+            "#Race rule",
             "-%s: %s" % R["twist"],
-            "-Race differences in the settings switches all of this off: then every race "
+            "-Turn off Race differences in the settings to remove all this: every race "
             "plays alike.",
         ]
 
@@ -3219,10 +3045,10 @@ def help_pages(tag=""):
         rk = [RANK_NAMES[HALL_RANK[n] - 1] for n in range(3)]
         pages.append([
             "#Guild halls",
-            "-Each guild has halls of its own, raised in your settlements. One settlement "
+            "-Build guild halls in your settlements. Each settlement "
             "holds one hall, so choose which guild it serves.",
             "-A bigger settlement allows a bigger hall.",
-            "-Halls are raised from their own Guild Halls tab, and a guild's halls appear "
+            "-Build halls through the Guild Halls tab. A guild's halls appear "
             "there once you are %s with it." % RANK_NAMES[1],
             "#Three levels",
             "-The %s needs %s with the guild, the %s needs %s, and the %s needs %s and "
@@ -3230,13 +3056,13 @@ def help_pages(tag=""):
             "#What a hall gives",
             "-Reputation and Favour with its guild each turn: %d, %d or %d by level."
             % tuple(HALL_REP),
-            "-A bonus from its guild, a unit of the guild's trade to train there, and "
+            "-A guild bonus, a unit of its trade to recruit there, and "
             "cheaper services from that guild, up to %d%% in all." % HALL_OFF_MAX,
             "#The Seat",
-            "-Lead a guild and hold a %s of theirs and you hold their Seat: the hall's "
-            "bonus spreads to all your lands at a third of its strength, and the most "
-            "they pay you in one turn rises by half." % nouns[2],
-            "-Lose the lead or the hall and the Seat goes.",
+            "-Lead a guild and hold its %s to claim the Seat. The hall's "
+            "bonus applies to all your lands at a third of its strength; your limit "
+            "for earnings each turn rises by half." % nouns[2],
+            "-Lose the lead or the hall and you lose the Seat.",
         ])
     return pages
 
@@ -3260,8 +3086,8 @@ def _ladder(blurb, steps):
     """
     parts = [(blurb % v).split(" ", 1) for v, _t in steps]
     if len(set(p[1] for p in parts if len(p) == 2)) != 1 or any(len(p) != 2 for p in parts):
-        return " / ".join("%s at %d reputation" % (blurb % v, t) for v, t in steps)
-    return "%s %s at %s reputation" % (parts[0][1], " / ".join(p[0] for p in parts),
+        return " / ".join('%s at %d Reputation' % (blurb % v, t) for v, t in steps)
+    return '%s %s at %s Reputation' % (parts[0][1], " / ".join(p[0] for p in parts),
                                        " / ".join(str(t) for _v, t in steps))
 
 
@@ -3301,7 +3127,7 @@ def _build_one(tag):
             xblurb, xreach = EFFECT_BLURB_EXTRA[g]
             rungs = _ladder(xblurb, [(extra[2][r], RANK_THRESHOLDS[r - 1])
                                      for r in range(2, 6) if extra[2][r] is not None])
-            desc += " For %s: %s." % (xreach, rungs.replace(" reputation", ""))
+            desc += " For %s: %s." % (xreach, rungs.replace(' Reputation', ""))
         loc.append({"key": "derpy_gg_guild_desc_%s" % g,
                     "text": desc, "tooltip": "false"})
         for rank in range(2, 6):
@@ -3342,8 +3168,7 @@ def _build_one(tag):
             signed = rank_value(g, rank) * EFFECT_GOOD_SIGN[g]
             loc.append({
                 "key": "effect_bundles_localised_description_%s" % key,
-                "text": "Rank %d of 5 with %s, reached at %d reputation. %s, for %s.%s "
-                        "This lasts as long as the rank does."
+                "text": 'Rank %d of 5 with %s at %d Reputation. %s for %s.%s Keep this rank to keep the bonus.'
                         % (rank, GUILD_NAMES[g], RANK_THRESHOLDS[rank - 1],
                            blurb % signed, reach, extra_sentence(g, rank)),
                 "tooltip": "false"})
@@ -3373,10 +3198,7 @@ def _build_one(tag):
                     "text": ltitle, "tooltip": "false"})
         loc.append({
             "key": "effect_bundles_localised_description_%s" % lkey,
-            "text": "You hold more reputation with %s than any other faction in the "
-                    "world. %s, for %s, on top of whatever your rank already pays - "
-                    "and, unless the settings say otherwise, their greatest service is "
-                    "open to you alone. This lasts only while you lead them."
+            "text": 'You lead %s. %s for %s, in addition to your rank bonus. Unless the settings say otherwise, only you can buy their finest service. These benefits last while you lead.'
                     % (GUILD_NAMES[g], blurb % (lead_value(g) * EFFECT_GOOD_SIGN[g]),
                        reach),
             "tooltip": "false"})
@@ -3409,10 +3231,7 @@ def _build_one(tag):
                 "text": PATRON_NAME, "tooltip": "false"})
     loc.append({
         "key": "effect_bundles_localised_description_%s" % PATRON_BUNDLE,
-        "text": "This lord speaks for one of the Great Guilds, and the guild answers. "
-                "%s for their army. While they hold the post, that guild's reputation "
-                "pays more and its services cost up to %d%% less. Only one lord may "
-                "hold it."
+        "text": 'This lord serves as a guild Patron. %s for their army. While appointed, they increase earnings with that guild and reduce its service prices by up to %d%%. Only one lord can hold the post.'
                 % (patron_clause(), PATRON_DISCOUNT),
         "tooltip": "false"})
 
@@ -3429,22 +3248,20 @@ def _build_one(tag):
             body = service_text(s, tag)
         elif body is None and s.get("hostile"):
             # Inflicted, not received. The sign is already inverted for this.
-            body = ("Inflicts %s on a faction you are at war with, across %s, for "
-                    "%d turns. You gain nothing directly - they simply pay more."
+            body = ('Inflicts %s on an enemy faction across %s for %d turns. Raises their costs without paying you.'
                     % (blurb % signed, EFFECT_REACH_THEIRS[s["guild"]], s["turns"]))
         elif body is None:
             # A bundle service has no bespoke sentence: its payload IS the effect.
-            body = "%s, for %s, for %d turns." % (blurb % signed, reach, s["turns"])
+            body = '%s for %s for %d turns.' % (blurb % signed, reach, s["turns"])
         pics = service_icons(s, tag, icon_of)
         if pics:
             body = pics + " " + body
         gate = ""
         if s["key"] in LEAD_SERVICES:
-            gate = (" Unless the settings say otherwise, only the faction that leads "
-                    "%s may buy it." % GUILD_NAMES[s["guild"]])
+            gate = (' Only the leader of %s may buy it, unless the settings say otherwise.' % GUILD_NAMES[s["guild"]])
         loc.append({
             "key": "derpy_gg_service_desc_%s" % s["key"],
-            "text": "%s||Costs %d favour. Cooldown %d turns. Needs rank %d, %s.%s"
+            "text": '%s||Costs %d Favour. Cooldown: %d turns. Needs rank %d, %s.%s'
                     % (body, s["cost"], s["cd"], s["rank"],
                        RANK_NAMES[s["rank"] - 1], gate),
             "tooltip": "false"})
@@ -3466,7 +3283,7 @@ def _build_one(tag):
                         "text": SERVICE_NAMES[s["key"]], "tooltip": "false"})
             loc.append({"key": "effect_bundles_localised_description_%s" % key,
                         "text": ("Inflicted by %s. %s" if s["kind"] == "enemy_settlement"
-                                 else "Bought from %s with favour. %s")
+                                 else 'Bought from %s with Favour. %s')
                                 % (GUILD_NAMES[s["guild"]], service_text(s, tag)),
                         "tooltip": "false"})
             continue
@@ -3498,12 +3315,11 @@ def _build_one(tag):
                     "text": SERVICE_NAMES[s["key"]], "tooltip": "false"})
         loc.append({
             "key": "effect_bundles_localised_description_%s" % key,
-            "text": ("Inflicted by %s, bought with favour. %s, across %s. "
-                     "Runs for %d turns."
+            "text": ('Inflicted by %s, paid in Favour. %s across %s for %d turns.'
                      % (GUILD_NAMES[s["guild"]], blurb % signed,
                         EFFECT_REACH_THEIRS[s["guild"]], s["turns"]))
                     if s.get("hostile") else
-                    ("Bought from %s with favour. %s, for %s. Runs for %d turns."
+                    ('Bought from %s with Favour. %s for %s for %d turns.'
                      % (GUILD_NAMES[s["guild"]], blurb % signed, reach, s["turns"])),
             "tooltip": "false"})
 
@@ -3562,10 +3378,7 @@ def _build_one(tag):
     # there are two numbers and that spending one does not cost the other.
     loc.append({
         "key": "derpy_gg_standing_help",
-        "text": "REPUTATION sets your rank, and it can fall. FAVOUR is earned "
-                "alongside it and is what you spend - spending it never costs you rank."
-                "||%s"
-                "||Help tab: the full rules."
+        "text": 'Reputation sets your rank and can fall. Spend the Favour you earn alongside it without losing rank.||%s||See Help for the full rules.'
                 % " / ".join("%s %d" % (RANK_NAMES[i], RANK_THRESHOLDS[i])
                              for i in range(5)),
         "tooltip": "false"})
@@ -3582,27 +3395,20 @@ def _build_one(tag):
                       # so the fragments are lower-case and carry no full stop.
                       ("tab_log", "Log"),
                       ("hdr_log", "What has happened, newest first."),
-                      ("log_help", "Every rank you gain or lose, every service you buy, "
-                                   "every service your rivals buy or use against you, "
-                                   "every price a guild puts on you, and every guild "
-                                   "lead that changes hands. The most recent entries "
-                                   "are kept."),
-                      ("log_empty", "Nothing yet. Ranks gained and lost, services "
-                                    "bought and leads changing hands are recorded "
-                                    "here."),
+                      ("log_help", "Records rank changes, your purchases, rivals' services, bounties on you and changes in guild leadership. Keeps the most recent entries."),
+                      ("log_empty", 'Nothing yet. Rank changes, service purchases and changes in guild leadership appear here.'),
                       ("log_turn", "Turn"),
                       ("log_rose", "you rose to"),
                       ("log_fell", "you fell to"),
                       ("log_bought", "you bought"),
                       ("log_ai_bought", "bought"),
                       # GG.refund_purchase: the service could not be delivered.
-                      ("log_refunded", "could not be delivered and your favour was "
-                                       "returned"),
+                      ("log_refunded", 'failed; your Favour was returned'),
                       ("log_hit", "was used against you by"),
                       ("log_lead_won", "you took the lead"),
                       ("log_lead_lost", "you lost the lead to"),
                       # The reputation drained away and nobody took it (logic audit).
-                      ("log_lead_lapsed", "you no longer lead them, and nobody does"),
+                      ("log_lead_lapsed", 'you lost the lead; nobody holds it'),
                       ("log_from", "from"),
                       # RIVALS' BOUNTIES (2026-09-29). Lower case, no full stop.
                       ("log_hunted", "put a price on"),
@@ -3619,8 +3425,7 @@ def _build_one(tag):
                       # GG.can_buy "unavailable" (stage 2): what the service works on
                       # has gone since the draw - a caravan home, a pool lost.
                       ("unavailable_short", "Unavailable"),
-                      ("unavailable", "What this service works on is not there for you "
-                                      "right now, so it cannot be bought."),
+                      ("unavailable", 'You do not currently have a valid target for this service.'),
                       # THE RACE EARNINGS (stage 2): GGUI.log_text builds
                       # "log_earn_" .. route at draw time, so check_race_mirror proves
                       # each ships. Lower case, no full stop.
@@ -3643,13 +3448,9 @@ def _build_one(tag):
                       ("bounty_lord", "Their general"),
                       ("bounty_war", "War with"),
                       ("bounty_war_tip", "Taking this means war with"),
-                      ("bounty_stake_tip", "Favour you put up to take this bounty. You "
-                       "get it back when you finish, and lose it if you fail or hand it "
-                       "back."),
-                      ("bounty_fail_tip", "Fail it and you lose the favour "
-                       "you put up and %n reputation with this guild."),
-                      ("bounty_stake_short", "Needs %n favour with this guild to take. "
-                       "You have %m."),
+                      ("bounty_stake_tip", 'Favour staked on this bounty. Complete it to get the stake back. Fail or return it and you lose the stake.'),
+                      ("bounty_fail_tip", 'Failure costs your Favour stake and %n Reputation with this guild.'),
+                      ("bounty_stake_short", 'Needs %n Favour with this guild. You have %m.'),
                       ("bounty_char", "Their lord or hero"),
                       ("bounty_obj_coffers", "Save %n gold more than you hold now"),
                       ("bounty_obj_coffers_taken", "Hold %n gold"),
@@ -3684,54 +3485,35 @@ def _build_one(tag):
                       # A service's price moves with your standing, so the card has to
                       # say what moved it or the number looks wrong.
                       ("cost_base", "base"),
-                      ("cost_loyal", "The guild knows you, and charges less."),
-                      ("cost_rival", "You wear their rival's mark, and they charge "
-                                     "for it."),
+                      ("cost_loyal", 'Your Reputation lowers the price.'),
+                      ("cost_rival", 'Your Reputation with their rival raises the price.'),
                       # The hostile service reads its target from the campaign map's own
                       # selection, so the card has to say so rather than refusing a
                       # button that looked live.
                       # GG.target_ok refuses a faction at peace (2026-09-29).
-                      ("needs_target", "Select a character of a faction you are at war "
-                                       "with on the campaign map first - this service is "
-                                       "aimed at their faction."),
+                      ("needs_target", 'Select a character from a faction you are at war with on the campaign map. The service targets their faction.'),
                       ("needs_target_short", "Pick a target"),
                       # ONE REFUSAL STRING ANSWERED FOR ALL FIVE targeted services and
                       # was right for one of them. A player told to select an enemy, who
                       # does, and is refused anyway, is debugging the mod.
                       # "The regiment joins" was on the army services too, which add no
                       # regiment. Hire has its own line, because a full army is refused.
-                      ("needs_army", "Select one of your own armies on the campaign map "
-                                     "first."),
-                      ("needs_army_room", "Select one of your own armies with room for "
-                                          "another regiment on the campaign map first."),
+                      ("needs_army", 'Select one of your armies on the campaign map.'),
+                      ("needs_army_room", 'Select one of your armies on the campaign map with room for another regiment.'),
                       # Two race army services with a rule of their own (logic audit).
-                      ("needs_army_not_leader", "Select one of your own armies on the "
-                                                "campaign map first, not the one your "
-                                                "faction leader leads."),
-                      ("needs_army_unblessed", "Select one of your own armies on the "
-                                               "campaign map first, one the Lady has not "
-                                               "yet blessed."),
-                      ("needs_char", "Select one of your own lords or heroes on the "
-                                     "campaign map first, below the highest rank."),
-                      ("needs_settlement_own", "Select one of your OWN settlements on the "
-                                               "campaign map first."),
-                      ("needs_region_enemy", "Select a settlement of a faction you are at "
-                                             "war with on the campaign map first."),
+                      ("needs_army_not_leader", "Select one of your armies on the campaign map, excluding your faction leader's army."),
+                      ("needs_army_unblessed", "Select one of your armies on the campaign map that has not received the Lady's blessing."),
+                      ("needs_char", 'Select one of your lords or heroes on the campaign map who is below the highest rank.'),
+                      ("needs_settlement_own", 'Select one of your settlements on the campaign map.'),
+                      ("needs_region_enemy", 'Select a settlement on the campaign map whose owner you are at war with.'),
                       # Not your own: GG.target_ok refuses it (2026-09-29).
-                      ("needs_region_any", "Select a settlement that is not yours on the "
-                                           "campaign map first - its region is what gets "
-                                           "revealed."),
-                      ("needs_region_own", "Select one of your OWN settlements on the "
-                                           "campaign map first, with a building that "
-                                           "still has somewhere to go."),
-                      ("needs_research", "Start researching something first - this "
-                                         "finishes whatever technology you have queued "
-                                         "in the tech tree."),
+                      ("needs_region_any", "Select another faction's settlement on the campaign map to reveal its region."),
+                      ("needs_region_own", 'Select one of your settlements on the campaign map with a building that can be upgraded.'),
+                      ("needs_research", 'Start researching a technology first. This service completes your current research.'),
                       # Every culture in the campaign runs guilds now, and only three
                       # have a unit mapped. Refusing is right - the old fallback would
                       # have dropped a Chaos Dwarf regiment into an Araby army.
-                      ("no_unit", "This guild keeps no regiment your people would "
-                                  "muster. Their other services are open to you."),
+                      ("no_unit", 'This guild has no regiment available for your race. You can use its other services.'),
                       # THE LEAGUE TABLE. The Standings tab printed one name per guild
                       # and threw the other five away, so nobody could see second place
                       # or their own position.
@@ -3743,14 +3525,14 @@ def _build_one(tag):
                       ("per_turn", "/turn"),
                       # "Upkeep: -12/turn." - the number and per_turn are put between.
                       ("upkeep_on", "Upkeep:"),
-                      ("upkeep_soon", "An upkeep begins on turn"),
+                      ("upkeep_soon", 'Upkeep starts on turn'),
                       # ONE SENTENCE. It follows the guild's description on the rank
                       # line's hover, and the two together ran to 17 lines (2026-09-28).
                       # The Help tab's "Losing reputation" page has the full rule.
-                      ("upkeep_help", "Stop earning and you slide back down."),
+                      ("upkeep_help", 'Stop earning and Reputation falls.'),
                       ("table_head", "Reputation with this guild:"),
                       ("more", "more"),
-                      ("unranked", "no reputation yet"),
+                      ("unranked", 'no Reputation yet'),
                       ("buy", "Buy"), ("prev", "<"), ("next", ">"),
                       # THE COURT. The fifth tab, holding the two things that are done
                       # TO you and the one thing you do with a lord.
@@ -3761,12 +3543,9 @@ def _build_one(tag):
                       ("lead_you", "You lead them"),
                       ("lead_by", "Led by"),
                       ("lead_title", "Foremost"),
-                      ("lead_hint", "Only the faction holding the most reputation "
-                                    "with this guild may buy this. Out-earn whoever "
-                                    "holds it."),
+                      ("lead_hint", "Only this guild's leader may buy this service. Earn more Reputation to take the lead."),
                       # Under the table's hover when the top row is not the leader.
-                      ("lead_held", "The leader keeps them until a rival is ahead by more "
-                                    "than a turn's earnings."),
+                      ("lead_held", "A rival must lead by more than a turn's earnings to replace the leader."),
                       # The patron.
                       ("patron_none", "No patron appointed"),
                       ("patron_appoint", "Appoint"),
@@ -3777,13 +3556,13 @@ def _build_one(tag):
                       ("patron_elsewhere", "Your patron already serves another guild. "
                                            "Appointing here moves them."),
                       # The demands.
-                      ("demand_none", "No demand stands against you"),
+                      ("demand_none", 'No outstanding demand'),
                       ("demand_pay", "Pay"),
                       ("demand_owed", "They want"),
                       ("demand_due", "turns to pay"),
                       ("demand_short", "You cannot pay this yet"),
                       ("demand_gold", "gold"),
-                      ("demand_favour", "favour"),
+                      ("demand_favour", 'Favour'),
                       # Prefixes the rank a locked service wants, so the red text on
                       # the card reads as a requirement and not as a label.
                       ("needs", "Needs"),
@@ -3803,15 +3582,12 @@ def _build_one(tag):
                       ("ready", "ready to buy"),
                       # A big spend asks once before it goes.
                       ("confirm", "Confirm"),
-                      ("confirm_tip", "This spends half or more of your favour with "
-                                      "this guild, or is aimed at another faction. "
-                                      "Press Confirm to go ahead."),
+                      ("confirm_tip", 'This costs at least half your Favour with this guild or targets another faction. Press Confirm to proceed.'),
                       # A Leaderboard row's icon opens that guild.
                       ("open_guild", "Click to see this guild's services."),
                       # Picking a target with the panel out of the way.
                       ("pick_button", "Select"),
-                      ("pick_help", "Press Select to move this panel aside while you "
-                                    "choose on the map."),
+                      ("pick_help", 'Press Select to move the panel aside and choose a target on the map.'),
                       ("pick_cancel", "Press Escape or Cancel to go back."),
                       ("cancel", "Cancel"),
                       # Map links on the bounty board and the Leaderboard's list.
@@ -3820,8 +3596,7 @@ def _build_one(tag):
                       # The Log's filters.
                       ("lf_all", "All"), ("lf_mine", "Yours"),
                       ("lf_rivals", "Rivals"), ("lf_ranks", "Ranks"),
-                      ("log_empty_filter", "Nothing of this kind yet. Press All to see "
-                                           "every entry.")):
+                      ("log_empty_filter", 'No matching entries. Press All to see every entry.')):
         loc.append({"key": "derpy_gg_" + key, "text": text, "tooltip": "false"})
     for dk, d in sorted(DEMAND_KINDS.items()):
         loc.append({"key": "derpy_gg_demand_name_" + dk, "text": d["name"],
@@ -3844,24 +3619,13 @@ def _build_one(tag):
     # 801 characters under a three-line card - 17 lines of tooltip (screenshot
     # 2026-09-28). Each card now says its own part; the Help tab's Court page has the rest.
     for key, text in (
-            ("court_intro", "The Court holds the three things a guild does that you do "
-                            "not choose. Hover a card for its part; the Help tab's Court "
-                            "page has the full rules."),
-            ("court_help_lead", "The leader alone gets an extra bonus and, unless the "
-                                "settings say otherwise, the guild's dearest service. "
-                                "Out-earn them to take it."),
+            ("court_intro", 'Manage demands, leadership and patronage here. Hover a card for details or read the Court page in Help.'),
+            ("court_help_lead", 'The leader gets an extra bonus and exclusive access to the finest service, unless the settings say otherwise. Out-earn them to take the lead.'),
             ("court_help_demand",
-             "Pay it and your reputation with this guild jumps. Let the deadline pass "
-             "and nothing is lost." if expiry_free(tag) else
-             "Pay it and your reputation with this guild jumps. Let "
-             "the deadline pass and it falls, which can cost a rank."),
-            ("court_help_no_demand", "Now and then a guild that knows you asks for gold, "
-                                     "or for you to renounce the favour you hold with its "
-                                     "rival. It appears here, with a deadline."),
-            ("court_help_patron", "A patron is one of your lords, bound to one guild: "
-                                  "their army is the better for it, this guild's "
-                                  "reputation pays more, and its services cost up to "
-                                  "%d%% less. One lord, one guild." % PATRON_DISCOUNT)):
+             'Pay to gain Reputation with this guild. Missing the deadline costs nothing.' if expiry_free(tag) else
+             'Pay to gain Reputation with this guild. Miss the deadline and it falls, which may cost a rank.'),
+            ("court_help_no_demand", 'Guilds you have earned with may demand gold or Favour held with their rival. Their terms and deadline appear here.'),
+            ("court_help_patron", 'Appoint a lord as Patron to one guild. Their army gains bonuses, earnings with that guild increase and its services cost up to %d%% less. One lord, one guild.' % PATRON_DISCOUNT)):
         loc.append({"key": "derpy_gg_" + key, "text": text, "tooltip": "false"})
 
     # The feed, both halves. A demand that arrives silently is a deadline nobody saw.
@@ -3873,11 +3637,11 @@ def _build_one(tag):
     loc.append({"key": "message_event_text_text_derpy_gg_demand_secondary",
                 "text": "They do not ask twice.", "tooltip": "false"})
     loc.append({"key": "message_event_text_text_derpy_gg_demand_fail_title",
-                "text": "A Guild Is Answered With Silence", "tooltip": "false"})
+                "text": 'A Guild Demand Ignored', "tooltip": "false"})
     loc.append({"key": "message_event_text_text_derpy_gg_demand_fail_primary",
                 "text": "The deadline has passed and nothing was paid. "
                         + ("Nobody in the Under-Empire expected otherwise." if expiry_free(tag)
-                           else "Your reputation with that guild has fallen."),
+                           else 'Your Reputation with that guild has fallen.'),
                 "tooltip": "false"})
     loc.append({"key": "message_event_text_text_derpy_gg_demand_fail_secondary",
                 "text": "The ledger is kept whether you read it or not.",
@@ -3886,11 +3650,9 @@ def _build_one(tag):
     # A FAILED BOUNTY, on the demand record: a feed record is presentation, and a guild
     # taking reputation back for work not done looks the same whichever way it was owed.
     loc.append({"key": "message_event_text_text_derpy_gg_bounty_fail_title",
-                "text": "A Guild Is Left Waiting", "tooltip": "false"})
+                "text": 'A Guild Bounty Failed', "tooltip": "false"})
     loc.append({"key": "message_event_text_text_derpy_gg_bounty_fail_primary",
-                "text": "Work you took from a guild has gone undone. The favour you put "
-                        "up is lost, and reputation with the guild with it; the card "
-                        "named the sum. Handing an offer back costs only the favour.",
+                "text": 'You failed a guild bounty. You lose your Favour stake and the Reputation shown on the card. Returning a bounty costs only the stake.',
                 "tooltip": "false"})
     loc.append({"key": "message_event_text_text_derpy_gg_bounty_fail_secondary",
                 "text": "A promise in the ledger is a debt.", "tooltip": "false"})
@@ -3898,21 +3660,19 @@ def _build_one(tag):
     # ONLY THE EMPTY SLOT SHOWS THIS. It used to sit under every offer as well, six lines
     # repeating the Help tab's Bounties page; an offer now says its own terms instead.
     loc.append({"key": "derpy_gg_bounty_help",
-                "text": "A guild posts work it wants done here. Taking it turns it into a "
-                        "mission. The Help tab's Bounties page explains the rest.",
+                "text": 'Accept a guild bounty here to start a mission. See the Bounties page in Help for the rules.',
                 "tooltip": "false"})
     loc.append({"key": "derpy_gg_locked_hint",
-                "text": "Your rank with this guild is too low. Keep earning reputation.",
+                "text": 'Your rank with this guild is too low. Keep earning Reputation.',
                 "tooltip": "false"})
 
     # The feed message the player sees when a hostile service lands on them.
     loc.append({"key": "message_event_text_text_derpy_gg_hit_title",
                 "text": "A Guild Moves Against You", "tooltip": "false"})
     loc.append({"key": "message_event_text_text_derpy_gg_hit_primary",
-                "text": "A rival has bought the favour of a guild, and it has been "
-                        "spent on you.", "tooltip": "false"})
+                "text": 'A rival has paid a guild to act against you.', "tooltip": "false"})
     loc.append({"key": "message_event_text_text_derpy_gg_hit_secondary",
-                "text": "Their favour buys more than goods.", "tooltip": "false"})
+                "text": 'Their Favour buys more than goods.', "tooltip": "false"})
 
     # A rival paid to take what is yours (2026-09-29). Fixed text: the Log names who and what.
     loc.append({"key": "message_event_text_text_derpy_gg_hunted_title",
@@ -3920,13 +3680,12 @@ def _build_one(tag):
     loc.append({"key": "message_event_text_text_derpy_gg_hunted_primary",
                 "text": "A guild has hired a rival against you.", "tooltip": "false"})
     loc.append({"key": "message_event_text_text_derpy_gg_hunted_secondary",
-                "text": "The Guilds panel's Log names who, and what they were paid to take.",
+                "text": 'The Guilds Log names the rival and their target.',
                 "tooltip": "false"})
     # The guilds redrew their services (2026-09-29 pools). Same text for every race.
     for part, text in (("title", "New Services"),
                        ("primary", "The guilds have changed what they offer."),
-                       ("secondary", "Each guild's three services have been drawn again. "
-                                     "Open the Guilds panel to see them.")):
+                       ("secondary", 'Each guild has three new service offers. Open the Guilds panel to see them.')):
         loc.append({"key": "message_event_text_text_derpy_gg_rotation_" + part,
                     "text": text, "tooltip": "false"})
 
@@ -3957,10 +3716,7 @@ def _build_one(tag):
         loc.append({"key": "message_event_text_text_derpy_gg_lead_won_%s_title" % _g,
                     "text": "%s Answer To You" % _full, "tooltip": "false"})
         loc.append({"key": "message_event_text_text_derpy_gg_lead_won_%s_primary" % _g,
-                    "text": "You now hold more reputation with %s than any other power "
-                            "in the world. Their leader's bonus is yours, and, unless "
-                            "the settings say otherwise, their finest service is sold to "
-                            "nobody else." % _full,
+                    "text": "You now lead %s. You gain their leader's bonus and, unless the settings say otherwise, exclusive access to their finest service." % _full,
                     "tooltip": "false"})
         loc.append({"key": "message_event_text_text_derpy_gg_lead_won_%s_secondary" % _g,
                     "text": "It is taken back the same way it was won.",
@@ -3968,9 +3724,7 @@ def _build_one(tag):
         loc.append({"key": "message_event_text_text_derpy_gg_lead_lost_%s_title" % _g,
                     "text": "%s Have Turned Away" % _full, "tooltip": "false"})
         loc.append({"key": "message_event_text_text_derpy_gg_lead_lost_%s_primary" % _g,
-                    "text": "A rival has out-earned you with %s. Their leader's bonus "
-                            "went with them, and so, unless the settings say otherwise, "
-                            "did the sole right to their finest service." % _full,
+                    "text": "A rival now leads %s. You lose the leader's bonus and, unless the settings say otherwise, exclusive access to their finest service." % _full,
                     "tooltip": "false"})
         loc.append({"key":
                     "message_event_text_text_derpy_gg_lead_lost_%s_secondary" % _g,
@@ -4003,7 +3757,7 @@ def _build_one(tag):
                          "settings say otherwise, only to whoever leads them.",
                       5: " There is no higher rank."}.get(
                 _r, " A service that was closed to you is open.")
-            _body = ("Your rank with %s has risen to %s. Their bonus to you has grown.%s"
+            _body = ('With %s, you are now %s. Your rank bonus has increased.%s'
                      % (_full, _rank, _opens))
             loc.append({"key": _stem + "_primary", "text": _body, "tooltip": "false"})
             # A HALL THIS RANK OPENS (spec 2026-10-04): level n opens at HALL_RANK[n]. Its
@@ -4024,14 +3778,12 @@ def _build_one(tag):
     # key is whichever one happened to trigger it.
     _NOTICE = {
         "first": ("%s Have Noticed You",
-                  "Word of your doings has reached %s. They keep a ledger of every power "
-                  "in the world, and your name is now in it. Reputation with them is earned "
-                  "by playing as you already play; what it buys is on the Guilds panel.",
+                  'Your deeds have caught the attention of %s. Your name is in their ledger. Campaign actions earn Reputation with them; the Guilds panel shows their services.',
                   "The guild crest at the top of your screen opens it."),
         "half": ("%s Are Watching Closely",
                  "You are halfway to your first rank with %s. At " + RANK_NAMES[1]
                  + " they open their first service to you.",
-                 "The Guilds panel shows how far every guild has come."),
+                 'The Guilds panel shows your progress with each guild.'),
     }
     for _tag in ("first", "half"):
         _title, _primary, _secondary = _NOTICE[_tag]
@@ -4061,14 +3813,7 @@ def _build_one(tag):
     loc.append({"key": "derpy_gg_rivals_idle",
                 "text": "Rivals have not moved yet - end a turn.", "tooltip": "false"})
     loc.append({"key": "derpy_gg_rivals_help",
-                "text": "What the other powers of the world did with their guilds "
-                        "last turn: services they bought with favour, "
-                        "demands they answered, and lords serving as guild "
-                        "patrons.||Every one of these is a tool you have too. The "
-                        "rivals are playing for the same guilds you are."
-                        "||Each row below names who leads that guild, how much "
-                        "reputation the leader gained last turn, and marks the "
-                        "name in yellow when the guild changed hands.",
+                "text": "Last turn's rival activity: services bought with Favour, demands paid and lords appointed as Patrons.||Rivals use the same guilds and services as you.||Each row names a guild's leader and their Reputation earned last turn. Yellow names mark a change in leadership.",
                 "tooltip": "false"})
     loc.append({"key": "derpy_gg_took", "text": "changed hands this turn",
                 "tooltip": "false"})
@@ -4088,7 +3833,7 @@ def _build_one(tag):
     for g in GUILDS:
         kind = BOUNTIES[g][0]
         title, desc = F["bounties"][g]
-        done = "The guild has been paid in full, and so have you."
+        done = 'The work is done. The guild has paid your reward.'
         missions.append({
             "key": bounty_key(g), "mission_type": BOUNTY_KINDS[kind]["mtype"],
             "localised_title": title, "localised_description": desc,
@@ -5276,8 +5021,8 @@ def built_tables():
                         # line went without until 2026-10-04 (asked for in game). ONE %n:
                         # the engine fills only the first and prints a second one raw
                         # ("10 Reputation and %n Favour", seen in game 2026-10-04).
-                        "text": "[[col:yellow]]Completing this earns %%n Reputation with the "
-                                "%s, and the same in Favour[[/col]]" % short_name(g, tag),
+                        "text": "[[col:yellow]]Complete this for %%n Reputation with the "
+                                "%s and matching Favour[[/col]]" % short_name(g, tag),
                         "tooltip": "false"})
     owner = covered_chains()
     for r in sorted(live_rows("building_levels"), key=lambda r: r["level_name"]):
@@ -6341,8 +6086,8 @@ RACE_TEXT = {
          "twist": ("Hashut's tithe", "the guilds make demands more often, and a demand "
                    "you pay is worth half again as much.")},
     "_emp": {"label": "Empire",
-             "earn": "Taking a settlement in the lands of the old Empire, from anyone who "
-                     "is not of the Empire, pays the {g}.",
+             "earn": "Taking a settlement in the old Empire from a faction that "
+                     "is not of the Empire pays the {g}.",
              "twist": ("Petty rivalries", "earning with a guild takes half again as much "
                        "from its rival.")},
     "_dwf": {"label": "Dwarf",
@@ -6350,7 +6095,7 @@ RACE_TEXT = {
              "twist": ("Never forgotten", "a bounty you fail costs half again as much "
                        "Reputation, and a demand you let expire costs twice as much.")},
     "_brt": {"label": "Bretonnia",
-             "earn": "Chivalry you earn pays the {g}, one Reputation for every five "
+             "earn": "Earning Chivalry pays the {g}: one Reputation for every five "
                      "points.",
              "twist": ("Noblesse oblige", "a demand you pay is worth half again as much, "
                        "and one you let expire costs twice as much.")},
@@ -6360,17 +6105,17 @@ RACE_TEXT = {
                        "rival.")},
     "_ksl": {"label": "Kislev",
              "earn": "Beginning a Motherland ritual pays the {g}.",
-             "twist": ("Hardy folk", "the upkeep every guild charges is halved.")},
+             "twist": ("Hardy folk", "each guild charges half the upkeep.")},
     "_def": {"label": "Dark Elf",
-             "earn": "Slaves taken in battle or by raiding pay the {g}, one Reputation for "
+             "earn": "Slaves taken in battle or raids pay the {g}: one Reputation for "
                      "every twenty.",
              "twist": ("Cutthroat", "earning with a guild takes half again as much from "
                        "its rival, and services aimed at your enemies cost a quarter "
                        "less.")},
     "_hef": {"label": "High Elf",
-             "earn": "A court action that succeeds pays the {g}.",
+             "earn": "A successful court action pays the {g}.",
              "twist": ("Ancient houses", "each guild lets you hold half again as much "
-                       "favour.")},
+                       "Favour.")},
     "_skv": {"label": "Skaven", "earn": "Founding an under-city pays the {g}.",
              "twist": ("Treachery", "earning with a guild takes half again as much from its "
                        "rival, and a demand you let expire costs nothing.")},

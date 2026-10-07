@@ -1017,13 +1017,16 @@ FRAMES = {
         # 30..70) sit outside the buttons.
         "gbar": [_L("ui/skins/wh2_main_hef_high_elves/bar_small_buttons.png", (0, 85, 0, 85))],
         # Aislinn's dragonship header, navy with blue corner curls, tiled at its own size;
-        # its last 12 columns are transparent, hence the 24 right margin and the second
-        # slot stopping at 113. The open tab wears a gold outline.
+        # its last 18 columns are transparent, hence the 24 right margin. The layer runs
+        # 18 past the tab so the VISIBLE plate is 3..122, centred under the label: drawn
+        # 6..107 it sat 9px left of the centred text, and "Leaderboard" in the game's font
+        # (100px, measured off a 2026-10-07 screenshot) ran onto the right curl. The
+        # overhang is fully transparent. The open tab wears a gold outline on the plate.
         "tab": {"layers": [_L(_HEF_TAB, (12, 24, 12, 12), True, colour=_DIM,
-                              offset=(6, 0), dw=-6),
-                           _L(CLEAR, (8, 8, 8, 8), colour="#FFD37AFF", offset=(6, 0), dw=-18)],
-                "hover": [_L(_HEF_TAB, (12, 24, 12, 12), True, offset=(6, 0), dw=-6),
-                          _L(CLEAR, (8, 8, 8, 8), colour="#FFD37AFF", offset=(6, 0), dw=-18)],
+                              offset=(3, 0), dw=12),
+                           _L(CLEAR, (8, 8, 8, 8), colour="#FFD37AFF", offset=(3, 0), dw=-6)],
+                "hover": [_L(_HEF_TAB, (12, 24, 12, 12), True, offset=(3, 0), dw=12),
+                          _L(CLEAR, (8, 8, 8, 8), colour="#FFD37AFF", offset=(3, 0), dw=-6)],
                 "selected": [_HEF_TAB, _D + "white_frame.png"],
                 "selected_hover": [_HEF_TAB, _D + "white_frame.png"]},
         # The card's gold rim again round a dark trough; its opening 17..733, 7..21 holds the

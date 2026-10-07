@@ -3,6 +3,21 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-10-07 - build C6AAD5FC
+
+MD5 `C6AAD5FC289D35725322256AD107DEB0`, 45,609,629 bytes. Includes build 2C504683, which
+was not released on its own. Not yet seen in game.
+
+- **Every text in the mod reworded** to read naturally: 3,440 of 8,980 lines across all
+  nine races, about 6% shorter overall. Names, numbers and rules are unchanged.
+  Reputation and Favour are capitalised everywhere. The settings page now says seven
+  guilds, not six.
+- **High Elf tabs:** the plates now sit centred under their labels, so "Leaderboard" no
+  longer runs over the tab's border.
+- Detail: `docs/history/HANDOFF_20261007_GUILDS_TEXT_HUMANIZE_CODEX.md` (the brief),
+  `docs/history/CODEX_GUILDS_TEXT_REPORT_20261007.md` and
+  `docs/history/HANDOFF_20261007_GUILDS_TEXT_HUMANIZE_CLAUDE.md`.
+
 ## 2026-10-05 - build C3140F92
 
 MD5 `C3140F927FDECD0974719610FCF729F9`, 45,700,250 bytes. Includes builds FBCC9948, 9FC1E42F
