@@ -129,11 +129,13 @@ first turn after loading.
 **Mod Configuration Tool (optional).** If MCT is installed, the mod adds a settings page:
 a difficulty preset (Easy, Default, Hard, Cutthroat, or Custom with every earn rate and
 limit exposed), switches for AI spending, hostile services, guild notices on the feed, the
-leader's monopoly on each guild's top service, race differences and guild halls, and a debug
-log option. The values are
-read once, when a campaign starts, and are fixed for the life of that save. In multiplayer
-the host's settings are used for every player; the debug log option stays each player's
-own. Without MCT, or with a host who has no MCT, the defaults apply.
+leader's monopoly on each guild's top service, race differences and guild halls, a panel
+size (Small, Medium or Large) and a debug log option. The values are
+read once, when a campaign starts, and are fixed for the life of that save. The panel size
+and the debug log option are the exceptions: they can be changed at any time and take effect
+the next time the panel opens. In multiplayer the host's settings are used for every player;
+the panel size and the debug log option stay each player's own. Without MCT, or with a host
+who has no MCT, the defaults apply.
 
 ## This repository
 

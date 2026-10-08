@@ -6259,6 +6259,31 @@ end)()
     assert(GGUI.scale_for(nil, nil) == 1, "an unreadable screen draws the design size")
     assert(GGUI.scale_for(0, 0) == 1, "a zero screen draws the design size")
 
+    -- MCT "Panel size": the size asked for, stepped down to Medium when it would not fit.
+    assert(GGUI.pick_size("large", 1920, 1080, 1) == "large", "Large fits 1080p")
+    assert(GGUI.pick_size("large", 1600, 900, 1) == "medium", "Large is 933 tall, not on 900")
+    assert(GGUI.pick_size("large", 3840, 2160, 2) == "large", "4K: 2 x 4/3 x 700 = 1867 fits")
+    assert(GGUI.pick_size("small", 1600, 900, 1) == "small", "Small always fits")
+    assert(GGUI.pick_size("bogus", 1920, 1080, 1) == "medium", "an unknown size is Medium")
+    assert(GGUI.pick_size("large", nil, nil, 1) == "large", "no screen reading, no step down")
+    local prev_mct = get_mct
+    get_mct = nil
+    assert(GGUI.want_size() == "medium", "no MCT reads Medium")
+    local pick = "large"
+    get_mct = function() return {get_mod_by_key = function() return {
+        get_option_by_key = function(_, k) return k == "ui_size" and
+            {get_finalized_setting = function() return pick end} or nil end} end} end
+    assert(GGUI.want_size() == "large", "the MCT dropdown is read by its key")
+    pick = 150
+    assert(GGUI.want_size() == "medium", "a stale slider value reads Medium")
+    get_mct = prev_mct
+
+    -- THE FILE FACTOR CANCELS in text measurement: a Large file's probe reads F times the
+    -- design one with no stretch, and text_ratio must still report F, not 1.
+    GGUI.F, GGUI.PROBE_W0 = 4 / 3, nil
+    assert(GGUI.text_ratio() == 4 / 3, "no probe yet: the ratio is the file factor")
+    GGUI.F = 1
+
     GGUI.S = 2
     assert(GGUI.px(20) == 40 and GGUI.px(7) == 14, "px multiplies by the factor")
     GGUI.S = 1.33
@@ -6275,8 +6300,19 @@ end)()
         function n:Find(i) return self.kids[i + 1] end
         function n:SetCanResizeWidth(v) calls[#calls + 1] = self.id .. " cw" end
         function n:SetCanResizeHeight(v) calls[#calls + 1] = self.id .. " ch" end
-        function n:Resize(rw, rh)
+        -- AS THE ENGINE DOES IT: the third argument defaults to true and rescales every
+        -- child by the parent's factor. The walk sizes each child itself, so a default
+        -- Resize compounded the scale per level - S, S^2, S^3 - in game on 2026-10-08.
+        function n:Resize(rw, rh, kids_too)
             calls[#calls + 1] = self.id .. " " .. rw .. "x" .. rh
+            if kids_too ~= false then
+                local fx, fy = rw / self.w, rh / self.h
+                local function grow(k)
+                    k.w, k.h = math.floor(k.w * fx + 0.5), math.floor(k.h * fy + 0.5)
+                    for _, kk in ipairs(k.kids) do grow(kk) end
+                end
+                for _, k in ipairs(self.kids) do grow(k) end
+            end
             self.w, self.h = rw, rh
         end
         function n:AnimationExists(a) return text and a == GGUI.SCALE_ANIM end
@@ -6295,12 +6331,15 @@ end)()
         })
     end
 
-    GGUI.S = 1
+    -- The walk applies the SCREEN factor only: the file is already at the MCT size, so a
+    -- Large file at 1080p (S = 4/3, SA = 1) must not be touched.
+    GGUI.S, GGUI.SA = 4 / 3, 1
     GGUI.scale_tree(tree())
     assert(#calls == 0, "at the design size nothing is touched, got " .. table.concat(calls, "; "))
 
-    GGUI.S = 2
+    GGUI.S, GGUI.SA = 2, 2
     GGUI.scale_tree(tree())
+    GGUI.SA = 1
     local got = table.concat(calls, "; ")
     local a = GGUI.SCALE_ANIM
     local want = table.concat({
@@ -8141,9 +8180,20 @@ end)()
             end
         end
         saved["derpy_gg_log_" .. ME] = table.concat(log, "|")
+        -- GG_DUMP_SIZE: draw it at that MCT Panel size (small / medium / large).
+        local dsize = os.getenv("GG_DUMP_SIZE") or "medium"
+        assert(GGUI.SIZES[dsize], "GG_DUMP_SIZE must be a GGUI.SIZES key, got " .. dsize)
+        local keep_want = GGUI.want_size
+        GGUI.want_size = function() return dsize end
+        -- A Small or Large file draws a real smaller or bigger font, and the engine measures
+        -- that font: the stand-in measure has to grow with it, or every plate placed by a
+        -- measured width lands at Medium's.
+        local keep_measure = measure
+        measure = function(s) return keep_measure(s) * GGUI.SIZES[dsize].f end
+        local dsfx = GGUI.SIZES[dsize].suffix
         SIZE = {}
         for _, fn in ipairs({"panel", "card", "row", "list", "frow"}) do
-            local x = io.open("Modding Files/pack/ui/campaign ui/derpy_gg_" .. fn .. ".twui.xml"):read("*a")
+            local x = io.open("Modding Files/pack/ui/campaign ui/derpy_gg_" .. fn .. dsfx .. ".twui.xml"):read("*a")
             -- The first width after each id is its state's: componentimages carry none.
             for at, id in string.gmatch(x, '()%sid="([^"]+)"') do
                 local w, h = string.match(x, 'width="(%d+)"%s+height="(%d+)"', at)
@@ -8181,6 +8231,7 @@ end)()
             out:close()
         end
         GGUI.close()
+        GGUI.want_size, measure = keep_want, keep_measure
         GG.patrons[ME], SIZE, GG.log_entries, GG.halls[ME] = nil, nil, stub_log, nil
         GG.CULTURE_OF[ME], GG.CULTURE_OF[RIVAL] = GG.CHD_CULTURE, GG.CHD_CULTURE
         cm.get_human_factions, GG.player_cultures_cache = keep_humans, nil

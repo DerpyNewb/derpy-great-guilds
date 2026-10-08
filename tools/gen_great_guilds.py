@@ -5810,7 +5810,8 @@ def check_presets():
     # One nesting level only, which is all this table has: `name = { ... },`
     presets = set(re.findall(r"(?m)^    ([a-z_]+) = \{", block.group(1)))
 
-    drops = set(re.findall(r'add_dropdown_value\("([a-z_]+)"', mct))
+    # The DIFFICULTY dropdown's values only: the file has other dropdowns (Panel size).
+    drops = set(re.findall(r'o_preset:add_dropdown_value\("([a-z_]+)"', mct))
     custom = "custom"
     if custom not in drops:
         out.append("the MCT dropdown offers no %r value, so the player can never reach "

@@ -10,6 +10,8 @@ made for this mod silently changed the Zharr Exchange's shipped output too.
 
 GUID RANGE:
     GG21xxxx  derpy_gg_panel / derpy_gg_card / derpy_gg_row   <- this file
+    GG22xxxx  the same files at MCT's Small size (*_sm), 2026-10-08
+    GG23xxxx  the same files at MCT's Large size (*_lg), 2026-10-08
 Claimed 2026-09-10 in both ledgers (gen_exchange_ui.py and docs/CUSTOM_UI.md).
 DE15xxxx is RETIRED and must never be reused - a reused prefix against a save
 still holding the old component is a silent non-draw.
@@ -1539,14 +1541,314 @@ FILES = [
 ]
 
 
+# MCT "Panel size" (2026-10-08): Small / Medium / Large. No runtime call changes a font, and
+# font_scale only stretches the glyphs it already drew, so a slider drew soft text at every
+# size but 100% (in game). Each size is therefore a whole second set of files, every length
+# scaled and every font category moved one real step along CA's list - the Zharr Exchange's
+# Large, measured in game 2026-10-07. Suffix -> (num, den, GUID prefix, font map). Must match
+# GGUI.SIZES in the Lua; check_sizes pins the two. 9-slice margins are texture pixels and
+# stay as they are. header_24_bold has nothing above it, so Large keeps the title's size.
+# NO FONT MAY SHRINK LESS THAN ITS BOX: Small was 5/6 and header_14 -> header_12 is 0.857, so
+# every heading came out relatively wider and ran into its neighbour (in game, 2026-10-08).
+# Small is therefore 6/7, the largest step any mapped font takes, and Large's 4/3 is already
+# at least every font step it takes; check_font_steps asserts both.
+SIZES = {
+    "_sm": (6, 7, "GG22", {"body_12": "body_10", "header_14": "header_12",
+                           "header_18": "header_14", "header_24_bold": "header_20_bold"}),
+    "_lg": (4, 3, "GG23", {"body_12": "body_16", "header_14": "header_18",
+                           "header_18": "header_24_bold", "header_24_bold": "header_24_bold"}),
+}
+
+
+# A TILED LAYER IS DRAWN AT ITS ART'S NATIVE SIZE, cropped or repeated - not stretched.
+# With no top/bottom slice, Medium's boxes hold one copy of each plate below, but a Large card
+# (160 tall) over 128px of art drew a second bordered plate under the first, and a Small one
+# (100) lost its bottom border (in game, 2026-10-08). Slicing a native top and bottom off and
+# repeating the middle was tried next and drew a seam across every Large card (in game): the
+# leather is not a repeating texture. So off Medium, a plate that Medium shows whole is drawn
+# from a COPY OF ITS ART RESIZED BY THE SAME FACTOR, margins scaled with it - one copy fills
+# the box exactly as at Medium. bake_size_art writes the copies from CA's PNGs into
+# SIZE_ART_DIR; check_size_art proves every one the files name is there at its size. Art
+# heights read off CA's PNGs; check_tile_heights re-reads them from the preview's cache.
+TILE_TEX_H = {
+    "ui/skins/default/bret_vows_titel.png": 47,
+    "ui/skins/default/chivalry_bar_frame.png": 19,
+    "ui/skins/default/cp1_cth_tiger_court/pillar_info_holder.png": 200,
+    "ui/skins/default/dlc23_chd_hell_forge/cap_group_background.png": 128,
+    "ui/skins/default/dlc23_chd_hell_forge/cap_title_holder.png": 54,
+    "ui/skins/default/dlc23_chd_hell_forge/sub_title.png": 30,
+    "ui/skins/default/dlc23_chd_military_convoys/military_convoys_completed_convoys_bar.png": 29,
+    "ui/skins/default/dlc27_hef_asur_domination/wh3_sea_patrol_progress_bar_fill.png": 37,
+    "ui/skins/default/dlc29_skv_chaotic_plans/sub_title_bgr.png": 36,
+    "ui/skins/default/panel_title.png": 59,
+    "ui/skins/default/slider_vertical_mid.png": 215,
+    "ui/skins/default/wh3_main_court_orthodoxy/court_progress_top_bar.png": 22,
+    "ui/skins/warhammer2/ikit_panel_bar_background.png": 32,
+    "ui/skins/warhammer2/murderous_prowess_frame.png": 41,
+    "ui/skins/wh3_main_cth_cathay/compass_power_bar_frame.png": 26,
+}
+# Medium shows the whole plate when its box is at least this much of the art. Below it Medium
+# already shows only the top (the reputation fills, 13 of 22 and 37) or the art is meant to
+# repeat (the slider rod), and those are left as Medium draws them.
+TILE_WHOLE = 0.85
+
+
+def _margin4(m):
+    return tuple(m) if isinstance(m, (tuple, list)) else (m,) * 4
+
+
+SIZE_ART_DIR = "ui/campaign ui/derpy_gg_sized"
+
+# THE TITLE PLATE IS SWAPPED PER CULTURE: the files name ui/skins/default/panel_title.png and
+# the game draws ui/skins/<culture>/panel_title.png - the Chaos Dwarfs' spiked plate in game,
+# where the default is a skull bar (memory wh3-default-skin-path-swaps-per-culture). A copy
+# under our own folder would lose that, so its copies ship where CA's do: top level of every
+# skin folder that has one, same file name in each, so the same swap picks the reader's.
+# The skins CA ships a panel_title.png for, read out of the ui packs' path list.
+SKINNED_ART = {
+    "ui/skins/default/panel_title.png": [
+        "daemon", "warhammer2", "warhammer3", "wh2_dlc09_tmb_tomb_kings",
+        "wh2_dlc11_cst_vampire_coast", "wh2_main_hef_high_elves", "wh2_main_lzd_lizardmen",
+        "wh2_main_skv_skaven", "wh3_dlc23_chd_chaos_dwarfs", "wh3_dlc29_nag_host_of_nagash",
+        "wh3_main_cth_cathay", "wh3_main_ksl_kislev", "wh_dlc03_bst_beastmen",
+        "wh_dlc05_wef_wood_elves", "wh_dlc08_nor_norsca", "wh_main_dwf_dwarfs",
+        "wh_main_grn_greenskins", "wh_main_vmp_vampire_counts"],
+}
+
+
+def size_art_path(path, sfx):
+    """Where the resized copy of CA's `path` ships: flat, lower case, the size first."""
+    if path in SKINNED_ART:
+        return "ui/skins/default/derpy_gg_%s_%s" % (sfx[1:], path.rsplit("/", 1)[1])
+    flat = path.replace("ui/skins/", "").replace("/", "_")
+    return "%s/%s_%s" % (SIZE_ART_DIR, sfx[1:], flat)
+
+
+def size_art_copies():
+    """[(shipped path, CA path, suffix)]: every copy, one per skin for a swapped plate."""
+    out = []
+    for dst, (src, sfx) in sorted(size_art().items()):
+        out.append((dst, src, sfx))
+        for skin in SKINNED_ART.get(src, ()):
+            out.append((dst.replace("/default/", "/%s/" % skin, 1),
+                        src.replace("/default/", "/%s/" % skin, 1), sfx))
+    return out
+
+
+def tile_scaled(lay, med_h, sfx):
+    """The layer drawn from a resized copy when Medium shows its tiled plate whole."""
+    th = TILE_TEX_H.get(lay["path"])
+    top, right, bottom, left = _margin4(lay.get("margin", 0))
+    if not lay.get("tile") or top or bottom or not th or med_h < TILE_WHOLE * th:
+        return lay
+    n, d = SIZES[sfx][:2]
+    return dict(lay, path=size_art_path(lay["path"], sfx), src=lay["path"],
+                margin=tuple(int(v * n / float(d) + 0.5) for v in (top, right, bottom, left)))
+
+
+def size_art():
+    """{shipped path: (CA path, suffix)} for every resized copy the built files name."""
+    out = {}
+    for fname, builder, _c in frame_files():
+        sfx = size_of(fname)
+        if not sfx:
+            continue
+        for c in builder().walk():
+            for lay in (c.kw.get("layers") or []) + (c.kw.get("hover") or []):
+                if lay.get("src"):
+                    out[lay["path"]] = (lay["src"], sfx)
+    return out
+
+
+def _art_cache(path):
+    return os.path.join(ROOT, ".skilltree_cache", "ui_preview", path.replace("/", os.sep))
+
+
+def bake_size_art():
+    """Write every resized copy, from CA's PNGs (extracted by the preview when missing)."""
+    from PIL import Image
+    want = size_art_copies()
+    srcs = sorted(set(s for _d, s, _x in want))
+    if not all(os.path.isfile(_art_cache(s)) for s in srcs):
+        import preview_guilds_panel as PV
+        PV.extract_art(extra=srcs)
+    written = []
+    for dst, src, sfx in want:
+        n, d = SIZES[sfx][:2]
+        im = Image.open(_art_cache(src)).convert("RGBA")
+        w, h = (max(1, int(v * n / float(d) + 0.5)) for v in im.size)
+        out = os.path.join(ROOT, "Modding Files", "pack", dst.replace("/", os.sep))
+        if not os.path.isdir(os.path.dirname(out)):
+            os.makedirs(os.path.dirname(out))
+        im.resize((w, h), Image.LANCZOS).save(out)
+        written.append(out)
+    # The folders hold only what the files name: a copy left behind ships for nothing. In a
+    # skin folder only our own derpy_gg_ files are ours to prune - other mods stage there.
+    keep = set(d for d, _s, _x in want)
+    pack = os.path.join(ROOT, "Modding Files", "pack")
+    for folder in [SIZE_ART_DIR] + sorted(set(d.rsplit("/", 1)[0] for d in keep
+                                              if d.startswith("ui/skins/"))):
+        disk = os.path.join(pack, folder.replace("/", os.sep))
+        for name in os.listdir(disk):
+            ours = folder == SIZE_ART_DIR or name.startswith("derpy_gg_")
+            if ours and folder + "/" + name not in keep:
+                os.remove(os.path.join(disk, name))
+    return written
+
+
+def check_size_art():
+    """Every resized copy a built file names is staged, at its size's dimensions."""
+    out = []
+    try:
+        from PIL import Image
+    except ImportError:
+        return out
+    for dst, src, sfx in size_art_copies():
+        f = os.path.join(ROOT, "Modding Files", "pack", dst.replace("/", os.sep))
+        if not os.path.isfile(f):
+            out.append("%s is named by a %s file and not staged - it draws nothing "
+                       "(gen_guilds_ui.py --write bakes it)" % (dst, sfx))
+            continue
+        cache = _art_cache(src)
+        if os.path.isfile(cache):
+            th = Image.open(cache).size[1]
+        else:
+            th = TILE_TEX_H[src]
+        n, d = SIZES[sfx][:2]
+        if Image.open(f).size[1] != int(th * n / float(d) + 0.5):
+            out.append("%s is %dpx tall, not %s's %d at %d/%d"
+                       % (dst, Image.open(f).size[1], src, th, n, d))
+    return out
+
+
+def check_font_steps():
+    """No mapped font may grow by more than its size's factor, or text outgrows its box."""
+    out = []
+    for sfx, (n, d, _p, fonts) in sorted(SIZES.items()):
+        for src, dst in sorted(fonts.items()):
+            a = int(re.search(r"\d+", src).group())
+            b = int(re.search(r"\d+", dst).group())
+            if b * d > a * n:
+                out.append("%s maps %s to %s, %.3f of its size against boxes at %d/%d - "
+                           "that text is wider than its box" % (sfx, src, dst, b / a, n, d))
+    return out
+
+
+def check_tile_heights():
+    """TILE_TEX_H against CA's PNGs, when the preview has extracted them."""
+    out = []
+    cache = os.path.join(ROOT, ".skilltree_cache", "ui_preview")
+    try:
+        from PIL import Image
+    except ImportError:
+        return out
+    for path, h in sorted(TILE_TEX_H.items()):
+        f = os.path.join(cache, path)
+        if os.path.isfile(f):
+            got = Image.open(f).size[1]
+            if got != h:
+                out.append("TILE_TEX_H says %s is %dpx tall, the art is %d" % (path, h, got))
+    return out
+
+
+def sized(root, suffix):
+    """The same tree at another size: boxes, image offsets, text insets, list columns, fonts."""
+    n, d, _prefix, fonts = SIZES[suffix]
+
+    def z(v):
+        # Lua's GGUI.px rounding: floor(v * S + 0.5).
+        return int(v * n / float(d) + 0.5) if v >= 0 else -int(-v * n / float(d) + 0.5)
+
+    def zpair(s):
+        # NEVER BELOW MEDIUM'S INSET: an inset keeps text clear of a 9-slice end, and those
+        # ends are drawn at native size at every size - the header's arrow does not shrink.
+        return ",".join("%.2f" % (max(float(v) * n / d, float(v)) if n < d
+                                  else float(v) * n / d) for v in s.split(","))
+
+    for c in root.walk():
+        med_h = c.h
+        c.w, c.h = z(c.w), z(c.h)
+        kw = c.kw
+        for key in ("layers", "hover"):
+            if kw.get(key):
+                kw[key] = [tile_scaled(dict(lay, offset=tuple(float(v) * n / d
+                                                              for v in lay.get("offset", (0, 0))),
+                                            dw=z(lay.get("dw", 0)), dh=z(lay.get("dh", 0))),
+                                       med_h + lay.get("dh", 0), suffix)
+                           for lay in kw[key]]
+        if kw.get("text"):
+            kw["tx"] = zpair(kw.get("tx", "4.00,0.00"))
+            kw["ty"] = zpair(kw.get("ty", "8.00,0.00"))
+            kw["fontcat"] = fonts[EU.fontcat(kw)]
+            # font_m_size in proportion, as Medium writes it (12 beside header_14): the
+            # category is what the engine sizes by, and the preview's PIL font reads this.
+            kw["size"] = z(kw.get("size", 12))
+        le = kw.get("layoutengine")
+        if le and le.get("columns"):
+            kw["layoutengine"] = dict(le, columns=[z(v) for v in le["columns"]])
+    return root
+
+
+def check_sizes(lua_src):
+    """The Lua, the MCT dropdown and SIZES must name the same sizes at the same factors.
+
+    A suffix the Lua appends that no file carries is a CreateComponent on a missing path,
+    which draws nothing and says nothing; a factor that disagrees places every part at one
+    size inside boxes of another.
+    """
+    out = []
+    block = re.search(r"GGUI\.SIZES = \{(.*?)\n\}", lua_src, re.S)
+    if not block:
+        return ["zzz_derpy_guilds_ui.lua declares no GGUI.SIZES"]
+    lua = {}
+    for key, num, den, sfx in re.findall(
+            r'(\w+)\s*=\s*\{f = (\d+)(?: / (\d+))?,\s*suffix = "([^"]*)"\}', block.group(1)):
+        lua[key] = (int(num), int(den or 1), sfx)
+    want = {"medium": (1, 1, "")}
+    for sfx, (n, d, _p, _f) in SIZES.items():
+        want[{"_sm": "small", "_lg": "large"}.get(sfx, sfx)] = (n, d, sfx)
+    if lua != want:
+        out.append("GGUI.SIZES %r does not match gen_guilds_ui.SIZES %r" % (lua, want))
+    mct_path = os.path.join(ROOT, "Modding Files", "pack", "script", "mct", "settings",
+                            "derpy_great_guilds.lua")
+    if os.path.isfile(mct_path):
+        mct = io.open(mct_path, encoding="utf-8").read()
+        drops = set(re.findall(r'o_size:add_dropdown_value\("([a-z_]+)"', mct))
+        if drops != set(lua):
+            out.append("MCT Panel size offers %s but GGUI.SIZES has %s - a pick the panel "
+                       "does not know opens at Medium" % (sorted(drops), sorted(lua)))
+    m = re.search(r"GGUI\.PANEL_W, GGUI\.PANEL_H = (\d+), (\d+)", lua_src)
+    root = _panel()
+    if not m or (int(m.group(1)), int(m.group(2))) != (root.w, root.h):
+        out.append("GGUI.PANEL_W/H must be the panel's Medium size %dx%d, or the fit test "
+                   "lets a Large panel off the screen" % (root.w, root.h))
+    return out
+
+
+def size_of(fname):
+    """The SIZES suffix a file was built at, or "" for Medium."""
+    for sfx in SIZES:
+        if fname.endswith(sfx + ".twui.xml"):
+            return sfx
+    return ""
+
+
 def frame_files():
-    """FILES plus each race's own panel and card (see FRAMES)."""
+    """FILES plus each race's own panel and card (see FRAMES), then all of it per SIZES."""
     out = list(FILES)
     for tag in FRAME_TAGS:
         out.append((frame_file("derpy_gg_panel", tag), lambda t=tag: _panel(t),
                     "The Great Guilds - panel frame, tabs, pager (%s frame)" % tag))
         out.append((frame_file("derpy_gg_card", tag), lambda t=tag: _card(t),
                     "The Great Guilds - one service card (%s frame)" % tag))
+    for sfx in sorted(SIZES):
+        for fname, builder, comment in list(out):
+            if fname in UNSCALED_FILES or size_of(fname):
+                continue
+            out.append((fname.replace(".twui.xml", sfx + ".twui.xml"),
+                        lambda b=builder, s=sfx: sized(b(), s),
+                        "%s (%s size, %d/%d)" % (comment, sfx[1:], SIZES[sfx][0],
+                                                 SIZES[sfx][1])))
     return out
 
 
@@ -1554,7 +1856,8 @@ def build_xml():
     """path -> xml text. GUIDs are minted per file from one counter, as the Exchange does."""
     out = {}
     for fname, builder, comment in frame_files():
-        root = EU.assign(builder(), GUID_PREFIX)
+        sfx = size_of(fname)
+        root = EU.assign(builder(), SIZES[sfx][2] if sfx else GUID_PREFIX)
         if fname not in UNSCALED_FILES:
             for c in root.walk():
                 if c.kw.get("text"):
@@ -2144,6 +2447,10 @@ def check():
         out += check_help_fits(lua_src)
         out += check_loc_keys(lua_src)
         out += check_panel_bg(lua_src)
+        out += check_sizes(lua_src)
+        out += check_tile_heights()
+        out += check_size_art()
+        out += check_font_steps()
         out += check_opener_crest(lua_src)
         # The guild buttons repaint their glyph by index; the plate is image 0.
         m = re.search(r"GGUI\.GUILD_BTN_ICON\s*=\s*(\d+)", lua_src)
@@ -2461,10 +2768,11 @@ def check():
                        "- a silent non-draw" % (fname, g))
         for g in sorted(hier_guids - comp_guids):
             out.append("%s: guid %s is in <hierarchy> with no component" % (fname, g))
+        want = SIZES[size_of(fname)][2] if size_of(fname) else GUID_PREFIX
         for g in sorted(comp_guids):
-            if not g.startswith(GUID_PREFIX):
+            if not g.startswith(want):
                 out.append("%s: guid %s outside this file's %s range"
-                           % (fname, g, GUID_PREFIX))
+                           % (fname, g, want))
             if g.startswith("DE15"):
                 out.append("%s: DE15 is RETIRED and must not be reused" % fname)
 
@@ -2873,6 +3181,7 @@ def write_ui(outdir=None):
     if not os.path.isdir(outdir):
         os.makedirs(outdir)
     written = [write_clear()]
+    written += bake_size_art()
     for fname, text in sorted(build_xml().items()):
         path = os.path.join(outdir, fname)
         with io.open(path, "w", encoding="utf-8", newline="\n") as fh:
@@ -2892,8 +3201,9 @@ def selftest():
         seen[g] = name
 
     files = build_xml()
-    assert len(files) == 6 + 2 * len(FRAME_TAGS), (
-        "six xml files and a panel and card per race frame, got %d" % len(files))
+    assert len(files) == 1 + (5 + 2 * len(FRAME_TAGS)) * (1 + len(SIZES)), (
+        "the opener, then five xml files and a panel and card per race frame at every "
+        "size, got %d" % len(files))
 
     total_guids = 0
     for path, text in sorted(files.items()):
@@ -2999,6 +3309,25 @@ def selftest():
         moved = lua.replace('{"top", 1, -23}', '{"top", 1, -22}', 1)
         assert moved != lua, "the slider mutation no longer matches the Lua"
         assert check_slider_parts(moved), "a slider arrow 1px off CA_SLIDER was not reported"
+
+    # THE SIZES DRAW LIKE MEDIUM. A whole tiled plate is drawn off Medium from a copy of its
+    # art resized by the same factor, margins with it (one plate, no repeat, crop or seam),
+    # Medium's own layer is untouched, and a Small text inset never drops below Medium's.
+    ground = HF + "cap_group_background.png"
+    assert [l for l in _card().kids[0].kw["layers"] if l["path"] == ground], (
+        "Medium's card ground must stay CA's own file")
+    for sfx in SIZES:
+        lay = [l for l in sized(_card(), sfx).kids[0].kw["layers"] if l.get("src") == ground]
+        assert lay and lay[0]["path"] == size_art_path(ground, sfx), (
+            "%s card ground is not drawn from its resized copy" % sfx)
+        assert _margin4(lay[0]["margin"])[1] == int(24 * SIZES[sfx][0] / float(SIZES[sfx][1])
+                                                    + 0.5), "%s margins not scaled" % sfx
+    med = dict((c.name, c.kw.get("tx")) for c in _card().walk() if c.kw.get("text"))
+    for c in sized(_card(), "_sm").walk():
+        if c.kw.get("text") and med.get(c.name):
+            for a, b in zip(c.kw["tx"].split(","), med[c.name].split(",")):
+                assert float(a) >= float(b) or float(b) < 0, (
+                    "%s: Small inset %s below Medium's %s" % (c.name, c.kw["tx"], med[c.name]))
 
     assert not check(), "check() found problems: %r" % (check(),)
     print("selftest ok: %d files, %d guids" % (len(files), total_guids))

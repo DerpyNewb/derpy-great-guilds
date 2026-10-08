@@ -31,6 +31,7 @@ m:add_new_section("systems", "Systems")
 m:add_new_section("court", "The Court")
 m:add_new_section("rates", "Earn rates")
 m:add_new_section("caps", "Limit per turn")
+m:add_new_section("display", "Display")
 m:add_new_section("debug", "Debug")
 
 -- ----------------------------------------------------------------- difficulty --
@@ -295,6 +296,26 @@ for i = 1, #CAPS do
     o:set_assigned_section("caps")
     if IN_CAMPAIGN then o:set_locked(true, LOCK_REASON) end
 end
+
+-- ----------------------------------------------------------------- display --
+-- DISPLAY ONLY, so never locked and never frozen into the save: the panel reads it live on
+-- every open. On top of the automatic size, which already grows the panel on screens
+-- larger than 1080p. Three sizes and not a slider: each is its own set of panel files with
+-- real font sizes, because stretching text drew it soft (2026-10-08).
+local o_size = m:add_new_option("ui_size", "dropdown")
+o_size:set_text("Panel size")
+o_size:set_tooltip_text("Size of the Guilds panel and its text. Takes effect the next "
+    .. "time you open the panel. Large needs a screen at least 1080 pixels tall at your "
+    .. "UI scale; on a smaller one the panel opens at Medium.")
+-- Keys must match GGUI.SIZES in zzz_derpy_guilds_ui.lua; gen_guilds_ui.check_sizes pins them.
+o_size:add_dropdown_value("small", "Small", "About a seventh smaller than the standard size.", false)
+o_size:add_dropdown_value("medium", "Medium", "The standard size.", true)
+o_size:add_dropdown_value("large", "Large", "A third larger than the standard size.", false)
+o_size:set_default_value("medium")
+o_size:set_assigned_section("display")
+-- Each player's own in multiplayer, like the log switch below: it only changes this
+-- machine's screen.
+o_size:set_is_global(true)
 
 -- ------------------------------------------------------------------- debug --
 -- The debug class is deliberately NOT snapshotted: the campaign script reads it

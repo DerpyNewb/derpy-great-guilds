@@ -40,6 +40,11 @@ UI_FILES = [
 ] + ["Modding Files/pack/ui/campaign ui/derpy_gg_%s_%s.twui.xml" % (kind, race)
      for race in ("brt", "cth", "def", "dwf", "emp", "hef", "ksl", "skv")
      for kind in ("panel", "card")]
+# MCT "Panel size": every file above but the opener again at Small and Large
+# (gen_guilds_ui.SIZES); GGUI.frame_path and the PATH_* sites append the suffix.
+UI_FILES += [p.replace(".twui.xml", sfx + ".twui.xml")
+             for sfx in ("_sm", "_lg")
+             for p in list(UI_FILES) if not p.endswith("derpy_gg_opener.twui.xml")]
 MCT_FILE = "Modding Files/pack/script/mct/settings/derpy_great_guilds.lua"
 MODEL_LUA = SCRIPTS[0]
 
@@ -50,6 +55,8 @@ MODEL_LUA = SCRIPTS[0]
 ART_DIRS = [
     "ui/campaign ui/derpy_gg_icons",
     "ui/campaign ui/derpy_gg_bg",
+    # CA plates resized for the Small and Large panel files (gen_guilds_ui.bake_size_art).
+    "ui/campaign ui/derpy_gg_sized",
 ]
 
 
@@ -424,6 +431,19 @@ def _pack_files():
             for name in sorted(os.listdir(disk)):
                 out.append((os.path.abspath(os.path.join(disk, name)),
                             folder + "/" + name))
+    # THE RESIZED TITLE PLATES sit at the top of every culture's skin folder, where CA's own
+    # panel_title.png does, so the per-culture swap picks the reader's (gen_guilds_ui
+    # SKINNED_ART). Other mods stage files there too: only our derpy_gg_ ones are packed.
+    skins = "Modding Files/pack/ui/skins"
+    if os.path.isdir(skins):
+        for skin in sorted(os.listdir(skins)):
+            disk = os.path.join(skins, skin)
+            if not os.path.isdir(disk):
+                continue
+            for name in sorted(os.listdir(disk)):
+                if name.startswith("derpy_gg_") and name.endswith(".png"):
+                    out.append((os.path.abspath(os.path.join(disk, name)),
+                                "ui/skins/%s/%s" % (skin, name)))
     disk = "Modding Files/pack/" + HALL_ICON_DIR
     if os.path.isdir(disk):
         for name in sorted(os.listdir(disk)):

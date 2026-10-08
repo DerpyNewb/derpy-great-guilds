@@ -3,6 +3,17 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-10-08 - build 2C6BCF55
+
+MD5 `2C6BCF55A6A66737C57DC1975164F47F`, 49,732,138 bytes. Small and Large seen in game.
+
+- **Panel size in MCT:** Small, Medium (the old size, unchanged) or Large. Each size has its
+  own panel files with CA's real font sizes, so the text stays sharp; the CA plates the panel
+  repeats are shipped resized for each size, so a card stays one plate with one border. Large
+  falls back to Medium on a screen too small for it.
+- **Fixed:** on screens above 1080p the panel's automatic enlargement scaled every part more
+  than once, so the cards ran off the panel.
+
 ## 2026-10-07 - build C6AAD5FC
 
 MD5 `C6AAD5FC289D35725322256AD107DEB0`, 45,609,629 bytes. Includes build 2C504683, which

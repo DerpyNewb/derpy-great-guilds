@@ -177,9 +177,11 @@ function GGUI.header_fits(head, stats, tag)
        or type(bw) ~= "number" or bw <= 0 then
         return nil
     end
-    -- Design px, then the units the measurement comes back in (see GGUI.wrap).
-    local room = (bw / GGUI.S - (GGUI.HEADER_INSET[tag] or 202) - GGUI.HEADER_GAP)
-                 * GGUI.text_ratio()
+    -- Design px, then the units the measurement comes back in (see GGUI.wrap). The insets
+    -- are TEXT insets, which a Small file keeps at Medium's size (gen_guilds_ui.sized: they
+    -- clear 9-slice ends drawn at native size), so below 1 they are charged at full size.
+    local inset = (GGUI.HEADER_INSET[tag] or 202) * math.max(1, 1 / GGUI.F)
+    local room = (bw / GGUI.S - inset - GGUI.HEADER_GAP) * GGUI.text_ratio()
     return hw + sw <= room
 end
 
@@ -508,8 +510,8 @@ end
 -- draws nothing and says nothing, so an unknown tag must never be appended.
 function GGUI.frame_path(base)
     local tag = GGUI.tag()
-    if tag ~= "" and GGUI.FRAME[tag] then return base .. tag end
-    return base
+    if tag ~= "" and GGUI.FRAME[tag] then return base .. tag .. GGUI.SUFFIX end
+    return base .. GGUI.SUFFIX
 end
 
 function GGUI.light_card(card, lit)
@@ -677,7 +679,16 @@ GGUI.FLAG_FALLBACK = "ui/flags/wh3_dlc23_chd_chaos_dwarfs/mon_24.png"
 -- width, so an ultrawide gets the panel a 16:9 screen of the same height would.
 GGUI.DESIGN_W = 1920
 GGUI.DESIGN_H = 1080
+-- THE TOTAL FACTOR, design pixels to screen pixels: every MoveTo and offset goes through
+-- GGUI.px with it. It is GGUI.F times GGUI.SA, and the two are applied differently:
+--   F  - the MCT size. The parts ARE that size in their own .twui.xml files, with real
+--        font categories, so nothing is stretched (GGUI.SIZES).
+--   SA - the screen factor above. scale_tree resizes the parts and stretches their text.
 GGUI.S = 1
+GGUI.F = 1
+GGUI.SA = 1
+GGUI.SUFFIX = ""
+GGUI.SIZE = "medium"
 
 function GGUI.scale_for(sw, sh)
     if type(sw) ~= "number" or type(sh) ~= "number" or sw <= 0 or sh <= 0 then
@@ -687,6 +698,45 @@ function GGUI.scale_for(sw, sh)
     if s <= 1 then return 1 end
     -- Hundredths: 2560x1440 is 1.333... and the tail buys nothing but float noise.
     return math.floor(s * 100 + 0.5) / 100
+end
+
+-- MCT "Panel size": Small / Medium / Large. A SLIDER WAS TRIED FIRST (2026-10-08) and drew
+-- soft text at every size but 100%: font_scale stretches the glyphs it already drew, and
+-- no call changes a font. So each size is its own set of files, every font category one
+-- real step along CA's list - gen_guilds_ui.SIZES writes them, and check_sizes pins this
+-- table against it. Medium is the original files, no suffix.
+GGUI.SIZES = {
+    small  = {f = 6 / 7, suffix = "_sm"},
+    medium = {f = 1,     suffix = ""},
+    large  = {f = 4 / 3, suffix = "_lg"},
+}
+-- The panel at Medium: what decides whether a size fits the screen. check_sizes pins it
+-- against the generator's panel root.
+GGUI.PANEL_W, GGUI.PANEL_H = 790, 700
+
+-- Read live on every open, like log_accrual: display only, never frozen into the save, and
+-- set_is_global keeps it each player's own in multiplayer.
+function GGUI.want_size()
+    local ok, v = pcall(function()
+        local mct = get_mct and get_mct()
+        local mod = mct and mct:get_mod_by_key("derpy_great_guilds")
+        local opt = mod and mod:get_option_by_key("ui_size")
+        return opt and opt:get_finalized_setting()
+    end)
+    if ok and GGUI.SIZES[v] then return v end
+    return "medium"
+end
+
+-- THE SIZE THAT IS DRAWN: the one asked for, stepped down to Medium when it would not fit
+-- the screen at this screen factor. Medium always fits: the engine's screen is never below
+-- 1600x900. Large does not on that floor (a 1280x720 window, or 1080p at UI Scale ~120%).
+function GGUI.pick_size(want, sw, sh, sa)
+    local z = GGUI.SIZES[want] and want or "medium"
+    if type(sw) == "number" and type(sh) == "number" then
+        local f = GGUI.SIZES[z].f * (sa or 1)
+        if GGUI.PANEL_W * f > sw or GGUI.PANEL_H * f > sh then z = "medium" end
+    end
+    return z
 end
 
 function GGUI.px(v)
@@ -706,18 +756,24 @@ GGUI.SCALE_ANIM = "derpy_gg_scale"
 -- parent's resize by itself (isrelativeresize), and the size set after that is the one
 -- that stands.
 --
+-- Resize(w, h, FALSE). The third argument defaults to true and rescales every child by
+-- the parent's factor; this walk then scales each child again, so the default compounded
+-- per level - the title at S^2, card text at S^3 - and ran the cards off the panel at
+-- 150% (in game, 2026-10-08).
+--
 -- SetCanResize* before Resize, or the call is ignored (the rep bar's idiom). The
 -- pictures follow their box: across CA's panels an image's canresizewidth is only ever
 -- written "false", 7,585 times and never "true", so stretching is the default.
 function GGUI.scale_tree(c)
-    if GGUI.S == 1 or not c then return end
+    -- GGUI.SA, not GGUI.S: the file is already at the MCT size (GGUI.F).
+    if GGUI.SA == 1 or not c then return end
     local w, h
     pcall(function()
         w, h = c:Dimensions()
-        w, h = GGUI.px(w), GGUI.px(h)
+        w, h = math.floor(w * GGUI.SA + 0.5), math.floor(h * GGUI.SA + 0.5)
         c:SetCanResizeWidth(true)
         c:SetCanResizeHeight(true)
-        c:Resize(w, h)
+        c:Resize(w, h, false)
     end)
     pcall(function()
         if c:AnimationExists(GGUI.SCALE_ANIM) then
@@ -727,7 +783,7 @@ function GGUI.scale_tree(c)
             if w and h then
                 c:SetAnimationFrameProperty(GGUI.SCALE_ANIM, 0, "scale", w, h)
             end
-            c:SetAnimationFrameProperty(GGUI.SCALE_ANIM, 0, "font_scale", GGUI.S)
+            c:SetAnimationFrameProperty(GGUI.SCALE_ANIM, 0, "font_scale", GGUI.SA)
             c:TriggerAnimation(GGUI.SCALE_ANIM)
         end
     end)
@@ -744,19 +800,24 @@ end
 -- again here. 1 means the engine measures at the design size, GGUI.S at the drawn one.
 -- GGUI.wrap needs to know which, or the Help tab breaks its lines in the wrong places.
 -- Logged when it changes, which is the in-game answer to the question.
+--
+-- TIMES GGUI.F: a Small or Large file draws a real smaller or bigger font, so its probe is
+-- already F times the design reading before any stretch. Every caller divides by GGUI.S
+-- (= F x SA) or multiplies by GGUI.px, so the F cancels and lines break against the box
+-- the text actually sits in, whatever the true width ratio of body_16 to body_12 is.
 GGUI.PROBE = "The Great Guilds of Zharr-Naggrund"
 GGUI.PROBE_W0 = nil
 GGUI.RATIO_SEEN = nil
 
 function GGUI.text_ratio()
-    if type(GGUI.PROBE_W0) ~= "number" or GGUI.PROBE_W0 <= 0 then return 1 end
+    if type(GGUI.PROBE_W0) ~= "number" or GGUI.PROBE_W0 <= 0 then return GGUI.F end
     local c = comp("gg_help_01")
     -- THE PANEL IS SHUT during a pick, and the pick card still wraps. The last reading is
     -- still the truth about the font.
-    if not c then return GGUI.RATIO_SEEN or 1 end
+    if not c then return GGUI.RATIO_SEEN or GGUI.F end
     local ok, w = pcall(function() return c:TextDimensionsForText(GGUI.PROBE) end)
-    if not ok or type(w) ~= "number" or w <= 0 then return 1 end
-    local r = w / GGUI.PROBE_W0
+    if not ok or type(w) ~= "number" or w <= 0 then return GGUI.F end
+    local r = GGUI.F * w / GGUI.PROBE_W0
     if r ~= GGUI.RATIO_SEEN then
         GGUI.RATIO_SEEN = r
         GGUI.info(string.format("text measures x%.2f at panel scale %.2f", r, GGUI.S))
@@ -841,13 +902,17 @@ function GGUI.open()
     if comp(GGUI.PANEL) then GGUI.refresh(); return end
     local ok = pcall(function()
         local r = root()
+        -- Dimensions(), not Bounds(): Bounds() includes children. Read on every open,
+        -- so a player who changes UI Scale or the MCT size gets it the next time they
+        -- look. BEFORE CreateComponent, because the size picks which files are created.
+        local sw, sh = r:Dimensions()
+        GGUI.SA = GGUI.scale_for(sw, sh)
+        GGUI.SIZE = GGUI.pick_size(GGUI.want_size(), sw, sh, GGUI.SA)
+        GGUI.F, GGUI.SUFFIX = GGUI.SIZES[GGUI.SIZE].f, GGUI.SIZES[GGUI.SIZE].suffix
+        GGUI.S = GGUI.F * GGUI.SA
         r:CreateComponent(GGUI.PANEL, GGUI.frame_path(GGUI.PATH_PANEL))
         local panel = comp(GGUI.PANEL)
         if not panel then return end
-        -- Dimensions(), not Bounds(): Bounds() includes children. Read on every open,
-        -- so a player who changes UI Scale gets the new size the next time they look.
-        local sw, sh = r:Dimensions()
-        GGUI.S = GGUI.scale_for(sw, sh)
         panel:PropagatePriority(60)
 
         -- AND IT EATS THE MOUSE WHILE IT IS UP. Without this the panel is scenery:
@@ -880,11 +945,11 @@ function GGUI.open()
         -- One standings row per guild, stacked under the header. Created once and
         -- hidden with el.hidden-style visibility on the tabs that do not use them.
         for i = 1, #GG.GUILDS do
-            panel:CreateComponent(GGUI.ROW .. "_" .. i, GGUI.PATH_ROW)
+            panel:CreateComponent(GGUI.ROW .. "_" .. i, GGUI.PATH_ROW .. GGUI.SUFFIX)
         end
         -- The faction list frame. Its rows are not created here: they depend on who is
         -- alive and which guild is selected, so GGUI.draw_faction_list builds them.
-        panel:CreateComponent(GGUI.LIST, GGUI.PATH_LIST)
+        panel:CreateComponent(GGUI.LIST, GGUI.PATH_LIST .. GGUI.SUFFIX)
 
         -- GROW EVERYTHING, THEN PLACE IT. The probe is measured first because it has to
         -- be the design-size reading. The panel is centred after the scale, on the size
@@ -910,8 +975,8 @@ function GGUI.open()
         end
         local pw, ph = panel:Dimensions()
         panel:MoveTo(math.floor((sw - pw) / 2), math.floor((sh - ph) / 2))
-        GGUI.info(string.format("panel scale %.2f on a %dx%d screen, panel %dx%d",
-                               GGUI.S, sw, sh, pw, ph))
+        GGUI.info(string.format("panel scale %.2f on a %dx%d screen, panel %dx%d, %s size",
+                               GGUI.S, sw, sh, pw, ph, GGUI.SIZE))
 
         -- Creation and scale above. GGUI.layout() places every component, including
         -- the panel's own children, which the .twui.xml offsets do not.
@@ -1187,7 +1252,10 @@ function GGUI.show_need(card, name, text)
         pcall(function() c:SetVisible(false) end)
         return
     end
-    local w = math.floor((GGUI.text_w(c, text) or 140) + 2 * GGUI.NEED_PAD + 0.5)
+    -- The pad is the cell's TEXT inset, which a Small file keeps at Medium's size
+    -- (gen_guilds_ui.sized), so below 1 it is charged at full size.
+    local pad = GGUI.NEED_PAD * math.max(1, 1 / GGUI.F)
+    local w = math.floor((GGUI.text_w(c, text) or 140) + 2 * pad + 0.5)
     local nw = GGUI.text_w(comp("card_name", card) or c, name)
     local dx = GGUI.NEED_RIGHT - w
     if nw then
@@ -1199,7 +1267,7 @@ function GGUI.show_need(card, name, text)
     pcall(function()
         local _, h = c:Dimensions()
         c:SetCanResizeWidth(true)
-        c:Resize(GGUI.px(w), h)
+        c:Resize(GGUI.px(w), h, false)
         c:SetVisible(true)
         local cx, cy = card:Position()
         c:MoveTo(cx + GGUI.px(dx), cy + GGUI.px(GGUI.CARD_CHILD_XY.card_need[2]))
@@ -1878,7 +1946,7 @@ function GGUI.refresh()
             bar:SetVisible(barred and w > 0)
             if w > 0 then
                 bar:SetCanResizeWidth(true)
-                bar:Resize(GGUI.px(w), GGUI.px(GGUI.REP_BAR_H))
+                bar:Resize(GGUI.px(w), GGUI.px(GGUI.REP_BAR_H), false)
             end
         end)
         set_tooltip(bar, GGUI.loc_guild(guild) .. "  " .. rep .. " / " .. next_at)
@@ -2480,7 +2548,7 @@ function GGUI.draw_faction_list(faction)
 
     for i = 1, #rows do
         local name = GGUI.FROW .. "_" .. i
-        local ok = pcall(function() box:CreateComponent(name, GGUI.PATH_FROW) end)
+        local ok = pcall(function() box:CreateComponent(name, GGUI.PATH_FROW .. GGUI.SUFFIX) end)
         local fr = ok and comp(name, box) or nil
         if fr then
             -- Created after open() scaled the panel, so it is scaled here, once.

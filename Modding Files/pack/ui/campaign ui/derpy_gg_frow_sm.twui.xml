@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<layout
+	version="142"
+	comment="The Great Guilds - one faction inside the standings list (sm size, 6/7)"
+	precache_condition="">
+	<hierarchy>
+		<root this="GG220001-D000-4000-B000000000000001">
+			<derpy_gg_frow this="GG220004-D000-4000-B000000000000004"/>
+		</root>
+	</hierarchy>
+	<components>
+		<root
+			this="GG220001-D000-4000-B000000000000001"
+			id="root"
+			tooltipslocalised="true"
+			uniqueguid="GG220001-D000-4000-B000000000000001"
+			currentstate="GG220002-D000-4000-B000000000000002"
+			defaultstate="GG220002-D000-4000-B000000000000002">
+			<states>
+				<standard
+					this="GG220002-D000-4000-B000000000000002"
+					name="standard"
+					width="607"
+					height="21"
+					uniqueguid="GG220002-D000-4000-B000000000000002">
+				</standard>
+			</states>
+		</root>
+		<derpy_gg_frow
+			this="GG220004-D000-4000-B000000000000004"
+			id="derpy_gg_frow"
+			tooltipslocalised="true"
+			uniqueguid="GG220004-D000-4000-B000000000000004"
+			currentstate="GG220005-D000-4000-B000000000000005"
+			defaultstate="GG220005-D000-4000-B000000000000005">
+			<states>
+				<standard
+					this="GG220005-D000-4000-B000000000000005"
+					name="standard"
+					width="607"
+					height="21"
+					interactive="true"
+					uniqueguid="GG220005-D000-4000-B000000000000005">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="6.00,0.00"
+						textyoffset="4.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="10"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="body_10"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="21"
+							targetmetrics_m_width="607"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</derpy_gg_frow>
+	</components>
+</layout>

@@ -56,12 +56,15 @@ def check_guid_range(files):
     """A reused prefix against a save holding the old component is a silent non-draw."""
     out = []
     for fname, text in sorted(files.items()):
+        # Small and Large files carry their size's own prefix (gen_guilds_ui.SIZES).
+        sfx = U.size_of(fname)
+        want = U.SIZES[sfx][2] if sfx else U.GUID_PREFIX
         for g in sorted(_comp_guids(text)):
             if g.startswith("DE15"):
                 out.append("%s: DE15 is RETIRED and must not be reused" % fname)
-            elif not g.startswith(U.GUID_PREFIX):
+            elif not g.startswith(want):
                 out.append("%s: %s outside the %s range claimed by this mod"
-                           % (fname, g, U.GUID_PREFIX))
+                           % (fname, g, want))
     return out
 
 
