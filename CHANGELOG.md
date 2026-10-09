@@ -3,6 +3,20 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-10-09 - build 27793F84
+
+MD5 `27793F84B8489ABF9E88BA127FB4D76E`, 50,544,153 bytes. Uploaded to the Workshop.
+
+- **The guild panel opens with no other mods enabled.** `GGUI.pick_size` started its search
+  at `math.huge`, which the game's Lua does not have: every open threw "attempt to compare
+  number with nil" unless another mod (OvN's json shim) had defined it. Now a finite
+  sentinel; the harness runs it with `math.huge = nil`.
+- **The click listener leaves core's queue altogether.** Moving it to the front was not
+  enough: `core:event_callback` tests every listener's condition before calling any
+  callback, so one mod's throwing condition still dropped the click. `GGUI.click_first`
+  moves `gg_clicks` into `events.ComponentLClickUp`, the engine's own list, wrapped so it
+  never throws into the engine.
+
 ## 2026-10-09 - build DCE96F43
 
 MD5 `DCE96F435C30C5D9EFDCC4517ECB7BA7`, 50,543,334 bytes. Uploaded to the Workshop. Includes

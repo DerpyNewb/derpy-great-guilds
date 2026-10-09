@@ -869,32 +869,42 @@ effect = {get_localised_string = function(k) return k end}
 cm.get_local_faction_name = function() return "cr_me" end
 UIComponent = function(x) return x end
 
--- ANOTHER MOD'S CLICK HANDLER THAT THROWS, registered before ours as every earlier-loading
--- mod's is (player report 2026-10-09, Malakai: "click sound, nothing opens"). Since 9.1
--- lib_core calls listeners unprotected, so a throw unwinds the dispatch loop and every
--- listener queued behind it never runs that click.
-core:add_listener("stranger_throws", "ComponentLClickUp", true,
-                  function() error("another mod's click handler") end, true)
+-- ANOTHER MOD'S CLICK LISTENER WHOSE CONDITION THROWS, registered before ours as every
+-- earlier-loading mod's is (player report 2026-10-09, Malakai: "click sound, nothing
+-- opens", and again after gg_clicks was moved to the front of core's queue). Since 9.0
+-- lib_core calls listeners unprotected, and core:event_callback tests every condition
+-- before it calls any callback, so this drops the whole click wherever ours sits in it.
+-- events.ComponentLClickUp is the engine's list, with core's dispatcher one entry of it.
+events = {ComponentLClickUp = {function(context)
+    local go = {}
+    for _, l in ipairs(core.event_listeners.ComponentLClickUp) do
+        if l.condition == true or l.condition(context) then go[#go + 1] = l end
+    end
+    for _, l in ipairs(go) do l.callback(context) end
+end}}
+STRANGER_THROWS = true
+core:add_listener("stranger_throws", "ComponentLClickUp", function()
+    if STRANGER_THROWS then error("another mod's click condition") end
+    return false
+end, function() end, true)
 
 dofile("Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_ui.lua")
 
 do
-    -- lib_core's call pass with no protection: in queue order, a throw ends it.
-    local ran = {}
-    local function dispatch(event, context)
-        for _, l in ipairs(core.event_listeners[event]) do
-            if l.condition == true or l.condition(context) then
-                ran[#ran + 1] = l.name
-                l.callback(context)
-            end
-        end
+    -- The engine's pass, in list order; a throw ends it, the worst case. Then a click the
+    -- stranger lets through: a copy left in core's queue as well would run that one twice.
+    local seen = 0
+    local on_click = GGUI.on_click
+    GGUI.on_click = function() seen = seen + 1 end
+    for _, throws in ipairs({true, false}) do
+        STRANGER_THROWS, seen = throws, 0
+        pcall(function()
+            for _, fn in ipairs(events.ComponentLClickUp) do fn({string = "harness_nothing"}) end
+        end)
+        assert(seen == 1, "a click must reach gg_clicks exactly once (stranger's condition "
+               .. (throws and "throws" or "passes") .. "), reached it " .. seen .. " times")
     end
-    -- An id no handler acts on: this asks whether gg_clicks is REACHED, not what it does.
-    pcall(dispatch, "ComponentLClickUp", {string = "harness_nothing"})
-    local reached = false
-    for _, n in ipairs(ran) do if n == "gg_clicks" then reached = true end end
-    assert(reached, "a throwing click listener registered earlier starves gg_clicks: "
-           .. "ran " .. table.concat(ran, ","))
+    GGUI.on_click = on_click
 
     -- AND BEING FIRST MUST NOT MAKE US THE THROWER: a click whose handling fails is
     -- swallowed, so the listeners behind ours still run.
@@ -6317,6 +6327,13 @@ end)()
     assert(GGUI.pick_size("small", 1920, 1080, 1) == "small", "1080p Small stays Small")
     -- The MCT tooltip says all three match at 4K (antislop #26).
     assert(GGUI.pick_size("small", 3840, 2160, 2) == "large", "4K Small draws Large")
+    -- The game's math library has no `huge`; the panel threw on every open with no other
+    -- mod loaded to define it (2026-10-09).
+    local huge = math.huge
+    math.huge = nil
+    local ok_nh, got_nh = pcall(GGUI.pick_size, "medium", 1920, 1080, 1)
+    math.huge = huge
+    assert(ok_nh and got_nh == "medium", "pick_size without math.huge: " .. tostring(got_nh))
     local prev_mct = get_mct
     get_mct = nil
     assert(GGUI.want_size() == "medium", "no MCT reads Medium")

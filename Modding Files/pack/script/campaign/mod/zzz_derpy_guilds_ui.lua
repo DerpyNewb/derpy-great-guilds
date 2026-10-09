@@ -758,7 +758,9 @@ function GGUI.pick_size(want, sw, sh, sa)
     local z = GGUI.SIZES[want] and want or "medium"
     local target = GGUI.SIZES[z].f * (sa or 1)
     local fits = type(sw) ~= "number" or type(sh) ~= "number"
-    local best, gap = "medium", math.huge
+    -- NOT math.huge: the game's math library has no `huge`. It only worked while another
+    -- mod (OvN's json shim: `math.huge = 2 ^ 1024`) defined it; alone, `d < gap` threw.
+    local best, gap = "medium", 1e30
     for _, k in ipairs({"small", "medium", "large"}) do
         local s = GGUI.SIZES[k]
         local d = math.abs(s.f - target)
@@ -3038,12 +3040,13 @@ end
 
 -- ----------------------------------------------------------- interaction ---
 
--- FIRST IN THE CLICK QUEUE (player report 2026-10-09, Malakai: "click sound, nothing
--- opens"). Since 9.1 lib_core calls listeners unprotected, and even its protected path's
--- failure handler escapes the loop: one mod's ComponentLClickUp handler that throws
--- abandons every listener queued behind it, logging nothing. This file loads late (zzz_),
--- so it was queued behind them all. Moved to the front once registered; and pcall'd, so
--- being first cannot make this the handler that starves the rest.
+-- OUT OF CORE'S QUEUE ALTOGETHER (player report 2026-10-09, Malakai: "click sound,
+-- nothing opens", and again after the first fix). Since 9.0 lib_core calls listeners
+-- unprotected, and core:event_callback tests EVERY listener's condition before it calls
+-- any callback (lib_core.lua 1978-1990): one mod's condition that throws drops the whole
+-- click, so index 1 of core.event_listeners was not first enough. GGUI.click_first lifts
+-- gg_clicks into events.ComponentLClickUp, the engine's own list that core's dispatcher
+-- is one entry of - CA's wh2_campaign_traits.lua writes to events.* the same way.
 function GGUI.on_click(context)
     local id = context.string
     if not id then return end
@@ -3134,15 +3137,27 @@ core:add_listener("gg_clicks", "ComponentLClickUp", true, function(context)
     if not ok then GGUI.click_failed(context.string, err) end
 end, true)
 
-pcall(function()
-    local list = core.event_listeners.ComponentLClickUp
-    for i = #list, 2, -1 do
-        if list[i].name == "gg_clicks" then
-            table.insert(list, 1, table.remove(list, i))
-            break
+-- Inserted into the engine's list BEFORE it leaves core's, so a missing events table
+-- leaves the listener where core put it. The wrapper never throws into the engine.
+function GGUI.click_first(name)
+    pcall(function()
+        local list = core.event_listeners.ComponentLClickUp
+        for i = #list, 1, -1 do
+            local l = list[i]
+            if l.name == name then
+                table.insert(events.ComponentLClickUp, 1, function(context)
+                    pcall(function()
+                        if l.condition == true or l.condition(context) then l.callback(context) end
+                    end)
+                end)
+                table.remove(list, i)
+                return
+            end
         end
-    end
-end)
+    end)
+end
+
+GGUI.click_first("gg_clicks")
 
 -- The name of the component a clicked child sits in: card_buy's card, row_icon's row.
 function GGUI.parent_name(context)
