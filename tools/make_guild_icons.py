@@ -168,7 +168,7 @@ _GUILDS = ("brass", "immortals", "daemonsmiths", "khanate", "overseers", "slaver
 # (source/guild_icons/codex_<g><tag>/, made by to_ca_icon.py there) and they ship under the
 # LEVEL's key, derpy_gg_hall_<g>_<n><tag>. Must match gen_great_guilds.HALL_LEVEL_ICON_TAGS -
 # import_great_guilds refuses a build whose variant rows name an icon that is not staged.
-HALL_LEVEL_ICON_TAGS = ("_emp", "_dwf", "")
+HALL_LEVEL_ICON_TAGS = ("_emp", "_dwf", "", "_brt")
 HALL_LEVEL_ICONS = {
     os.path.join(SRC, "codex_%s%s" % (_g, _tag), "derpy_gg_hall_%s%s_%d.png" % (_g, _tag, _n + 1)):
         "derpy_gg_hall_%s_%d%s" % (_g, _n, _tag)

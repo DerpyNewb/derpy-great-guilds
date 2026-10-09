@@ -10112,4 +10112,49 @@ end)()
     GG.CULTURE_OF[S], GG.state[S], GG.turn_gain[S] = nil, nil, nil
     GG.player_cultures = keep_pc
 end)()
+
+-- ======================================= THE DEBUG "MAX REPUTATION" BUTTON ==========
+-- Driven through the LISTENER the MCT's event reaches, not GG.debug_max, so the wiring is
+-- under test too. Exact numbers, because the obvious wrong implementation - GG.grant in a
+-- loop - charges each guild's rival as it pays the guild and leaves half of them short.
+-- A function, not a do block: the main chunk is at Lua 5.1's 200-local ceiling.
+;(function()
+    local F = "dbg_max_faction"
+    GG.CULTURE_OF[F] = "wh3_dlc23_chd_chaos_dwarfs"
+    GG.state[F] = nil
+    local start = {brass = {120, 40}, immortals = {2000, 7}, daemonsmiths = {0, 0},
+                   khanate = {300, 5}, overseers = {0, 0}, slavers = {1500, 9},
+                   temple = {99, 0}}
+    GG.state[F] = {}
+    for g, v in pairs(start) do GG.state[F][g] = {rep = v[1], fav = v[2]} end
+    GG.save(F)
+    GG.state[F] = nil                       -- the op must read the save, as in game
+    local keep_local = cm.get_local_faction_name
+    cm.get_local_faction_name = function() return F end
+    local a0, r0 = #applied, #removed
+    assert(handlers.gg_debug_max, "the MCT button's listener is registered")
+    assert(listened.DerpyGGMaxReputation, "listening for the MCT button's event")
+    handlers.gg_debug_max()
+    cm.get_local_faction_name = keep_local
+    GG.state[F] = nil
+    GG.load(F)                              -- what a reload would see
+    for g, v in pairs(start) do
+        local rep, fav = GG.get(F, g)
+        local want = v[1] > 1500 and v[1] or 1500
+        assert(rep == want, g .. ": Reputation " .. tostring(rep) .. ", want " .. want)
+        assert(fav == v[2], g .. ": Favour changed to " .. tostring(fav))
+    end
+    local on, off = {}, {}
+    for i = a0 + 1, #applied do if applied[i][2] == F then on[applied[i][1]] = true end end
+    for i = r0 + 1, #removed do if removed[i][2] == F then off[removed[i][1]] = true end end
+    assert(on["derpy_gg_rank_brass_5"], "brass gets its rank 5 bundle")
+    assert(off["derpy_gg_rank_brass_2"], "brass loses its rank 2 bundle")
+    assert(off["derpy_gg_rank_khanate_3"], "khanate loses its rank 3 bundle")
+    assert(not on["derpy_gg_rank_immortals_5"] and not on["derpy_gg_rank_slavers_5"],
+           "a guild already at the top is not touched")
+    local n = 0
+    for _ in pairs(on) do n = n + 1 end
+    assert(n == 5, "five guilds raised, got " .. n)
+    GG.CULTURE_OF[F], GG.state[F] = nil, nil
+end)()
 print("harness ok")

@@ -5321,6 +5321,19 @@ function GG.register()
         end
     end, true)
 
+    -- THE MCT'S "Max Reputation with every guild" BUTTON. It changes the campaign, so it
+    -- goes out as an op: applied here in single player, sent to every machine in
+    -- multiplayer. after_mp redraws the panel if it is open.
+    core:add_listener("gg_debug_max", "DerpyGGMaxReputation", true, function()
+        local ok, err = pcall(function()
+            local me = cm:get_local_faction_name(true)
+            if not me then return end
+            GG.mp_send(me, "debug_max", "")
+            if GG.after_mp then GG.after_mp(me) end
+        end)
+        if not ok then GG.trace("max Reputation failed: " .. tostring(err)) end
+    end, true)
+
     core:add_listener("gg_turn", "FactionTurnStart", true, function(context)
         local name = faction_name_of(context)
         if not name then return end
@@ -6223,6 +6236,37 @@ GG.MP_OPS.demand = function(faction)
         GG.save_demand(faction)
         GG.save(faction)
     end
+end
+
+-- DEBUG: EVERY GUILD AT THE TOP RANK, for testing halls and rank-4 services. The MCT's
+-- "Max Reputation with every guild" button sends it as an op, so multiplayer applies it on
+-- every machine; the wh3 MCP bridge calls GG.debug_max directly. Not GG.grant: that charges
+-- each guild's rival as it pays the guild, and posts seven rank-up messages. Reputation
+-- only - Favour is untouched - and never lowered, so a guild already above the top
+-- threshold keeps what it has. Returns how many guilds it raised.
+function GG.debug_max(faction)
+    if not faction then return 0 end
+    GG.load(faction)
+    GG.state[faction] = GG.state[faction] or blank()
+    local top, raised = GG.RANKS[#GG.RANKS], 0
+    for i = 1, #GG.GUILDS do
+        local guild = GG.GUILDS[i]
+        local g = GG.state[faction][guild]
+        if g.rep < top then
+            local before = GG.rank_of(g.rep)
+            g.rep = top
+            -- apply_rank swaps the bundle and unlocks the halls the new rank allows.
+            GG.apply_rank(faction, guild, before, GG.rank_of(top))
+            raised = raised + 1
+        end
+    end
+    GG.save(faction)
+    GG.trace("debug: " .. faction .. " raised to the top rank with " .. raised .. " guilds")
+    return raised
+end
+
+GG.MP_OPS.debug_max = function(faction)
+    GG.debug_max(faction)
 end
 
 -- "appoint|guild|character cqi" or "dismiss|guild". THE VERB IS SENT, not inferred: the

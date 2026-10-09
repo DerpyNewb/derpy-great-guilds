@@ -3,6 +3,19 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-10-09 - build 6EA73771
+
+MD5 `6EA73771A582BBFCCB72EFA15CF30688`, 50,542,201 bytes. Includes builds 2985E43E,
+7EC05831, 227285E5 and 46C2C4C6, which were not released on their own.
+
+- **Hall icons redrawn from Medieval II:** one icon per level for the Bretonnian, Empire,
+  Dwarf and Chaos Dwarf guild halls. Bretonnia and the Empire trace the Medieval II
+  guild buildings; the Dwarfs and Chaos Dwarfs keep the Medieval II layout in their own
+  architecture (art is not in this repo).
+- **Debug: "Max Reputation with every guild"** in the MCT debug section raises your
+  faction to the top rank with all seven guilds. Favour is not changed. Multiplayer-safe.
+- **Fixed:** closing MCT after visiting the settings page no longer throws a script error.
+
 ## 2026-10-09 - build E8F55503
 
 MD5 `E8F555038ECAC0ABA8AC8DF9029CE786`, 50,494,385 bytes. Includes builds 84183968, F08C99CC

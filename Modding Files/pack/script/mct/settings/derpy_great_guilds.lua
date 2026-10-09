@@ -362,6 +362,18 @@ o_dump:set_tooltip_text("Writes every faction's Reputation to script_log.txt. Do
     .. "nothing outside a campaign.")
 o_dump:set_assigned_section("debug")
 
+-- Same route as the dump: a custom event the campaign script listens for
+-- (gg_debug_max), which sends it to every machine in multiplayer.
+local o_max = m:add_new_action("max_reputation", "Max Reputation with every guild", function()
+    if core and core.trigger_custom_event then
+        core:trigger_custom_event("DerpyGGMaxReputation", {})
+    end
+end)
+o_max:set_tooltip_text("For testing. Raises your faction to the top rank with all seven "
+    .. "guilds. Anything that also needs you to lead a guild still needs that. Favour is "
+    .. "not changed. Does nothing outside a campaign.")
+o_max:set_assigned_section("debug")
+
 -- ------------------------------------------------------- locking the numbers --
 -- THIS BLOCK MUST COME LAST. m:get_option_by_key answers nil for an option that has not
 -- been registered yet, and the loop below would then silently lock nothing.
@@ -387,21 +399,27 @@ local PRESET_OWNED = {
 local CUSTOM_ONLY = "The chosen difficulty sets this value; the number shown here "
     .. "is not used. Choose Custom to edit it."
 
+-- PCALLED: MctFinalized fires while MCT tears its panel down, and set_locked redraws the
+-- option. A dropdown whose page was opened and then left still holds its dead component,
+-- finds no list in it and throws (in game, 2026-10-09). MCT sets the flag before the
+-- redraw, so the lock stands; only the redraw is lost, and the page is rebuilt on open.
+local function lock(o, on, why) pcall(o.set_locked, o, on, why) end
+
 local function relock()
     local custom = o_preset:get_finalized_setting() == "custom"
     for _, k in ipairs(PRESET_OWNED) do
         local o = m:get_option_by_key(k)
         if o then
             if IN_CAMPAIGN then
-                o:set_locked(true, LOCK_REASON)
+                lock(o, true, LOCK_REASON)
             elseif not custom then
-                o:set_locked(true, CUSTOM_ONLY)
+                lock(o, true, CUSTOM_ONLY)
             else
-                o:set_locked(false)
+                lock(o, false)
             end
         end
     end
-    if IN_CAMPAIGN then o_preset:set_locked(true, LOCK_REASON) end
+    if IN_CAMPAIGN then lock(o_preset, true, LOCK_REASON) end
 end
 
 -- The callback fires on MctOptionSelectedSettingSet, BEFORE the value is finalized, so it
