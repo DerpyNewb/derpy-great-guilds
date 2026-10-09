@@ -1061,7 +1061,7 @@ function GG.bounty_mission_key(guild, faction)
 end
 
 -- One live mission per key per faction, so one bounty per guild at a time. The board
--- holds three of six guilds, which sits well inside that.
+-- holds three of seven guilds, which sits well inside that.
 function GG.bounty_for_guild(faction, guild)
     local list = GG.bounties[faction]
     if not list then return nil end
@@ -1114,7 +1114,7 @@ end
 -- Brass Tablets - an ordinary thing to do to a faction with high standing, since high
 -- standing means an active warring faction - locked that guild's best service away from
 -- every living faction including the player, permanently, and left a dead name on the
--- Standings tab. Six services, one per guild, could each be removed from a campaign this
+-- Standings tab. One service per guild could be removed from a campaign this
 -- way, in silence. Same shape as the bounty whose target lord had died: state that
 -- outlives the world it was picked from.
 --
@@ -1133,7 +1133,7 @@ end
 --
 -- FILTERED ON THE GG.dead CACHE, NOT WITH A FRESH is_dead PER ROW. This is a draw-time
 -- read and a save carried across builds can hold rows for factions well outside the
--- race, so a real engine call per row would be six guilds times everything in GG.state
+-- race, so a real engine call per row would be seven guilds times everything in GG.state
 -- on every panel refresh. GG.leader_of below does make the real call, on the top row, and caches
 -- what it finds - and GGUI.leaders calls it for every guild before drawing, so the one
 -- row whose correctness is load-bearing (it carries the bundle and the monopoly) is
@@ -1353,7 +1353,7 @@ end
 -- who is present in each, what culture each faction is, and where its crest lives.
 --
 -- ONE WALK, NOT ONE PER CULTURE. The previous shape took a culture and walked the whole
--- faction list looking for it, so six guilds across a modded install's dozen cultures
+-- faction list looking for it, so seven guilds across a modded install's dozen cultures
 -- meant a dozen walks of ~190 factions. The list is the same list every time; walking it
 -- once and bucketing is the same information for a twelfth of the work.
 --
@@ -1410,7 +1410,7 @@ end
 -- of three culture keys was wrong because it could not see a culture any mod added - Old
 -- World, Immortal Empires Expanded, the Hobgoblin Khanates and the rest were all silently
 -- inert. Opening it to EVERY culture in the campaign was wrong in the other direction: it
--- is six guilds of Chaos Dwarf flavour, and a campaign does not want the Empire and the
+-- is guilds of Chaos Dwarf flavour, and a campaign does not want the Empire and the
 -- Lizardmen quietly running their own copies of them.
 --
 -- So the culture is READ OFF THE PLAYER rather than listed here. A Chaos Dwarf campaign
@@ -1590,7 +1590,7 @@ function GG.reassert_leaders()
             -- and notice that a name had changed.
             --
             -- `was ~= nil` skips the FIRST assertion of the session. GG.leaders_now is
-            -- empty after a load, so the next sweep re-asserts all six guilds - a
+            -- empty after a load, so the next sweep re-asserts every guild - a
             -- guild nobody leads is stored as `false`, never nil, so nil here means
             -- "we have not looked yet this session", not "nobody held it".
             if was ~= nil then GG.announce_lead(guild, who, was) end
@@ -1672,7 +1672,7 @@ end
 function GG.snapshot_world(turn, bought, demands, patrons)
     -- THE FIRST SNAPSHOT CLAIMS NO MOVEMENT. Against an empty record every guild's
     -- leader has "gained" their entire reputation and every guild has "changed hands"
-    -- from nobody, so a fresh campaign's first round would light all six rows up with
+    -- from nobody, so a fresh campaign's first round would light every row up with
     -- movement that did not happen.
     local first = (GG.world.turn == 0)
     -- KEYED BY CULTURE AND GUILD, the same slot GG.leaders_now uses. The panel's yellow
@@ -3270,7 +3270,7 @@ function GG.save(faction)
         parts[#parts + 1] = g.rep .. "," .. g.fav
     end
     -- Cooldowns must survive a reload or every service is free after one save.
-    -- Packed after the six standing pairs, separated by ";".
+    -- Packed after the standing pairs, separated by ";".
     local cds = {}
     local f_cd = GG.cooldowns[faction] or {}
     for i = 1, #GG.SERVICES do
@@ -3465,7 +3465,7 @@ GG.TITHE_FACTOR = "missions"
 -- of their own, and not one was reachable. The Hobgoblins are the sharpest case, since
 -- the Khanate guild is named for them.
 --
--- THE GATE WAS THEN THIS TABLE, which was wrong the other way: it is six guilds of Chaos
+-- THE GATE WAS THEN THIS TABLE, which was wrong the other way: it is guilds of Chaos
 -- Dwarf flavour, and a campaign does not want the Empire and the Lizardmen quietly
 -- running their own copies of them.
 --
@@ -4158,14 +4158,14 @@ function GG.race_earn(faction, route, amount)
 end
 
 -- ---------------------------------------------------------------- the cards --
--- EIGHTEEN CARDS PER FACTION, one per guild per rank, each holding one service drawn from
+-- ONE CARD PER GUILD PER RANK (21 per faction), each holding one service drawn from
 -- that guild and rank's pool (spec 2026-09-29-great-guilds-service-pools-and-races §4).
 -- A faction with no cards holds each card's FIRST row - today's service - so an old save,
 -- the panel before the first turn and every test that never draws all read the
--- eighteen the mod always sold. Reading cards never rolls: the panel reads them, and a
+-- services the mod always sold. Reading cards never rolls: the panel reads them, and a
 -- roll from UI code runs on one machine and desyncs multiplayer.
 GG.CARD_RANKS = {2, 3, 4}
-GG.cards = GG.cards or {}   -- [faction] = {turn = n, keys = {18 service keys}}
+GG.cards = GG.cards or {}   -- [faction] = {turn = n, keys = {21 service keys}}
 
 function GG.default_card(guild, rank)
     for i = 1, #GG.SERVICES do
@@ -4501,7 +4501,7 @@ end
 -- first sweep of a session writes every level once - the engine saves the records itself,
 -- but a save from before halls has none, and this is what gives it some.
 GG.halls_locked = GG.halls_locked or {}
--- Which factions the turn-start sweep has done this session (all six guilds at once).
+-- Which factions the turn-start sweep has done this session (every guild at once).
 GG.halls_swept = GG.halls_swept or {}
 
 function GG.lock_halls(faction, guild)
@@ -4888,10 +4888,10 @@ GG.TUNE_DEFAULTS = {
     -- 0 empties the board - GG.post_bounties returns before it offers anything.
     rate_bounty = 80,
     -- Reputation a guild LOSES when its rival earns, as a percentage of that earning.
-    -- 0 switches rivalry off entirely and the six guilds go back to being independent
+    -- 0 switches rivalry off entirely and the guilds go back to being independent
     -- counters. 40 means a guild you never feed slides while one you do climbs.
     rate_rivalry = 40,
-    -- LEADERSHIP. Off, the six leadership bundles still apply - leading is still worth
+    -- LEADERSHIP. Off, the leadership bundles still apply - leading is still worth
     -- something - but the top service goes back to being rank-gated only.
     lead_monopoly = true,
     -- DEMANDS. 0 switches them off entirely: GG.demand_tick returns before it rolls.
@@ -5036,7 +5036,7 @@ GG.PRESETS = {
         rate_temple_taint = 1,
     },
 
-    -- CUTTHROAT. Standing is roughly half the default rate against caps to match, the
+    -- BRUTAL (the "ultra" key). Standing is roughly half the default rate against caps to match, the
     -- rivalry drain is more than double, and the Court asks every six turns with five to
     -- answer and a penalty above its own reward - so an unpayable demand is a real loss of
     -- rank rather than a delay. Specialising in two or three guilds stops being a style
@@ -6010,7 +6010,7 @@ end
 function GG.announce_lead(guild, who, was)
     -- ONLY WHEN THE PLAYER IS ONE OF THE TWO PARTIES. An AI taking a guild off another
     -- AI is a fact for the Standings tab, not an interrupt over the campaign map - and
-    -- with six guilds and a world of rivals it would be several interrupts a round.
+    -- with seven guilds and a world of rivals it would be several interrupts a round.
     local ok, humans = pcall(function() return cm:get_human_factions() end)
     if not ok or not humans then return end
     for i = 1, #humans do

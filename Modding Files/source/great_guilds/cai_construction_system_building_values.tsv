@@ -20,14 +20,14 @@ derpy_gg_hall_daemonsmiths_dwf						cai_military_group				3	3	1000	1000	1000	100
 derpy_gg_hall_khanate_dwf						cai_military_group				3	3	1000	1000	1000	1000	0	0	0	0	510	510	510	510	0	0	1050	1250	
 derpy_gg_hall_overseers_dwf						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	200	1000	
 derpy_gg_hall_slavers_dwf						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	200	1000	
-derpy_gg_hall_temple_dwf						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	1	1	
+derpy_gg_hall_temple_dwf						cai_military_group				3	3	1000	1000	1000	1000	0	0	0	0	510	510	510	510	0	0	1100	1500	
 derpy_gg_hall_brass_brt						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	20	125	
 derpy_gg_hall_immortals_brt						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	20	125	
 derpy_gg_hall_daemonsmiths_brt						cai_military_group				3	3	2000	2000	2000	2000	0	0	0	0	510	510	510	510	0	0	2400	2500	
 derpy_gg_hall_khanate_brt						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	200	1000	
 derpy_gg_hall_overseers_brt						cai_support_group				3	3	40	40	40	40	0	0	0	0	260	260	260	260	0	0	50	250	
 derpy_gg_hall_slavers_brt						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	20	125	
-derpy_gg_hall_temple_brt						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	20	125	
+derpy_gg_hall_temple_brt						cai_military_group				3	3	1000	1000	1000	1000	0	0	0	0	510	510	510	510	0	0	1050	1250	
 derpy_gg_hall_brass_cth						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	50	250	
 derpy_gg_hall_immortals_cth						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	50	250	
 derpy_gg_hall_daemonsmiths_cth						cai_military_group				3	3	1000	1000	1000	1000	0	0	0	0	510	510	510	510	0	0	1100	1500	
@@ -62,4 +62,4 @@ derpy_gg_hall_daemonsmiths_skv						cai_military_group				3	3	1000	1000	1000	100
 derpy_gg_hall_khanate_skv						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	20	125	
 derpy_gg_hall_overseers_skv						cai_military_group				3	3	1000	1000	1000	1000	0	0	0	0	510	510	510	510	0	0	1100	1500	
 derpy_gg_hall_slavers_skv						cai_military_group				3	3	1000	1000	1000	1000	0	0	0	0	510	510	510	510	0	0	1100	1500	
-derpy_gg_hall_temple_skv						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	20	125	
+derpy_gg_hall_temple_skv						cai_military_group				3	3	1000	1000	1000	1000	0	0	0	0	510	510	510	510	0	0	1100	1500	

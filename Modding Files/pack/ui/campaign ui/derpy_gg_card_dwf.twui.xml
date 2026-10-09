@@ -263,7 +263,7 @@
 							offset="3.00,3.00"
 							width="132"
 							height="24"
-							colour="#000000D0"
+							colour="#000000E0"
 							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<component_text
@@ -510,7 +510,7 @@
 							offset="3.00,3.00"
 							width="154"
 							height="20"
-							colour="#000000D0"
+							colour="#000000E0"
 							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<component_text

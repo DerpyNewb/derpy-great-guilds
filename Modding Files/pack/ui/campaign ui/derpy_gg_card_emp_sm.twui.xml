@@ -237,7 +237,7 @@
 							offset="2.57,2.57"
 							width="113"
 							height="21"
-							colour="#000000D0"
+							colour="#000000E0"
 							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<component_text
@@ -284,7 +284,7 @@
 						texthalign="Left"
 						textvalign="Center"
 						textxoffset="6.00,0.00"
-						textyoffset="2.00,0.00"
+						textyoffset="1.71,0.00"
 						texthbehaviour="Never split"
 						font_m_size="10"
 						font_m_colour="#C9BFA8FF"
@@ -324,7 +324,7 @@
 						texthalign="Left"
 						textvalign="Center"
 						textxoffset="6.00,0.00"
-						textyoffset="2.00,0.00"
+						textyoffset="1.71,0.00"
 						texthbehaviour="Never split"
 						font_m_size="10"
 						font_m_colour="#C9BFA8FF"
@@ -409,7 +409,7 @@
 						texthalign="Left"
 						textvalign="Center"
 						textxoffset="6.00,0.00"
-						textyoffset="4.00,0.00"
+						textyoffset="3.43,0.00"
 						texthbehaviour="Never split"
 						font_m_size="12"
 						font_m_colour="#FFF8D7FF"
@@ -471,14 +471,14 @@
 							offset="2.57,2.57"
 							width="132"
 							height="17"
-							colour="#000000D0"
+							colour="#000000E0"
 							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<component_text
 						texthalign="Left"
 						textvalign="Center"
 						textxoffset="10.00,10.00"
-						textyoffset="4.00,0.00"
+						textyoffset="3.43,0.00"
 						texthbehaviour="Never split"
 						font_m_size="12"
 						font_m_colour="#FFF8D7FF"

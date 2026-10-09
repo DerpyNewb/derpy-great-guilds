@@ -66,7 +66,7 @@ derpy_gg_svc_master_gunners		Gunnery Masters	faction	1	derpy_gg_daemonsmiths.png
 derpy_gg_svc_great_work		The Great Work	faction	1	derpy_gg_daemonsmiths.png	true	false	true
 derpy_gg_svc_arsenal		Arsenal of Zharr	faction	1	derpy_gg_daemonsmiths.png	true	false	true
 derpy_gg_svc_bribed_guards		Bribed Guards	faction	1	derpy_gg_khanate.png	true	false	true
-derpy_gg_svc_blooded_agents		Blooded Agents	faction	1	derpy_gg_khanate.png	true	false	true
+derpy_gg_svc_blooded_agents		Blooded Heroes	faction	1	derpy_gg_khanate.png	true	false	true
 derpy_gg_svc_sow_discord		Sow Discord	region	1	derpy_gg_khanate.png	true	false	true
 derpy_gg_svc_web_of_whispers		Web of Whispers	faction	1	derpy_gg_khanate.png	true	false	true
 derpy_gg_svc_poisoned_wells		Poisoned Wells	region	1	derpy_gg_khanate.png	true	false	true
@@ -148,14 +148,14 @@ derpy_gg_svc_drillmasters_emp		Drill Sergeants	faction	1	derpy_gg_immortals_emp.
 derpy_gg_svc_battle_standard_emp		The Regimental Colours	force	1	derpy_gg_immortals_emp.png	true	false	true
 derpy_gg_svc_field_surgeons_emp		Barber-Surgeons	force	1	derpy_gg_immortals_emp.png	true	false	true
 derpy_gg_svc_veteran_cadre_emp		Old Soldiers	faction	1	derpy_gg_immortals_emp.png	true	false	true
-derpy_gg_svc_ward_runes_emp		Blessed Wards	force	1	derpy_gg_daemonsmiths_emp.png	true	false	true
-derpy_gg_svc_spirit_siphon_emp		The Colleges' Tithe	faction	1	derpy_gg_daemonsmiths_emp.png	true	false	true
+derpy_gg_svc_ward_runes_emp		Pavise Wall	force	1	derpy_gg_daemonsmiths_emp.png	true	false	true
+derpy_gg_svc_spirit_siphon_emp		Proofed Armour	faction	1	derpy_gg_daemonsmiths_emp.png	true	false	true
 derpy_gg_svc_forged_arms_emp		Nuln Steel	faction	1	derpy_gg_daemonsmiths_emp.png	true	false	true
 derpy_gg_svc_master_gunners_emp		Master Gunners	faction	1	derpy_gg_daemonsmiths_emp.png	true	false	true
 derpy_gg_svc_great_work_emp		The Grand Treatise	faction	1	derpy_gg_daemonsmiths_emp.png	true	false	true
 derpy_gg_svc_arsenal_emp		The Imperial Arsenal	faction	1	derpy_gg_daemonsmiths_emp.png	true	false	true
 derpy_gg_svc_bribed_guards_emp		Bribed Watchmen	faction	1	derpy_gg_khanate_emp.png	true	false	true
-derpy_gg_svc_blooded_agents_emp		Seasoned Agents	faction	1	derpy_gg_khanate_emp.png	true	false	true
+derpy_gg_svc_blooded_agents_emp		Seasoned Heroes	faction	1	derpy_gg_khanate_emp.png	true	false	true
 derpy_gg_svc_sow_discord_emp		Rumours in the Taverns	region	1	derpy_gg_khanate_emp.png	true	false	true
 derpy_gg_svc_web_of_whispers_emp		Every Street Corner	faction	1	derpy_gg_khanate_emp.png	true	false	true
 derpy_gg_svc_poisoned_wells_emp		Bad Water	region	1	derpy_gg_khanate_emp.png	true	false	true
@@ -171,7 +171,7 @@ derpy_gg_svc_slave_levy_emp		Press Gangs	faction	1	derpy_gg_slavers_emp.png	true
 derpy_gg_svc_pit_fights_emp		Tourney Grounds	faction	1	derpy_gg_slavers_emp.png	true	false	true
 derpy_gg_svc_great_hunt_emp		The Long Ride	faction	1	derpy_gg_slavers_emp.png	true	false	true
 derpy_gg_svc_scorched_earth_emp		Burn the Fields	region	1	derpy_gg_slavers_emp.png	true	false	true
-derpy_gg_svc_witch_hunters_warrant_emp		Witch Hunters' Warrant	region	1	derpy_gg_overseers_emp.png	true	false	true
+derpy_gg_svc_witch_hunters_warrant_emp		The Watch-Houses	region	1	derpy_gg_overseers_emp.png	true	false	true
 derpy_gg_svc_unity_of_empire_emp		Unity of the Empire	faction	1	derpy_gg_brass_emp.png	true	false	true
 derpy_gg_svc_hashut_blessing_emp		Ward of Azyr	force	1	derpy_gg_temple_emp.png	true	false	true
 derpy_gg_svc_forge_sermons_emp		Colleges' Proclamation	region	1	derpy_gg_temple_emp.png	true	false	true
@@ -425,7 +425,7 @@ derpy_gg_svc_master_gunners_cth		Master Gunners	faction	1	derpy_gg_daemonsmiths_
 derpy_gg_svc_great_work_cth		The Academy's Treatise	faction	1	derpy_gg_daemonsmiths_cth.png	true	false	true
 derpy_gg_svc_arsenal_cth		Imperial Arsenal	faction	1	derpy_gg_daemonsmiths_cth.png	true	false	true
 derpy_gg_svc_bribed_guards_cth		Paid Informers	faction	1	derpy_gg_khanate_cth.png	true	false	true
-derpy_gg_svc_blooded_agents_cth		Seasoned Agents	faction	1	derpy_gg_khanate_cth.png	true	false	true
+derpy_gg_svc_blooded_agents_cth		Seasoned Heroes	faction	1	derpy_gg_khanate_cth.png	true	false	true
 derpy_gg_svc_sow_discord_cth		Whispered Slanders	region	1	derpy_gg_khanate_cth.png	true	false	true
 derpy_gg_svc_web_of_whispers_cth		A Thousand Crows	faction	1	derpy_gg_khanate_cth.png	true	false	true
 derpy_gg_svc_poisoned_wells_cth		Poisoned Wells	region	1	derpy_gg_khanate_cth.png	true	false	true
@@ -515,7 +515,7 @@ derpy_gg_svc_master_gunners_ksl		Master Gunners	faction	1	derpy_gg_daemonsmiths_
 derpy_gg_svc_great_work_ksl		The Frost Maiden's Lore	faction	1	derpy_gg_daemonsmiths_ksl.png	true	false	true
 derpy_gg_svc_arsenal_ksl		Streltsi Armoury	faction	1	derpy_gg_daemonsmiths_ksl.png	true	false	true
 derpy_gg_svc_bribed_guards_ksl		Paid Border Guards	faction	1	derpy_gg_khanate_ksl.png	true	false	true
-derpy_gg_svc_blooded_agents_ksl		Hardened Agents	faction	1	derpy_gg_khanate_ksl.png	true	false	true
+derpy_gg_svc_blooded_agents_ksl		Hardened Heroes	faction	1	derpy_gg_khanate_ksl.png	true	false	true
 derpy_gg_svc_sow_discord_ksl		Stir the Oblast	region	1	derpy_gg_khanate_ksl.png	true	false	true
 derpy_gg_svc_web_of_whispers_ksl		Every Road North	faction	1	derpy_gg_khanate_ksl.png	true	false	true
 derpy_gg_svc_poisoned_wells_ksl		Frozen Wells	region	1	derpy_gg_khanate_ksl.png	true	false	true
@@ -694,7 +694,7 @@ derpy_gg_svc_master_gunners_hef		Bolt Thrower Crews	faction	1	derpy_gg_daemonsmi
 derpy_gg_svc_great_work_hef		The White Tower's Lore	faction	1	derpy_gg_daemonsmiths_hef.png	true	false	true
 derpy_gg_svc_arsenal_hef		Lothern Armoury	faction	1	derpy_gg_daemonsmiths_hef.png	true	false	true
 derpy_gg_svc_bribed_guards_hef		Paid Watchers	faction	1	derpy_gg_khanate_hef.png	true	false	true
-derpy_gg_svc_blooded_agents_hef		Seasoned Agents	faction	1	derpy_gg_khanate_hef.png	true	false	true
+derpy_gg_svc_blooded_agents_hef		Seasoned Heroes	faction	1	derpy_gg_khanate_hef.png	true	false	true
 derpy_gg_svc_sow_discord_hef		Whispers of Doubt	region	1	derpy_gg_khanate_hef.png	true	false	true
 derpy_gg_svc_web_of_whispers_hef		Shadows in Every Court	faction	1	derpy_gg_khanate_hef.png	true	false	true
 derpy_gg_svc_poisoned_wells_hef		Poisoned Wells	region	1	derpy_gg_khanate_hef.png	true	false	true
@@ -873,7 +873,7 @@ derpy_gg_svc_master_gunners_gen		Master Gunners	faction	1	derpy_gg_daemonsmiths_
 derpy_gg_svc_great_work_gen		The Great Work	faction	1	derpy_gg_daemonsmiths_gen.png	true	false	true
 derpy_gg_svc_arsenal_gen		Arsenal	faction	1	derpy_gg_daemonsmiths_gen.png	true	false	true
 derpy_gg_svc_bribed_guards_gen		Bribed Guards	faction	1	derpy_gg_khanate_gen.png	true	false	true
-derpy_gg_svc_blooded_agents_gen		Blooded Agents	faction	1	derpy_gg_khanate_gen.png	true	false	true
+derpy_gg_svc_blooded_agents_gen		Blooded Heroes	faction	1	derpy_gg_khanate_gen.png	true	false	true
 derpy_gg_svc_sow_discord_gen		Sow Discord	region	1	derpy_gg_khanate_gen.png	true	false	true
 derpy_gg_svc_web_of_whispers_gen		Web of Whispers	faction	1	derpy_gg_khanate_gen.png	true	false	true
 derpy_gg_svc_poisoned_wells_gen		Poisoned Wells	region	1	derpy_gg_khanate_gen.png	true	false	true

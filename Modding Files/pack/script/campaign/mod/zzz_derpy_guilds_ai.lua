@@ -8,7 +8,7 @@
 
 GGAI = GGAI or {}
 
--- ALL EIGHTEEN. Three were cut until 2026-09-24 because each needed a target the AI had
+-- EVERY SERVICE. Three were cut until 2026-09-24 because each needed a target the AI had
 -- no way to pick; GGAI.pick_target has one for every kind now.
 
 -- One purchase per faction per turn. A hard cap, not a tuning value.

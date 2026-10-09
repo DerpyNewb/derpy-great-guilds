@@ -250,7 +250,7 @@
 							offset="4.00,4.00"
 							width="176"
 							height="32"
-							colour="#000000D0"
+							colour="#000000E0"
 							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<component_text
@@ -484,7 +484,7 @@
 							offset="4.00,4.00"
 							width="205"
 							height="27"
-							colour="#000000D0"
+							colour="#000000E0"
 							margin="0.00,0.00,0.00,0.00"/>
 					</imagemetrics>
 					<component_text

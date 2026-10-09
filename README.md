@@ -25,7 +25,7 @@ Named here as the Chaos Dwarfs know them; every race has its own names for the s
 | The Khanate | successful hero actions | cheaper hero recruitment |
 | The Overseers | settlements growing a level, and buildings no other guild claims | cheaper construction |
 | The Slavers | settlements sacked, more when razed | income from sacking and razing |
-| The Temple of Hashut | devout provinces, and battles won against the Dwarfs | public order |
+| The Temple of Hashut | devout provinces, and battles won against the Dwarfs | Winds of Magic reserve |
 
 A finished building also pays the guild it belongs to (a forge pays the Daemonsmiths, a
 dock the Brass Tablets, a barracks the Immortals), and pays more at higher levels. Every
@@ -34,7 +34,11 @@ every guild at once.
 
 The temple earns differently for each race: from devout provinces, provinces kept clean of
 Chaos, holy war against the race's old enemies, or its priests' and wizards' hero actions,
-and for the Skaven from provinces carrying Skaven corruption.
+and for the Skaven from provinces carrying Skaven corruption. Its bonuses follow each
+race's own faith too: spell resistance for the Ancestor Temples, ward save for the Grail
+and Asuryan, melee attack for Khaine, leadership for the Orthodoxy, and the Winds of Magic
+for the Colleges, the Celestial Temples, the Grey Seers and Hashut, with three services of
+its own for each race.
 
 ## How it plays
 
@@ -68,7 +72,7 @@ and for the Skaven from provinces carrying Skaven corruption.
   army or character. Every race's heroes can do it. The price reflects the target and its
   distance, rated Routine, Hard or Grim.
 - **Leadership.** Whichever faction of your race holds the most reputation with a guild
-  leads it. The leader gets an extra bonus, and nobody else can buy that guild's dearest
+  leads it. The leader gets an extra bonus, and nobody else can buy that guild's finest
   service. The Leaderboard tab shows who leads each guild.
 - **The Court.** Guilds that know you make demands with a deadline: gold, or the favour you
   hold with their rival. Pay and your reputation jumps; ignore it and it falls. You can also
@@ -80,7 +84,8 @@ and for the Skaven from provinces carrying Skaven corruption.
   A hall pays its guild 4, 8 or 15 reputation and favour a turn, gives a local bonus, trains
   a unit of the guild's trade, and makes that guild's services 3% cheaper (15% at most). Lead
   a guild while holding its top hall and you hold its **Seat**: the hall's bonus spreads to
-  all your lands at a third of its strength, and the guild's per-turn limit rises by half.
+  all your lands at a third of its strength (the temple's Seat has a bonus of its own), and
+  the guild's per-turn limit rises by half.
 - **Upkeep.** After the opening turns, each guild takes back a little reputation every
   turn, more at higher ranks, so a guild you stop feeding slides back down the ladder.
 - **The AI plays it too.** AI factions of your race earn, buy services (never the
@@ -127,7 +132,7 @@ It can be added to a campaign already in progress: rank bonuses are re-applied o
 first turn after loading.
 
 **Mod Configuration Tool (optional).** If MCT is installed, the mod adds a settings page:
-a difficulty preset (Easy, Default, Hard, Cutthroat, or Custom with every earn rate and
+a difficulty preset (Easy, Default, Hard, Brutal, or Custom with every earn rate and
 limit exposed), switches for AI spending, hostile services, guild notices on the feed, the
 leader's monopoly on each guild's top service, race differences and guild halls, a panel
 size (Small, Medium or Large) and a debug log option. The values are

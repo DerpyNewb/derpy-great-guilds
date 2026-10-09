@@ -13,8 +13,8 @@ if not mct then return end
 local m = mct:register_mod("derpy_great_guilds")
 m:set_title("The Great Guilds")
 m:set_author("derpy")
-m:set_description("Seven guilds span the world. Earn their Favour during your "
-    .. "campaign and spend it on services. Settings are fixed when a campaign starts. "
+m:set_description("Earn Favour with seven guilds during your campaign and spend "
+    .. "it on their services. Settings are fixed when a campaign starts. "
     .. "Change them from the main menu before starting a new one. In multiplayer, "
     .. "every player uses the host's settings.")
 
@@ -35,10 +35,10 @@ m:add_new_section("display", "Display")
 m:add_new_section("debug", "Debug")
 
 -- ----------------------------------------------------------------- difficulty --
--- ONE DROPDOWN THAT OWNS THE NUMBERS. Twenty of the values below are difficulty; pick
--- anything but Custom and the preset sets all twenty and greys them.
+-- ONE DROPDOWN THAT OWNS THE NUMBERS. Thirty of the values below are difficulty
+-- (PRESET_OWNED); pick anything but Custom and the preset sets all of them and greys them.
 --
--- THE FOUR SWITCHES IN "Systems" ARE NOT LOCKED BY A PRESET and are read on every one of
+-- THE SWITCHES IN "Systems" ARE NOT LOCKED BY A PRESET and are read on every one of
 -- them. The Zharr Exchange's presets own its checkboxes too, so under any preset but
 -- Custom every checkbox in that mod is inert - and a switch that silently does nothing is
 -- a defect this mod has already shipped once. Difficulty is not the same question as
@@ -60,7 +60,7 @@ o_preset:add_dropdown_value("hard", "Hard",
     "A slower climb and a demanding Court. About a quarter less Reputation per event with "
     .. "lower limits per turn, demands every nine turns with six to answer, and an "
     .. "ignored demand costing half again what it does on Default.", false)
-o_preset:add_dropdown_value("ultra", "Cutthroat",
+o_preset:add_dropdown_value("ultra", "Brutal",
     "Reputation comes at roughly half the Default rate with limits to match, "
     .. "rivalry costs more than double, and the Court asks every six turns with five "
     .. "to answer. Missing a demand costs more than meeting it earns. Concentrate on "
@@ -79,7 +79,7 @@ o_ai:set_tooltip_text("Rivals earn Reputation, buy services (some can target you
     .. "and compete for leadership, but never buy services, answer demands or appoint patrons.")
 o_ai:set_default_value(true)
 o_ai:set_assigned_section("systems")
--- LOCKED IN A CAMPAIGN like every other setting: all five switches below are frozen into
+-- LOCKED IN A CAMPAIGN like every other setting: every switch below is frozen into
 -- the save at the first tick, so a box ticked mid-campaign changed nothing and said
 -- nothing (logic audit, 2026-09-29).
 if IN_CAMPAIGN then o_ai:set_locked(true, LOCK_REASON) end
@@ -142,7 +142,7 @@ if IN_CAMPAIGN then o_race:set_locked(true, LOCK_REASON) end
 
 local o_hostile = m:add_new_option("hostile_services", "checkbox")
 o_hostile:set_text("Guilds can be turned on you")
-o_hostile:set_tooltip_text("Allows services aimed at other factions: The Khan's Price "
+o_hostile:set_tooltip_text("Allows services aimed at other factions: those that raise an enemy's costs, "
     .. "and strikes against enemy settlements. Off: nobody may buy them, including you.")
 o_hostile:set_default_value(true)
 o_hostile:set_assigned_section("systems")
@@ -153,7 +153,7 @@ o_notices:set_default_value(true)
 o_notices:set_text("Guild notices")
 o_notices:set_tooltip_text("Announces new ranks, a guild first taking notice of you "
                            .. "and changes to services on the event feed. Demands, "
-                           .. "a guild lost and a rival's service used against you "
+                           .. "losing a guild's lead and a rival's service used against you "
                            .. "are always announced.")
 o_notices:set_assigned_section("systems")
 if IN_CAMPAIGN then o_notices:set_locked(true, LOCK_REASON) end
@@ -161,7 +161,7 @@ if IN_CAMPAIGN then o_notices:set_locked(true, LOCK_REASON) end
 local o_mono = m:add_new_option("lead_monopoly", "checkbox")
 o_mono:set_text("Only the leader buys the finest service")
 o_mono:set_tooltip_text("Only the faction with the most Reputation in a guild can buy "
-    .. "its dearest service. Off: anyone with the required rank may buy it, "
+    .. "its finest service. Off: anyone with the required rank may buy it, "
     .. "and the leader keeps their bonus.")
 o_mono:set_default_value(true)
 o_mono:set_assigned_section("systems")
@@ -186,7 +186,7 @@ local COURT = {
      .. "turn still applies."},
     {"rate_decay", "Upkeep", 100, 0, 400,
      "Each guild charges Reputation every turn according to your rank. At 100, "
-     .. "Unmarked costs one point a turn and Exalted costs five. 0 switches upkeep "
+     .. "rank 1 costs 1 Reputation a turn and rank 5 costs 5. 0 switches upkeep "
      .. "off: only rivalry, demands and failed bounties can then reduce Reputation."},
     {"decay_from", "Upkeep begins on turn", 25, 0, 200,
      "No upkeep is charged before this turn. 0 switches upkeep off."},
@@ -213,37 +213,41 @@ for i = 1, #COURT do
 end
 
 -- ------------------------------------------------------------------- rates --
--- One slider per guild. These are the reputation and favour paid per event, and
+-- One slider per guild, and four for the temple's earn routes. These are the Reputation
+-- and Favour paid per event, and
 -- they are STARTING VALUES rather than measurements - the design says so plainly.
 --
 -- NAMED BY ROLE, because the frontend has no race to name them for. In a campaign
--- GGUI.name_mct renames all twelve guild sliders to the player's own flavour at the
--- first tick. gen_great_guilds.py checks these labels against its generic flavour.
+-- GGUI.name_mct renames the guild sliders (rate_<guild> and cap_<guild>, thirteen) to the
+-- player's own flavour at the first tick. The temple's four route sliders keep their
+-- role label: each race earns from its temple by different routes, so a race name on
+-- them could promise a route that race does not have. gen_great_guilds.py checks these
+-- labels against its generic flavour.
 
 local RATES = {
     {"rate_brass", "The Merchant Houses", 250, 50, 1000,
-     "Net income in gold per point. Lower earns faster."},
-    {"rate_immortals", "The Veterans' Company", 15, 1, 60, "Points per battle won."},
+     "Net income in gold for each point of Reputation. Lower earns faster."},
+    {"rate_immortals", "The Veterans' Company", 15, 1, 60, "Reputation per battle won."},
     {"rate_daemonsmiths", "The Artisans' Guild", 60, 5, 200,
-     "Points per technology researched."},
+     "Reputation per technology researched."},
     {"rate_khanate", "The Shadow Guild", 8, 1, 40,
-     "Points per successful hero action."},
+     "Reputation per successful hero action."},
     {"rate_overseers", "The Builders' Guild", 10, 1, 40,
-     "Points per completed building level, paid to the guild named on its card."},
+     "Reputation per completed building level, paid to the guild named on its card."},
     {"rate_slavers", "The Raiders' Guild", 25, 1, 100,
-     "Points per settlement sacked. Razing pays 60% more."},
+     "Reputation per settlement sacked. Razing pays 60% more."},
     {"rate_temple_devout", "The Faith Guild: provinces in good order", 1, 0, 10,
-     "Points per province with public order above zero, every turn."},
+     "Reputation per province with public order above zero, every turn."},
     {"rate_temple_chaos", "The Faith Guild: provinces free of corruption", 2, 0, 10,
-     "Points per province with no Chaos corruption, every turn."},
+     "Reputation per province with no Chaos corruption, every turn."},
     {"rate_temple_holy", "The Faith Guild: holy wars", 10, 0, 60,
-     "Points per battle won against the faith's sworn enemies."},
+     "Reputation per battle won against the faith's sworn enemies."},
     {"rate_temple_taint", "The Faith Guild: tainted provinces", 2, 0, 10,
-     "Points per province carrying Skaven corruption, every turn. Skaven only."},
-    -- Not a guild: the one signal that pays ALL SIX. Each guild's own per-turn cap
+     "Reputation per province carrying Skaven corruption, every turn. Skaven only."},
+    -- Not a guild: the one signal that pays EVERY GUILD. Each guild's own per-turn cap
     -- still applies, so this cannot be used to outrun them.
     {"rate_missions", "Missions (every guild)", 10, 0, 60,
-     "Points earned with every guild for completing a mission. 0 switches this off."},
+     "Reputation earned with every guild for completing a mission. 0 switches this off."},
     -- The bounty board's pay. An order of magnitude above the blanket rate because a
     -- bounty is chosen, targeted and timed. 0 empties the board entirely.
     {"rate_bounty", "Bounties (the posting guild)", 80, 0, 400,
@@ -251,9 +255,10 @@ local RATES = {
      .. "0 empties the bounty board."},
     -- Not an earn rate at all, but it belongs beside them: it is the price of one.
     -- The only setting here that can take reputation AWAY, so 0 is a real choice and
-    -- turns the six guilds back into six independent counters.
+    -- turns the guilds back into independent counters.
     {"rate_rivalry", "Rivalry (cost to the rival)", 40, 0, 100,
-     "Reputation lost with a guild when you earn with its rival, as a percentage earned. "
+     "Reputation lost with a guild when you earn with its rival, as a percentage of what "
+     .. "you earned. "
      .. "0 switches rivalry off."},
 }
 
@@ -304,9 +309,11 @@ end
 -- real font sizes, because stretching text drew it soft (2026-10-08).
 local o_size = m:add_new_option("ui_size", "dropdown")
 o_size:set_text("Panel size")
-o_size:set_tooltip_text("Size of the Guilds panel and its text. Takes effect the next "
+o_size:set_tooltip_text("Size of the Great Guilds panel and its text. Takes effect the next "
     .. "time you open the panel. Large needs a screen at least 1080 pixels tall at your "
-    .. "UI scale; on a smaller one the panel opens at Medium.")
+    .. "UI scale; on a smaller one the panel opens at Medium. On a screen larger than "
+    .. "1080p the panel already grows to fit, so some sizes look the same there: at 1440p "
+    .. "Medium and Large match, and at 4K all three do.")
 -- Keys must match GGUI.SIZES in zzz_derpy_guilds_ui.lua; gen_guilds_ui.check_sizes pins them.
 o_size:add_dropdown_value("small", "Small", "About a seventh smaller than the standard size.", false)
 o_size:add_dropdown_value("medium", "Medium", "The standard size.", true)
@@ -359,7 +366,8 @@ o_dump:set_assigned_section("debug")
 -- THIS BLOCK MUST COME LAST. m:get_option_by_key answers nil for an option that has not
 -- been registered yet, and the loop below would then silently lock nothing.
 --
--- The list is every NUMERIC key, which is exactly the set GG.PRESETS is allowed to name.
+-- The list is every numeric key a preset sets, which is exactly the set GG.PRESETS is
+-- allowed to name; rotate_turns and hall_off are read on every preset (GG.EVERY_PRESET).
 -- If a slider is added above without being added here it stays editable under a preset
 -- that overrides it - the player sets a number, the preset wins, and nothing says so.
 local PRESET_OWNED = {

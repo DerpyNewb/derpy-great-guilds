@@ -47,23 +47,44 @@
 				<gg_help_19 this="GG230079-D000-4000-B000000000000079"/>
 				<gg_help_20 this="GG23007C-D000-4000-B00000000000007C"/>
 				<gg_help_21 this="GG23007F-D000-4000-B00000000000007F"/>
-				<gg_lf_all this="GG230082-D000-4000-B000000000000082"/>
-				<gg_lf_mine this="GG230085-D000-4000-B000000000000085"/>
-				<gg_lf_ranks this="GG230088-D000-4000-B000000000000088"/>
-				<gg_lf_rivals this="GG23008B-D000-4000-B00000000000008B"/>
-				<gg_next this="GG23008E-D000-4000-B00000000000008E"/>
-				<gg_prev this="GG230091-D000-4000-B000000000000091"/>
-				<gg_rank_line this="GG230094-D000-4000-B000000000000094"/>
-				<gg_rank_mark this="GG230097-D000-4000-B000000000000097"/>
-				<gg_rank_stats this="GG23009A-D000-4000-B00000000000009A"/>
-				<gg_rep_bar this="GG23009D-D000-4000-B00000000000009D"/>
-				<gg_tab_bounty this="GG2300A0-D000-4000-B0000000000000A0"/>
-				<gg_tab_court this="GG2300A3-D000-4000-B0000000000000A3"/>
-				<gg_tab_guilds this="GG2300A6-D000-4000-B0000000000000A6"/>
-				<gg_tab_help this="GG2300A9-D000-4000-B0000000000000A9"/>
-				<gg_tab_log this="GG2300AC-D000-4000-B0000000000000AC"/>
-				<gg_tab_stand this="GG2300AF-D000-4000-B0000000000000AF"/>
-				<gg_title this="GG2300B2-D000-4000-B0000000000000B2"/>
+				<gg_helph_01 this="GG230082-D000-4000-B000000000000082"/>
+				<gg_helph_02 this="GG230085-D000-4000-B000000000000085"/>
+				<gg_helph_03 this="GG230088-D000-4000-B000000000000088"/>
+				<gg_helph_04 this="GG23008B-D000-4000-B00000000000008B"/>
+				<gg_helph_05 this="GG23008E-D000-4000-B00000000000008E"/>
+				<gg_helph_06 this="GG230091-D000-4000-B000000000000091"/>
+				<gg_helph_07 this="GG230094-D000-4000-B000000000000094"/>
+				<gg_helph_08 this="GG230097-D000-4000-B000000000000097"/>
+				<gg_helph_09 this="GG23009A-D000-4000-B00000000000009A"/>
+				<gg_helph_10 this="GG23009D-D000-4000-B00000000000009D"/>
+				<gg_helph_11 this="GG2300A0-D000-4000-B0000000000000A0"/>
+				<gg_helph_12 this="GG2300A3-D000-4000-B0000000000000A3"/>
+				<gg_helph_13 this="GG2300A6-D000-4000-B0000000000000A6"/>
+				<gg_helph_14 this="GG2300A9-D000-4000-B0000000000000A9"/>
+				<gg_helph_15 this="GG2300AC-D000-4000-B0000000000000AC"/>
+				<gg_helph_16 this="GG2300AF-D000-4000-B0000000000000AF"/>
+				<gg_helph_17 this="GG2300B2-D000-4000-B0000000000000B2"/>
+				<gg_helph_18 this="GG2300B5-D000-4000-B0000000000000B5"/>
+				<gg_helph_19 this="GG2300B8-D000-4000-B0000000000000B8"/>
+				<gg_helph_20 this="GG2300BB-D000-4000-B0000000000000BB"/>
+				<gg_helph_21 this="GG2300BE-D000-4000-B0000000000000BE"/>
+				<gg_lf_all this="GG2300C1-D000-4000-B0000000000000C1"/>
+				<gg_lf_mine this="GG2300C4-D000-4000-B0000000000000C4"/>
+				<gg_lf_ranks this="GG2300C7-D000-4000-B0000000000000C7"/>
+				<gg_lf_rivals this="GG2300CA-D000-4000-B0000000000000CA"/>
+				<gg_next this="GG2300CD-D000-4000-B0000000000000CD"/>
+				<gg_prev this="GG2300D0-D000-4000-B0000000000000D0"/>
+				<gg_rank_line this="GG2300D3-D000-4000-B0000000000000D3"/>
+				<gg_rank_mark this="GG2300D6-D000-4000-B0000000000000D6"/>
+				<gg_rank_stats this="GG2300D9-D000-4000-B0000000000000D9"/>
+				<gg_rep_bar this="GG2300DC-D000-4000-B0000000000000DC"/>
+				<gg_tab_bounty this="GG2300DF-D000-4000-B0000000000000DF"/>
+				<gg_tab_court this="GG2300E2-D000-4000-B0000000000000E2"/>
+				<gg_tab_guilds this="GG2300E5-D000-4000-B0000000000000E5"/>
+				<gg_tab_help this="GG2300E8-D000-4000-B0000000000000E8"/>
+				<gg_tab_log this="GG2300EB-D000-4000-B0000000000000EB"/>
+				<gg_tab_stand this="GG2300EE-D000-4000-B0000000000000EE"/>
+				<gg_title this="GG2300F1-D000-4000-B0000000000000F1"/>
 			</derpy_gg_panel>
 		</root>
 	</hierarchy>
@@ -723,6 +744,7 @@
 							offset="0.00,0.00"
 							width="648"
 							height="53"
+							colour="#D8D8D8FF"
 							margin="0.00,85.00,0.00,85.00"/>
 					</imagemetrics>
 				</standard>
@@ -756,7 +778,7 @@
 							offset="0.00,0.00"
 							width="51"
 							height="5"
-							colour="#FFD37AFF"
+							colour="#FFB900FF"
 							shader_name="glow_pulse_t0"
 							shadertechnique_vars="0.80,1.50,0.80,0.00"
 							margin="0.00,0.00,0.00,0.00"/>
@@ -2101,45 +2123,885 @@
 				</derpy_gg_scale>
 			</animations>
 		</gg_help_21>
-		<gg_lf_all
+		<gg_helph_01
 			this="GG230082-D000-4000-B000000000000082"
-			id="gg_lf_all"
+			id="gg_helph_01"
 			tooltipslocalised="true"
-			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
 			uniqueguid="GG230082-D000-4000-B000000000000082"
 			currentstate="GG230083-D000-4000-B000000000000083"
 			defaultstate="GG230083-D000-4000-B000000000000083">
-			<componentimages>
-				<component_image
-					this="GG230082-D001-4000-B000000000000082"
-					uniqueguid="GG230082-D001-4000-B000000000000082"
-					imagepath="ui/skins/default/button_square_medium_text_active.png"/>
-				<component_image
-					this="GG230082-D003-4000-B000000000000082"
-					uniqueguid="GG230082-D003-4000-B000000000000082"
-					imagepath="ui/skins/default/button_square_medium_text_hover.png"/>
-			</componentimages>
 			<states>
 				<standard
 					this="GG230083-D000-4000-B000000000000083"
 					name="standard"
-					width="147"
-					height="32"
-					interactive="true"
+					width="1000"
+					height="24"
 					uniqueguid="GG230083-D000-4000-B000000000000083">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_01>
+		<gg_helph_02
+			this="GG230085-D000-4000-B000000000000085"
+			id="gg_helph_02"
+			tooltipslocalised="true"
+			uniqueguid="GG230085-D000-4000-B000000000000085"
+			currentstate="GG230086-D000-4000-B000000000000086"
+			defaultstate="GG230086-D000-4000-B000000000000086">
+			<states>
+				<standard
+					this="GG230086-D000-4000-B000000000000086"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG230086-D000-4000-B000000000000086">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_02>
+		<gg_helph_03
+			this="GG230088-D000-4000-B000000000000088"
+			id="gg_helph_03"
+			tooltipslocalised="true"
+			uniqueguid="GG230088-D000-4000-B000000000000088"
+			currentstate="GG230089-D000-4000-B000000000000089"
+			defaultstate="GG230089-D000-4000-B000000000000089">
+			<states>
+				<standard
+					this="GG230089-D000-4000-B000000000000089"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG230089-D000-4000-B000000000000089">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_03>
+		<gg_helph_04
+			this="GG23008B-D000-4000-B00000000000008B"
+			id="gg_helph_04"
+			tooltipslocalised="true"
+			uniqueguid="GG23008B-D000-4000-B00000000000008B"
+			currentstate="GG23008C-D000-4000-B00000000000008C"
+			defaultstate="GG23008C-D000-4000-B00000000000008C">
+			<states>
+				<standard
+					this="GG23008C-D000-4000-B00000000000008C"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG23008C-D000-4000-B00000000000008C">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_04>
+		<gg_helph_05
+			this="GG23008E-D000-4000-B00000000000008E"
+			id="gg_helph_05"
+			tooltipslocalised="true"
+			uniqueguid="GG23008E-D000-4000-B00000000000008E"
+			currentstate="GG23008F-D000-4000-B00000000000008F"
+			defaultstate="GG23008F-D000-4000-B00000000000008F">
+			<states>
+				<standard
+					this="GG23008F-D000-4000-B00000000000008F"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG23008F-D000-4000-B00000000000008F">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_05>
+		<gg_helph_06
+			this="GG230091-D000-4000-B000000000000091"
+			id="gg_helph_06"
+			tooltipslocalised="true"
+			uniqueguid="GG230091-D000-4000-B000000000000091"
+			currentstate="GG230092-D000-4000-B000000000000092"
+			defaultstate="GG230092-D000-4000-B000000000000092">
+			<states>
+				<standard
+					this="GG230092-D000-4000-B000000000000092"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG230092-D000-4000-B000000000000092">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_06>
+		<gg_helph_07
+			this="GG230094-D000-4000-B000000000000094"
+			id="gg_helph_07"
+			tooltipslocalised="true"
+			uniqueguid="GG230094-D000-4000-B000000000000094"
+			currentstate="GG230095-D000-4000-B000000000000095"
+			defaultstate="GG230095-D000-4000-B000000000000095">
+			<states>
+				<standard
+					this="GG230095-D000-4000-B000000000000095"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG230095-D000-4000-B000000000000095">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_07>
+		<gg_helph_08
+			this="GG230097-D000-4000-B000000000000097"
+			id="gg_helph_08"
+			tooltipslocalised="true"
+			uniqueguid="GG230097-D000-4000-B000000000000097"
+			currentstate="GG230098-D000-4000-B000000000000098"
+			defaultstate="GG230098-D000-4000-B000000000000098">
+			<states>
+				<standard
+					this="GG230098-D000-4000-B000000000000098"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG230098-D000-4000-B000000000000098">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_08>
+		<gg_helph_09
+			this="GG23009A-D000-4000-B00000000000009A"
+			id="gg_helph_09"
+			tooltipslocalised="true"
+			uniqueguid="GG23009A-D000-4000-B00000000000009A"
+			currentstate="GG23009B-D000-4000-B00000000000009B"
+			defaultstate="GG23009B-D000-4000-B00000000000009B">
+			<states>
+				<standard
+					this="GG23009B-D000-4000-B00000000000009B"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG23009B-D000-4000-B00000000000009B">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_09>
+		<gg_helph_10
+			this="GG23009D-D000-4000-B00000000000009D"
+			id="gg_helph_10"
+			tooltipslocalised="true"
+			uniqueguid="GG23009D-D000-4000-B00000000000009D"
+			currentstate="GG23009E-D000-4000-B00000000000009E"
+			defaultstate="GG23009E-D000-4000-B00000000000009E">
+			<states>
+				<standard
+					this="GG23009E-D000-4000-B00000000000009E"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG23009E-D000-4000-B00000000000009E">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_10>
+		<gg_helph_11
+			this="GG2300A0-D000-4000-B0000000000000A0"
+			id="gg_helph_11"
+			tooltipslocalised="true"
+			uniqueguid="GG2300A0-D000-4000-B0000000000000A0"
+			currentstate="GG2300A1-D000-4000-B0000000000000A1"
+			defaultstate="GG2300A1-D000-4000-B0000000000000A1">
+			<states>
+				<standard
+					this="GG2300A1-D000-4000-B0000000000000A1"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG2300A1-D000-4000-B0000000000000A1">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_11>
+		<gg_helph_12
+			this="GG2300A3-D000-4000-B0000000000000A3"
+			id="gg_helph_12"
+			tooltipslocalised="true"
+			uniqueguid="GG2300A3-D000-4000-B0000000000000A3"
+			currentstate="GG2300A4-D000-4000-B0000000000000A4"
+			defaultstate="GG2300A4-D000-4000-B0000000000000A4">
+			<states>
+				<standard
+					this="GG2300A4-D000-4000-B0000000000000A4"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG2300A4-D000-4000-B0000000000000A4">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_12>
+		<gg_helph_13
+			this="GG2300A6-D000-4000-B0000000000000A6"
+			id="gg_helph_13"
+			tooltipslocalised="true"
+			uniqueguid="GG2300A6-D000-4000-B0000000000000A6"
+			currentstate="GG2300A7-D000-4000-B0000000000000A7"
+			defaultstate="GG2300A7-D000-4000-B0000000000000A7">
+			<states>
+				<standard
+					this="GG2300A7-D000-4000-B0000000000000A7"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG2300A7-D000-4000-B0000000000000A7">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_13>
+		<gg_helph_14
+			this="GG2300A9-D000-4000-B0000000000000A9"
+			id="gg_helph_14"
+			tooltipslocalised="true"
+			uniqueguid="GG2300A9-D000-4000-B0000000000000A9"
+			currentstate="GG2300AA-D000-4000-B0000000000000AA"
+			defaultstate="GG2300AA-D000-4000-B0000000000000AA">
+			<states>
+				<standard
+					this="GG2300AA-D000-4000-B0000000000000AA"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG2300AA-D000-4000-B0000000000000AA">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_14>
+		<gg_helph_15
+			this="GG2300AC-D000-4000-B0000000000000AC"
+			id="gg_helph_15"
+			tooltipslocalised="true"
+			uniqueguid="GG2300AC-D000-4000-B0000000000000AC"
+			currentstate="GG2300AD-D000-4000-B0000000000000AD"
+			defaultstate="GG2300AD-D000-4000-B0000000000000AD">
+			<states>
+				<standard
+					this="GG2300AD-D000-4000-B0000000000000AD"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG2300AD-D000-4000-B0000000000000AD">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_15>
+		<gg_helph_16
+			this="GG2300AF-D000-4000-B0000000000000AF"
+			id="gg_helph_16"
+			tooltipslocalised="true"
+			uniqueguid="GG2300AF-D000-4000-B0000000000000AF"
+			currentstate="GG2300B0-D000-4000-B0000000000000B0"
+			defaultstate="GG2300B0-D000-4000-B0000000000000B0">
+			<states>
+				<standard
+					this="GG2300B0-D000-4000-B0000000000000B0"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG2300B0-D000-4000-B0000000000000B0">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_16>
+		<gg_helph_17
+			this="GG2300B2-D000-4000-B0000000000000B2"
+			id="gg_helph_17"
+			tooltipslocalised="true"
+			uniqueguid="GG2300B2-D000-4000-B0000000000000B2"
+			currentstate="GG2300B3-D000-4000-B0000000000000B3"
+			defaultstate="GG2300B3-D000-4000-B0000000000000B3">
+			<states>
+				<standard
+					this="GG2300B3-D000-4000-B0000000000000B3"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG2300B3-D000-4000-B0000000000000B3">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_17>
+		<gg_helph_18
+			this="GG2300B5-D000-4000-B0000000000000B5"
+			id="gg_helph_18"
+			tooltipslocalised="true"
+			uniqueguid="GG2300B5-D000-4000-B0000000000000B5"
+			currentstate="GG2300B6-D000-4000-B0000000000000B6"
+			defaultstate="GG2300B6-D000-4000-B0000000000000B6">
+			<states>
+				<standard
+					this="GG2300B6-D000-4000-B0000000000000B6"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG2300B6-D000-4000-B0000000000000B6">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_18>
+		<gg_helph_19
+			this="GG2300B8-D000-4000-B0000000000000B8"
+			id="gg_helph_19"
+			tooltipslocalised="true"
+			uniqueguid="GG2300B8-D000-4000-B0000000000000B8"
+			currentstate="GG2300B9-D000-4000-B0000000000000B9"
+			defaultstate="GG2300B9-D000-4000-B0000000000000B9">
+			<states>
+				<standard
+					this="GG2300B9-D000-4000-B0000000000000B9"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG2300B9-D000-4000-B0000000000000B9">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_19>
+		<gg_helph_20
+			this="GG2300BB-D000-4000-B0000000000000BB"
+			id="gg_helph_20"
+			tooltipslocalised="true"
+			uniqueguid="GG2300BB-D000-4000-B0000000000000BB"
+			currentstate="GG2300BC-D000-4000-B0000000000000BC"
+			defaultstate="GG2300BC-D000-4000-B0000000000000BC">
+			<states>
+				<standard
+					this="GG2300BC-D000-4000-B0000000000000BC"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG2300BC-D000-4000-B0000000000000BC">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_20>
+		<gg_helph_21
+			this="GG2300BE-D000-4000-B0000000000000BE"
+			id="gg_helph_21"
+			tooltipslocalised="true"
+			uniqueguid="GG2300BE-D000-4000-B0000000000000BE"
+			currentstate="GG2300BF-D000-4000-B0000000000000BF"
+			defaultstate="GG2300BF-D000-4000-B0000000000000BF">
+			<states>
+				<standard
+					this="GG2300BF-D000-4000-B0000000000000BF"
+					name="standard"
+					width="1000"
+					height="24"
+					uniqueguid="GG2300BF-D000-4000-B0000000000000BF">
+					<component_text
+						texthalign="Left"
+						textvalign="Center"
+						textxoffset="8.00,0.00"
+						textyoffset="0.00,0.00"
+						texthbehaviour="Never split"
+						font_m_size="19"
+						font_m_colour="#FFF8D7FF"
+						font_m_leading="3"
+						fontcat_name="header_18"/>
+				</standard>
+			</states>
+			<animations>
+				<derpy_gg_scale
+					id="derpy_gg_scale">
+					<frames>
+						<frame
+							interpolationtime="0"
+							interpolationpropertymask="512"
+							targetmetrics_m_height="24"
+							targetmetrics_m_width="1000"
+							targetmetrics_m_font_scale="1"/>
+					</frames>
+				</derpy_gg_scale>
+			</animations>
+		</gg_helph_21>
+		<gg_lf_all
+			this="GG2300C1-D000-4000-B0000000000000C1"
+			id="gg_lf_all"
+			tooltipslocalised="true"
+			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
+			uniqueguid="GG2300C1-D000-4000-B0000000000000C1"
+			currentstate="GG2300C2-D000-4000-B0000000000000C2"
+			defaultstate="GG2300C2-D000-4000-B0000000000000C2">
+			<componentimages>
+				<component_image
+					this="GG2300C1-D001-4000-B0000000000000C1"
+					uniqueguid="GG2300C1-D001-4000-B0000000000000C1"
+					imagepath="ui/skins/default/button_square_medium_text_active.png"/>
+				<component_image
+					this="GG2300C1-D003-4000-B0000000000000C1"
+					uniqueguid="GG2300C1-D003-4000-B0000000000000C1"
+					imagepath="ui/skins/default/button_square_medium_text_hover.png"/>
+			</componentimages>
+			<states>
+				<standard
+					this="GG2300C2-D000-4000-B0000000000000C2"
+					name="standard"
+					width="147"
+					height="37"
+					interactive="true"
+					uniqueguid="GG2300C2-D000-4000-B0000000000000C2">
 					<imagemetrics>
 						<image
-							this="GG230082-D002-4000-B000000000000082"
-							uniqueguid="GG230082-D002-4000-B000000000000082"
-							componentimage="GG230082-D001-4000-B000000000000082"
-							offset="0.00,-2.67"
+							this="GG2300C1-D002-4000-B0000000000000C1"
+							uniqueguid="GG2300C1-D002-4000-B0000000000000C1"
+							componentimage="GG2300C1-D001-4000-B0000000000000C1"
+							offset="0.00,-4.00"
 							width="147"
-							height="49"
+							height="57"
 							margin="8.00,8.00,8.00,8.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
-							transition_m_target_state="GG230084-D000-4000-B000000000000084"/>
+							transition_m_target_state="GG2300C3-D000-4000-B0000000000000C3"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -2153,26 +3015,26 @@
 						fontcat_name="header_18"/>
 				</standard>
 				<hover
-					this="GG230084-D000-4000-B000000000000084"
+					this="GG2300C3-D000-4000-B0000000000000C3"
 					name="hover"
 					width="147"
-					height="32"
+					height="37"
 					interactive="true"
-					uniqueguid="GG230084-D000-4000-B000000000000084">
+					uniqueguid="GG2300C3-D000-4000-B0000000000000C3">
 					<imagemetrics>
 						<image
-							this="GG230082-D004-4000-B000000000000082"
-							uniqueguid="GG230082-D004-4000-B000000000000082"
-							componentimage="GG230082-D003-4000-B000000000000082"
-							offset="0.00,-2.67"
+							this="GG2300C1-D004-4000-B0000000000000C1"
+							uniqueguid="GG2300C1-D004-4000-B0000000000000C1"
+							componentimage="GG2300C1-D003-4000-B0000000000000C1"
+							offset="0.00,-4.00"
 							width="147"
-							height="49"
+							height="57"
 							margin="8.00,8.00,8.00,8.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
 							index="1"
-							transition_m_target_state="GG230083-D000-4000-B000000000000083"/>
+							transition_m_target_state="GG2300C2-D000-4000-B0000000000000C2"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -2193,7 +3055,7 @@
 						<frame
 							interpolationtime="0"
 							interpolationpropertymask="512"
-							targetmetrics_m_height="32"
+							targetmetrics_m_height="37"
 							targetmetrics_m_width="147"
 							targetmetrics_m_font_scale="1"/>
 					</frames>
@@ -2201,44 +3063,44 @@
 			</animations>
 		</gg_lf_all>
 		<gg_lf_mine
-			this="GG230085-D000-4000-B000000000000085"
+			this="GG2300C4-D000-4000-B0000000000000C4"
 			id="gg_lf_mine"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
-			uniqueguid="GG230085-D000-4000-B000000000000085"
-			currentstate="GG230086-D000-4000-B000000000000086"
-			defaultstate="GG230086-D000-4000-B000000000000086">
+			uniqueguid="GG2300C4-D000-4000-B0000000000000C4"
+			currentstate="GG2300C5-D000-4000-B0000000000000C5"
+			defaultstate="GG2300C5-D000-4000-B0000000000000C5">
 			<componentimages>
 				<component_image
-					this="GG230085-D001-4000-B000000000000085"
-					uniqueguid="GG230085-D001-4000-B000000000000085"
+					this="GG2300C4-D001-4000-B0000000000000C4"
+					uniqueguid="GG2300C4-D001-4000-B0000000000000C4"
 					imagepath="ui/skins/default/button_square_medium_text_active.png"/>
 				<component_image
-					this="GG230085-D003-4000-B000000000000085"
-					uniqueguid="GG230085-D003-4000-B000000000000085"
+					this="GG2300C4-D003-4000-B0000000000000C4"
+					uniqueguid="GG2300C4-D003-4000-B0000000000000C4"
 					imagepath="ui/skins/default/button_square_medium_text_hover.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG230086-D000-4000-B000000000000086"
+					this="GG2300C5-D000-4000-B0000000000000C5"
 					name="standard"
 					width="147"
-					height="32"
+					height="37"
 					interactive="true"
-					uniqueguid="GG230086-D000-4000-B000000000000086">
+					uniqueguid="GG2300C5-D000-4000-B0000000000000C5">
 					<imagemetrics>
 						<image
-							this="GG230085-D002-4000-B000000000000085"
-							uniqueguid="GG230085-D002-4000-B000000000000085"
-							componentimage="GG230085-D001-4000-B000000000000085"
-							offset="0.00,-2.67"
+							this="GG2300C4-D002-4000-B0000000000000C4"
+							uniqueguid="GG2300C4-D002-4000-B0000000000000C4"
+							componentimage="GG2300C4-D001-4000-B0000000000000C4"
+							offset="0.00,-4.00"
 							width="147"
-							height="49"
+							height="57"
 							margin="8.00,8.00,8.00,8.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
-							transition_m_target_state="GG230087-D000-4000-B000000000000087"/>
+							transition_m_target_state="GG2300C6-D000-4000-B0000000000000C6"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -2252,26 +3114,26 @@
 						fontcat_name="header_18"/>
 				</standard>
 				<hover
-					this="GG230087-D000-4000-B000000000000087"
+					this="GG2300C6-D000-4000-B0000000000000C6"
 					name="hover"
 					width="147"
-					height="32"
+					height="37"
 					interactive="true"
-					uniqueguid="GG230087-D000-4000-B000000000000087">
+					uniqueguid="GG2300C6-D000-4000-B0000000000000C6">
 					<imagemetrics>
 						<image
-							this="GG230085-D004-4000-B000000000000085"
-							uniqueguid="GG230085-D004-4000-B000000000000085"
-							componentimage="GG230085-D003-4000-B000000000000085"
-							offset="0.00,-2.67"
+							this="GG2300C4-D004-4000-B0000000000000C4"
+							uniqueguid="GG2300C4-D004-4000-B0000000000000C4"
+							componentimage="GG2300C4-D003-4000-B0000000000000C4"
+							offset="0.00,-4.00"
 							width="147"
-							height="49"
+							height="57"
 							margin="8.00,8.00,8.00,8.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
 							index="1"
-							transition_m_target_state="GG230086-D000-4000-B000000000000086"/>
+							transition_m_target_state="GG2300C5-D000-4000-B0000000000000C5"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -2292,7 +3154,7 @@
 						<frame
 							interpolationtime="0"
 							interpolationpropertymask="512"
-							targetmetrics_m_height="32"
+							targetmetrics_m_height="37"
 							targetmetrics_m_width="147"
 							targetmetrics_m_font_scale="1"/>
 					</frames>
@@ -2300,44 +3162,44 @@
 			</animations>
 		</gg_lf_mine>
 		<gg_lf_ranks
-			this="GG230088-D000-4000-B000000000000088"
+			this="GG2300C7-D000-4000-B0000000000000C7"
 			id="gg_lf_ranks"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
-			uniqueguid="GG230088-D000-4000-B000000000000088"
-			currentstate="GG230089-D000-4000-B000000000000089"
-			defaultstate="GG230089-D000-4000-B000000000000089">
+			uniqueguid="GG2300C7-D000-4000-B0000000000000C7"
+			currentstate="GG2300C8-D000-4000-B0000000000000C8"
+			defaultstate="GG2300C8-D000-4000-B0000000000000C8">
 			<componentimages>
 				<component_image
-					this="GG230088-D001-4000-B000000000000088"
-					uniqueguid="GG230088-D001-4000-B000000000000088"
+					this="GG2300C7-D001-4000-B0000000000000C7"
+					uniqueguid="GG2300C7-D001-4000-B0000000000000C7"
 					imagepath="ui/skins/default/button_square_medium_text_active.png"/>
 				<component_image
-					this="GG230088-D003-4000-B000000000000088"
-					uniqueguid="GG230088-D003-4000-B000000000000088"
+					this="GG2300C7-D003-4000-B0000000000000C7"
+					uniqueguid="GG2300C7-D003-4000-B0000000000000C7"
 					imagepath="ui/skins/default/button_square_medium_text_hover.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG230089-D000-4000-B000000000000089"
+					this="GG2300C8-D000-4000-B0000000000000C8"
 					name="standard"
 					width="147"
-					height="32"
+					height="37"
 					interactive="true"
-					uniqueguid="GG230089-D000-4000-B000000000000089">
+					uniqueguid="GG2300C8-D000-4000-B0000000000000C8">
 					<imagemetrics>
 						<image
-							this="GG230088-D002-4000-B000000000000088"
-							uniqueguid="GG230088-D002-4000-B000000000000088"
-							componentimage="GG230088-D001-4000-B000000000000088"
-							offset="0.00,-2.67"
+							this="GG2300C7-D002-4000-B0000000000000C7"
+							uniqueguid="GG2300C7-D002-4000-B0000000000000C7"
+							componentimage="GG2300C7-D001-4000-B0000000000000C7"
+							offset="0.00,-4.00"
 							width="147"
-							height="49"
+							height="57"
 							margin="8.00,8.00,8.00,8.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
-							transition_m_target_state="GG23008A-D000-4000-B00000000000008A"/>
+							transition_m_target_state="GG2300C9-D000-4000-B0000000000000C9"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -2351,26 +3213,26 @@
 						fontcat_name="header_18"/>
 				</standard>
 				<hover
-					this="GG23008A-D000-4000-B00000000000008A"
+					this="GG2300C9-D000-4000-B0000000000000C9"
 					name="hover"
 					width="147"
-					height="32"
+					height="37"
 					interactive="true"
-					uniqueguid="GG23008A-D000-4000-B00000000000008A">
+					uniqueguid="GG2300C9-D000-4000-B0000000000000C9">
 					<imagemetrics>
 						<image
-							this="GG230088-D004-4000-B000000000000088"
-							uniqueguid="GG230088-D004-4000-B000000000000088"
-							componentimage="GG230088-D003-4000-B000000000000088"
-							offset="0.00,-2.67"
+							this="GG2300C7-D004-4000-B0000000000000C7"
+							uniqueguid="GG2300C7-D004-4000-B0000000000000C7"
+							componentimage="GG2300C7-D003-4000-B0000000000000C7"
+							offset="0.00,-4.00"
 							width="147"
-							height="49"
+							height="57"
 							margin="8.00,8.00,8.00,8.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
 							index="1"
-							transition_m_target_state="GG230089-D000-4000-B000000000000089"/>
+							transition_m_target_state="GG2300C8-D000-4000-B0000000000000C8"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -2391,7 +3253,7 @@
 						<frame
 							interpolationtime="0"
 							interpolationpropertymask="512"
-							targetmetrics_m_height="32"
+							targetmetrics_m_height="37"
 							targetmetrics_m_width="147"
 							targetmetrics_m_font_scale="1"/>
 					</frames>
@@ -2399,44 +3261,44 @@
 			</animations>
 		</gg_lf_ranks>
 		<gg_lf_rivals
-			this="GG23008B-D000-4000-B00000000000008B"
+			this="GG2300CA-D000-4000-B0000000000000CA"
 			id="gg_lf_rivals"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
-			uniqueguid="GG23008B-D000-4000-B00000000000008B"
-			currentstate="GG23008C-D000-4000-B00000000000008C"
-			defaultstate="GG23008C-D000-4000-B00000000000008C">
+			uniqueguid="GG2300CA-D000-4000-B0000000000000CA"
+			currentstate="GG2300CB-D000-4000-B0000000000000CB"
+			defaultstate="GG2300CB-D000-4000-B0000000000000CB">
 			<componentimages>
 				<component_image
-					this="GG23008B-D001-4000-B00000000000008B"
-					uniqueguid="GG23008B-D001-4000-B00000000000008B"
+					this="GG2300CA-D001-4000-B0000000000000CA"
+					uniqueguid="GG2300CA-D001-4000-B0000000000000CA"
 					imagepath="ui/skins/default/button_square_medium_text_active.png"/>
 				<component_image
-					this="GG23008B-D003-4000-B00000000000008B"
-					uniqueguid="GG23008B-D003-4000-B00000000000008B"
+					this="GG2300CA-D003-4000-B0000000000000CA"
+					uniqueguid="GG2300CA-D003-4000-B0000000000000CA"
 					imagepath="ui/skins/default/button_square_medium_text_hover.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG23008C-D000-4000-B00000000000008C"
+					this="GG2300CB-D000-4000-B0000000000000CB"
 					name="standard"
 					width="147"
-					height="32"
+					height="37"
 					interactive="true"
-					uniqueguid="GG23008C-D000-4000-B00000000000008C">
+					uniqueguid="GG2300CB-D000-4000-B0000000000000CB">
 					<imagemetrics>
 						<image
-							this="GG23008B-D002-4000-B00000000000008B"
-							uniqueguid="GG23008B-D002-4000-B00000000000008B"
-							componentimage="GG23008B-D001-4000-B00000000000008B"
-							offset="0.00,-2.67"
+							this="GG2300CA-D002-4000-B0000000000000CA"
+							uniqueguid="GG2300CA-D002-4000-B0000000000000CA"
+							componentimage="GG2300CA-D001-4000-B0000000000000CA"
+							offset="0.00,-4.00"
 							width="147"
-							height="49"
+							height="57"
 							margin="8.00,8.00,8.00,8.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
-							transition_m_target_state="GG23008D-D000-4000-B00000000000008D"/>
+							transition_m_target_state="GG2300CC-D000-4000-B0000000000000CC"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -2450,26 +3312,26 @@
 						fontcat_name="header_18"/>
 				</standard>
 				<hover
-					this="GG23008D-D000-4000-B00000000000008D"
+					this="GG2300CC-D000-4000-B0000000000000CC"
 					name="hover"
 					width="147"
-					height="32"
+					height="37"
 					interactive="true"
-					uniqueguid="GG23008D-D000-4000-B00000000000008D">
+					uniqueguid="GG2300CC-D000-4000-B0000000000000CC">
 					<imagemetrics>
 						<image
-							this="GG23008B-D004-4000-B00000000000008B"
-							uniqueguid="GG23008B-D004-4000-B00000000000008B"
-							componentimage="GG23008B-D003-4000-B00000000000008B"
-							offset="0.00,-2.67"
+							this="GG2300CA-D004-4000-B0000000000000CA"
+							uniqueguid="GG2300CA-D004-4000-B0000000000000CA"
+							componentimage="GG2300CA-D003-4000-B0000000000000CA"
+							offset="0.00,-4.00"
 							width="147"
-							height="49"
+							height="57"
 							margin="8.00,8.00,8.00,8.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
 							index="1"
-							transition_m_target_state="GG23008C-D000-4000-B00000000000008C"/>
+							transition_m_target_state="GG2300CB-D000-4000-B0000000000000CB"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -2490,7 +3352,7 @@
 						<frame
 							interpolationtime="0"
 							interpolationpropertymask="512"
-							targetmetrics_m_height="32"
+							targetmetrics_m_height="37"
 							targetmetrics_m_width="147"
 							targetmetrics_m_font_scale="1"/>
 					</frames>
@@ -2498,36 +3360,36 @@
 			</animations>
 		</gg_lf_rivals>
 		<gg_next
-			this="GG23008E-D000-4000-B00000000000008E"
+			this="GG2300CD-D000-4000-B0000000000000CD"
 			id="gg_next"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Round_Small_Button"
-			uniqueguid="GG23008E-D000-4000-B00000000000008E"
-			currentstate="GG23008F-D000-4000-B00000000000008F"
-			defaultstate="GG23008F-D000-4000-B00000000000008F">
+			uniqueguid="GG2300CD-D000-4000-B0000000000000CD"
+			currentstate="GG2300CE-D000-4000-B0000000000000CE"
+			defaultstate="GG2300CE-D000-4000-B0000000000000CE">
 			<componentimages>
 				<component_image
-					this="GG23008E-D001-4000-B00000000000008E"
-					uniqueguid="GG23008E-D001-4000-B00000000000008E"
+					this="GG2300CD-D001-4000-B0000000000000CD"
+					uniqueguid="GG2300CD-D001-4000-B0000000000000CD"
 					imagepath="ui/skins/default/button_round_small_active.png"/>
 				<component_image
-					this="GG23008E-D003-4000-B00000000000008E"
-					uniqueguid="GG23008E-D003-4000-B00000000000008E"
+					this="GG2300CD-D003-4000-B0000000000000CD"
+					uniqueguid="GG2300CD-D003-4000-B0000000000000CD"
 					imagepath="ui/skins/default/button_round_small_hover.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG23008F-D000-4000-B00000000000008F"
+					this="GG2300CE-D000-4000-B0000000000000CE"
 					name="standard"
 					width="51"
 					height="51"
 					interactive="true"
-					uniqueguid="GG23008F-D000-4000-B00000000000008F">
+					uniqueguid="GG2300CE-D000-4000-B0000000000000CE">
 					<imagemetrics>
 						<image
-							this="GG23008E-D002-4000-B00000000000008E"
-							uniqueguid="GG23008E-D002-4000-B00000000000008E"
-							componentimage="GG23008E-D001-4000-B00000000000008E"
+							this="GG2300CD-D002-4000-B0000000000000CD"
+							uniqueguid="GG2300CD-D002-4000-B0000000000000CD"
+							componentimage="GG2300CD-D001-4000-B0000000000000CD"
 							offset="0.00,0.00"
 							width="51"
 							height="51"
@@ -2535,7 +3397,7 @@
 					</imagemetrics>
 					<transitionmap>
 						<transition
-							transition_m_target_state="GG230090-D000-4000-B000000000000090"/>
+							transition_m_target_state="GG2300CF-D000-4000-B0000000000000CF"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -2549,17 +3411,17 @@
 						fontcat_name="header_18"/>
 				</standard>
 				<hover
-					this="GG230090-D000-4000-B000000000000090"
+					this="GG2300CF-D000-4000-B0000000000000CF"
 					name="hover"
 					width="51"
 					height="51"
 					interactive="true"
-					uniqueguid="GG230090-D000-4000-B000000000000090">
+					uniqueguid="GG2300CF-D000-4000-B0000000000000CF">
 					<imagemetrics>
 						<image
-							this="GG23008E-D004-4000-B00000000000008E"
-							uniqueguid="GG23008E-D004-4000-B00000000000008E"
-							componentimage="GG23008E-D003-4000-B00000000000008E"
+							this="GG2300CD-D004-4000-B0000000000000CD"
+							uniqueguid="GG2300CD-D004-4000-B0000000000000CD"
+							componentimage="GG2300CD-D003-4000-B0000000000000CD"
 							offset="0.00,0.00"
 							width="51"
 							height="51"
@@ -2568,7 +3430,7 @@
 					<transitionmap>
 						<transition
 							index="1"
-							transition_m_target_state="GG23008F-D000-4000-B00000000000008F"/>
+							transition_m_target_state="GG2300CE-D000-4000-B0000000000000CE"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -2597,36 +3459,36 @@
 			</animations>
 		</gg_next>
 		<gg_prev
-			this="GG230091-D000-4000-B000000000000091"
+			this="GG2300D0-D000-4000-B0000000000000D0"
 			id="gg_prev"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Round_Small_Button"
-			uniqueguid="GG230091-D000-4000-B000000000000091"
-			currentstate="GG230092-D000-4000-B000000000000092"
-			defaultstate="GG230092-D000-4000-B000000000000092">
+			uniqueguid="GG2300D0-D000-4000-B0000000000000D0"
+			currentstate="GG2300D1-D000-4000-B0000000000000D1"
+			defaultstate="GG2300D1-D000-4000-B0000000000000D1">
 			<componentimages>
 				<component_image
-					this="GG230091-D001-4000-B000000000000091"
-					uniqueguid="GG230091-D001-4000-B000000000000091"
+					this="GG2300D0-D001-4000-B0000000000000D0"
+					uniqueguid="GG2300D0-D001-4000-B0000000000000D0"
 					imagepath="ui/skins/default/button_round_small_active.png"/>
 				<component_image
-					this="GG230091-D003-4000-B000000000000091"
-					uniqueguid="GG230091-D003-4000-B000000000000091"
+					this="GG2300D0-D003-4000-B0000000000000D0"
+					uniqueguid="GG2300D0-D003-4000-B0000000000000D0"
 					imagepath="ui/skins/default/button_round_small_hover.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG230092-D000-4000-B000000000000092"
+					this="GG2300D1-D000-4000-B0000000000000D1"
 					name="standard"
 					width="51"
 					height="51"
 					interactive="true"
-					uniqueguid="GG230092-D000-4000-B000000000000092">
+					uniqueguid="GG2300D1-D000-4000-B0000000000000D1">
 					<imagemetrics>
 						<image
-							this="GG230091-D002-4000-B000000000000091"
-							uniqueguid="GG230091-D002-4000-B000000000000091"
-							componentimage="GG230091-D001-4000-B000000000000091"
+							this="GG2300D0-D002-4000-B0000000000000D0"
+							uniqueguid="GG2300D0-D002-4000-B0000000000000D0"
+							componentimage="GG2300D0-D001-4000-B0000000000000D0"
 							offset="0.00,0.00"
 							width="51"
 							height="51"
@@ -2634,7 +3496,7 @@
 					</imagemetrics>
 					<transitionmap>
 						<transition
-							transition_m_target_state="GG230093-D000-4000-B000000000000093"/>
+							transition_m_target_state="GG2300D2-D000-4000-B0000000000000D2"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -2648,17 +3510,17 @@
 						fontcat_name="header_18"/>
 				</standard>
 				<hover
-					this="GG230093-D000-4000-B000000000000093"
+					this="GG2300D2-D000-4000-B0000000000000D2"
 					name="hover"
 					width="51"
 					height="51"
 					interactive="true"
-					uniqueguid="GG230093-D000-4000-B000000000000093">
+					uniqueguid="GG2300D2-D000-4000-B0000000000000D2">
 					<imagemetrics>
 						<image
-							this="GG230091-D004-4000-B000000000000091"
-							uniqueguid="GG230091-D004-4000-B000000000000091"
-							componentimage="GG230091-D003-4000-B000000000000091"
+							this="GG2300D0-D004-4000-B0000000000000D0"
+							uniqueguid="GG2300D0-D004-4000-B0000000000000D0"
+							componentimage="GG2300D0-D003-4000-B0000000000000D0"
 							offset="0.00,0.00"
 							width="51"
 							height="51"
@@ -2667,7 +3529,7 @@
 					<transitionmap>
 						<transition
 							index="1"
-							transition_m_target_state="GG230092-D000-4000-B000000000000092"/>
+							transition_m_target_state="GG2300D1-D000-4000-B0000000000000D1"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -2696,30 +3558,30 @@
 			</animations>
 		</gg_prev>
 		<gg_rank_line
-			this="GG230094-D000-4000-B000000000000094"
+			this="GG2300D3-D000-4000-B0000000000000D3"
 			id="gg_rank_line"
 			tooltipslocalised="true"
-			uniqueguid="GG230094-D000-4000-B000000000000094"
-			currentstate="GG230095-D000-4000-B000000000000095"
-			defaultstate="GG230095-D000-4000-B000000000000095">
+			uniqueguid="GG2300D3-D000-4000-B0000000000000D3"
+			currentstate="GG2300D4-D000-4000-B0000000000000D4"
+			defaultstate="GG2300D4-D000-4000-B0000000000000D4">
 			<componentimages>
 				<component_image
-					this="GG230094-D001-4000-B000000000000094"
-					uniqueguid="GG230094-D001-4000-B000000000000094"
+					this="GG2300D3-D001-4000-B0000000000000D3"
+					uniqueguid="GG2300D3-D001-4000-B0000000000000D3"
 					imagepath="ui/skins/default/dlc27_hef_intrigue_court/dlc27_intrigue_court_immunity.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG230095-D000-4000-B000000000000095"
+					this="GG2300D4-D000-4000-B0000000000000D4"
 					name="standard"
 					width="1000"
 					height="61"
-					uniqueguid="GG230095-D000-4000-B000000000000095">
+					uniqueguid="GG2300D4-D000-4000-B0000000000000D4">
 					<imagemetrics>
 						<image
-							this="GG230094-D002-4000-B000000000000094"
-							uniqueguid="GG230094-D002-4000-B000000000000094"
-							componentimage="GG230094-D001-4000-B000000000000094"
+							this="GG2300D3-D002-4000-B0000000000000D3"
+							uniqueguid="GG2300D3-D002-4000-B0000000000000D3"
+							componentimage="GG2300D3-D001-4000-B0000000000000D3"
 							offset="0.00,0.00"
 							width="1000"
 							height="61"
@@ -2752,42 +3614,42 @@
 			</animations>
 		</gg_rank_line>
 		<gg_rank_mark
-			this="GG230097-D000-4000-B000000000000097"
+			this="GG2300D6-D000-4000-B0000000000000D6"
 			id="gg_rank_mark"
 			tooltipslocalised="true"
-			uniqueguid="GG230097-D000-4000-B000000000000097"
-			currentstate="GG230098-D000-4000-B000000000000098"
-			defaultstate="GG230098-D000-4000-B000000000000098">
+			uniqueguid="GG2300D6-D000-4000-B0000000000000D6"
+			currentstate="GG2300D7-D000-4000-B0000000000000D7"
+			defaultstate="GG2300D7-D000-4000-B0000000000000D7">
 			<componentimages>
 				<component_image
-					this="GG230097-D001-4000-B000000000000097"
-					uniqueguid="GG230097-D001-4000-B000000000000097"
+					this="GG2300D6-D001-4000-B0000000000000D6"
+					uniqueguid="GG2300D6-D001-4000-B0000000000000D6"
 					imagepath="ui/skins/default/dlc27_hef_asur_domination/faction_selection_frame_active.png"/>
 				<component_image
-					this="GG230097-D003-4000-B000000000000097"
-					uniqueguid="GG230097-D003-4000-B000000000000097"
+					this="GG2300D6-D003-4000-B0000000000000D6"
+					uniqueguid="GG2300D6-D003-4000-B0000000000000D6"
 					imagepath="ui/campaign ui/derpy_gg_icons/brass.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG230098-D000-4000-B000000000000098"
+					this="GG2300D7-D000-4000-B0000000000000D7"
 					name="standard"
 					width="59"
 					height="63"
-					uniqueguid="GG230098-D000-4000-B000000000000098">
+					uniqueguid="GG2300D7-D000-4000-B0000000000000D7">
 					<imagemetrics>
 						<image
-							this="GG230097-D002-4000-B000000000000097"
-							uniqueguid="GG230097-D002-4000-B000000000000097"
-							componentimage="GG230097-D001-4000-B000000000000097"
+							this="GG2300D6-D002-4000-B0000000000000D6"
+							uniqueguid="GG2300D6-D002-4000-B0000000000000D6"
+							componentimage="GG2300D6-D001-4000-B0000000000000D6"
 							offset="0.00,0.00"
 							width="59"
 							height="63"
 							margin="0.00,0.00,0.00,0.00"/>
 						<image
-							this="GG230097-D004-4000-B000000000000097"
-							uniqueguid="GG230097-D004-4000-B000000000000097"
-							componentimage="GG230097-D003-4000-B000000000000097"
+							this="GG2300D6-D004-4000-B0000000000000D6"
+							uniqueguid="GG2300D6-D004-4000-B0000000000000D6"
+							componentimage="GG2300D6-D003-4000-B0000000000000D6"
 							offset="10.67,10.67"
 							width="38"
 							height="38"
@@ -2797,19 +3659,19 @@
 			</states>
 		</gg_rank_mark>
 		<gg_rank_stats
-			this="GG23009A-D000-4000-B00000000000009A"
+			this="GG2300D9-D000-4000-B0000000000000D9"
 			id="gg_rank_stats"
 			tooltipslocalised="true"
-			uniqueguid="GG23009A-D000-4000-B00000000000009A"
-			currentstate="GG23009B-D000-4000-B00000000000009B"
-			defaultstate="GG23009B-D000-4000-B00000000000009B">
+			uniqueguid="GG2300D9-D000-4000-B0000000000000D9"
+			currentstate="GG2300DA-D000-4000-B0000000000000DA"
+			defaultstate="GG2300DA-D000-4000-B0000000000000DA">
 			<states>
 				<standard
-					this="GG23009B-D000-4000-B00000000000009B"
+					this="GG2300DA-D000-4000-B0000000000000DA"
 					name="standard"
 					width="1000"
 					height="61"
-					uniqueguid="GG23009B-D000-4000-B00000000000009B">
+					uniqueguid="GG2300DA-D000-4000-B0000000000000DA">
 					<component_text
 						texthalign="Right"
 						textvalign="Center"
@@ -2837,30 +3699,30 @@
 			</animations>
 		</gg_rank_stats>
 		<gg_rep_bar
-			this="GG23009D-D000-4000-B00000000000009D"
+			this="GG2300DC-D000-4000-B0000000000000DC"
 			id="gg_rep_bar"
 			tooltipslocalised="true"
-			uniqueguid="GG23009D-D000-4000-B00000000000009D"
-			currentstate="GG23009E-D000-4000-B00000000000009E"
-			defaultstate="GG23009E-D000-4000-B00000000000009E">
+			uniqueguid="GG2300DC-D000-4000-B0000000000000DC"
+			currentstate="GG2300DD-D000-4000-B0000000000000DD"
+			defaultstate="GG2300DD-D000-4000-B0000000000000DD">
 			<componentimages>
 				<component_image
-					this="GG23009D-D001-4000-B00000000000009D"
-					uniqueguid="GG23009D-D001-4000-B00000000000009D"
+					this="GG2300DC-D001-4000-B0000000000000DC"
+					uniqueguid="GG2300DC-D001-4000-B0000000000000DC"
 					imagepath="ui/skins/default/dlc27_hef_asur_domination/wh3_sea_patrol_progress_bar_fill.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG23009E-D000-4000-B00000000000009E"
+					this="GG2300DD-D000-4000-B0000000000000DD"
 					name="standard"
 					width="952"
 					height="17"
-					uniqueguid="GG23009E-D000-4000-B00000000000009E">
+					uniqueguid="GG2300DD-D000-4000-B0000000000000DD">
 					<imagemetrics>
 						<image
-							this="GG23009D-D002-4000-B00000000000009D"
-							uniqueguid="GG23009D-D002-4000-B00000000000009D"
-							componentimage="GG23009D-D001-4000-B00000000000009D"
+							this="GG2300DC-D002-4000-B0000000000000DC"
+							uniqueguid="GG2300DC-D002-4000-B0000000000000DC"
+							componentimage="GG2300DC-D001-4000-B0000000000000DC"
 							offset="0.00,0.00"
 							width="952"
 							height="17"
@@ -2871,44 +3733,44 @@
 			</states>
 		</gg_rep_bar>
 		<gg_tab_bounty
-			this="GG2300A0-D000-4000-B0000000000000A0"
+			this="GG2300DF-D000-4000-B0000000000000DF"
 			id="gg_tab_bounty"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
-			uniqueguid="GG2300A0-D000-4000-B0000000000000A0"
-			currentstate="GG2300A1-D000-4000-B0000000000000A1"
-			defaultstate="GG2300A1-D000-4000-B0000000000000A1">
+			uniqueguid="GG2300DF-D000-4000-B0000000000000DF"
+			currentstate="GG2300E0-D000-4000-B0000000000000E0"
+			defaultstate="GG2300E0-D000-4000-B0000000000000E0">
 			<componentimages>
 				<component_image
-					this="GG2300A0-D001-4000-B0000000000000A0"
-					uniqueguid="GG2300A0-D001-4000-B0000000000000A0"
+					this="GG2300DF-D001-4000-B0000000000000DF"
+					uniqueguid="GG2300DF-D001-4000-B0000000000000DF"
 					imagepath="ui/skins/default/dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"/>
 				<component_image
-					this="GG2300A0-D003-4000-B0000000000000A0"
-					uniqueguid="GG2300A0-D003-4000-B0000000000000A0"
+					this="GG2300DF-D003-4000-B0000000000000DF"
+					uniqueguid="GG2300DF-D003-4000-B0000000000000DF"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 				<component_image
-					this="GG2300A0-D005-4000-B0000000000000A0"
-					uniqueguid="GG2300A0-D005-4000-B0000000000000A0"
+					this="GG2300DF-D005-4000-B0000000000000DF"
+					uniqueguid="GG2300DF-D005-4000-B0000000000000DF"
 					imagepath="ui/skins/default/dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"/>
 				<component_image
-					this="GG2300A0-D007-4000-B0000000000000A0"
-					uniqueguid="GG2300A0-D007-4000-B0000000000000A0"
+					this="GG2300DF-D007-4000-B0000000000000DF"
+					uniqueguid="GG2300DF-D007-4000-B0000000000000DF"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG2300A1-D000-4000-B0000000000000A1"
+					this="GG2300E0-D000-4000-B0000000000000E0"
 					name="standard"
 					width="167"
 					height="45"
 					interactive="true"
-					uniqueguid="GG2300A1-D000-4000-B0000000000000A1">
+					uniqueguid="GG2300E0-D000-4000-B0000000000000E0">
 					<imagemetrics>
 						<image
-							this="GG2300A0-D002-4000-B0000000000000A0"
-							uniqueguid="GG2300A0-D002-4000-B0000000000000A0"
-							componentimage="GG2300A0-D001-4000-B0000000000000A0"
+							this="GG2300DF-D002-4000-B0000000000000DF"
+							uniqueguid="GG2300DF-D002-4000-B0000000000000DF"
+							componentimage="GG2300DF-D001-4000-B0000000000000DF"
 							offset="4.00,0.00"
 							width="183"
 							height="45"
@@ -2916,9 +3778,9 @@
 							colour="#B4B4B4FF"
 							margin="12.00,24.00,12.00,12.00"/>
 						<image
-							this="GG2300A0-D004-4000-B0000000000000A0"
-							uniqueguid="GG2300A0-D004-4000-B0000000000000A0"
-							componentimage="GG2300A0-D003-4000-B0000000000000A0"
+							this="GG2300DF-D004-4000-B0000000000000DF"
+							uniqueguid="GG2300DF-D004-4000-B0000000000000DF"
+							componentimage="GG2300DF-D003-4000-B0000000000000DF"
 							offset="4.00,0.00"
 							width="159"
 							height="45"
@@ -2927,7 +3789,7 @@
 					</imagemetrics>
 					<transitionmap>
 						<transition
-							transition_m_target_state="GG2300A2-D000-4000-B0000000000000A2"/>
+							transition_m_target_state="GG2300E1-D000-4000-B0000000000000E1"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -2941,26 +3803,26 @@
 						fontcat_name="header_18"/>
 				</standard>
 				<hover
-					this="GG2300A2-D000-4000-B0000000000000A2"
+					this="GG2300E1-D000-4000-B0000000000000E1"
 					name="hover"
 					width="167"
 					height="45"
 					interactive="true"
-					uniqueguid="GG2300A2-D000-4000-B0000000000000A2">
+					uniqueguid="GG2300E1-D000-4000-B0000000000000E1">
 					<imagemetrics>
 						<image
-							this="GG2300A0-D006-4000-B0000000000000A0"
-							uniqueguid="GG2300A0-D006-4000-B0000000000000A0"
-							componentimage="GG2300A0-D005-4000-B0000000000000A0"
+							this="GG2300DF-D006-4000-B0000000000000DF"
+							uniqueguid="GG2300DF-D006-4000-B0000000000000DF"
+							componentimage="GG2300DF-D005-4000-B0000000000000DF"
 							offset="4.00,0.00"
 							width="183"
 							height="45"
 							tile="true"
 							margin="12.00,24.00,12.00,12.00"/>
 						<image
-							this="GG2300A0-D008-4000-B0000000000000A0"
-							uniqueguid="GG2300A0-D008-4000-B0000000000000A0"
-							componentimage="GG2300A0-D007-4000-B0000000000000A0"
+							this="GG2300DF-D008-4000-B0000000000000DF"
+							uniqueguid="GG2300DF-D008-4000-B0000000000000DF"
+							componentimage="GG2300DF-D007-4000-B0000000000000DF"
 							offset="4.00,0.00"
 							width="159"
 							height="45"
@@ -2970,7 +3832,7 @@
 					<transitionmap>
 						<transition
 							index="1"
-							transition_m_target_state="GG2300A1-D000-4000-B0000000000000A1"/>
+							transition_m_target_state="GG2300E0-D000-4000-B0000000000000E0"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -2999,44 +3861,44 @@
 			</animations>
 		</gg_tab_bounty>
 		<gg_tab_court
-			this="GG2300A3-D000-4000-B0000000000000A3"
+			this="GG2300E2-D000-4000-B0000000000000E2"
 			id="gg_tab_court"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
-			uniqueguid="GG2300A3-D000-4000-B0000000000000A3"
-			currentstate="GG2300A4-D000-4000-B0000000000000A4"
-			defaultstate="GG2300A4-D000-4000-B0000000000000A4">
+			uniqueguid="GG2300E2-D000-4000-B0000000000000E2"
+			currentstate="GG2300E3-D000-4000-B0000000000000E3"
+			defaultstate="GG2300E3-D000-4000-B0000000000000E3">
 			<componentimages>
 				<component_image
-					this="GG2300A3-D001-4000-B0000000000000A3"
-					uniqueguid="GG2300A3-D001-4000-B0000000000000A3"
+					this="GG2300E2-D001-4000-B0000000000000E2"
+					uniqueguid="GG2300E2-D001-4000-B0000000000000E2"
 					imagepath="ui/skins/default/dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"/>
 				<component_image
-					this="GG2300A3-D003-4000-B0000000000000A3"
-					uniqueguid="GG2300A3-D003-4000-B0000000000000A3"
+					this="GG2300E2-D003-4000-B0000000000000E2"
+					uniqueguid="GG2300E2-D003-4000-B0000000000000E2"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 				<component_image
-					this="GG2300A3-D005-4000-B0000000000000A3"
-					uniqueguid="GG2300A3-D005-4000-B0000000000000A3"
+					this="GG2300E2-D005-4000-B0000000000000E2"
+					uniqueguid="GG2300E2-D005-4000-B0000000000000E2"
 					imagepath="ui/skins/default/dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"/>
 				<component_image
-					this="GG2300A3-D007-4000-B0000000000000A3"
-					uniqueguid="GG2300A3-D007-4000-B0000000000000A3"
+					this="GG2300E2-D007-4000-B0000000000000E2"
+					uniqueguid="GG2300E2-D007-4000-B0000000000000E2"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG2300A4-D000-4000-B0000000000000A4"
+					this="GG2300E3-D000-4000-B0000000000000E3"
 					name="standard"
 					width="167"
 					height="45"
 					interactive="true"
-					uniqueguid="GG2300A4-D000-4000-B0000000000000A4">
+					uniqueguid="GG2300E3-D000-4000-B0000000000000E3">
 					<imagemetrics>
 						<image
-							this="GG2300A3-D002-4000-B0000000000000A3"
-							uniqueguid="GG2300A3-D002-4000-B0000000000000A3"
-							componentimage="GG2300A3-D001-4000-B0000000000000A3"
+							this="GG2300E2-D002-4000-B0000000000000E2"
+							uniqueguid="GG2300E2-D002-4000-B0000000000000E2"
+							componentimage="GG2300E2-D001-4000-B0000000000000E2"
 							offset="4.00,0.00"
 							width="183"
 							height="45"
@@ -3044,9 +3906,9 @@
 							colour="#B4B4B4FF"
 							margin="12.00,24.00,12.00,12.00"/>
 						<image
-							this="GG2300A3-D004-4000-B0000000000000A3"
-							uniqueguid="GG2300A3-D004-4000-B0000000000000A3"
-							componentimage="GG2300A3-D003-4000-B0000000000000A3"
+							this="GG2300E2-D004-4000-B0000000000000E2"
+							uniqueguid="GG2300E2-D004-4000-B0000000000000E2"
+							componentimage="GG2300E2-D003-4000-B0000000000000E2"
 							offset="4.00,0.00"
 							width="159"
 							height="45"
@@ -3055,7 +3917,7 @@
 					</imagemetrics>
 					<transitionmap>
 						<transition
-							transition_m_target_state="GG2300A5-D000-4000-B0000000000000A5"/>
+							transition_m_target_state="GG2300E4-D000-4000-B0000000000000E4"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -3069,26 +3931,26 @@
 						fontcat_name="header_18"/>
 				</standard>
 				<hover
-					this="GG2300A5-D000-4000-B0000000000000A5"
+					this="GG2300E4-D000-4000-B0000000000000E4"
 					name="hover"
 					width="167"
 					height="45"
 					interactive="true"
-					uniqueguid="GG2300A5-D000-4000-B0000000000000A5">
+					uniqueguid="GG2300E4-D000-4000-B0000000000000E4">
 					<imagemetrics>
 						<image
-							this="GG2300A3-D006-4000-B0000000000000A3"
-							uniqueguid="GG2300A3-D006-4000-B0000000000000A3"
-							componentimage="GG2300A3-D005-4000-B0000000000000A3"
+							this="GG2300E2-D006-4000-B0000000000000E2"
+							uniqueguid="GG2300E2-D006-4000-B0000000000000E2"
+							componentimage="GG2300E2-D005-4000-B0000000000000E2"
 							offset="4.00,0.00"
 							width="183"
 							height="45"
 							tile="true"
 							margin="12.00,24.00,12.00,12.00"/>
 						<image
-							this="GG2300A3-D008-4000-B0000000000000A3"
-							uniqueguid="GG2300A3-D008-4000-B0000000000000A3"
-							componentimage="GG2300A3-D007-4000-B0000000000000A3"
+							this="GG2300E2-D008-4000-B0000000000000E2"
+							uniqueguid="GG2300E2-D008-4000-B0000000000000E2"
+							componentimage="GG2300E2-D007-4000-B0000000000000E2"
 							offset="4.00,0.00"
 							width="159"
 							height="45"
@@ -3098,7 +3960,7 @@
 					<transitionmap>
 						<transition
 							index="1"
-							transition_m_target_state="GG2300A4-D000-4000-B0000000000000A4"/>
+							transition_m_target_state="GG2300E3-D000-4000-B0000000000000E3"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -3127,44 +3989,44 @@
 			</animations>
 		</gg_tab_court>
 		<gg_tab_guilds
-			this="GG2300A6-D000-4000-B0000000000000A6"
+			this="GG2300E5-D000-4000-B0000000000000E5"
 			id="gg_tab_guilds"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
-			uniqueguid="GG2300A6-D000-4000-B0000000000000A6"
-			currentstate="GG2300A7-D000-4000-B0000000000000A7"
-			defaultstate="GG2300A7-D000-4000-B0000000000000A7">
+			uniqueguid="GG2300E5-D000-4000-B0000000000000E5"
+			currentstate="GG2300E6-D000-4000-B0000000000000E6"
+			defaultstate="GG2300E6-D000-4000-B0000000000000E6">
 			<componentimages>
 				<component_image
-					this="GG2300A6-D001-4000-B0000000000000A6"
-					uniqueguid="GG2300A6-D001-4000-B0000000000000A6"
+					this="GG2300E5-D001-4000-B0000000000000E5"
+					uniqueguid="GG2300E5-D001-4000-B0000000000000E5"
 					imagepath="ui/skins/default/dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"/>
 				<component_image
-					this="GG2300A6-D003-4000-B0000000000000A6"
-					uniqueguid="GG2300A6-D003-4000-B0000000000000A6"
+					this="GG2300E5-D003-4000-B0000000000000E5"
+					uniqueguid="GG2300E5-D003-4000-B0000000000000E5"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 				<component_image
-					this="GG2300A6-D005-4000-B0000000000000A6"
-					uniqueguid="GG2300A6-D005-4000-B0000000000000A6"
+					this="GG2300E5-D005-4000-B0000000000000E5"
+					uniqueguid="GG2300E5-D005-4000-B0000000000000E5"
 					imagepath="ui/skins/default/dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"/>
 				<component_image
-					this="GG2300A6-D007-4000-B0000000000000A6"
-					uniqueguid="GG2300A6-D007-4000-B0000000000000A6"
+					this="GG2300E5-D007-4000-B0000000000000E5"
+					uniqueguid="GG2300E5-D007-4000-B0000000000000E5"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG2300A7-D000-4000-B0000000000000A7"
+					this="GG2300E6-D000-4000-B0000000000000E6"
 					name="standard"
 					width="167"
 					height="45"
 					interactive="true"
-					uniqueguid="GG2300A7-D000-4000-B0000000000000A7">
+					uniqueguid="GG2300E6-D000-4000-B0000000000000E6">
 					<imagemetrics>
 						<image
-							this="GG2300A6-D002-4000-B0000000000000A6"
-							uniqueguid="GG2300A6-D002-4000-B0000000000000A6"
-							componentimage="GG2300A6-D001-4000-B0000000000000A6"
+							this="GG2300E5-D002-4000-B0000000000000E5"
+							uniqueguid="GG2300E5-D002-4000-B0000000000000E5"
+							componentimage="GG2300E5-D001-4000-B0000000000000E5"
 							offset="4.00,0.00"
 							width="183"
 							height="45"
@@ -3172,9 +4034,9 @@
 							colour="#B4B4B4FF"
 							margin="12.00,24.00,12.00,12.00"/>
 						<image
-							this="GG2300A6-D004-4000-B0000000000000A6"
-							uniqueguid="GG2300A6-D004-4000-B0000000000000A6"
-							componentimage="GG2300A6-D003-4000-B0000000000000A6"
+							this="GG2300E5-D004-4000-B0000000000000E5"
+							uniqueguid="GG2300E5-D004-4000-B0000000000000E5"
+							componentimage="GG2300E5-D003-4000-B0000000000000E5"
 							offset="4.00,0.00"
 							width="159"
 							height="45"
@@ -3183,7 +4045,7 @@
 					</imagemetrics>
 					<transitionmap>
 						<transition
-							transition_m_target_state="GG2300A8-D000-4000-B0000000000000A8"/>
+							transition_m_target_state="GG2300E7-D000-4000-B0000000000000E7"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -3197,26 +4059,26 @@
 						fontcat_name="header_18"/>
 				</standard>
 				<hover
-					this="GG2300A8-D000-4000-B0000000000000A8"
+					this="GG2300E7-D000-4000-B0000000000000E7"
 					name="hover"
 					width="167"
 					height="45"
 					interactive="true"
-					uniqueguid="GG2300A8-D000-4000-B0000000000000A8">
+					uniqueguid="GG2300E7-D000-4000-B0000000000000E7">
 					<imagemetrics>
 						<image
-							this="GG2300A6-D006-4000-B0000000000000A6"
-							uniqueguid="GG2300A6-D006-4000-B0000000000000A6"
-							componentimage="GG2300A6-D005-4000-B0000000000000A6"
+							this="GG2300E5-D006-4000-B0000000000000E5"
+							uniqueguid="GG2300E5-D006-4000-B0000000000000E5"
+							componentimage="GG2300E5-D005-4000-B0000000000000E5"
 							offset="4.00,0.00"
 							width="183"
 							height="45"
 							tile="true"
 							margin="12.00,24.00,12.00,12.00"/>
 						<image
-							this="GG2300A6-D008-4000-B0000000000000A6"
-							uniqueguid="GG2300A6-D008-4000-B0000000000000A6"
-							componentimage="GG2300A6-D007-4000-B0000000000000A6"
+							this="GG2300E5-D008-4000-B0000000000000E5"
+							uniqueguid="GG2300E5-D008-4000-B0000000000000E5"
+							componentimage="GG2300E5-D007-4000-B0000000000000E5"
 							offset="4.00,0.00"
 							width="159"
 							height="45"
@@ -3226,7 +4088,7 @@
 					<transitionmap>
 						<transition
 							index="1"
-							transition_m_target_state="GG2300A7-D000-4000-B0000000000000A7"/>
+							transition_m_target_state="GG2300E6-D000-4000-B0000000000000E6"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -3255,44 +4117,44 @@
 			</animations>
 		</gg_tab_guilds>
 		<gg_tab_help
-			this="GG2300A9-D000-4000-B0000000000000A9"
+			this="GG2300E8-D000-4000-B0000000000000E8"
 			id="gg_tab_help"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
-			uniqueguid="GG2300A9-D000-4000-B0000000000000A9"
-			currentstate="GG2300AA-D000-4000-B0000000000000AA"
-			defaultstate="GG2300AA-D000-4000-B0000000000000AA">
+			uniqueguid="GG2300E8-D000-4000-B0000000000000E8"
+			currentstate="GG2300E9-D000-4000-B0000000000000E9"
+			defaultstate="GG2300E9-D000-4000-B0000000000000E9">
 			<componentimages>
 				<component_image
-					this="GG2300A9-D001-4000-B0000000000000A9"
-					uniqueguid="GG2300A9-D001-4000-B0000000000000A9"
+					this="GG2300E8-D001-4000-B0000000000000E8"
+					uniqueguid="GG2300E8-D001-4000-B0000000000000E8"
 					imagepath="ui/skins/default/dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"/>
 				<component_image
-					this="GG2300A9-D003-4000-B0000000000000A9"
-					uniqueguid="GG2300A9-D003-4000-B0000000000000A9"
+					this="GG2300E8-D003-4000-B0000000000000E8"
+					uniqueguid="GG2300E8-D003-4000-B0000000000000E8"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 				<component_image
-					this="GG2300A9-D005-4000-B0000000000000A9"
-					uniqueguid="GG2300A9-D005-4000-B0000000000000A9"
+					this="GG2300E8-D005-4000-B0000000000000E8"
+					uniqueguid="GG2300E8-D005-4000-B0000000000000E8"
 					imagepath="ui/skins/default/dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"/>
 				<component_image
-					this="GG2300A9-D007-4000-B0000000000000A9"
-					uniqueguid="GG2300A9-D007-4000-B0000000000000A9"
+					this="GG2300E8-D007-4000-B0000000000000E8"
+					uniqueguid="GG2300E8-D007-4000-B0000000000000E8"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG2300AA-D000-4000-B0000000000000AA"
+					this="GG2300E9-D000-4000-B0000000000000E9"
 					name="standard"
 					width="167"
 					height="45"
 					interactive="true"
-					uniqueguid="GG2300AA-D000-4000-B0000000000000AA">
+					uniqueguid="GG2300E9-D000-4000-B0000000000000E9">
 					<imagemetrics>
 						<image
-							this="GG2300A9-D002-4000-B0000000000000A9"
-							uniqueguid="GG2300A9-D002-4000-B0000000000000A9"
-							componentimage="GG2300A9-D001-4000-B0000000000000A9"
+							this="GG2300E8-D002-4000-B0000000000000E8"
+							uniqueguid="GG2300E8-D002-4000-B0000000000000E8"
+							componentimage="GG2300E8-D001-4000-B0000000000000E8"
 							offset="4.00,0.00"
 							width="183"
 							height="45"
@@ -3300,9 +4162,9 @@
 							colour="#B4B4B4FF"
 							margin="12.00,24.00,12.00,12.00"/>
 						<image
-							this="GG2300A9-D004-4000-B0000000000000A9"
-							uniqueguid="GG2300A9-D004-4000-B0000000000000A9"
-							componentimage="GG2300A9-D003-4000-B0000000000000A9"
+							this="GG2300E8-D004-4000-B0000000000000E8"
+							uniqueguid="GG2300E8-D004-4000-B0000000000000E8"
+							componentimage="GG2300E8-D003-4000-B0000000000000E8"
 							offset="4.00,0.00"
 							width="159"
 							height="45"
@@ -3311,7 +4173,7 @@
 					</imagemetrics>
 					<transitionmap>
 						<transition
-							transition_m_target_state="GG2300AB-D000-4000-B0000000000000AB"/>
+							transition_m_target_state="GG2300EA-D000-4000-B0000000000000EA"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -3325,26 +4187,26 @@
 						fontcat_name="header_18"/>
 				</standard>
 				<hover
-					this="GG2300AB-D000-4000-B0000000000000AB"
+					this="GG2300EA-D000-4000-B0000000000000EA"
 					name="hover"
 					width="167"
 					height="45"
 					interactive="true"
-					uniqueguid="GG2300AB-D000-4000-B0000000000000AB">
+					uniqueguid="GG2300EA-D000-4000-B0000000000000EA">
 					<imagemetrics>
 						<image
-							this="GG2300A9-D006-4000-B0000000000000A9"
-							uniqueguid="GG2300A9-D006-4000-B0000000000000A9"
-							componentimage="GG2300A9-D005-4000-B0000000000000A9"
+							this="GG2300E8-D006-4000-B0000000000000E8"
+							uniqueguid="GG2300E8-D006-4000-B0000000000000E8"
+							componentimage="GG2300E8-D005-4000-B0000000000000E8"
 							offset="4.00,0.00"
 							width="183"
 							height="45"
 							tile="true"
 							margin="12.00,24.00,12.00,12.00"/>
 						<image
-							this="GG2300A9-D008-4000-B0000000000000A9"
-							uniqueguid="GG2300A9-D008-4000-B0000000000000A9"
-							componentimage="GG2300A9-D007-4000-B0000000000000A9"
+							this="GG2300E8-D008-4000-B0000000000000E8"
+							uniqueguid="GG2300E8-D008-4000-B0000000000000E8"
+							componentimage="GG2300E8-D007-4000-B0000000000000E8"
 							offset="4.00,0.00"
 							width="159"
 							height="45"
@@ -3354,7 +4216,7 @@
 					<transitionmap>
 						<transition
 							index="1"
-							transition_m_target_state="GG2300AA-D000-4000-B0000000000000AA"/>
+							transition_m_target_state="GG2300E9-D000-4000-B0000000000000E9"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -3383,44 +4245,44 @@
 			</animations>
 		</gg_tab_help>
 		<gg_tab_log
-			this="GG2300AC-D000-4000-B0000000000000AC"
+			this="GG2300EB-D000-4000-B0000000000000EB"
 			id="gg_tab_log"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
-			uniqueguid="GG2300AC-D000-4000-B0000000000000AC"
-			currentstate="GG2300AD-D000-4000-B0000000000000AD"
-			defaultstate="GG2300AD-D000-4000-B0000000000000AD">
+			uniqueguid="GG2300EB-D000-4000-B0000000000000EB"
+			currentstate="GG2300EC-D000-4000-B0000000000000EC"
+			defaultstate="GG2300EC-D000-4000-B0000000000000EC">
 			<componentimages>
 				<component_image
-					this="GG2300AC-D001-4000-B0000000000000AC"
-					uniqueguid="GG2300AC-D001-4000-B0000000000000AC"
+					this="GG2300EB-D001-4000-B0000000000000EB"
+					uniqueguid="GG2300EB-D001-4000-B0000000000000EB"
 					imagepath="ui/skins/default/dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"/>
 				<component_image
-					this="GG2300AC-D003-4000-B0000000000000AC"
-					uniqueguid="GG2300AC-D003-4000-B0000000000000AC"
+					this="GG2300EB-D003-4000-B0000000000000EB"
+					uniqueguid="GG2300EB-D003-4000-B0000000000000EB"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 				<component_image
-					this="GG2300AC-D005-4000-B0000000000000AC"
-					uniqueguid="GG2300AC-D005-4000-B0000000000000AC"
+					this="GG2300EB-D005-4000-B0000000000000EB"
+					uniqueguid="GG2300EB-D005-4000-B0000000000000EB"
 					imagepath="ui/skins/default/dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"/>
 				<component_image
-					this="GG2300AC-D007-4000-B0000000000000AC"
-					uniqueguid="GG2300AC-D007-4000-B0000000000000AC"
+					this="GG2300EB-D007-4000-B0000000000000EB"
+					uniqueguid="GG2300EB-D007-4000-B0000000000000EB"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG2300AD-D000-4000-B0000000000000AD"
+					this="GG2300EC-D000-4000-B0000000000000EC"
 					name="standard"
 					width="167"
 					height="45"
 					interactive="true"
-					uniqueguid="GG2300AD-D000-4000-B0000000000000AD">
+					uniqueguid="GG2300EC-D000-4000-B0000000000000EC">
 					<imagemetrics>
 						<image
-							this="GG2300AC-D002-4000-B0000000000000AC"
-							uniqueguid="GG2300AC-D002-4000-B0000000000000AC"
-							componentimage="GG2300AC-D001-4000-B0000000000000AC"
+							this="GG2300EB-D002-4000-B0000000000000EB"
+							uniqueguid="GG2300EB-D002-4000-B0000000000000EB"
+							componentimage="GG2300EB-D001-4000-B0000000000000EB"
 							offset="4.00,0.00"
 							width="183"
 							height="45"
@@ -3428,9 +4290,9 @@
 							colour="#B4B4B4FF"
 							margin="12.00,24.00,12.00,12.00"/>
 						<image
-							this="GG2300AC-D004-4000-B0000000000000AC"
-							uniqueguid="GG2300AC-D004-4000-B0000000000000AC"
-							componentimage="GG2300AC-D003-4000-B0000000000000AC"
+							this="GG2300EB-D004-4000-B0000000000000EB"
+							uniqueguid="GG2300EB-D004-4000-B0000000000000EB"
+							componentimage="GG2300EB-D003-4000-B0000000000000EB"
 							offset="4.00,0.00"
 							width="159"
 							height="45"
@@ -3439,7 +4301,7 @@
 					</imagemetrics>
 					<transitionmap>
 						<transition
-							transition_m_target_state="GG2300AE-D000-4000-B0000000000000AE"/>
+							transition_m_target_state="GG2300ED-D000-4000-B0000000000000ED"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -3453,26 +4315,26 @@
 						fontcat_name="header_18"/>
 				</standard>
 				<hover
-					this="GG2300AE-D000-4000-B0000000000000AE"
+					this="GG2300ED-D000-4000-B0000000000000ED"
 					name="hover"
 					width="167"
 					height="45"
 					interactive="true"
-					uniqueguid="GG2300AE-D000-4000-B0000000000000AE">
+					uniqueguid="GG2300ED-D000-4000-B0000000000000ED">
 					<imagemetrics>
 						<image
-							this="GG2300AC-D006-4000-B0000000000000AC"
-							uniqueguid="GG2300AC-D006-4000-B0000000000000AC"
-							componentimage="GG2300AC-D005-4000-B0000000000000AC"
+							this="GG2300EB-D006-4000-B0000000000000EB"
+							uniqueguid="GG2300EB-D006-4000-B0000000000000EB"
+							componentimage="GG2300EB-D005-4000-B0000000000000EB"
 							offset="4.00,0.00"
 							width="183"
 							height="45"
 							tile="true"
 							margin="12.00,24.00,12.00,12.00"/>
 						<image
-							this="GG2300AC-D008-4000-B0000000000000AC"
-							uniqueguid="GG2300AC-D008-4000-B0000000000000AC"
-							componentimage="GG2300AC-D007-4000-B0000000000000AC"
+							this="GG2300EB-D008-4000-B0000000000000EB"
+							uniqueguid="GG2300EB-D008-4000-B0000000000000EB"
+							componentimage="GG2300EB-D007-4000-B0000000000000EB"
 							offset="4.00,0.00"
 							width="159"
 							height="45"
@@ -3482,7 +4344,7 @@
 					<transitionmap>
 						<transition
 							index="1"
-							transition_m_target_state="GG2300AD-D000-4000-B0000000000000AD"/>
+							transition_m_target_state="GG2300EC-D000-4000-B0000000000000EC"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -3511,44 +4373,44 @@
 			</animations>
 		</gg_tab_log>
 		<gg_tab_stand
-			this="GG2300AF-D000-4000-B0000000000000AF"
+			this="GG2300EE-D000-4000-B0000000000000EE"
 			id="gg_tab_stand"
 			tooltipslocalised="true"
 			soundcategory="UI_GBL_TMP_Square_Large_Text_Button"
-			uniqueguid="GG2300AF-D000-4000-B0000000000000AF"
-			currentstate="GG2300B0-D000-4000-B0000000000000B0"
-			defaultstate="GG2300B0-D000-4000-B0000000000000B0">
+			uniqueguid="GG2300EE-D000-4000-B0000000000000EE"
+			currentstate="GG2300EF-D000-4000-B0000000000000EF"
+			defaultstate="GG2300EF-D000-4000-B0000000000000EF">
 			<componentimages>
 				<component_image
-					this="GG2300AF-D001-4000-B0000000000000AF"
-					uniqueguid="GG2300AF-D001-4000-B0000000000000AF"
+					this="GG2300EE-D001-4000-B0000000000000EE"
+					uniqueguid="GG2300EE-D001-4000-B0000000000000EE"
 					imagepath="ui/skins/default/dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"/>
 				<component_image
-					this="GG2300AF-D003-4000-B0000000000000AF"
-					uniqueguid="GG2300AF-D003-4000-B0000000000000AF"
+					this="GG2300EE-D003-4000-B0000000000000EE"
+					uniqueguid="GG2300EE-D003-4000-B0000000000000EE"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 				<component_image
-					this="GG2300AF-D005-4000-B0000000000000AF"
-					uniqueguid="GG2300AF-D005-4000-B0000000000000AF"
+					this="GG2300EE-D005-4000-B0000000000000EE"
+					uniqueguid="GG2300EE-D005-4000-B0000000000000EE"
 					imagepath="ui/skins/default/dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"/>
 				<component_image
-					this="GG2300AF-D007-4000-B0000000000000AF"
-					uniqueguid="GG2300AF-D007-4000-B0000000000000AF"
+					this="GG2300EE-D007-4000-B0000000000000EE"
+					uniqueguid="GG2300EE-D007-4000-B0000000000000EE"
 					imagepath="ui/campaign ui/derpy_gg_icons/clear.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG2300B0-D000-4000-B0000000000000B0"
+					this="GG2300EF-D000-4000-B0000000000000EF"
 					name="standard"
 					width="167"
 					height="45"
 					interactive="true"
-					uniqueguid="GG2300B0-D000-4000-B0000000000000B0">
+					uniqueguid="GG2300EF-D000-4000-B0000000000000EF">
 					<imagemetrics>
 						<image
-							this="GG2300AF-D002-4000-B0000000000000AF"
-							uniqueguid="GG2300AF-D002-4000-B0000000000000AF"
-							componentimage="GG2300AF-D001-4000-B0000000000000AF"
+							this="GG2300EE-D002-4000-B0000000000000EE"
+							uniqueguid="GG2300EE-D002-4000-B0000000000000EE"
+							componentimage="GG2300EE-D001-4000-B0000000000000EE"
 							offset="4.00,0.00"
 							width="183"
 							height="45"
@@ -3556,9 +4418,9 @@
 							colour="#B4B4B4FF"
 							margin="12.00,24.00,12.00,12.00"/>
 						<image
-							this="GG2300AF-D004-4000-B0000000000000AF"
-							uniqueguid="GG2300AF-D004-4000-B0000000000000AF"
-							componentimage="GG2300AF-D003-4000-B0000000000000AF"
+							this="GG2300EE-D004-4000-B0000000000000EE"
+							uniqueguid="GG2300EE-D004-4000-B0000000000000EE"
+							componentimage="GG2300EE-D003-4000-B0000000000000EE"
 							offset="4.00,0.00"
 							width="159"
 							height="45"
@@ -3567,7 +4429,7 @@
 					</imagemetrics>
 					<transitionmap>
 						<transition
-							transition_m_target_state="GG2300B1-D000-4000-B0000000000000B1"/>
+							transition_m_target_state="GG2300F0-D000-4000-B0000000000000F0"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -3581,26 +4443,26 @@
 						fontcat_name="header_18"/>
 				</standard>
 				<hover
-					this="GG2300B1-D000-4000-B0000000000000B1"
+					this="GG2300F0-D000-4000-B0000000000000F0"
 					name="hover"
 					width="167"
 					height="45"
 					interactive="true"
-					uniqueguid="GG2300B1-D000-4000-B0000000000000B1">
+					uniqueguid="GG2300F0-D000-4000-B0000000000000F0">
 					<imagemetrics>
 						<image
-							this="GG2300AF-D006-4000-B0000000000000AF"
-							uniqueguid="GG2300AF-D006-4000-B0000000000000AF"
-							componentimage="GG2300AF-D005-4000-B0000000000000AF"
+							this="GG2300EE-D006-4000-B0000000000000EE"
+							uniqueguid="GG2300EE-D006-4000-B0000000000000EE"
+							componentimage="GG2300EE-D005-4000-B0000000000000EE"
 							offset="4.00,0.00"
 							width="183"
 							height="45"
 							tile="true"
 							margin="12.00,24.00,12.00,12.00"/>
 						<image
-							this="GG2300AF-D008-4000-B0000000000000AF"
-							uniqueguid="GG2300AF-D008-4000-B0000000000000AF"
-							componentimage="GG2300AF-D007-4000-B0000000000000AF"
+							this="GG2300EE-D008-4000-B0000000000000EE"
+							uniqueguid="GG2300EE-D008-4000-B0000000000000EE"
+							componentimage="GG2300EE-D007-4000-B0000000000000EE"
 							offset="4.00,0.00"
 							width="159"
 							height="45"
@@ -3610,7 +4472,7 @@
 					<transitionmap>
 						<transition
 							index="1"
-							transition_m_target_state="GG2300B0-D000-4000-B0000000000000B0"/>
+							transition_m_target_state="GG2300EF-D000-4000-B0000000000000EF"/>
 					</transitionmap>
 					<component_text
 						texthalign="Center"
@@ -3639,30 +4501,30 @@
 			</animations>
 		</gg_tab_stand>
 		<gg_title
-			this="GG2300B2-D000-4000-B0000000000000B2"
+			this="GG2300F1-D000-4000-B0000000000000F1"
 			id="gg_title"
 			tooltipslocalised="true"
-			uniqueguid="GG2300B2-D000-4000-B0000000000000B2"
-			currentstate="GG2300B3-D000-4000-B0000000000000B3"
-			defaultstate="GG2300B3-D000-4000-B0000000000000B3">
+			uniqueguid="GG2300F1-D000-4000-B0000000000000F1"
+			currentstate="GG2300F2-D000-4000-B0000000000000F2"
+			defaultstate="GG2300F2-D000-4000-B0000000000000F2">
 			<componentimages>
 				<component_image
-					this="GG2300B2-D001-4000-B0000000000000B2"
-					uniqueguid="GG2300B2-D001-4000-B0000000000000B2"
+					this="GG2300F1-D001-4000-B0000000000000F1"
+					uniqueguid="GG2300F1-D001-4000-B0000000000000F1"
 					imagepath="ui/skins/default/derpy_gg_lg_panel_title.png"/>
 			</componentimages>
 			<states>
 				<standard
-					this="GG2300B3-D000-4000-B0000000000000B3"
+					this="GG2300F2-D000-4000-B0000000000000F2"
 					name="standard"
 					width="907"
 					height="72"
-					uniqueguid="GG2300B3-D000-4000-B0000000000000B3">
+					uniqueguid="GG2300F2-D000-4000-B0000000000000F2">
 					<imagemetrics>
 						<image
-							this="GG2300B2-D002-4000-B0000000000000B2"
-							uniqueguid="GG2300B2-D002-4000-B0000000000000B2"
-							componentimage="GG2300B2-D001-4000-B0000000000000B2"
+							this="GG2300F1-D002-4000-B0000000000000F1"
+							uniqueguid="GG2300F1-D002-4000-B0000000000000F1"
+							componentimage="GG2300F1-D001-4000-B0000000000000F1"
 							offset="0.00,0.00"
 							width="907"
 							height="72"

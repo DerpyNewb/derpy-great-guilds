@@ -118,15 +118,21 @@ PANEL_LAYOUT["gg_gsel"] = (232, 590, GTAB_W, 4)
 PANEL_LAYOUT["gg_gbar"] = (152, 595, 486, 40)
 # THE LOG'S FILTERS, in the band the reputation bar and its track use on the Guilds tab -
 # both are hidden on the Log, and the first of its 21 lines starts at y=168.
+# 28 TALL, NOT 24 (antislop audit 2026-10-09): Small scales the box to 20, where the pill's
+# dark middle is shorter than a header_12 caption and the glyphs sat on its bright rims
+# (All 1.6:1, the rest 2.6:1). 28 is 24 at Small, Medium's old height, and ends at 166.
 LOG_FILTERS = ["gg_lf_all", "gg_lf_mine", "gg_lf_rivals", "gg_lf_ranks"]
 for _i, _name in enumerate(LOG_FILTERS):
-    PANEL_LAYOUT[_name] = (20 + _i * 120, 138, 110, 24)
+    PANEL_LAYOUT[_name] = (20 + _i * 120, 138, 110, 28)
 # 21 SLOTS AT A 20px STEP, not 16 at 24. The Help tab truncates in silence - its
 # builder stops at HELP_SLOTS - and the text had grown to about 21 lines. The last slot
 # sits at y=568 and ends at 586, clear of the pager at y=596.
 HELP_SLOTS = 21
 for _i in range(HELP_SLOTS):
     PANEL_LAYOUT["gg_help_%02d" % (_i + 1)] = (20, 168 + _i * 20, 750, 18)
+    # A HEADING CELL OVER EACH SLOT (antislop audit 2026-10-09): no runtime call changes a
+    # font, so a Help heading drew as yellow body text. A "#" line goes here instead.
+    PANEL_LAYOUT["gg_helph_%02d" % (_i + 1)] = (20, 168 + _i * 20, 750, 18)
 
 # One card, three children. The card template is its own file so the panel file
 # does not carry three near-identical subtrees.
@@ -430,7 +436,7 @@ SOUND_BUY = "UI_GBL_HUD_Purchase"
 #   Hell Forge ground this replaced. The tech tree's Zharr-Naggrund (avg 67,67,67) and all
 #   seven event pictures (avg 62-119) are far too bright to carry unplated text.
 #
-# And it is symmetric and architectural, which is what a hall of six guilds should be.
+# And it is symmetric and architectural, which is what a hall of guilds should be.
 PANEL_ART = "ui/skins/default/dlc23_tower_of_zharr/tier_01_background.png"
 
 # A SCRIM over the art, not a dimmed copy of the file. 1x1_blank_white tinted is the idiom
@@ -622,7 +628,7 @@ REP_TRACK_LAYERS = [
 
 # The per-guild glyph on each card. The file ships ONE placeholder and the campaign
 # Lua swaps it per service with SetImagePath - the card is a single template used by
-# all six guilds, so the icon cannot be baked in. GGUI.GUILD_ICON holds the real
+# every guild, so the icon cannot be baked in. GGUI.GUILD_ICON holds the real
 # mapping and check() proves every path in it exists. The glyph is image CARD_ICON,
 # over the holder; GGUI.CARD_ICON_INDEX must say the same, which check() pins.
 CARD_GLYPH = 62
@@ -645,7 +651,7 @@ COST_LAYERS = [
      "margin": (0, 12, 0, 12), "tile": True, "dock": None},
 ]
 
-# The bronze bar the six guild buttons sit on, as the Hell-Forge's category buttons do.
+# The bronze bar the guild buttons sit on, as the Hell-Forge's category buttons do.
 # TWO HALVES, THE LOWER ONE y_flipped. The art has a rim and angled caps along its top only:
 # CA docks it on the Hell-Forge's bottom border, which hides the open edge. Mid-panel that
 # edge read as the buttons being cut off - SEEN IN GAME 2026-09-28, twice. Each half is
@@ -685,11 +691,18 @@ GOLD = "#FFD37AFF"
 # block's heat glow in its ACTIVE and cooldown states (not selected; re-read 2026-10-04).
 # CA does pulse selections too (glow_pulse_t0 on 22 selected states), so the shader is CA's
 # usage and the numbers are borrowed from the active look.
+# ONE COLOUR FOR "SELECTED" (antislop audit 2026-10-09): the open tab's and the active
+# filter's captions are CA's `yellow` (db/ui_colours, FFB900), so the marker is too. GOLD
+# stays on the counts, which are figures, not a selection.
+SELECTED = "#FFB900FF"
 GSEL_LAYERS = [
     {"path": "ui/skins/default/1x1_blank_white.png",
-     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "colour": GOLD, "dock": None,
+     "offset": (0, 0), "dw": 0, "dh": 0, "margin": 0, "colour": SELECTED, "dock": None,
      "shader": "glow_pulse_t0", "shader_vars": "0.80,1.50,0.80,0.00"},
 ]
+
+SKV_TAB_WASH = {"path": "ui/skins/default/1x1_blank_white.png", "offset": (4, 6),
+                "dw": -8, "dh": -12, "margin": 0, "colour": "#00000070", "dock": None}
 
 # A standings row is a BAND, not a button - a flat tint, the same idiom as the
 # reputation track. It was a 750px-wide stretched button plate, which is the exact
@@ -698,8 +711,9 @@ GSEL_LAYERS = [
 # plate and price box. CA's red (FF2D2D) - "Needs Sworn", and a price favour cannot meet -
 # measured 2.3:1 to 4.49:1 on six races' plate art (2026-10-05), ui_colours has no brighter
 # red, and at #000000A0 four still failed. The near-black Chaos Dwarf box barely changes.
+# E0, not D0 (antislop audit 2026-10-09): at D0 the 14px red still measured 4.07-4.53:1.
 PLATE_WASH = {"path": "ui/skins/default/1x1_blank_white.png", "offset": (3, 3),
-              "dw": -6, "dh": -6, "margin": 0, "colour": "#000000D0", "dock": None}
+              "dw": -6, "dh": -6, "margin": 0, "colour": "#000000E0", "dock": None}
 
 ROW_LAYERS = [
     {"path": "ui/skins/default/1x1_blank_white.png",
@@ -1017,7 +1031,9 @@ FRAMES = {
         "rank_tx": "64.00,0.00", "rank_ty": "0.00,0.00",
         # CA's 85 ends, NOT tiled: 467x71 into 438x40 only shrinks. The griffins (columns
         # 30..70) sit outside the buttons.
-        "gbar": [_L("ui/skins/wh2_main_hef_high_elves/bar_small_buttons.png", (0, 85, 0, 85))],
+        # Tinted to 85% like the Skaven bar: the guild counts measured 4.2:1 on it.
+        "gbar": [_L("ui/skins/wh2_main_hef_high_elves/bar_small_buttons.png", (0, 85, 0, 85),
+                    colour="#D8D8D8FF")],
         # Aislinn's dragonship header, navy with blue corner curls, tiled at its own size;
         # its last 18 columns are transparent, hence the 24 right margin. The layer runs
         # 18 past the tab so the VISIBLE plate is 3..122, centred under the label: drawn
@@ -1094,7 +1110,9 @@ FRAMES = {
         "rank": [_L("ui/skins/wh3_main_ksl_kislev/bar_small_central_left.png", (0, 75, 0, 75))],
         "rank_tx": "78.00,0.00", "rank_ty": "8.00,0.00",
         # Heads at columns 18..75; the middle only shrinks (307 to 278).
-        "gbar": [_L("ui/skins/wh3_main_ksl_kislev/bar_small_buttons.png", (0, 80, 0, 80))],
+        # Tinted to 85% like the Skaven bar: the guild counts measured 4.3:1 on it at Large.
+        "gbar": [_L("ui/skins/wh3_main_ksl_kislev/bar_small_buttons.png", (0, 80, 0, 80),
+                    colour="#D8D8D8FF")],
         # The icy bar and its copper outline SCALED WHOLE: nine-sliced, the files' 23px
         # transparent left pad pushed each caption 10px off centre. The open tab is
         # Devotion's black plate.
@@ -1212,16 +1230,23 @@ FRAMES = {
         "rank_tx": "56.00,0.00", "rank_ty": "0.00,0.00",
         # The Skaven HUD bar at CA's 85px ends, not tiled: 467x71 into 486x40 only squeezes
         # the height, and its ornaments (columns 15..75) sit outside the end buttons.
-        "gbar": [_L("ui/skins/wh2_main_skv_skaven/bar_small_buttons.png", (0, 85, 0, 85))],
+        # TINTED TO 85% (antislop audit 2026-10-09): each guild's count sits past its
+        # ring on this bar's light wood, and gold there measured 4.2:1 at Small.
+        "gbar": [_L("ui/skins/wh2_main_skv_skaven/bar_small_buttons.png", (0, 85, 0, 85),
+                    colour="#D8D8D8FF")],
         # Ikit's workshop buttons, 246x52: flat along the length with 3px ends and a
         # highlight in the top 12 and bottom 10 rows, which stay native. The open tab is the
         # pressed button ringed by the tutorial glow in CA's green.
+        # A DARK WASH OVER THE MIDDLE, the third image of EVERY state, since paint_tab
+        # repaints by index (antislop audit 2026-10-09): at Small the native highlights
+        # leave a 7px dark band and the captions measured 3.7-4.1:1 on the lime.
         "tab": {"layers": [_L(_W2 + "ikit_button_active.png", (12, 3, 10, 3)),
-                           _L(CLEAR, 16, colour="#A0FF37C0")],
+                           _L(CLEAR, 16, colour="#A0FF37C0"), SKV_TAB_WASH],
                 "hover": [_L(_W2 + "ikit_button_hover.png", (12, 3, 10, 3)),
-                          _L(CLEAR, 16, colour="#A0FF37C0")],
-                "selected": [_W2 + "ikit_button_down.png", _TUTGLOW],
-                "selected_hover": [_W2 + "ikit_button_down.png", _TUTGLOW]},
+                          _L(CLEAR, 16, colour="#A0FF37C0"), SKV_TAB_WASH],
+                "selected": [_W2 + "ikit_button_down.png", _TUTGLOW, SKV_TAB_WASH["path"]],
+                "selected_hover": [_W2 + "ikit_button_down.png", _TUTGLOW,
+                                   SKV_TAB_WASH["path"]]},
         # Ikit's dark trough, tiled at its own size as CA tiles it, and his warp-green fill
         # at CA's 2px ends. NOT his frame: it is 88 rows with ornaments far above and below a
         # 19-row trough, and fitted into 29 rows the trough would be 6.
@@ -1360,6 +1385,10 @@ def _panel(tag=""):
                   "ty": f["rank_ty"]}
         elif name in ("gg_back_text", "gg_back_list"):
             kw = {"layers": back_layers(h)}
+        elif name.startswith("gg_helph_"):
+            # header_14 in an 18px slot: one step under the view heading's header_18.
+            kw = {"text": True, "size": 14, "align": "Left", "valign": "Center",
+                  "fontcat": "header_14", "tx": LABEL_TX, "ty": "0.00,0.00"}
         elif name.startswith("gg_help_"):
             kw = {"text": True, "size": 12, "align": "Left", "valign": "Center",
                   "fontcat": "body_12", "colour": "#C9BFA8FF",
@@ -1778,7 +1807,11 @@ def sized(root, suffix):
                            for lay in kw[key]]
         if kw.get("text"):
             kw["tx"] = zpair(kw.get("tx", "4.00,0.00"))
-            kw["ty"] = zpair(kw.get("ty", "8.00,0.00"))
+            # THE VERTICAL INSET SCALES (antislop audit 2026-10-09): the ends kept native are
+            # the left and right ones, and Cathay's 8px lift, kept whole in a shrunken header,
+            # put the Small figures on the plate's top rail at 3.9:1.
+            kw["ty"] = ",".join("%.2f" % (float(v) * n / d)
+                                for v in kw.get("ty", "8.00,0.00").split(","))
             kw["fontcat"] = fonts[EU.fontcat(kw)]
             # font_m_size in proportion, as Medium writes it (12 beside header_14): the
             # category is what the engine sizes by, and the preview's PIL font reads this.
@@ -2152,7 +2185,7 @@ def check_scroll_parts(files):
 
 
 def check_panel_bg(lua_src):
-    """The per-guild panel ground: the index, the six files, and their brightness.
+    """The per-guild panel ground: the index, one file per guild, and their brightness.
 
     Three ways this goes wrong and none of them says anything in game:
 
@@ -2211,8 +2244,8 @@ def check_panel_bg(lua_src):
                            "that race's panel keeps whichever ground was painted last"
                            % (guild, tag, fpath))
     for extra in sorted(set(got) - set(G.GUILDS)):
-        out.append("GGUI.PANEL_BG has an entry for %r, which is not one of the six "
-                   "guilds - nothing will ever ask for it" % extra)
+        out.append("GGUI.PANEL_BG has an entry for %r, which is not a "
+                   "guild - nothing will ever ask for it" % extra)
 
     try:
         import make_guild_backgrounds as BG

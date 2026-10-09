@@ -475,8 +475,20 @@ def do_import():
     import json
     import rpfm_client as rpfm
 
-    _reopen(rpfm)
+    import read_pack_index as rpi
+
     files = _pack_files()
+    # A HALL ICON NO LONGER STAGED (retired by make_guild_icons.py, e.g. the Empire's
+    # one-per-chain icons on 2026-10-08) would ride on in the pack forever, because
+    # add_packed_files only adds. Read off the saved file before RPFM reopens it.
+    staged = {b for _a, b in files}
+    gone = sorted({h[0] for h in rpi.read(PACK, HALL_ICON_DIR + "/" + HALL_ICON_PREFIX)}
+                  - staged)
+    _reopen(rpfm)
+    if gone:
+        rpfm.call("delete_packed_files", {
+            "pack_key": PACK, "paths": json.dumps([{"File": p} for p in gone])}, quiet=True)
+        print("  %-44s %d file(s)" % ("retired hall icons removed", len(gone)))
     rpfm.call("add_packed_files", {
         "pack_key": PACK,
         "source_paths": [a for a, _b in files],

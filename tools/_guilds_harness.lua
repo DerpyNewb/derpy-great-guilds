@@ -975,7 +975,7 @@ GG.assert_ranks("cr_midcampaign")
 assert(#applied == a1, "re-assert must be idempotent within a session, applied "
        .. (#applied - a1) .. " more")
 
--- ------------------------------------------------------- missions pay all six --
+-- ---------------------------------------------------- missions pay every guild --
 -- The only signal that is not one guild's own business, and the floor under the
 -- other six: measured on a naval horde at turn 10, three guilds were still on 0
 -- because that faction runs no agents, builds nothing and had sacked nothing.
@@ -2250,7 +2250,7 @@ assert(GG.leaders_now[GG.lead_slot("brass", GG.CHD_CULTURE)] == L2,
            .. "a multiplayer campaign where one side's guilds never start")
     -- BOTH TABLES ARE SWAPPED, not cleared: the block after this one asserts that a
     -- second sweep applies nothing, and it is measuring the crown the block BEFORE this
-    -- one set. Leaving GG.leaders_now empty here re-crowns all six guilds there.
+    -- one set. Leaving GG.leaders_now empty here re-crowns every guild there.
     local outer, outer_leaders = GG.state, GG.leaders_now
     GG.state = {}
     GG.leaders_now = {}
@@ -2562,7 +2562,7 @@ assert(GG.world.held[WBS] == HUMAN,
 assert(GG.world.moved[WBS] == false,
        "the FIRST snapshot must claim no movement - against an empty record every guild "
        .. "has changed hands from nobody and its leader has gained their whole score, "
-       .. "so a new campaign's opening round would light all six rows up")
+       .. "so a new campaign's opening round would light every row up")
 assert(GG.world.gain[WBS] == 0,
        "and no gain either, got " .. tostring(GG.world.gain[WBS]))
 
@@ -2628,7 +2628,7 @@ assert(feed[#feed][2]
        == "message_event_text_text_derpy_gg_lead_won_khanate_title",
        "and taking one must be the other message, got " .. tostring(feed[#feed][2]))
 
--- AI TO AI IS NOT AN INTERRUPT. Six guilds and a world of rivals would be several feed
+-- AI TO AI IS NOT AN INTERRUPT. Seven guilds and a world of rivals would be several feed
 -- popups a round over changes the player is not party to.
 fmark = #feed
 GG.announce_lead("brass", RIVAL, "cr_world_third")
@@ -2637,7 +2637,7 @@ assert(#feed == fmark,
        .. "the Standings tab is for")
 
 -- AND NOT ON THE FIRST SWEEP AFTER A LOAD. GG.leaders_now is empty at load, so the next
--- faction turn start re-asserts all six guilds; announcing those would fire six popups
+-- faction turn start re-asserts every guild; announcing those would fire a popup each
 -- every single time the player loaded a save.
 -- THE PLAYER MUST HOLD A GUILD GOING IN, or this proves nothing: with the crown on a
 -- rival, an unguarded first sweep announces nothing either and the assertion passes
@@ -3508,7 +3508,7 @@ end
     -- MULTIPLAYER IGNORES MCT ENTIRELY. MCT is a LOCAL registry: nothing reconciles two
     -- machines, so a snapshot taken from it freezes a different economy into each save on the
     -- first turn. With per-key sliders that was a slow divergence; with a preset it is one
-    -- click - host on Easy, client on Cutthroat - so the guard lands with the dropdown.
+    -- click - host on Easy, client on Brutal - so the guard lands with the dropdown.
     -- A STANDING MCT, OR THIS PROVES NOTHING. Written first as "set multiplayer, read
     -- settings, assert they are the defaults" - which passed with the guard DELETED,
     -- because the harness has no get_mct and both paths therefore returned the defaults
@@ -3974,7 +3974,7 @@ end)()
 -- each guild's dearest service to the leader and to nobody else - so destroying the
 -- faction that led a guild locked that guild's best service away from every living
 -- faction INCLUDING THE PLAYER, permanently, and left a dead name on the Standings tab.
--- Six services, one per guild, could each be deleted from a campaign this way in
+-- One service per guild could be deleted from a campaign this way in
 -- silence. High standing means an active warring faction, so being wiped out is an
 -- ordinary thing for a leader to have happen.
 ;(function()
@@ -5468,7 +5468,7 @@ end)()
 
     -- ---- AND THE ROW'S GUILD ICON ---------------------------------------------------
     -- A fake panel that answers every lookup, so the draw runs to the end. Keyed by
-    -- parent AND name: all six rows have a child called row_icon.
+    -- parent AND name: every row has a child called row_icon.
     -- The leader cell is 60px here, so the draw must go through leader_fit and drop
     -- the rival's name; every other cell measures 0 and is left alone.
     local imgs, texts, fakes = {}, {}, {}
@@ -5535,7 +5535,7 @@ end)()
     GGUI.draw_standings(A)
     assert(GGUI.LIST_LAST == #lrows,
            "draw_standings must reach the faction list - without that call the tab draws "
-           .. "its six rows and the list under them stays empty forever")
+           .. "its rows and the list under them stays empty forever")
 
     GG.state = prev_state
     GG.roster_cache = nil
@@ -6266,6 +6266,12 @@ end)()
     assert(GGUI.pick_size("small", 1600, 900, 1) == "small", "Small always fits")
     assert(GGUI.pick_size("bogus", 1920, 1080, 1) == "medium", "an unknown size is Medium")
     assert(GGUI.pick_size("large", nil, nil, 1) == "large", "no screen reading, no step down")
+    -- 1440p: the screen factor buys a real font, never a stretched one (soft text, 2026-10-09).
+    assert(GGUI.pick_size("medium", 2560, 1440, 1.33) == "large", "1440p Medium draws Large")
+    assert(GGUI.pick_size("small", 2560, 1440, 1.33) == "medium", "1440p Small draws Medium")
+    assert(GGUI.pick_size("small", 1920, 1080, 1) == "small", "1080p Small stays Small")
+    -- The MCT tooltip says all three match at 4K (antislop #26).
+    assert(GGUI.pick_size("small", 3840, 2160, 2) == "large", "4K Small draws Large")
     local prev_mct = get_mct
     get_mct = nil
     assert(GGUI.want_size() == "medium", "no MCT reads Medium")
@@ -6924,6 +6930,18 @@ end)()
     GGUI.info("loud")
     assert(#lines == 1 and string.find(lines[1], "loud", 1, true),
            "an informational line must print with debug logging on")
+    -- A FAILED OPEN SAYS WHY (antislop #29): the opener used to just do nothing.
+    lines = {}
+    local keep_pick = GGUI.pick_size
+    GGUI.pick_size = function() error("boom") end
+    GGUI.open()
+    GGUI.pick_size = keep_pick
+    local said = false
+    for _, l in ipairs(lines) do
+        -- Whichever step fails first (here the stub has no root), its error is printed.
+        if string.find(l, "GAVE UP opening the panel: .+:%d+: ") then said = true end
+    end
+    assert(said, "a failed open must print its error, got " .. table.concat(lines, " | "))
     out, GG.logging = prev_out, prev_logging
     local src = io.open("Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_ui.lua"):read("*a")
     for call in string.gmatch(src, 'GGUI%.say%(([^\n]*)') do
@@ -7284,12 +7302,13 @@ end)()
     -- ---- the fake UI ----
     -- refuse[name]: the engine declines to create it, as it does for a bad path.
     local made, gone, fakes, refuse = {}, {}, {}, {}
-    local texts, tips, inter, vis, dis, imgs, moved, sized = {}, {}, {}, {}, {}, {}, {}, {}
+    local texts, tips, inter, vis, dis, imgs, moved, sized, shader =
+        {}, {}, {}, {}, {}, {}, {}, {}, {}
     -- SIZE[name] = {w, h} out of our .twui.xml files, set only by GG_DUMP below: GGUI.wrap
     -- breaks lines against a component's width, and 100px wraps a card at 14 characters.
     local SIZE
     local function reset()
-        for _, t in ipairs({texts, tips, inter, vis, dis, imgs, moved, sized}) do clear(t) end
+        for _, t in ipairs({texts, tips, inter, vis, dis, imgs, moved, sized, shader}) do clear(t) end
     end
     local PANEL_KEY = "root/" .. GGUI.PANEL
     -- Created on the root and never inside the panel. Everything else a find from the root
@@ -7340,6 +7359,7 @@ end)()
         f.SetVisible = function(self, b) vis[self.key] = b end
         f.Visible = function(self) return vis[self.key] ~= false end
         f.SetDisabled = function(self, b) dis[self.key] = b end
+        f.ShaderTechniqueSet = function(self, s) shader[self.key] = s end
         f.SetImagePath = function(self, p, i) imgs[self.key .. "#" .. tostring(i)] = p end
         f.TextDimensionsForText = function(_, s) return measure(s), 18 end
         f.CreateComponent = function(self, n)
@@ -7806,7 +7826,7 @@ end)()
     reset()
     GGUI.refresh()
     assert(vis["P/gg_gtab_1"] == false and vis["P/gg_gsel"] == false,
-           "the Leaderboard shows all six already")
+           "the Leaderboard shows every guild already")
     GGUI.close()
 
     -- ---- the pick card's wrap, at scale ----------------------------------------------
@@ -8001,16 +8021,26 @@ end)()
         local c3 = texts["P/" .. GGUI.CARD .. "_3/card_cost"] or ""
         assert(has(c3, "[[col:red]]") and not has(c2, "[[col:red]]"),
                "the price is red only where favour falls short, got " .. c2 .. " | " .. c3)
-        local b2 = texts["P/" .. GGUI.CARD .. "_2/card_buy"] or ""
-        local b3 = texts["P/" .. GGUI.CARD .. "_3/card_buy"] or ""
-        assert(has(b3, "[[col:red]]") and has(b2, "[[col:" .. GGUI.LOCK_COL .. "]]"),
-               "the Buy caption is red where favour falls short, orange where only the "
-               .. "rank does, got " .. b2 .. " | " .. b3)
-        -- And the Buy caption is red where favour is what stops it.
+        -- A SHUT BUY IS GREYED, ITS CAPTION KEPT LEGIBLE (antislop audit 2026-10-09): red on
+        -- the red plate measured 2.85:1, and SetDisabled draws nothing on these buttons. The
+        -- red stays on the price, which says why.
+        for i = 1, 3 do
+            local k = "P/" .. GGUI.CARD .. "_" .. i .. "/card_buy"
+            assert(not has(texts[k] or "", "[[col:"), "card " .. i .. ": caption uncoloured, got "
+                   .. tostring(texts[k]))
+            assert(shader[k] == (dis[k] and "set_greyscale_t0" or "normal_t0"),
+                   "card " .. i .. ": disabled=" .. tostring(dis[k]) .. " but shader "
+                   .. tostring(shader[k]))
+        end
+        assert(dis["P/" .. GGUI.CARD .. "_3/card_buy"] == true, "the third card is shut")
+        -- Short of favour alone: greyed too, and the price is what turns red.
         standing({brass = {150, 10}})
         open_on(1)
-        local b1 = texts["P/" .. GGUI.CARD .. "_1/card_buy"] or ""
-        assert(has(b1, "[[col:red]]"), "short of favour, the Buy caption is red, got " .. b1)
+        local k1 = "P/" .. GGUI.CARD .. "_1/card_buy"
+        assert(dis[k1] == true and shader[k1] == "set_greyscale_t0",
+               "short of favour, the Buy is greyed, got " .. tostring(shader[k1]))
+        assert(has(texts["P/" .. GGUI.CARD .. "_1/card_cost"] or "", "[[col:red]]"),
+               "short of favour, the price is red")
         standing({brass = {150, 150}})
         -- Every other use of the card has no reason to show, a real offer included.
         GG.bounties[ME] = {{guild = "khanate", kind = "region_take", target = "wh3_qol_r",
@@ -8018,8 +8048,132 @@ end)()
         open_on(3)
         GG.bounties[ME] = nil
         for i = 1, 3 do
-            assert(vis["P/" .. GGUI.CARD .. "_" .. i .. "/card_need"] == false,
+            assert(vis["P/" .. GGUI.CARD .. "_" .. i .. "/card_need"] == false
+                   or vis["P/" .. GGUI.CARD .. "_" .. i] == false,
                    "the bounty board hides card " .. i .. "'s reason plate")
+        end
+        -- AN EMPTY BOARD IS ONE CARD, AND THE HEADER SAYS WHEN OFFERS COME (antislop #28):
+        -- three "No bounty on offer" cards under "0 / 3 Taken" said nothing useful.
+        GG.bounties[ME] = {}
+        open_on(3)
+        GG.bounties[ME] = nil
+        local c = "P/" .. GGUI.CARD .. "_"
+        assert(texts[c .. "1/card_desc_1"] == GGUI.loc("bounty_none") and vis[c .. "1"] ~= false,
+               "the first card says the board is empty, got " .. tostring(texts[c .. "1/card_desc_1"]))
+        assert(vis[c .. "2"] == false and vis[c .. "3"] == false, "the other two cards are hidden")
+        assert(texts["P/gg_rank_stats"] == GGUI.loc("bounty_next"),
+               "the header says when offers come, got " .. tostring(texts["P/gg_rank_stats"]))
+        -- Switched off, no offers come at all, and the header must not promise them.
+        local keep_pay = GG.bounty_pay
+        GG.bounty_pay = function() return 0 end
+        open_on(3)
+        GG.bounty_pay = keep_pay
+        assert(texts["P/gg_rank_stats"] == GGUI.loc("bounty_off"),
+               "a board switched off says so, got " .. tostring(texts["P/gg_rank_stats"]))
+        -- THE COURT'S DEADLINE READS AS A DEADLINE (antislop #49): "0 turns to pay" read as
+        -- already lapsed, and "1 turns" was possible.
+        local t_now = GG.turn_now()
+        local d2 = "P/" .. GGUI.CARD .. "_1/card_desc_2"
+        GG.demands[ME] = {guild = "slavers", kind = "tribute", amount = 100, due = t_now - 1}
+        open_on(4)
+        assert(has(texts[d2] or "", GGUI.loc("demand_due_now")), "0 left is due this turn, got "
+               .. tostring(texts[d2]))
+        GG.demands[ME].due = t_now
+        open_on(4)
+        assert(has(texts[d2] or "", "1 " .. GGUI.loc("demand_due_1")), "1 left is singular, got "
+               .. tostring(texts[d2]))
+        -- EACH FIGURE ONCE (antislop #51): the price beside Pay, not again in the line; the
+        -- leadership card's box is for prices, and a score is not one.
+        local c1 = "P/" .. GGUI.CARD .. "_1/"
+        assert(texts[c1 .. "card_cost"] == "100" and not has(texts[c1 .. "card_desc_1"] or "", "100"),
+               "the demand's figure shows once, got " .. tostring(texts[c1 .. "card_desc_1"]))
+        assert((texts["P/" .. GGUI.CARD .. "_3/card_cost"] or "") == "",
+               "the leadership card has no price, got " .. tostring(texts["P/" .. GGUI.CARD .. "_3/card_cost"]))
+        -- THE PATRON CARD HAS A GLYPH AND ONE ACCOUNT OF ITSELF (antislop #52): "No patron
+        -- appointed" sat over "Your patron already serves another guild".
+        local keep_p = GG.patrons[ME]
+        local other = (GGUI.current_guild() == "brass") and "slavers" or "brass"
+        GG.patrons[ME] = {guild = other, cqi = 77}
+        open_on(4)
+        local c2 = "P/" .. GGUI.CARD .. "_2/"
+        assert(texts[c2 .. "card_desc_1"] == GGUI.loc("patron_elsewhere")
+               and (texts[c2 .. "card_desc_2"] or "") == "",
+               "a patron elsewhere is said once, got " .. tostring(texts[c2 .. "card_desc_1"])
+               .. " | " .. tostring(texts[c2 .. "card_desc_2"]))
+        assert(vis[c2 .. "card_icon"] == true, "the patron card shows its glyph")
+        GG.patrons[ME] = keep_p
+        GG.demands[ME].due = t_now + 4
+        open_on(4)
+        assert(has(texts[d2] or "", "5 " .. GGUI.loc("demand_due")), "5 left is plural, got "
+               .. tostring(texts[d2]))
+        GG.demands[ME] = nil
+        -- THE HEADER'S HOLDER NAMES A GUILD ONLY WHERE THE VIEW IS ONE (antislop #53).
+        local mark = "P/gg_rank_mark#" .. GGUI.RANK_ICON_INDEX
+        for _, tab in ipairs({3, 5, 6}) do
+            open_on(tab)
+            assert(imgs[mark] == GGUI.art(GGUI.CREST), "tab " .. tab .. " wears the crest, got "
+                   .. tostring(imgs[mark]))
+        end
+        open_on(1)
+        assert(imgs[mark] == GGUI.icon(GGUI.current_guild()), "the Guilds tab wears the guild")
+        -- THE FOOTER'S FAVOUR NAMES ITS GUILD, AND ONLY WHERE ONE IS ON SCREEN (antislop #54).
+        open_on(1)
+        assert(has(texts["P/gg_footer"] or "", GGUI.loc_guild(GGUI.current_guild()) .. " "
+                   .. GGUI.loc("favour")), "the Guilds tab footer names the guild, got "
+                   .. tostring(texts["P/gg_footer"]))
+        for _, tab in ipairs({3, 5, 6}) do
+            open_on(tab)
+            assert(not has(texts["P/gg_footer"] or "", GGUI.loc("favour")),
+                   "tab " .. tab .. " shows no one guild's Favour, got " .. tostring(texts["P/gg_footer"]))
+        end
+        -- THE CARD'S REFUSALS ARE LOC, NOT ENGLISH IN THE LUA (antislop #56).
+        open_on(1)
+        local t3 = tips["P/" .. GGUI.CARD .. "_3"] or ""
+        -- Matched on the template's text before its first placeholder, which holds with the
+        -- loc shipped (filled) and without it (the key itself).
+        assert(has(t3, (string.match(GGUI.loc("tip_short_rep"), "^[^%%]*")))
+               and not has(t3, " reputation with them"),
+               "a rank-shut card explains itself from loc, got " .. t3)
+        -- A SLOT WITH NO SERVICE IS NOT A BARE PLATE (antislop #58).
+        open_on(1)
+        GGUI.draw_card(ME, 3, nil)
+        assert(vis["P/" .. GGUI.CARD .. "_3"] == false, "an empty service slot hides its card")
+        open_on(1)
+        assert(vis["P/" .. GGUI.CARD .. "_3"] ~= false, "and a refresh with a service shows it again")
+        -- ONE IS SINGULAR (antislop #50): "1 services bought", "1 turns left".
+        local keep_world = GG.world
+        GG.world = {turn = 3, bought = 1, demands = 2, patrons = 1}
+        local rl = GGUI.rivals_line()
+        GG.world = keep_world
+        assert(has(rl, "1 " .. GGUI.loc("rivals_bought_1")) and has(rl, "2 " .. GGUI.loc("rivals_demands"))
+               and has(rl, "1 " .. GGUI.loc("rivals_patrons_1")), "the rivals line counts in the singular, got " .. rl)
+        assert(GGUI.count(1, "bounty_turns") == "1 " .. GGUI.loc("bounty_turns_1")
+               and GGUI.count(3, "bounty_turns") == "3 " .. GGUI.loc("bounty_turns"), "count picks _1 for one")
+        -- HELP HEADINGS IN A HEADER FONT (antislop #30): no runtime call changes a font, so
+        -- a "#" line goes to its own header_14 cell and the body cell beside it stays empty.
+        local keep_common = common
+        common = {get_localised_string = function(k)
+            if string.find(k, "help_p1", 1, true) then return "#Head one||Body.||#Head two||More." end
+            return keep_common and keep_common.get_localised_string(k) or ""
+        end}
+        open_on(5)
+        local heads = {}
+        for i = 1, GGUI.HELP_SLOTS do
+            local h = texts[string.format("P/gg_helph_%02d", i)] or ""
+            if h ~= "" then
+                heads[#heads + 1] = h
+                assert((texts[string.format("P/gg_help_%02d", i)] or "") == "",
+                       "slot " .. i .. " draws its heading twice")
+            end
+        end
+        assert(#heads == 2 and has(heads[1], "Head one") and has(heads[2], "Head two"),
+               "both headings drawn in the header cells, got " .. table.concat(heads, " | "))
+        assert(has(texts["P/gg_help_02"] or "", "Body."), "the body stays in the body cells")
+        common = keep_common
+        open_on(6)
+        for i = 1, GGUI.HELP_SLOTS do
+            local k = string.format("P/gg_helph_%02d", i)
+            assert((texts[k] or "") == "" or vis[k] == false, "the Log leaves heading " .. i .. " empty")
         end
         local key = GGUI.services_of(g1)[1].key
         GG.cooldowns[ME] = {[key] = 7}
@@ -9601,7 +9755,7 @@ end)()
     saved["derpy_gg_" .. F] = "10,1|20,2|30,3|40,4|50,5|60,6;" .. table.concat(cds, "|")
     GG.state[F], GG.cooldowns[F] = nil, nil
     GG.load(F)
-    assert(select(1, GG.get(F, "slavers")) == 60, "the six pairs load where they were")
+    assert(select(1, GG.get(F, "slavers")) == 60, "the pairs load where they were")
     local r, f = GG.get(F, "temple")
     assert(r == 0 and f == 0, "the temple starts at 0,0 in an old save")
     assert(GG.cooldowns[F].asuryans_grace == 5, "cooldowns keep their positions")

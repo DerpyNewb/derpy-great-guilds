@@ -162,10 +162,23 @@ HALL_ICONS = {
 # from that race's own building line, so the hall takes the SAME source stem as its guild's
 # card - read off ICONS rather than retyped, so the two cannot drift apart.
 _CARD_STEM = {name: stem for stem, name in ICONS.items()}
+_GUILDS = ("brass", "immortals", "daemonsmiths", "khanate", "overseers", "slavers", "temple")
+# PER-LEVEL HALL ICONS (2026-10-08): races whose halls draw one icon PER LEVEL, the way
+# Medieval II's guild pictures grow with each upgrade. Codex drew each set from the M2 line
+# (source/guild_icons/codex_<g><tag>/, made by to_ca_icon.py there) and they ship under the
+# LEVEL's key, derpy_gg_hall_<g>_<n><tag>. Must match gen_great_guilds.HALL_LEVEL_ICON_TAGS -
+# import_great_guilds refuses a build whose variant rows name an icon that is not staged.
+HALL_LEVEL_ICON_TAGS = ("_emp", "_dwf", "")
+HALL_LEVEL_ICONS = {
+    os.path.join(SRC, "codex_%s%s" % (_g, _tag), "derpy_gg_hall_%s%s_%d.png" % (_g, _tag, _n + 1)):
+        "derpy_gg_hall_%s_%d%s" % (_g, _n, _tag)
+    for _tag in HALL_LEVEL_ICON_TAGS for _g in _GUILDS for _n in range(3)}
 for _tag in ("_emp", "_dwf", "_brt", "_cth", "_ksl", "_def", "_hef", "_skv"):
-    for _g in ("brass", "immortals", "daemonsmiths", "khanate", "overseers", "slavers",
-               "temple"):
+    for _g in _GUILDS:
         HALL_ICONS[_CARD_STEM[_g + _tag]] = "derpy_gg_hall_" + _g + _tag
+# A per-level race's one-per-chain icon is retired (build_halls deletes it), so never copy it.
+_RETIRED = {"derpy_gg_hall_%s%s" % (_g, _t) for _t in HALL_LEVEL_ICON_TAGS for _g in _GUILDS}
+HALL_ICONS = {k: v for k, v in HALL_ICONS.items() if v not in _RETIRED}
 HALL_DST = os.path.join(ROOT, "Modding Files", "pack", "ui", "buildings", "icons")
 
 UI_PACK = os.path.join(r"F:\SteamLibrary\steamapps\common\Total War WARHAMMER III",
@@ -310,6 +323,25 @@ def build_halls(write=True):
                 fh.write(data)
         elif not os.path.isfile(os.path.join(HALL_DST, name + ".png")):
             out.append("hall icon not written: %s.png" % name)
+    for src, name in sorted(HALL_LEVEL_ICONS.items()):
+        dst = os.path.join(HALL_DST, name + ".png")
+        if not os.path.isfile(src):
+            out.append("missing per-level hall icon: %s" % src)
+        elif write:
+            with open(dst, "wb") as fh:
+                fh.write(open(src, "rb").read())
+        elif not os.path.isfile(dst) or open(dst, "rb").read() != open(src, "rb").read():
+            out.append("per-level hall icon not staged or stale: %s.png" % name)
+    # A retired one-per-chain icon would still be packed (the importer takes every
+    # derpy_gg_hall_*.png), so delete it.
+    for tag in HALL_LEVEL_ICON_TAGS:
+        for g in _GUILDS:
+            old = os.path.join(HALL_DST, "derpy_gg_hall_%s%s.png" % (g, tag))
+            if os.path.isfile(old):
+                if write:
+                    os.remove(old)
+                else:
+                    out.append("retired hall icon still staged: %s" % os.path.basename(old))
     return out
 
 
@@ -480,7 +512,10 @@ def selftest():
         for g in ("brass", "immortals", "daemonsmiths", "khanate", "overseers",
                   "slavers", "temple", "crest"):
             assert g + tag in names, "no icon ships as " + g + tag
-    assert len(set(HALL_ICONS.values())) == len(HALL_ICONS) == 63
+    assert len(set(HALL_ICONS.values())) == len(HALL_ICONS) == 63 - 7 * len(HALL_LEVEL_ICON_TAGS)
+    assert len(set(HALL_LEVEL_ICONS.values())) == 21 * len(HALL_LEVEL_ICON_TAGS)
+    assert not set(HALL_ICONS.values()) & set(HALL_LEVEL_ICONS.values())
+    assert all(v == v.lower() for v in HALL_LEVEL_ICONS.values()), "a pack path must be lowercase"
     assert all(v == v.lower() for v in HALL_ICONS.values()), "a pack path must be lowercase"
     print("selftest ok: alpha preserved, peak opaque, detailed source refused")
 

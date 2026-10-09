@@ -368,6 +368,27 @@ GGUI.PANEL_XY = {
     gg_help_19   = {20, 528},
     gg_help_20   = {20, 548},
     gg_help_21   = {20, 568},
+    gg_helph_01  = {20, 168},
+    gg_helph_02  = {20, 188},
+    gg_helph_03  = {20, 208},
+    gg_helph_04  = {20, 228},
+    gg_helph_05  = {20, 248},
+    gg_helph_06  = {20, 268},
+    gg_helph_07  = {20, 288},
+    gg_helph_08  = {20, 308},
+    gg_helph_09  = {20, 328},
+    gg_helph_10  = {20, 348},
+    gg_helph_11  = {20, 368},
+    gg_helph_12  = {20, 388},
+    gg_helph_13  = {20, 408},
+    gg_helph_14  = {20, 428},
+    gg_helph_15  = {20, 448},
+    gg_helph_16  = {20, 468},
+    gg_helph_17  = {20, 488},
+    gg_helph_18  = {20, 508},
+    gg_helph_19  = {20, 528},
+    gg_helph_20  = {20, 548},
+    gg_helph_21  = {20, 568},
 }
 
 -- Mirrors HELP_SLOTS in tools/gen_guilds_ui.py; check() refuses if the two differ.
@@ -382,7 +403,7 @@ GGUI.CARD_CHILD_XY = {
     card_buy  = {596, 60},
 }
 
--- The card is ONE template used by all six guilds, so its icon cannot be baked into
+-- The card is ONE template used by every guild, so its icon cannot be baked into
 -- the .twui.xml - the file ships a placeholder and this swaps it per draw. A path the
 -- game does not have draws a blank square and says nothing about it, so
 -- gen_guilds_ui.check() parses this table and asserts every path exists in a ui pack.
@@ -462,10 +483,10 @@ GGUI.FRAME = {
     _skv = {
         heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
         rim = "ui/skins/default/tutglow_square.png",
-        active = {"ui/skins/warhammer2/ikit_button_active.png", "ui/campaign ui/derpy_gg_icons/clear.png"},
-        hover = {"ui/skins/warhammer2/ikit_button_hover.png", "ui/campaign ui/derpy_gg_icons/clear.png"},
-        selected = {"ui/skins/warhammer2/ikit_button_down.png", "ui/skins/default/tutglow_square.png"},
-        selected_hover = {"ui/skins/warhammer2/ikit_button_down.png", "ui/skins/default/tutglow_square.png"},
+        active = {"ui/skins/warhammer2/ikit_button_active.png", "ui/campaign ui/derpy_gg_icons/clear.png", "ui/skins/default/1x1_blank_white.png"},
+        hover = {"ui/skins/warhammer2/ikit_button_hover.png", "ui/campaign ui/derpy_gg_icons/clear.png", "ui/skins/default/1x1_blank_white.png"},
+        selected = {"ui/skins/warhammer2/ikit_button_down.png", "ui/skins/default/tutglow_square.png", "ui/skins/default/1x1_blank_white.png"},
+        selected_hover = {"ui/skins/warhammer2/ikit_button_down.png", "ui/skins/default/tutglow_square.png", "ui/skins/default/1x1_blank_white.png"},
     },
     _dwf = {
         heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
@@ -657,7 +678,7 @@ GGUI.SLIDER_PARTS = {
 }
 
 -- WHICH GUILD THE LIST IS SHOWING: an index into GG.GUILDS, because GGUI.leaders() builds
--- the six rows in exactly that order. Clicking a standings row sets it.
+-- the rows in exactly that order. Clicking a standings row sets it.
 GGUI.STAND_GUILD = 1
 
 -- A faction whose flag_path() was unreadable still gets a crest rather than a gap. A path
@@ -727,16 +748,25 @@ function GGUI.want_size()
     return "medium"
 end
 
--- THE SIZE THAT IS DRAWN: the one asked for, stepped down to Medium when it would not fit
--- the screen at this screen factor. Medium always fits: the engine's screen is never below
--- 1600x900. Large does not on that floor (a 1280x720 window, or 1080p at UI Scale ~120%).
+-- THE SIZE THAT IS DRAWN: the file set nearest the size asked for times the screen factor,
+-- among those that fit. The screen factor is spent HERE, on a real font, and never on
+-- font_scale: a 2560x1440 player reported soft text at all three sizes (2026-10-09),
+-- because SA 1.33 stretched every glyph. So at 1440p Medium draws the Large files - the
+-- 1080p look, sharp - and above Large's 4/3 the panel simply stays Large. Medium always
+-- fits: the engine's screen is never below 1600x900. Large does not on that floor.
 function GGUI.pick_size(want, sw, sh, sa)
     local z = GGUI.SIZES[want] and want or "medium"
-    if type(sw) == "number" and type(sh) == "number" then
-        local f = GGUI.SIZES[z].f * (sa or 1)
-        if GGUI.PANEL_W * f > sw or GGUI.PANEL_H * f > sh then z = "medium" end
+    local target = GGUI.SIZES[z].f * (sa or 1)
+    local fits = type(sw) ~= "number" or type(sh) ~= "number"
+    local best, gap = "medium", math.huge
+    for _, k in ipairs({"small", "medium", "large"}) do
+        local s = GGUI.SIZES[k]
+        local d = math.abs(s.f - target)
+        if (fits or (GGUI.PANEL_W * s.f <= sw and GGUI.PANEL_H * s.f <= sh)) and d < gap then
+            best, gap = k, d
+        end
     end
-    return z
+    return best
 end
 
 function GGUI.px(v)
@@ -900,14 +930,16 @@ end
 
 function GGUI.open()
     if comp(GGUI.PANEL) then GGUI.refresh(); return end
-    local ok = pcall(function()
+    local ok, err = pcall(function()
         local r = root()
         -- Dimensions(), not Bounds(): Bounds() includes children. Read on every open,
         -- so a player who changes UI Scale or the MCT size gets it the next time they
         -- look. BEFORE CreateComponent, because the size picks which files are created.
         local sw, sh = r:Dimensions()
-        GGUI.SA = GGUI.scale_for(sw, sh)
-        GGUI.SIZE = GGUI.pick_size(GGUI.want_size(), sw, sh, GGUI.SA)
+        -- SA stays 1: pick_size spends the screen factor on a real font, so scale_tree
+        -- and its font_scale stretch never run (soft text at 1440p, 2026-10-09).
+        GGUI.SA = 1
+        GGUI.SIZE = GGUI.pick_size(GGUI.want_size(), sw, sh, GGUI.scale_for(sw, sh))
         GGUI.F, GGUI.SUFFIX = GGUI.SIZES[GGUI.SIZE].f, GGUI.SIZES[GGUI.SIZE].suffix
         GGUI.S = GGUI.F * GGUI.SA
         r:CreateComponent(GGUI.PANEL, GGUI.frame_path(GGUI.PATH_PANEL))
@@ -982,6 +1014,9 @@ function GGUI.open()
         -- the panel's own children, which the .twui.xml offsets do not.
         GGUI.layout()
     end)
+    -- A FAILED OPEN SAYS WHY, always (antislop audit 2026-10-09): otherwise the opener
+    -- just does nothing, and a player's log has no line to send.
+    if not ok then GGUI.say("GAVE UP opening the panel: " .. tostring(err)) end
     -- ASKED OF THE PANEL, not of `ok`: the body above returns early without a panel and
     -- still reports success, and a key held for a panel that is not there swallows the
     -- player's next Escape for nothing.
@@ -1046,10 +1081,12 @@ function GGUI.draw_card(faction, i, s)
         set_text(comp("card_buy", card), "")
         local eb = comp("card_buy", card)
         if eb then pcall(function() eb:SetVisible(false) end) end
-        -- An empty card keeps its plate but drops the glyph, so a short guild's
-        -- third slot reads as empty rather than as a mislabelled service.
+        -- An empty card drops the glyph, so a short guild's third slot reads as empty
+        -- rather than as a mislabelled service - and the whole card, so it is not a bare
+        -- plate either (antislop audit 2026-10-09). The bounty board shows it again.
         local ic = comp("card_icon", card)
         if ic then pcall(function() ic:SetVisible(false) end) end
+        pcall(function() card:SetVisible(false) end)
         return
     end
     local ok, why = GGUI.card_state(faction, s)
@@ -1070,8 +1107,7 @@ function GGUI.draw_card(faction, i, s)
         -- something standing between the player and a service they can otherwise afford.
         need = GGUI.loc("needs_lead")
     elseif not ok and why == "cooldown" then
-        label = label .. "  " .. GG.cooldown_left(faction, s.key) .. " "
-                .. GGUI.loc("bounty_turns")
+        label = label .. "  " .. GGUI.count(GG.cooldown_left(faction, s.key), "bounty_turns")
     elseif not ok and why == "target" then
         label = label .. "  [[col:yellow]]" .. GGUI.loc("needs_target_short") .. "[[/col]]"
     elseif not ok and why == "unavailable" then
@@ -1119,10 +1155,13 @@ function GGUI.draw_card(faction, i, s)
     if not ok and why == "rank" then
         -- The exact shortfall, because "keep earning reputation" does not tell a
         -- player whether they are ten short or a thousand.
-        tip = tip .. "||" .. GGUI.loc("locked_hint")
-              .. " You have " .. rep_now .. " reputation with them and need "
-              .. need_rep .. " for " .. GGUI.loc_rank(s.rank) .. " - "
-              .. math.max(0, need_rep - rep_now) .. " more."
+        -- From loc, not English built here (antislop audit 2026-10-09). %n held, %m needed,
+        -- %r the rank, %d the difference.
+        local short = GGUI.fill(GGUI.loc("tip_short_rep"), rep_now)
+        short = string.gsub(short, "%%m", tostring(need_rep))
+        short = string.gsub(short, "%%r", (string.gsub(GGUI.loc_rank(s.rank), "%%", "%%%%")))
+        short = string.gsub(short, "%%d", tostring(math.max(0, need_rep - rep_now)))
+        tip = tip .. "||" .. GGUI.loc("locked_hint") .. " " .. short
     elseif not ok and why == "lead" then
         local who = GG.leader_of(s.guild, GG.culture_of(faction))
         tip = tip .. "||" .. GGUI.loc("lead_hint")
@@ -1131,10 +1170,10 @@ function GGUI.draw_card(faction, i, s)
                   .. "."
         end
     elseif not ok and why == "cooldown" then
-        tip = tip .. "||On cooldown for another "
-              .. GG.cooldown_left(faction, s.key) .. " turns."
+        local left = GG.cooldown_left(faction, s.key)
+        tip = tip .. "||" .. GGUI.fill(GGUI.loc(left == 1 and "tip_cooldown_1" or "tip_cooldown"), left)
     elseif not ok and why == "favour" then
-        tip = tip .. "||You do not have " .. cost_now .. " favour with this guild yet."
+        tip = tip .. "||" .. GGUI.fill(GGUI.loc("tip_short_fav"), cost_now)
     elseif not ok and why == "target" then
         tip = tip .. "||" .. GGUI.loc(GGUI.target_hint(s))
         if pick then tip = tip .. "||" .. GGUI.loc("pick_help") end
@@ -1170,21 +1209,15 @@ function GGUI.draw_card(faction, i, s)
             cap = GGUI.loc("pick_button")
         elseif asking then
             cap = "[[col:yellow]]" .. GGUI.loc("confirm") .. "[[/col]]"
-        elseif not ok and (fav_now or 0) < cost_now then
-            -- RED WHERE FAVOUR FALLS SHORT, as it read before 2026-10-04 and as the price
-            -- does, whatever else shuts it (asked in game 2026-10-05). CA's red measures
-            -- 3.2:1 on the button art, under the 4.5:1 rule - chosen for the hue asked for.
-            cap = "[[col:red]]" .. cap .. "[[/col]]"
-        elseif not ok then
-            cap = "[[col:" .. GGUI.LOCK_COL .. "]]" .. cap .. "[[/col]]"
         end
+        -- A SHUT BUY IS GREYED, NOT RECOLOURED (antislop audit 2026-10-09): red on the red
+        -- plate measured 2.85:1. The price is red when favour is short and card_need says
+        -- what else shuts it, so the caption only has to read as dead.
         set_text(btn, cap)
         -- SHOWN AGAIN. The bounty board and the Court both hide this button on a slot
         -- with no action, and nothing else would ever bring it back.
-        pcall(function()
-            btn:SetVisible(true)
-            btn:SetDisabled(not (ok or pick))
-        end)
+        pcall(function() btn:SetVisible(true) end)
+        GGUI.set_live(btn, ok or pick)
     end
 end
 
@@ -1210,10 +1243,21 @@ end
 -- its own plate just past the name (card_need). Red on the bare bronze measured 2.2:1, so
 -- from 2026-10-04 the reason went in the name's colour - and blended into the card, seen
 -- in game 2026-10-05. The plate is the race's cost-box art, which red reads on.
--- LOCK_COL (db/ui_colours "orange", FFAD5B) marks a dead Buy caption that favour does not
--- explain, and the Court's deadline. A full path, as the faction list's flags are written.
+-- LOCK_COL (db/ui_colours "orange", FFAD5B) marks the Court's deadline. A full path, as
+-- the faction list's flags are written.
 GGUI.LOCK_ICON = "ui/skins/default/icon_padlock.png"
 GGUI.LOCK_COL = "orange"
+
+-- A CARD BUTTON'S LIVE OR DEAD LOOK. These plates ship `standard` and `hover` only, so
+-- SetDisabled stops the click and draws nothing; the look is the opener's greyscale
+-- (GGUI.gate_opener), and the caption stays cream so it still reads.
+function GGUI.set_live(btn, live)
+    pcall(function()
+        btn:SetDisabled(not live)
+        btn:ShaderTechniqueSet(live and "normal_t0" or "set_greyscale_t0", true, true)
+        if not live then btn:ShaderVarsSet(1, 0.6, 0, 0, true, true) end
+    end)
+end
 
 function GGUI.need_tag(text)
     return "[[img:" .. GGUI.LOCK_ICON .. "]][[/img]] [[col:red]]" .. text .. "[[/col]]"
@@ -1438,10 +1482,15 @@ function GGUI.draw_bounties(faction)
         local card = GGUI.card(i)
         local o = view[i] and list[view[i]]
         GGUI.BOUNTY_GUILD[i] = o and o.guild
-        if card and not o then
-            -- An empty slot says so, rather than leaving the previous tab's service
-            -- text sitting on a card that no longer means it.
+        if card and not o and (i > 1 or #view > 0) then
+            -- AN EMPTY SLOT IS HIDDEN; an empty board keeps one card saying so, and the
+            -- header says when offers come (antislop audit 2026-10-09).
+            pcall(function() card:SetVisible(false) end)
+        elseif card and not o then
+            -- It says so, rather than leaving the previous tab's service text sitting on
+            -- a card that no longer means it.
             GGUI.draw_card(faction, i, nil)
+            pcall(function() card:SetVisible(true) end)
             set_text(comp("card_desc_1", card), GGUI.loc("bounty_none"))
             set_tooltip(card, GGUI.loc("bounty_help"))
             -- No offer, no button. draw_card blanks the caption but leaves the plate,
@@ -1464,7 +1513,7 @@ function GGUI.draw_bounties(faction)
             else
                 local left = GGUI.BOUNTY_LIFE - (turn - (o.posted or 0))
                 if left < 0 then left = 0 end
-                pay = pay .. "   " .. left .. " " .. GGUI.loc("bounty_turns")
+                pay = pay .. "   " .. GGUI.count(left, "bounty_turns")
             end
             set_text(comp("card_desc_2", card), pay)
             -- THE PLATE IS THE STAKE, as a service card's plate is its favour price
@@ -1518,13 +1567,12 @@ function GGUI.draw_bounties(faction)
                 -- "it still lets me take it". The row keeps saying Taken beside the pay.
                 pcall(function() btn:SetVisible(not o.taken) end)
                 if not o.taken then
-                    -- SHORT OF FAVOUR, the Take is red and dead, the way a service the
+                    -- SHORT OF FAVOUR, the Take is greyed and dead, the way a service the
                     -- player cannot afford is, and the tooltip says by how much.
                     local _, fav = GG.get(faction, o.guild)
                     local short = not GG.stake_affordable(faction, o)
-                    set_text(btn, short and ("[[col:red]]" .. GGUI.loc("take") .. "[[/col]]")
-                                        or GGUI.loc("take"))
-                    pcall(function() btn:SetDisabled(short) end)
+                    set_text(btn, GGUI.loc("take"))
+                    GGUI.set_live(btn, not short)
                     if short then
                         tip = tip .. "||" .. string.gsub(GGUI.fill(
                             GGUI.loc("bounty_stake_short"), o.stake), "%%m", tostring(fav or 0))
@@ -1568,12 +1616,9 @@ function GGUI.fill_card(card, icon, name, l1, l2, right, button, enabled, tip)
     if btn then
         local cap = button or ""
         local show = cap ~= ""
-        if show and not enabled then cap = "[[col:red]]" .. cap .. "[[/col]]" end
         set_text(btn, cap)
-        pcall(function()
-            btn:SetVisible(show)
-            btn:SetDisabled(not enabled)
-        end)
+        pcall(function() btn:SetVisible(show) end)
+        GGUI.set_live(btn, enabled)
     end
     set_tooltip(card, tip or "")
 end
@@ -1627,13 +1672,21 @@ function GGUI.draw_court(faction)
         local unit = (d.kind == "tribute") and GGUI.loc("demand_gold")
                      or GGUI.loc("demand_favour")
         local left = GGUI.demand_left(d, turn)
-        local l1 = GGUI.loc("demand_owed") .. " " .. (d.amount or 0) .. " " .. unit
+        -- The amount is in the price box beside Pay; the line says what it is paid in
+        -- (antislop audit 2026-10-09: the figure showed twice).
+        local l1 = GGUI.loc("demand_owed") .. " " .. unit
         if d.kind == "renounce" and GG.RIVALS[d.guild] then
             l1 = l1 .. "  (" .. GGUI.loc_guild(GG.RIVALS[d.guild]) .. ")"
         end
-        -- The deadline goes red in its last two turns. It is the only number on this
-        -- panel with a point of no return behind it.
+        -- The deadline goes orange (LOCK_COL) in its last two turns. It is the only number
+        -- on this panel with a point of no return behind it. 0 left is the turn it is due,
+        -- not a lapsed one, and 1 is singular (antislop audit 2026-10-09).
         local l2 = left .. " " .. GGUI.loc("demand_due")
+        if left <= 0 then
+            l2 = GGUI.loc("demand_due_now")
+        elseif left == 1 then
+            l2 = "1 " .. GGUI.loc("demand_due_1")
+        end
         if left <= 2 then l2 = "[[col:" .. GGUI.LOCK_COL .. "]]" .. l2 .. "[[/col]]" end
         local tip = GGUI.loc_guild(d.guild) .. "  -  "
                     .. GGUI.loc("demand_desc_" .. d.kind)
@@ -1665,12 +1718,15 @@ function GGUI.draw_court(faction)
                         GGUI.loc("court_help_patron"))
     else
         local sel = GGUI.patron_cqi(faction)
-        local l2 = GGUI.loc("patron_needs_char")
-        if p then l2 = GGUI.loc("patron_elsewhere") end
+        -- ONE ACCOUNT OF ITSELF, AND THE GUILD'S GLYPH (antislop audit 2026-10-09): "No
+        -- patron appointed" sat over "Your patron already serves another guild", and the
+        -- card was the only one on the tab with an empty holder.
+        local l1, l2 = GGUI.loc("patron_none"), GGUI.loc("patron_needs_char")
+        if p then l1, l2 = GGUI.loc("patron_elsewhere"), "" end
         -- NOBODY SELECTED: the button picks a lord instead of sitting greyed out.
-        GGUI.write_card(2, nil,
+        GGUI.write_card(2, GGUI.icon(guild),
                         GGUI.loc("patron_of") .. ": " .. GGUI.loc_guild(guild),
-                        GGUI.loc("patron_none"), l2, "",
+                        l1, l2, "",
                         GGUI.loc(sel and "patron_appoint" or "pick_button"), true,
                         GGUI.loc("court_help_patron"))
     end
@@ -1691,7 +1747,7 @@ function GGUI.draw_court(faction)
                     line,
                     GGUI.loc("you") .. ": " .. mine .. "   "
                     .. GGUI.loc("leader") .. ": " .. (who_rep or 0),
-                    tostring(who_rep or 0), "", false,
+                    "", "", false,
                     GGUI.table_lines(guild, faction) .. "||"
                     .. GGUI.loc("court_help_lead"))
 end
@@ -1740,11 +1796,15 @@ function GGUI.refresh()
     -- or picking a row on Standings changes the hall behind the text.
     GGUI.paint_ground(GGUI.ground_guild())
     GGUI.paint_crest()
-    -- The header's round holder carries the glyph of the guild whose hall is behind it.
+    -- The header's round holder carries the glyph of the guild whose hall is behind it,
+    -- and the panel's crest on Bounties, Help and Log, which are about no one guild
+    -- (antislop audit 2026-10-09).
     local ri = comp("gg_rank_mark")
     if ri then
+        local whole = GGUI.TAB == 3 or GGUI.TAB == 5 or GGUI.TAB == 6
         pcall(function()
-            ri:SetImagePath(GGUI.icon(GGUI.ground_guild()) or "", GGUI.RANK_ICON_INDEX)
+            ri:SetImagePath(whole and GGUI.art(GGUI.CREST)
+                            or GGUI.icon(GGUI.ground_guild()) or "", GGUI.RANK_ICON_INDEX)
         end)
     end
     set_named_text("gg_title", GGUI.loc("panel_title"))
@@ -1775,13 +1835,13 @@ function GGUI.refresh()
     local next_at = GG.RANKS[math.min(rank + 1, #GG.RANKS)]
 
     -- ONLY THE GUILDS TAB SHOWS ONE GUILD AT A TIME, so only the Guilds tab has
-    -- anything for the pager to page. Standings lists all six, the bounty board pools
+    -- anything for the pager to page. Standings lists every guild, the bounty board pools
     -- its three offers from every guild, and Help is prose - on those three the arrows
     -- moved one word in the header and nothing else, which reads as a dead button.
     -- THE COURT PAGES TOO. Two of its three cards are about one guild - the patron is
     -- appointed to a named guild and leadership is held of a named guild - so the arrows
-    -- do exactly what they do on the Guilds tab. Standings lists all six, the board
-    -- pools from all six and Help is prose; on those three the arrows moved one word.
+    -- do exactly what they do on the Guilds tab. Standings lists every guild, the board
+    -- pools from all of them and Help is prose; on those three the arrows moved one word.
     -- THE LOG PAGES TOO, newest first, a slot-page at a time.
     local paged = (GGUI.TAB == 1 or GGUI.TAB == 4 or GGUI.TAB == 5 or GGUI.TAB == 6)
     for _, n in ipairs({"gg_prev", "gg_next"}) do
@@ -1905,6 +1965,12 @@ function GGUI.refresh()
             end
             head = GGUI.loc("hdr_bounty") .. "   " .. taken .. " / "
                    .. #GGUI.CARD_XY .. " " .. GGUI.loc("bounty_taken")
+            local view = {}
+            pcall(function() view = GG.bounty_view(faction) end)
+            if #view == 0 then
+                local ok, pay = pcall(GG.bounty_pay)
+                head = GGUI.loc((ok and pay <= 0) and "bounty_off" or "bounty_next")
+            end
         end
         -- The Standings header carries the rivals' line, so its hover explains that
         -- rather than repeating the general standing rules a hover away on the title.
@@ -1917,10 +1983,16 @@ function GGUI.refresh()
     -- THE COUNTDOWN (spec §9), here because the footer carries one short number on a
     -- 750px line; the rank and earned lines are full.
     local every = GG.rotation_turns()
-    -- THE GUILD ON SCREEN: the Leaderboard shows the selected row's (logic audit).
-    local shown_fav = select(2, GG.get(faction, GGUI.ground_guild()))
-    set_named_text("gg_footer", GGUI.loc("favour") .. ": " .. shown_fav .. "   "
-                   .. GGUI.countdown(every - GG.turn_now() % every))
+    -- THE GUILD ON SCREEN: the Leaderboard shows the selected row's (logic audit), and the
+    -- figure names it. Bounties, Help and Log show no one guild, so no Favour figure
+    -- (antislop audit 2026-10-09: it read 0 on Bounties and 150 on the Leaderboard).
+    local foot = GGUI.countdown(every - GG.turn_now() % every)
+    if not (GGUI.TAB == 3 or GGUI.TAB == 5 or GGUI.TAB == 6) then
+        local g = GGUI.ground_guild()
+        foot = GGUI.loc_guild(g) .. " " .. GGUI.loc("favour") .. ": "
+               .. select(2, GG.get(faction, g)) .. "   " .. foot
+    end
+    set_named_text("gg_footer", foot)
     set_tooltip(comp("gg_footer"), GGUI.loc("standing_help"))
 
     -- The bar is the rank line's picture, so it must agree with it. SetCanResizeWidth
@@ -1983,6 +2055,8 @@ function GGUI.refresh()
     for i = 1, GGUI.HELP_SLOTS do
         local h = comp(string.format("gg_help_%02d", i))
         if h then pcall(function() h:SetVisible(GGUI.TAB == 5 or GGUI.TAB == 6) end) end
+        local hh = comp(string.format("gg_helph_%02d", i))
+        if hh then pcall(function() hh:SetVisible(GGUI.TAB == 5) end) end
     end
 
     if GGUI.TAB == 1 then
@@ -2063,7 +2137,8 @@ function GGUI.help_lines(ruler)
             if #out > 0 then push("") end
             -- [[col:]] markup works in SetStateText. "yellow" is one of CA's 42 real
             -- names; a typo'd one drops the colour silently rather than erroring.
-            push("[[col:yellow]]" .. string.sub(seg, 2) .. "[[/col]]")
+            -- \2 marks it for draw_help, which writes it to the header_14 cell.
+            push("\2[[col:yellow]]" .. string.sub(seg, 2) .. "[[/col]]")
         elseif lead == "-" then
             local wrapped = GGUI.wrap(ruler, string.sub(seg, 2), GGUI.HELP_SLOTS)
             for i = 1, #wrapped do
@@ -2081,7 +2156,10 @@ function GGUI.draw_help()
     local first = comp("gg_help_01")
     local lines = GGUI.help_lines(first)
     for i = 1, GGUI.HELP_SLOTS do
-        set_text(comp(string.format("gg_help_%02d", i)), lines[i] or "")
+        local l = lines[i] or ""
+        local head = string.sub(l, 1, 1) == "\2"
+        set_text(comp(string.format("gg_help_%02d", i)), head and "" or l)
+        set_text(comp(string.format("gg_helph_%02d", i)), head and string.sub(l, 2) or "")
     end
 end
 
@@ -2259,7 +2337,7 @@ function GGUI.leaders(me)
         -- The rule lives in GG.leader_of: reputation above zero to be named at all, and
         -- a stable tie-break. This used to start from -1 and crown whichever faction
         -- pairs() yielded first, which in a young campaign is the only one in
-        -- GG.state - so the player led all six guilds at 0 reputation.
+        -- GG.state - so the player led every guild at 0 reputation.
         local guild = GG.GUILDS[gi]
         local best, best_rep = GG.leader_of(guild, GG.culture_of(me))
         rows[#rows + 1] = {guild = guild, faction_key = best,
@@ -2274,13 +2352,21 @@ end
 --
 -- Three numbers and no more: the line shares gg_rank_line's 750px with the tab's own
 -- header, and a fourth would push it past what fits.
+-- A COUNT AND ITS NOUN, the noun's _1 key for one (antislop audit 2026-10-09), as
+-- next_services_1 already did.
+function GGUI.count(n, key)
+    n = n or 0
+    local k = key
+    if n == 1 then k = key .. "_1" end
+    return n .. " " .. GGUI.loc(k)
+end
+
 function GGUI.rivals_line()
     local w = GG.world
     if not w or (w.turn or 0) == 0 then return GGUI.loc("rivals_idle") end
-    return GGUI.loc("rivals") .. " " .. (w.bought or 0) .. " "
-           .. GGUI.loc("rivals_bought") .. ", " .. (w.demands or 0) .. " "
-           .. GGUI.loc("rivals_demands") .. ", " .. (w.patrons or 0) .. " "
-           .. GGUI.loc("rivals_patrons")
+    return GGUI.loc("rivals") .. " " .. GGUI.count(w.bought, "rivals_bought") .. ", "
+           .. GGUI.count(w.demands, "rivals_demands") .. ", "
+           .. GGUI.count(w.patrons, "rivals_patrons")
 end
 
 -- WHAT THIS GUILD PAID YOU, AND FOR WHAT: the line under the Guilds tab's three cards,
@@ -2607,7 +2693,7 @@ function GGUI.draw_standings(faction)
             -- ever changes. Usually positive, because earning only adds - but a
             -- rivalry drain, a penalty or an expired demand can take it back, so the
             -- sign is read rather than assumed. Zero prints nothing rather than "+0",
-            -- which is clutter on six rows.
+            -- which is clutter on every row.
             local gain = (w.gain or {})[slot] or 0
             local cell = comp("row_leader", row)
             set_text(cell, GGUI.leader_fit(cell, L, faction, w.moved and w.moved[slot], gain))
@@ -2706,7 +2792,7 @@ function GGUI.ready_in(faction, guild)
     return n
 end
 
--- A guild's name and, when there is any, what is ready in it. The arrows and the six guild
+-- A guild's name and, when there is any, what is ready in it. The arrows and the guild
 -- buttons both say this, so they say it the same way.
 function GGUI.guild_tip(faction, guild)
     local t = GGUI.loc_guild(guild)
@@ -2978,7 +3064,7 @@ core:add_listener("gg_clicks", "ComponentLClickUp", true, function(context)
         GGUI.set_tab(6)
     elseif string.match(id, "^derpy_gg_row_%d+$") then
         -- Which guild the faction list below is about. The row index IS the guild index:
-        -- GGUI.leaders() builds its six rows in GG.GUILDS order.
+        -- GGUI.leaders() builds its rows in GG.GUILDS order.
         local n = tonumber(string.match(id, "(%d+)$"))
         if n then
             GGUI.STAND_GUILD = n

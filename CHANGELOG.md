@@ -3,6 +3,33 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-10-09 - build E8F55503
+
+MD5 `E8F555038ECAC0ABA8AC8DF9029CE786`, 50,494,385 bytes. Includes builds 84183968, F08C99CC
+and F41A33D9, which were not released on their own. Not yet seen in game.
+
+- **The Faith guild by each race's own lore:** its rank, leader, hall and Seat bonuses now
+  differ per race (the Colleges of Magic and others: Winds of Magic reserve; Ancestor
+  Temples: spell resistance; Grail and Asuryan: ward save; Khaine: melee attack; Orthodoxy:
+  leadership), with three signature services per race. The Empire's tithe moved from the
+  Engineers to the Colleges; the Engineers' service is now "Proofed Armour".
+- **Sharp text above 1080p:** a larger screen now picks a larger real panel size instead of
+  stretching the text, so it no longer blurs at 1440p.
+- **Rank-ups and "noticed you" notices** wait in the event feed instead of opening a popup.
+- **Hall icons** for the Chaos Dwarfs, Dwarfs and Empire, one per level, drawn from CA's own
+  building art for each race (art is not in this repo).
+- **Panel:** buttons you cannot use are greyed out; Help headings are larger; the Log
+  filters and the Skaven, High Elf, Kislev and Cathay text read clearly at Small and Large;
+  an empty bounty board says when new offers come; the footer names whose Favour it shows;
+  the Court shows each figure once and says "Due this turn"; "1 service", "1 turn".
+- **Text:** repeated guild descriptions rewritten, one completion line per guild instead of
+  one for every mission, "For 8 turns, units you recruit start 1 rank higher", the Patron's
+  figures in Help, and the hardest preset renamed from Cutthroat to Brutal (the Dark Elf
+  rule keeps that name; saves keep their setting).
+- Detail: `docs/design/2026-10-09-great-guilds-temple-lore-design.md`,
+  `docs/history/ANTISLOP_AUDIT_001_20261009.md` and
+  `docs/history/ANTISLOP_AUDIT_001_FIXLOG.md`.
+
 ## 2026-10-08 - build 2C6BCF55
 
 MD5 `2C6BCF55A6A66737C57DC1975164F47F`, 49,732,138 bytes. Small and Large seen in game.
