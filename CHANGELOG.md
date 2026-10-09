@@ -3,6 +3,20 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-10-09 - build DCE96F43
+
+MD5 `DCE96F435C30C5D9EFDCC4517ECB7BA7`, 50,543,334 bytes. Uploaded to the Workshop. Includes
+build E794804B, which was not released on its own.
+
+- **The guild button works when another mod's click script has an error.** A Workshop report
+  (Malakai): the button clicked and nothing opened. Since game patch 9.1 one mod's
+  `ComponentLClickUp` listener that throws stops every listener queued behind it, and this
+  mod loads last. `gg_clicks` now moves itself to the front of that queue, and its body runs
+  under `pcall` so it cannot block other mods' clicks in turn. A failed click writes
+  `GAVE UP on a click on <id>` to the script log.
+- Harness: the stub `core` keeps CA's listener queue; a throwing listener queued first proves
+  the move and the containment.
+
 ## 2026-10-09 - build 6EA73771
 
 MD5 `6EA73771A582BBFCCB72EFA15CF30688`, 50,542,201 bytes. Includes builds 2985E43E,

@@ -291,10 +291,16 @@ end
 -- lives inside a listener body is unreachable from any test that calls the function the
 -- listener calls - which is how GGAI's sweep ran on every one of ~190 faction turn
 -- starts a round while a harness that drove GGAI.run_turn directly saw nothing wrong.
+-- AND THE QUEUE IS CA'S SHAPE: core.event_listeners[event] is the list lib_core's
+-- dispatcher walks in order, so a test can ask where in it a listener sits.
 local listened, handlers = {}, {}
-core = {add_listener = function(_, name, event, _cond, fn)
+core = {event_listeners = {}, add_listener = function(self, name, event, cond, fn, persist)
     listened[event] = true
     handlers[name] = fn
+    self.event_listeners[event] = self.event_listeners[event] or {}
+    table.insert(self.event_listeners[event],
+                 {name = name, event = event, condition = cond, callback = fn,
+                  persistent = persist or false, to_remove = false})
 end}
 out = function() end
 
@@ -863,7 +869,46 @@ effect = {get_localised_string = function(k) return k end}
 cm.get_local_faction_name = function() return "cr_me" end
 UIComponent = function(x) return x end
 
+-- ANOTHER MOD'S CLICK HANDLER THAT THROWS, registered before ours as every earlier-loading
+-- mod's is (player report 2026-10-09, Malakai: "click sound, nothing opens"). Since 9.1
+-- lib_core calls listeners unprotected, so a throw unwinds the dispatch loop and every
+-- listener queued behind it never runs that click.
+core:add_listener("stranger_throws", "ComponentLClickUp", true,
+                  function() error("another mod's click handler") end, true)
+
 dofile("Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_ui.lua")
+
+do
+    -- lib_core's call pass with no protection: in queue order, a throw ends it.
+    local ran = {}
+    local function dispatch(event, context)
+        for _, l in ipairs(core.event_listeners[event]) do
+            if l.condition == true or l.condition(context) then
+                ran[#ran + 1] = l.name
+                l.callback(context)
+            end
+        end
+    end
+    -- An id no handler acts on: this asks whether gg_clicks is REACHED, not what it does.
+    pcall(dispatch, "ComponentLClickUp", {string = "harness_nothing"})
+    local reached = false
+    for _, n in ipairs(ran) do if n == "gg_clicks" then reached = true end end
+    assert(reached, "a throwing click listener registered earlier starves gg_clicks: "
+           .. "ran " .. table.concat(ran, ","))
+
+    -- AND BEING FIRST MUST NOT MAKE US THE THROWER: a click whose handling fails is
+    -- swallowed, so the listeners behind ours still run.
+    local open = GGUI.open
+    GGUI.open = function() error("open failed") end
+    local player_turn = GGUI.player_turn
+    GGUI.player_turn = function() return true end
+    local ok, err = pcall(handlers["gg_clicks"], {string = "gg_opener"})
+    GGUI.open, GGUI.player_turn = open, player_turn
+    assert(ok, "a throw inside gg_clicks escaped it: " .. tostring(err))
+
+    -- EVERY OTHER CHECK HERE CLICKS THROUGH gg_clicks: a failure must still fail them.
+    GGUI.click_failed = function(_, e) error(e, 0) end
+end
 
 GG.state = {a = {brass = {rep = 500, fav = 0}}, b = {brass = {rep = 900, fav = 0}}}
 -- BOTH IN ONE CULTURE, and the table is read AS a member of it. Leadership is per

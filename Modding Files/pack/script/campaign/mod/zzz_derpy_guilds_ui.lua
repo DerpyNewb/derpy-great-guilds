@@ -3038,7 +3038,13 @@ end
 
 -- ----------------------------------------------------------- interaction ---
 
-core:add_listener("gg_clicks", "ComponentLClickUp", true, function(context)
+-- FIRST IN THE CLICK QUEUE (player report 2026-10-09, Malakai: "click sound, nothing
+-- opens"). Since 9.1 lib_core calls listeners unprotected, and even its protected path's
+-- failure handler escapes the loop: one mod's ComponentLClickUp handler that throws
+-- abandons every listener queued behind it, logging nothing. This file loads late (zzz_),
+-- so it was queued behind them all. Moved to the front once registered; and pcall'd, so
+-- being first cannot make this the handler that starves the rest.
+function GGUI.on_click(context)
     local id = context.string
     if not id then return end
 
@@ -3116,7 +3122,27 @@ core:add_listener("gg_clicks", "ComponentLClickUp", true, function(context)
             GGUI.open()
         end
     end
+end
+
+-- Named, so the harness can make a failed click throw again instead of vanishing.
+function GGUI.click_failed(id, err)
+    GGUI.say("GAVE UP on a click on " .. tostring(id) .. ": " .. tostring(err))
+end
+
+core:add_listener("gg_clicks", "ComponentLClickUp", true, function(context)
+    local ok, err = pcall(GGUI.on_click, context)
+    if not ok then GGUI.click_failed(context.string, err) end
 end, true)
+
+pcall(function()
+    local list = core.event_listeners.ComponentLClickUp
+    for i = #list, 2, -1 do
+        if list[i].name == "gg_clicks" then
+            table.insert(list, 1, table.remove(list, i))
+            break
+        end
+    end
+end)
 
 -- The name of the component a clicked child sits in: card_buy's card, row_icon's row.
 function GGUI.parent_name(context)
