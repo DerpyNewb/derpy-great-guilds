@@ -3,6 +3,22 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-10-10 - build 587EF89E
+
+MD5 `587EF89EAFDB1E243CAEC1EB6389189E`, 50,528,055 bytes. Uploaded to the Workshop.
+
+- **Event messages read the way CA's do.** The large line under a message's title is now a
+  short subtitle ("A Rival Leads Them Now") and the sentences sit in the box below it; the
+  long text used to fill the large line with a one-line aside in the box. All 620 messages
+  rewritten: what happened, what it costs or gives, and which tab to check.
+- **The promotion hall line moved with it.** `GG.announce_rank` now picks a
+  `_secondary_hall` variant instead of `_primary_hall`; `check_message_text` refuses a
+  subtitle over 36 characters or ending in a full stop, and an empty box.
+- **One statement corrected.** The new-services message no longer promises "three new"
+  offers: `GG.draw_cards` keeps a card whose pool holds a single service.
+- **A demand says what missing it costs** up front: Reputation for most races, nothing for
+  the Skaven.
+
 ## 2026-10-09 - build 27793F84
 
 MD5 `27793F84B8489ABF9E88BA127FB4D76E`, 50,544,153 bytes. Uploaded to the Workshop.

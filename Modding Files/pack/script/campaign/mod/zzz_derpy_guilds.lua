@@ -6330,18 +6330,19 @@ function GG.announce_rank(faction, guild, old_rank, new_rank)
                       .. guild .. "_" .. new_rank .. GG.tag(faction)
             -- THE HALL LINE ("You may now raise a Lodge...") is its own key, read only
             -- while halls are on: with guild_halls off the locks keep every level shut.
-            local primary = k .. "_primary"
+            -- A sentence, so it rides in the body: _secondary_hall (2026-10-10).
+            local secondary = k .. "_secondary"
             if (not GG.setting or GG.setting("guild_halls") ~= false)
                and GG.HALL_TAGS[GG.tag(faction)]
                and (new_rank == GG.HALL_RANK[1] or new_rank == GG.HALL_RANK[2]) then
-                primary = k .. "_primary_hall"
+                secondary = k .. "_secondary_hall"
             end
             pcall(function()
-                cm:show_message_event(faction, k .. "_title", primary,
+                cm:show_message_event(faction, k .. "_title", k .. "_primary",
                                       -- true, not false: the record is a
                                       -- scripted_persistent_event and the flag has to
                                       -- agree with it or nothing draws.
-                                      k .. "_secondary", true,
+                                      secondary, true,
                                       GG.feed(faction, GG.FEED_INDEX_RANK))
             end)
             return

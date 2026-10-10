@@ -9722,26 +9722,33 @@ end)()
 -- and 4 open a hall level; with guild_halls off the locks keep every level shut, so the
 -- message must not promise one.
 ;(function()
-    local prims = {}
+    -- The hall line is a sentence, so it rides in the body: _secondary_hall (2026-10-10).
+    local secs, prims = {}, {}
     local prev_sme, prev_getter, prev_set = cm.show_message_event, cm.get_human_factions, GG.setting
-    cm.show_message_event = function(_, _f, _title, primary) prims[#prims + 1] = primary end
+    cm.show_message_event = function(_, _f, _title, primary, secondary)
+        prims[#prims + 1] = primary
+        secs[#secs + 1] = secondary
+    end
     local H = "cr_f5_chd"
     cm.get_human_factions = function() return {H} end
     GG.player_cultures_cache = nil
     local K = "message_event_text_text_derpy_gg_rank_"
     GG.announce_rank(H, "brass", 1, 2)
-    assert(prims[#prims] == K .. "brass_2_primary_hall",
-           "Indebted opens the Lodge: the hall key, got " .. tostring(prims[#prims]))
+    assert(secs[#secs] == K .. "brass_2_secondary_hall",
+           "Indebted opens the Lodge: the hall key, got " .. tostring(secs[#secs]))
     GG.announce_rank(H, "brass", 2, 3)
-    assert(prims[#prims] == K .. "brass_3_primary", "rank 3 opens no hall: the plain key, got "
-           .. tostring(prims[#prims]))
+    assert(secs[#secs] == K .. "brass_3_secondary", "rank 3 opens no hall: the plain key, got "
+           .. tostring(secs[#secs]))
     GG.announce_rank(H, "brass", 3, 4)
-    assert(prims[#prims] == K .. "brass_4_primary_hall", "Favoured opens the Hall")
+    assert(secs[#secs] == K .. "brass_4_secondary_hall", "Favoured opens the Hall")
     GG.setting = function(k) if k == "guild_halls" then return false end return prev_set(k) end
     GG.announce_rank(H, "slavers", 1, 2)
-    assert(prims[#prims] == K .. "slavers_2_primary",
-           "guild_halls off: the plain key, got " .. tostring(prims[#prims]))
-    assert(#prims == 4, "four promotions, four messages, got " .. #prims)
+    assert(secs[#secs] == K .. "slavers_2_secondary",
+           "guild_halls off: the plain key, got " .. tostring(secs[#secs]))
+    assert(#secs == 4, "four promotions, four messages, got " .. #secs)
+    -- The subtitle never varies: every promotion passes the plain _primary.
+    assert(prims[1] == K .. "brass_2_primary" and prims[3] == K .. "brass_4_primary",
+           "the hall variant moved out of _primary, got " .. tostring(prims[1]))
     GG.setting = prev_set
     cm.show_message_event, cm.get_human_factions = prev_sme, prev_getter
     GG.player_cultures_cache = nil
