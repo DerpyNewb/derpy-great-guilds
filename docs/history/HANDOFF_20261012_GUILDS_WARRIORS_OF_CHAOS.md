@@ -277,7 +277,7 @@ Deferred minors (the ledger has each):
 
 ## Open
 
-- **GitHub:** synced 2026-10-12 at build 33EF1D54, with README, CHANGELOG and DEVELOPMENT
+- **GitHub:** synced 2026-10-12 as commit 3de4623 (build 33EF1D54), with README, CHANGELOG and DEVELOPMENT
   updated. Re-sync after the upload if the build changes.
 - **The Empire's Small "Needs Journeyman"** at 2.7:1, see the Buy button paragraph.
 - **Norsca:** its own spec; §13 of this spec records the starting facts.
