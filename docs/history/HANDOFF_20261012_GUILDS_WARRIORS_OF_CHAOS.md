@@ -245,7 +245,8 @@ Deferred minors (the ledger has each):
 
 ## Open
 
-- **GitHub:** `repos/derpy-great-guilds` is not synced.
+- **GitHub:** synced 2026-10-12 as commit 8aa97a6 (build 1C79FD97), README, CHANGELOG and
+  DEVELOPMENT updated. Re-sync after the upload if the build changes.
 - **Norsca:** its own spec; §13 of this spec records the starting facts.
 - **The Dark Prince's build job:** he has none.
 - **The Plague Lord's 70% building share:** see above.
