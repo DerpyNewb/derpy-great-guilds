@@ -72,7 +72,14 @@ end
 -- texthbehaviour value that changes it. So a paragraph becomes a LIST OF LINES and
 -- each line gets its own component. Widths come from TextDimensionsForText, never
 -- from a character budget - the guess is what shipped "Shaken: Gemsto..." once.
-function GGUI.wrap(c, text, max_lines)
+--
+-- THE INSET IS NOT ROOM (2026-10-12): every wrapped cell draws its text GGUI.TEXT_INSET in
+-- from its left edge (gen_guilds_ui.LABEL_TX), so a line as wide as the cell ran that far
+-- past it. `lead` is a prefix the caller draws before every line - a help bullet, a log
+-- hang - and is measured with each one.
+GGUI.TEXT_INSET = 6
+
+function GGUI.wrap(c, text, max_lines, lead)
     if not c or not text or text == "" then return {} end
     local ok_w, w = pcall(function() return c:Dimensions() end)
     if not ok_w or not w or w <= 0 then return {text} end
@@ -80,7 +87,8 @@ function GGUI.wrap(c, text, max_lines)
     -- lines break where they break at 1x. The budget is put in whatever units the
     -- measurement below comes back in; see GGUI.text_ratio.
     local r = GGUI.text_ratio()
-    w = w * r / GGUI.S
+    w = (w / GGUI.S - GGUI.TEXT_INSET) * r
+    lead = lead or ""
     -- AN [[img:]] IS ONE WORD, AS WIDE AS ITS PICTURE (2026-10-05). CA's effect icons
     -- live under "ui/campaign ui/", so its spaces are held as \1 while the words are
     -- split, and the markup is charged GGUI.FLAG_W rather than measured as its path.
@@ -98,7 +106,7 @@ function GGUI.wrap(c, text, max_lines)
     local lines, cur = {}, nil
     for word in string.gmatch(text, "%S+") do
         local try = cur and (cur .. " " .. word) or word
-        local need = measure(try)
+        local need = measure(lead .. try)
         if need and need > w and cur then
             lines[#lines + 1] = cur
             if max_lines and #lines >= max_lines then
@@ -2161,7 +2169,8 @@ function GGUI.help_lines(ruler)
             -- \2 marks it for draw_help, which writes it to the header_14 cell.
             push("\2[[col:yellow]]" .. string.sub(seg, 2) .. "[[/col]]")
         elseif lead == "-" then
-            local wrapped = GGUI.wrap(ruler, string.sub(seg, 2), GGUI.HELP_SLOTS)
+            local wrapped = GGUI.wrap(ruler, string.sub(seg, 2), GGUI.HELP_SLOTS,
+                                      GGUI.HELP_BULLET)
             for i = 1, #wrapped do
                 push((i == 1 and GGUI.HELP_BULLET or GGUI.HELP_HANG) .. wrapped[i])
             end
@@ -2317,7 +2326,8 @@ function GGUI.log_lines(me, ruler)
         local text, bad
         if not keep or keep[entries[i].kind] then text, bad = GGUI.log_text(entries[i]) end
         if text then
-            local wrapped = GGUI.wrap(ruler, text, 3)
+            -- The hang, on the first line too: one budget for all three.
+            local wrapped = GGUI.wrap(ruler, text, 3, GGUI.HELP_HANG)
             if #wrapped == 0 then wrapped = {text} end
             for j = 1, #wrapped do
                 local line = (j == 1 and "" or GGUI.HELP_HANG) .. wrapped[j]

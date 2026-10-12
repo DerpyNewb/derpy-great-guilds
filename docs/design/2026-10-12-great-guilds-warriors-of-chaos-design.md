@@ -348,7 +348,7 @@ Recorded so the follow-up starts from it:
 
 ## 14. As shipped
 
-Built 2026-10-12 as 1C79FD97 (after the final review), deployed to the Workshop folder, not uploaded:
+Built 2026-10-12 as 33EF1D54 (after the final review, the Buy button and the wrap fix), deployed to the Workshop folder, not uploaded:
 `docs/sessions/HANDOFF_20261012_GUILDS_WARRIORS_OF_CHAOS.md`. Where it differs from this spec:
 - **§7 halls:** built in Dark Fortresses and the Glottkin's gardens, never Chaos Altars (the altar
   stops at level 2). No hall trains a unit; the Four's halls widen their Marauder pool and the

@@ -892,6 +892,15 @@ MUTANTS = [
     ("a weapon swap pays as a mark", M,
      b"string.sub(group, -8) == \"_to_self\" then return end",
      b"string.sub(group, -8) == \"_to_selfX\" then return end"),
+    ("a wrapped line is given the text inset as room", U,
+     b"w = (w / GGUI.S - GGUI.TEXT_INSET) * r",
+     b"w = (w / GGUI.S) * r"),
+    ("a help bullet is not measured with its line", U,
+     b"GGUI.HELP_BULLET)",
+     b"nil)"),
+    ("a log line is not measured with its hang", U,
+     b"GGUI.wrap(ruler, text, 3, GGUI.HELP_HANG)",
+     b"GGUI.wrap(ruler, text, 3)"),
 ]
 
 

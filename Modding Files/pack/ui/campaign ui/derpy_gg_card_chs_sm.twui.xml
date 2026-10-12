@@ -110,11 +110,15 @@
 				<component_image
 					this="GG220007-D001-4000-B000000000000007"
 					uniqueguid="GG220007-D001-4000-B000000000000007"
-					imagepath="ui/skins/default/button_square_medium_text_active.png"/>
+					imagepath="ui/skins/default/dlc26_wrath_of_khorne/button_square_extra_large_active.png"/>
 				<component_image
 					this="GG220007-D003-4000-B000000000000007"
 					uniqueguid="GG220007-D003-4000-B000000000000007"
-					imagepath="ui/skins/default/button_square_medium_text_hover.png"/>
+					imagepath="ui/skins/default/dlc26_wrath_of_khorne/button_square_extra_large_hover.png"/>
+				<component_image
+					this="GG220007-D005-4000-B000000000000007"
+					uniqueguid="GG220007-D005-4000-B000000000000007"
+					imagepath="ui/skins/default/path_to_glory/panel_selection_stroke.png"/>
 			</componentimages>
 			<states>
 				<standard
@@ -129,10 +133,10 @@
 							this="GG220007-D002-4000-B000000000000007"
 							uniqueguid="GG220007-D002-4000-B000000000000007"
 							componentimage="GG220007-D001-4000-B000000000000007"
-							offset="0.00,-3.43"
+							offset="0.00,0.00"
 							width="118"
-							height="50"
-							margin="8.00,8.00,8.00,8.00"/>
+							height="33"
+							margin="10.00,10.00,10.00,10.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition
@@ -161,10 +165,18 @@
 							this="GG220007-D004-4000-B000000000000007"
 							uniqueguid="GG220007-D004-4000-B000000000000007"
 							componentimage="GG220007-D003-4000-B000000000000007"
-							offset="0.00,-3.43"
+							offset="0.00,0.00"
 							width="118"
-							height="50"
-							margin="8.00,8.00,8.00,8.00"/>
+							height="33"
+							margin="10.00,10.00,10.00,10.00"/>
+						<image
+							this="GG220007-D006-4000-B000000000000007"
+							uniqueguid="GG220007-D006-4000-B000000000000007"
+							componentimage="GG220007-D005-4000-B000000000000007"
+							offset="0.00,0.00"
+							width="118"
+							height="33"
+							margin="4.00,4.00,4.00,4.00"/>
 					</imagemetrics>
 					<transitionmap>
 						<transition

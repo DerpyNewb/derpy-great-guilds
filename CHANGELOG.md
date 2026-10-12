@@ -3,6 +3,26 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-10-12 - build 33EF1D54
+
+MD5 `33EF1D54FFA6AA4F20EA6EA7E86B039F`, 55,229,842 bytes. Not yet uploaded and not yet tested in
+game. It includes build FBFCE371, which was not released on its own. Record:
+`docs/history/HANDOFF_20261012_GUILDS_WARRIORS_OF_CHAOS.md`.
+
+- **The Warriors of Chaos Buy button** is now the Wrath of Khorne square button, with the Path
+  to Glory stroke on hover. It replaces CA's default pill. A race's `FRAMES[tag]["buy"]`
+  overrides the pill.
+- **Text wraps inside its inset.** `GGUI.wrap` keeps clear of the 6px text inset
+  (`GGUI.TEXT_INSET`, held to `LABEL_TX` by `check_text_inset`). It also measures a Help
+  bullet or a Log indent along with each line, so no line overruns its box.
+- **The Warriors of Chaos god bar** is drawn at 90%. Its count badge now measures 4.5:1 or
+  better at every UI size.
+- **Preview:**
+  - the harness measures each label in the preview's own font, at that label's size
+    (`GG_DUMP_WIDTHS`);
+  - the preview greys whatever the Lua greys.
+- 284 mutants, all caught.
+
 ## 2026-10-12 - build 1C79FD97
 
 MD5 `1C79FD97EF4B0CCAAE83AB1E49EB401F`, 55,227,622 bytes. Not yet uploaded; not yet tested in

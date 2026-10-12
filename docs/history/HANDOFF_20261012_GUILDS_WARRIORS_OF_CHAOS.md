@@ -4,15 +4,17 @@ Tenth race of `derpy_great_guilds.pack`. Spec:
 `docs/superpowers/specs/2026-10-12-great-guilds-warriors-of-chaos-design.md`. Plan, with its 16
 plan-time rulings: `docs/superpowers/plans/2026-10-12-great-guilds-warriors-of-chaos.md`.
 
-**Built** 2026-10-12 13:00 after the final review's fix pass and the MCT taint tooltip fix,
-MD5 `1c79fd97ef4b0ccaae83ab1e49eb401f` (55,227,622 bytes, 544 files). Saved pack verified by the
+**Built** 2026-10-12 15:40 after the final review's fix pass, the MCT taint tooltip fix, the
+Buy button and the wrap fix, MD5 `33ef1d54ffa6aa4f20ea6ea7e86b039f` (55,229,842 bytes, 544 files). Saved pack verified by the
 importer. **Deployed to the Workshop folder** (item 3815248936); the MD5s match. Not in `data/`.
 **Not uploaded**: that is the author's call.
 
 The pre-build copies (`bb7a22ce`, Modpacks and Workshop identical) are in
 `Modding Files/Backup/guilds_pre_chs_20261012/`; the first build, `9ed7d543`, is in
 `Modding Files/Backup/guilds_pre_review_fix_20261012/`, and the review-fix build, `658bf0e1`,
-in `Modding Files/Backup/guilds_pre_mct_fix_20261012/`.
+in `Modding Files/Backup/guilds_pre_mct_fix_20261012/`, `1c79fd97` in
+`Modding Files/Backup/guilds_pre_buy_button_20261012/`, and `fbfce371` in
+`Modding Files/Backup/guilds_pre_wrap_fix_20261012/`.
 
 ## The race
 
@@ -158,7 +160,7 @@ garden chains all match `nurgle_garden`. That is a balance question for the auth
 - **Previews:** `preview_guilds_panel.py --flavour chs` exit 0 with no TOO WIDE and no LOW
   CONTRAST. The Gods (pages 1 and 7), Leaderboard, Bounties, Court and Help pages 2 and 7 were read.
 - **Harnesses:** both green.
-- **Mutation:** 281 of 281 caught, 14 new.
+- **Mutation:** 284 of 284 caught (281 at the first build).
 - **Lua:** luac on all five Lua files, `check_lua_api` 0, `check_lua_literal_left` 0,
   `check_lua_undeclared` 0 (baseline 0).
 - **Pack:** duplicated combined keys 0 across 23 DB tables (schema `is_key`).
@@ -229,6 +231,36 @@ After the review, the MCT "tainted provinces" slider still said "Skaven corrupti
 only" though it now pays the Warriors of Chaos too. It names both corruptions now, and
 `check_mct_names` fails a taint race whose corruption that tooltip does not name.
 
+**The Buy button** (after an in-game screenshot, 2026-10-12): CA's default pill, greyed shut
+by the Lua, read as a stray grey capsule on the race's spiked bronze cards. The Warriors of
+Chaos culture skin ships no buttons, so three Chaos panels' art was rendered side by side
+(`docs/mockups/guilds_chs_buy_20261012/compare.png`) and the author chose the Wrath of Khorne
+square button, 10px slices, with the Path to Glory stroke on hover (`FRAMES["_chs"]["buy"]`;
+`_card` uses a race's `buy` entry and falls back to the default pill). The preview had drawn
+every Buy live and red: the harness dump now carries each component's shader and
+`preview_guilds_panel.py` greys what a `set_greyscale_t0` component drew, text included.
+Rendered at all three sizes. That found two faults from before this change, both fixed in
+build 33EF1D54. That build differs from FBFCE371 only in the UI Lua and the three Chaos panel
+files:
+
+- **"Needs Chosen" 2px too wide at Small** was the preview's fault. The harness measured text
+  at 7px a character, but the preview drew it in PIL's font. With `GG_DUMP_WIDTHS` set, the
+  harness now measures each component with the preview font's own advances at that
+  component's size, and the label fits.
+- **The honest measure found a real fault** that the old one hid. `GGUI.wrap` filled the whole
+  box, though text sits 6px in (`LABEL_TX`). It also measured a Help bullet and a Log line
+  without the indent drawn in front of them. A line could therefore overrun its box by a few
+  pixels. The wrap now subtracts `GGUI.TEXT_INSET` and measures the optional `lead` with each
+  line. `check_text_inset` holds the inset to `LABEL_TX`; two harness cases and three mutants
+  pin the rest.
+- **The god bar's count badge** measured 3.9:1 at Small and 4.3:1 at Large on the bronze bar.
+  The bar is now drawn at 90% (`#E6E6E6FF`), the lightest of five tints tried that clears 4.5:1
+  at all three sizes.
+
+All ten races preview clean at all three sizes, except one finding from before this session:
+the Empire's Small "Needs Journeyman" measures 2.7:1. Its text sits over the Gardens of Morr
+slot rim, because `NEED_PAD` (10) is less than the rim's depth.
+
 Not fixed, a ruling: the Gifts route is uncapped for the Changer of Ways, because
 `GG.CAP.daemonsmiths = 0` is every race's rule. A large Souls spend on Tzeentch can climb ranks
 in one turn; a gifts-only limit is one number if it plays badly.
@@ -245,8 +277,9 @@ Deferred minors (the ledger has each):
 
 ## Open
 
-- **GitHub:** synced 2026-10-12 as commit 8aa97a6 (build 1C79FD97), README, CHANGELOG and
-  DEVELOPMENT updated. Re-sync after the upload if the build changes.
+- **GitHub:** synced 2026-10-12 at build 33EF1D54, with README, CHANGELOG and DEVELOPMENT
+  updated. Re-sync after the upload if the build changes.
+- **The Empire's Small "Needs Journeyman"** at 2.7:1, see the Buy button paragraph.
 - **Norsca:** its own spec; §13 of this spec records the starting facts.
 - **The Dark Prince's build job:** he has none.
 - **The Plague Lord's 70% building share:** see above.

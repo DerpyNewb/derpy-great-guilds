@@ -6491,14 +6491,16 @@ end)()
     k = 1
     local ICON = "[[img:ui/campaign ui/effect_bundles/melee.png]][[/img]]"
     local words = ICON .. " +6 melee attack for the army you select, for 5 turns."
-    local fits = #GGUI.bare(words) * 10 + GGUI.FLAG_W
+    -- LABEL_TX's 6px: gen_guilds_ui draws every wrapped cell's text that far in.
+    local INSET = 6
+    local fits = #GGUI.bare(words) * 10 + GGUI.FLAG_W + INSET
     local one = GGUI.wrap(cell(fits), words)
     assert(#one == 1 and one[1] == words,
            "an icon and its sentence fit on one line, got " .. table.concat(one, "|"))
     assert(#GGUI.wrap(cell(fits - 1), words) > 1, "the icon's width is paid for")
     -- Mid-line, where a split at the path's space would put a break between its halves.
     local mid = "abcdefghi " .. ICON
-    local got = GGUI.wrap(cell(#GGUI.bare(mid) * 10 + GGUI.FLAG_W), mid)
+    local got = GGUI.wrap(cell(#GGUI.bare(mid) * 10 + GGUI.FLAG_W + INSET), mid)
     assert(#got == 1 and got[1] == mid, "an icon after a word stays on its line, got "
            .. table.concat(got, "|"))
     local many = GGUI.wrap(cell(120), words)
@@ -6509,6 +6511,35 @@ end)()
         assert(opens == shuts, "a line cut an icon's markup in two: " .. l)
     end
     assert(table.concat(many, " ") == words, "the wrap lost or changed a word")
+
+    -- THE INSET IS NOT ROOM (2026-10-12). A cell draws its text INSET in from its left edge,
+    -- so a line as wide as the cell ran that far past its right one - help line 3, once the
+    -- preview measured in the font it draws in.
+    local ten = "abcd abcde"                                       -- 100 wide
+    assert(#GGUI.wrap(cell(100), ten) == 2, "a line as wide as its cell leaves the inset no room")
+    assert(#GGUI.wrap(cell(100 + INSET), ten) == 1, "the inset and the line together fit")
+    -- A PREFIX DRAWN BEFORE EVERY LINE is measured with it: a help bullet, a log hang.
+    local lead = GGUI.HELP_BULLET
+    assert(#GGUI.wrap(cell(100 + INSET), ten, nil, lead) == 2, "the bullet is paid for")
+    assert(#GGUI.wrap(cell(100 + INSET + #lead * 10), ten, nil, lead) == 1,
+           "a cell wide enough for bullet, inset and line holds it")
+    -- And the Help tab hands its bullet over.
+    local keep_loc, keep_page = GGUI.loc, GGUI.HELP_PAGE
+    GGUI.loc = function(key) return key == "help_p1" and ("-" .. ten) or key end
+    GGUI.HELP_PAGE = 1
+    local hl = GGUI.help_lines(cell(100 + INSET))
+    GGUI.loc, GGUI.HELP_PAGE = keep_loc, keep_page
+    assert(#hl == 2, "a bullet that fits only without its bullet wraps, got "
+           .. table.concat(hl, "|"))
+    -- And the Log hands its hang over, on the first line as well.
+    local keep_le, keep_lt, keep_lf = GG.log_entries, GGUI.log_text, GGUI.LOG_FILTER
+    GG.log_entries = function() return {{kind = "x"}} end
+    GGUI.log_text = function() return ten end
+    GGUI.LOG_FILTER = "no such filter"
+    local ll = GGUI.log_lines("wrap_test", cell(100 + INSET))
+    GG.log_entries, GGUI.log_text, GGUI.LOG_FILTER = keep_le, keep_lt, keep_lf
+    assert(#ll == 2, "a log line that fits only without its hang wraps, got "
+           .. table.concat(ll, "|"))
 end)()
 
 -- ------------------------------------------------ multiplayer: clicks travel --
@@ -7444,7 +7475,7 @@ end)()
         f.SetDisabled = function(self, b) dis[self.key] = b end
         f.ShaderTechniqueSet = function(self, s) shader[self.key] = s end
         f.SetImagePath = function(self, p, i) imgs[self.key .. "#" .. tostring(i)] = p end
-        f.TextDimensionsForText = function(_, s) return measure(s), 18 end
+        f.TextDimensionsForText = function(self, s) return measure(s, self.nm), 18 end
         f.CreateComponent = function(self, n)
             if self.key == "root" and not refuse[n] then made[n] = true end
             gone[norm(self.key, n)] = nil
@@ -8534,6 +8565,26 @@ end)()
         -- measured width lands at Medium's.
         local keep_measure = measure
         measure = function(s) return keep_measure(s) * GGUI.SIZES[dsize].f end
+        -- GG_DUMP_WIDTHS: THE PREVIEW'S OWN FONT (2026-10-12). preview_guilds_panel.py
+        -- writes each text component's size in this size's files and every byte's advance
+        -- at that size, so a plate the Lua sizes from TextDimensionsForText is sized in the
+        -- font the preview draws it in. Seven pixels a character reported labels the game
+        -- sizes to fit as 2-5px too wide at Small and Large.
+        local wpath = os.getenv("GG_DUMP_WIDTHS")
+        if wpath then
+            local W, scaled = dofile(wpath), measure
+            measure = function(s, nm)
+                local sz = nm and W.size[nm]
+                if not sz then return scaled(s) end
+                local t, n = W.w[sz], 0
+                for i = 1, #s do
+                    local b = string.byte(s, i)
+                    if b < 128 then n = n + (t[b] or sz * 0.5)
+                    elseif b >= 192 then n = n + sz * 0.6 end   -- a UTF-8 lead byte
+                end
+                return n
+            end
+        end
         local dsfx = GGUI.SIZES[dsize].suffix
         SIZE = {}
         for _, fn in ipairs({"panel", "card", "row", "list", "frow"}) do
@@ -8569,7 +8620,8 @@ end)()
                     out:write(table.concat({key, m and m[1] or "", m and m[2] or "",
                                             s and s[1] or "", s and s[2] or "",
                                             tostring(vis[key] ~= false), clean(texts[key]),
-                                            table.concat(pics, ";")}, "\t"), "\n")
+                                            table.concat(pics, ";"), shader[key] or ""}, "\t"),
+                              "\n")
                 end
             end
             out:close()

@@ -1288,7 +1288,11 @@ FRAMES = {
         "rank_tx": "70.00,0.00", "rank_ty": "8.00,0.00",
         # The Warriors' HUD button bar, 467x71: the Skaven/High Elf shape, 85px ends, its
         # spikes (columns 10-60 and 407-457) outside the end buttons.
-        "gbar": [_L("ui/skins/wh3_dlc20_chs_chaos/bar_small_buttons.png", (0, 85, 0, 85))],
+        # AT 90% (2026-10-12): the gold count on each god button's corner sits on this
+        # bronze, which measured 3.9:1 at Small and 4.3:1 at Large undimmed. 90% is the
+        # lightest of 100/90/86/82/78 that clears 4.5:1 at all three sizes.
+        "gbar": [_L("ui/skins/wh3_dlc20_chs_chaos/bar_small_buttons.png", (0, 85, 0, 85),
+                    colour="#E6E6E6FF")],
         # Tamurkhan's subtitle bar, 406x46, pointed ends to column 40. Standard dimmed, hover
         # at full brightness, the open tab ringed by the Path to Glory stroke.
         "tab": {"layers": [_L(_TC + "subtitle.png", (0, 40, 0, 40), colour=_DIM),
@@ -1296,6 +1300,16 @@ FRAMES = {
                 "hover": [_L(_TC + "subtitle.png", (0, 40, 0, 40)), _L(CLEAR, 4)],
                 "selected": [_TC + "subtitle.png", _PG + "panel_selection_stroke.png"],
                 "selected_hover": [_TC + "subtitle.png", _PG + "panel_selection_stroke.png"]},
+        # THE BUY BUTTON (2026-10-12, chosen from a rendered comparison): the Wrath of
+        # Khorne panel's square button, 122x82 with a 10px brass rim, square like the price
+        # box above it and the card around it. CA's default pill read as a stray grey
+        # capsule once the Lua greyed it shut. Its hover art barely differs from its
+        # active, so hover adds the Path to Glory stroke the open tab wears.
+        "buy": {"layers": [_L(_D + "dlc26_wrath_of_khorne/button_square_extra_large_active.png",
+                              10)],
+                "hover": [_L(_D + "dlc26_wrath_of_khorne/button_square_extra_large_hover.png",
+                             10),
+                          _L(_PG + "panel_selection_stroke.png", 4)]},
         # The Souls bar, 272x26: its dark back under its frame, both fitted so the frame's
         # opening (x 8-263, rows 8-18) holds the fixed fill rect; the Undivided fill CA
         # draws in it, already the Empire's and Bretonnia's.
@@ -1463,7 +1477,11 @@ def _card(tag=""):
     for name in sorted(CARD_LAYOUT):
         _x, _y, w, h = CARD_LAYOUT[name]
         if name == "card_buy":
-            kw = dict(BTN_TEXT, layers=plate(h, "active"), hover=plate(h, "hover"),
+            # A RACE'S OWN BUY PLATE (FRAMES[tag]["buy"], 2026-10-12), else CA's default
+            # pill. The Lua greys a shut one with set_greyscale_t0, so one state set is all
+            # it needs: what it looks like live, and hovered.
+            b = f.get("buy") or {"layers": plate(h, "active"), "hover": plate(h, "hover")}
+            kw = dict(BTN_TEXT, layers=b["layers"], hover=b["hover"],
                       interactive=True, sound=SOUND_BUY)
         elif name == "card_icon":
             kw = {"layers": holder_layers(w, h, CARD_GLYPH,
@@ -3100,6 +3118,7 @@ def check():
                        % (m and m.group(1), CARD_OFF))
         out += check_frame_mirror(src)
         out += check_header_inset(src)
+        out += check_text_inset(src)
 
     out += check_frame_files(files)
     out += check_pulses(files)
@@ -3214,6 +3233,20 @@ def check_header_inset(src):
             out.append("GGUI.HEADER_INSET[%r] is %r but rank_tx + RANK_STATS_PAD is %r"
                        % (tag, got.get(tag), want))
     return out
+
+
+def check_text_inset(src):
+    """GGUI.TEXT_INSET must be LABEL_TX's left inset.
+
+    GGUI.wrap takes it off a cell's width: the text is drawn that far in, so a line as wide
+    as the cell ran past it (help line 3 at Small and Large, 2026-10-12).
+    """
+    m = re.search(r"GGUI\.TEXT_INSET\s*=\s*([\d.]+)", src)
+    want = float(LABEL_TX.split(",")[0])
+    if not m or float(m.group(1)) != want:
+        return ["GGUI.TEXT_INSET is %r but LABEL_TX draws text %rpx in - GGUI.wrap would give "
+                "a line room its cell does not have" % (m and m.group(1), want)]
+    return []
 
 
 # THE CHAOS DWARFS' OWN ART, by where CA keeps it. None of it may be in another race's frame.
@@ -3385,6 +3418,13 @@ def selftest():
                 "an open Bretonnian tab with fewer layers than its slot was not reported"
         finally:
             FRAMES["_brt"]["tab"]["selected"] = saved
+
+    # THE TEXT INSET MIRROR CAN FAIL: a GGUI.TEXT_INSET a pixel off LABEL_TX is reported.
+    if os.path.isfile(lua_path):
+        assert not check_text_inset(lua), check_text_inset(lua)
+        off = re.sub(r"(GGUI\.TEXT_INSET\s*=\s*)6", r"\g<1>5", lua, count=1)
+        assert off != lua, "the text inset mutation no longer matches the Lua"
+        assert check_text_inset(off), "a GGUI.TEXT_INSET off LABEL_TX was not reported"
 
     # THE SLIDER PIN CAN FAIL: one number of one part moved is reported.
     if os.path.isfile(lua_path):
