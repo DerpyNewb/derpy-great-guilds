@@ -5,8 +5,8 @@ Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry 
 
 ## 2026-10-12 - build 33EF1D54
 
-MD5 `33EF1D54FFA6AA4F20EA6EA7E86B039F`, 55,229,842 bytes. Not yet uploaded and not yet tested in
-game. It includes build FBFCE371, which was not released on its own. Record:
+MD5 `33EF1D54FFA6AA4F20EA6EA7E86B039F`, 55,229,842 bytes. Uploaded to the Workshop 2026-10-12;
+not yet tested in game. It includes build FBFCE371, which was not released on its own. Record:
 `docs/history/HANDOFF_20261012_GUILDS_WARRIORS_OF_CHAOS.md`.
 
 - **The Warriors of Chaos Buy button** is now the Wrath of Khorne square button, with the Path

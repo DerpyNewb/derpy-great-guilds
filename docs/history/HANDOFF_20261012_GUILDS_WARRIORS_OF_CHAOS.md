@@ -7,7 +7,7 @@ plan-time rulings: `docs/superpowers/plans/2026-10-12-great-guilds-warriors-of-c
 **Built** 2026-10-12 15:40 after the final review's fix pass, the MCT taint tooltip fix, the
 Buy button and the wrap fix, MD5 `33ef1d54ffa6aa4f20ea6ea7e86b039f` (55,229,842 bytes, 544 files). Saved pack verified by the
 importer. **Deployed to the Workshop folder** (item 3815248936); the MD5s match. Not in `data/`.
-**Not uploaded**: that is the author's call.
+**Uploaded 2026-10-12 18:55** (manifest 1467718567190236466, notes `PATCH_NOTES_GREAT_GUILDS_20261012.md`).
 
 The pre-build copies (`bb7a22ce`, Modpacks and Workshop identical) are in
 `Modding Files/Backup/guilds_pre_chs_20261012/`; the first build, `9ed7d543`, is in
