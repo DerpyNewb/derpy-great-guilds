@@ -123,6 +123,24 @@ GG.RIVALS = {
     overseers    = "slavers",      slavers      = "overseers",
 }
 
+-- EACH RACE MAY PAIR ITS OWN RIVALS (woc spec §4.1, 2026-10-12). The Warriors of Chaos
+-- follow the gods' own feuds - Khorne against Slaanesh, Nurgle against Tzeentch, as CA's
+-- own wh_dlc08_norscan_gods.lua pairs them - and the two renegade gods against each other.
+-- Every other race keeps GG.RIVALS. Written both ways, like GG.RIVALS.
+GG.RIVALS_RACE = {
+    ["wh_main_chs_chaos"] = {
+        immortals = "slavers",      slavers      = "immortals",
+        overseers = "daemonsmiths", daemonsmiths = "overseers",
+        brass     = "khanate",      khanate      = "brass",
+    },
+}
+
+-- The rival of `guild` for `faction`'s race. EVERY rivalry read goes through here.
+function GG.rival_of(faction, guild)
+    local t = GG.RIVALS_RACE[GG.culture_of(faction) or ""] or GG.RIVALS
+    return t[guild]
+end
+
 -- Reputation lost by a guild whose rival just earned, as a percentage of that earning.
 -- Applied AFTER the gain, so a turn that pays both sides of a pair nets out rather than
 -- depending on which listener happened to fire first.
@@ -141,7 +159,7 @@ function GG.rival_loss(amount, faction)
 end
 
 function GG.rival_cost(faction, guild, amount)
-    local rival = GG.RIVALS[guild]
+    local rival = GG.rival_of(faction, guild)
     if not rival or not amount or amount <= 0 then return 0 end
     local share = GG.setting_for(faction, "rate_rivalry")
     if not share or share <= 0 then return 0 end
@@ -353,9 +371,14 @@ local function gain_key(faction) return "derpy_gg_gain_" .. faction end
 
 function GG.save_gain(faction)
     local parts = {}
-    for i = 1, #GG.GUILDS do
-        local n = (GG.turn_gain[faction] or {})[GG.GUILDS[i]]
-        if n and n > 0 then parts[#parts + 1] = GG.GUILDS[i] .. "=" .. n end
+    -- Each guild's limit, then its recruiting limit (rec_<guild>, GG.on_recruit). In
+    -- GG.GUILDS order, never pairs(), so every machine writes the same string.
+    for _, pre in ipairs({"", "rec_"}) do
+        for i = 1, #GG.GUILDS do
+            local k = pre .. GG.GUILDS[i]
+            local n = (GG.turn_gain[faction] or {})[k]
+            if n and n > 0 then parts[#parts + 1] = k .. "=" .. n end
+        end
     end
     cm:set_saved_value(gain_key(faction), table.concat(parts, ","))
 end
@@ -509,7 +532,7 @@ end
 -- An upper bound - GG.rival_cost may take less at a rank floor - which only makes the
 -- hold a little stickier.
 function GG.turn_start_charge(faction, guild)
-    if GG.RIVALS[guild] ~= "brass" then return 0 end
+    if GG.rival_of(faction, guild) ~= "brass" then return 0 end
     return GG.rival_loss(GG.turn_start_pay(faction, "brass"), faction)
 end
 
@@ -561,7 +584,7 @@ end
 
 -- THE TEMPLE'S ROUTES (temple spec §3.2, 2026-10-04), per culture. `devout`: a province in
 -- good order. `chaos`: a province with no Chaos corruption, and `vampiric` adds the undead's.
--- `holy`: the cultures a won battle must be against. `priests`: the hero subtypes whose
+-- `taint`: a province carrying the named corruption resource. `holy`: the cultures a won battle must be against. `priests`: the hero subtypes whose
 -- successful actions pay the temple instead of the spies. Not behind race_differences:
 -- this is the guild's base income. Mirrored by TEMPLE_ROUTES in tools/gen_great_guilds.py,
 -- which runs the block between the two marker lines under lua.exe and compares.
@@ -592,13 +615,400 @@ GG.TEMPLE_ROUTES = {
     -- THE GREY SEERS (skaven spec §3.2): no devout and no chaos route - the Under-Empire
     -- SPREADS corruption - so `taint` pays per province carrying Skaven corruption. No
     -- priests route: every Grey Seer subtype is a lord (faction_agent_permitted_subtypes).
-    ["wh2_main_skv_skaven"] = {taint = true,
+    ["wh2_main_skv_skaven"] = {taint = "wh3_main_corruption_skaven",
         holy = {"wh_main_dwf_dwarfs", "wh2_main_lzd_lizardmen"}},
+    -- THE UNDIVIDED (woc spec §3.3): the Warriors of Chaos ARE the corruption, so no devout
+    -- or clean route - `taint` pays per province carrying Undivided Chaos corruption. Their
+    -- priests are the UNMARKED Chaos Sorcerers; a marked one pays the Undoer like any hero.
+    ["wh_main_chs_chaos"] = {taint = "wh3_main_corruption_chaos",
+        holy = {"wh_main_emp_empire", "wh3_main_ksl_kislev", "wh3_main_cth_cathay"},
+        priests = {"wh_main_chs_chaos_sorcerer_fire", "wh_main_chs_chaos_sorcerer_death",
+                    "wh_main_chs_chaos_sorcerer_metal", "wh_dlc07_chs_chaos_sorcerer_shadow"}},
 }
 -- END TEMPLE ROUTES
 
 function GG.temple_routes(faction)
     return GG.TEMPLE_ROUTES[GG.culture_of(faction) or ""]
+end
+
+-- WHICH GUILD A RECRUIT PAYS (2026-10-11), per culture: `units` for UnitTrained,
+-- `characters` for CharacterRecruited. Read top to bottom; the first rule that fits wins,
+-- and a recruit no rule fits pays nothing. A rule whose guild is `false` pays nothing on
+-- purpose, for a unit that matches a fallback below it but belongs to no guild.
+--
+-- MATCHED ON WHAT THE UNIT IS, NOT A LIST OF KEYS, so modded units pay too. `key` is a
+-- plain substring of the unit key (a character's: its subtype key), so a modded unit named
+-- the CA way is caught; it may hold only [a-z0-9_]. `caste` names a GG.CASTES group, read
+-- off main_units.caste; `class` is land_units.class. Neither alone is enough: CA files
+-- every monster and Bull Centaur as class inf_mel, and gives Bull Centaurs and Wolf Raiders
+-- the same caste. `agent` is the agents-table type, `caster` agent_subtypes.is_caster.
+--
+-- EACH RACE OPENS WITH ITS HALL FAMILIES: a guild hall's own unit pays that hall's guild,
+-- every variant of it (user ruling, 2026-10-11). check_recruit_routes() in
+-- tools/gen_great_guilds.py runs this block under lua.exe against every race's vanilla
+-- roster and refuses a hall unit that pays another guild or a `key` that matches nothing.
+-- BEGIN RECRUIT ROUTES
+GG.CASTES = {
+    infantry = {melee_infantry = true, missile_infantry = true},
+    cavalry = {melee_cavalry = true, missile_cavalry = true, monstrous_cavalry = true},
+    beasts = {monster = true, monstrous_infantry = true, war_beast = true},
+    engines = {warmachine = true, chariot = true},
+}
+GG.RECRUIT_ROUTES = {
+    ["wh3_dlc23_chd_chaos_dwarfs"] = {
+        units = {
+            {"temple", key = "lammasu"},
+            {"brass", key = "wolf_raiders"},
+            {"overseers", key = "chaos_dwarf_warriors"},
+            {"slavers", key = "cutthroats"},
+            {"khanate", key = "hobgoblin"},
+            {"overseers", key = "labourer"},
+            {"slavers", key = "giant"},
+            -- A Bull Centaur: cavalry by caste, infantry by class. Catches the Temple Guard.
+            {"temple", caste = "cavalry", class = "inf_mel"},
+            {"khanate", caste = "cavalry"},
+            {"immortals", caste = "infantry"},
+            {"daemonsmiths", caste = "beasts"},
+            {"daemonsmiths", caste = "engines"},
+        },
+        characters = {
+            {"brass", key = "convoy"},
+            {"temple", agent = "general", caster = true},
+            {"overseers", agent = "general"},
+            {"daemonsmiths", agent = "wizard"},
+            {"immortals", agent = "engineer"},
+            {"temple", agent = "champion"},
+            {"khanate", agent = "spy"},
+        },
+    },
+    ["wh_main_emp_empire"] = {
+        units = {
+            {"brass", key = "pistoliers"},
+            {"immortals", key = "greatswords"},
+            {"daemonsmiths", key = "helblaster"},
+            {"khanate", key = "huntsmen"},
+            {"overseers", key = "halberdiers"},
+            {"slavers", key = "free_company"},
+            {"khanate", key = "hunting_hounds"},
+            {"daemonsmiths", key = "outriders"},
+            {"temple", key = "luminark"},
+            {"temple", key = "hurricanum"},
+            {"immortals", caste = "cavalry"},
+            {"immortals", caste = "infantry"},
+            {"daemonsmiths", caste = "engines"},
+        },
+        characters = {
+            {"khanate", key = "hunt"},
+            {"khanate", key = "wulfhart"},
+            {"daemonsmiths", key = "engineer"},
+            {"temple", agent = "wizard"},
+            {"temple", agent = "general", caster = true},
+            {"khanate", agent = "spy"},
+            {"immortals", agent = "champion"},
+            {"immortals", agent = "general"},
+        },
+    },
+    ["wh_main_dwf_dwarfs"] = {
+        units = {
+            {"temple", key = "giant_slayers"},
+            {"slavers", key = "slayer"},
+            {"slavers", key = "doomseekers"},
+            {"brass", key = "thunderers"},
+            {"immortals", key = "hammerers"},
+            {"khanate", key = "rangers"},
+            {"overseers", key = "miners"},
+            {"daemonsmiths", key = "organ_gun"},
+            {"daemonsmiths", key = "irondrakes"},
+            {"daemonsmiths", caste = "engines"},
+            {"immortals", caste = "infantry"},
+        },
+        -- EVERY DWARF CHARACTER IS A CASTER (agent_subtypes.is_caster), so `caster` cannot
+        -- tell a Runelord from a Thane here; the agent type and the key do it instead.
+        characters = {
+            {"temple", key = "slayer"},
+            {"temple", key = "runelord"},
+            {"temple", agent = "runesmith"},
+            {"daemonsmiths", agent = "engineer"},
+            {"immortals", agent = "champion"},
+            {"immortals", agent = "general"},
+        },
+    },
+    ["wh_main_brt_bretonnia"] = {
+        units = {
+            {"temple", key = "grail_knights"},
+            {"temple", key = "grail_guardians"},
+            {"temple", key = "questing"},
+            {"daemonsmiths", key = "grail_reliquae"},
+            {"slavers", key = "battle_pilgrims"},
+            {"khanate", key = "peasant_bowmen"},
+            {"brass", key = "mounted_yeomen"},
+            {"overseers", key = "trebuchet"},
+            {"immortals", key = "knights_errant"},
+            {"immortals", caste = "cavalry"},
+            {"slavers", caste = "infantry"},
+        },
+        characters = {
+            {"daemonsmiths", agent = "wizard"},
+            {"daemonsmiths", agent = "general", caster = true},
+            {"immortals", agent = "champion"},
+            {"immortals", agent = "general"},
+        },
+    },
+    ["wh3_main_cth_cathay"] = {
+        units = {
+            {"temple", key = "terracotta"},
+            {"temple", key = "lion"},
+            {"temple", key = "moon_bird"},
+            {"khanate", key = "crowmen"},
+            {"brass", key = "peasant_horsemen"},
+            {"slavers", key = "jade_lancers"},
+            {"overseers", key = "jade_warrior"},
+            {"immortals", key = "dragon_guard"},
+            {"daemonsmiths", key = "rocket_battery"},
+            {"daemonsmiths", caste = "engines"},
+            {"slavers", caste = "cavalry"},
+            {"slavers", caste = "infantry"},
+        },
+        characters = {
+            {"brass", key = "caravan"},
+            {"daemonsmiths", agent = "wizard"},
+            {"daemonsmiths", agent = "engineer"},
+            {"temple", agent = "general", caster = true},
+            {"khanate", agent = "spy"},
+            {"immortals", agent = "champion"},
+            {"immortals", agent = "general"},
+        },
+    },
+    ["wh3_main_ksl_kislev"] = {
+        units = {
+            {"temple", key = "bear"},
+            {"daemonsmiths", key = "ice_guard"},
+            {"brass", key = "streltsi"},
+            {"immortals", key = "tzar_guard"},
+            {"khanate", key = "akshina"},
+            {"overseers", key = "kossars"},
+            {"slavers", key = "horse_"},
+            {"daemonsmiths", key = "frost_wyrm"},
+            {"daemonsmiths", key = "snow_leopard"},
+            {false, key = "things_in_the_woods"},
+            {"slavers", caste = "engines"},
+            {"immortals", caste = "cavalry"},
+            {"immortals", caste = "infantry"},
+        },
+        characters = {
+            {"temple", key = "kostaltyn"},
+            {"temple", agent = "dignitary"},
+            {"daemonsmiths", agent = "wizard"},
+            {"daemonsmiths", agent = "general", caster = true},
+            {"immortals", agent = "general"},
+        },
+    },
+    ["wh2_main_def_dark_elves"] = {
+        units = {
+            {"temple", key = "witch_elves"},
+            {"temple", key = "sisters_of_slaughter"},
+            {"temple", key = "har_ganeth"},
+            {"temple", key = "bloodwrack"},
+            {"daemonsmiths", key = "doomfire"},
+            {"khanate", key = "shades"},
+            {"overseers", key = "dreadspears"},
+            {"slavers", key = "corsairs"},
+            {"immortals", key = "black_guard"},
+            {"brass", key = "dark_riders"},
+            {"immortals", key = "cold_one"},
+            {"overseers", key = "bolt_thrower"},
+            {false, key = "_sla_"},
+            {"overseers", caste = "infantry"},
+        },
+        characters = {
+            {"temple", key = "hellebron"},
+            {"slavers", key = "black_ark"},
+            {"slavers", key = "lokhir"},
+            {"temple", agent = "dignitary"},
+            {"khanate", agent = "spy"},
+            {"daemonsmiths", agent = "wizard"},
+            {"daemonsmiths", agent = "general", caster = true},
+            {"immortals", agent = "champion"},
+            {"immortals", agent = "general"},
+        },
+    },
+    -- THE PHOENIX GUARD IS TWO HALLS' UNIT, the Loremasters' and the Cult of Asuryan's.
+    -- It guards Asuryan's shrine, so the temple takes it.
+    ["wh2_main_hef_high_elves"] = {
+        units = {
+            {"temple", key = "phoenix"},
+            {"brass", key = "lothern"},
+            {"brass", key = "ships_company"},
+            {"brass", key = "skycutter"},
+            {"immortals", key = "swordmasters"},
+            {"immortals", key = "white_lions"},
+            {"khanate", key = "shadow_"},
+            {"overseers", key = "spearmen"},
+            {"slavers", key = "ellyrian_reavers"},
+            {"overseers", key = "bolt_thrower"},
+            {"immortals", caste = "cavalry"},
+            {"immortals", caste = "engines"},
+            {"overseers", caste = "infantry"},
+        },
+        characters = {
+            {"brass", key = "dragonship"},
+            {"brass", key = "sea_helm"},
+            {"khanate", key = "alith_anar"},
+            {"khanate", agent = "spy"},
+            {"daemonsmiths", agent = "wizard"},
+            {"daemonsmiths", agent = "runesmith"},
+            {"daemonsmiths", agent = "engineer"},
+            {"daemonsmiths", agent = "general", caster = true},
+            {"immortals", agent = "champion"},
+            {"immortals", agent = "general"},
+        },
+    },
+    -- NO CASTE FALLBACK: the Great Clans split every caste between them, and Clan
+    -- Pestilens has no guild here, so its monks, censers and catapults pay nothing.
+    ["wh2_main_skv_skaven"] = {
+        units = {
+            {"brass", key = "skavenslave"},
+            {"slavers", key = "clanrat"},
+            {"immortals", key = "stormvermin"},
+            {"overseers", key = "stormfiend"},
+            {"khanate", key = "runner"},
+            {"khanate", key = "eshin"},
+            {"overseers", key = "rat_ogre"},
+            {"overseers", key = "brood_horror"},
+            {"overseers", key = "hell_pit"},
+            {"overseers", key = "wolf_rats"},
+            {"daemonsmiths", key = "warp"},
+            {"daemonsmiths", key = "ratling"},
+            {"daemonsmiths", key = "poison_wind"},
+            {"daemonsmiths", key = "death_globe"},
+            {"daemonsmiths", key = "doom"},
+        },
+        characters = {
+            {"temple", key = "grey_seer"},
+            {"temple", key = "thanquol"},
+            {"temple", key = "vermin"},
+            {"daemonsmiths", key = "warlock"},
+            {"daemonsmiths", key = "ikit"},
+            {"khanate", key = "assassin"},
+            {"khanate", key = "snikch"},
+            {"khanate", key = "eshin"},
+            {"overseers", key = "throt"},
+            {"overseers", agent = "runesmith"},
+            {"immortals", key = "warlord"},
+            {"immortals", key = "queek"},
+            {"immortals", agent = "champion"},
+        },
+    },
+    -- THE WARRIORS OF CHAOS (woc spec §3.4): by the MARK in the key. Unmarked is the
+    -- Undivided's, as a last rule that fits everything. Nothing pays the Doubter or the
+    -- Undoer: the renegades have no warriors.
+    ["wh_main_chs_chaos"] = {
+        units = {
+            {"immortals", key = "_mkho"},     -- the Mark of Khorne
+            {"immortals", key = "_kho_"},
+            {"overseers", key = "_mnur"},
+            {"overseers", key = "_nur_"},
+            {"overseers", key = "blightking"},
+            {"slavers", key = "_msla"},
+            {"slavers", key = "_sla_"},
+            {"daemonsmiths", key = "_mtze"},
+            {"daemonsmiths", key = "_tze_"},
+            {"temple"},                       -- unmarked: the Undivided's
+        },
+        characters = {
+            {"immortals", key = "_mkho"},
+            {"immortals", key = "_kho_"},
+            {"immortals", key = "khorne"},
+            {"overseers", key = "_mnur"},
+            {"overseers", key = "_nur_"},
+            {"overseers", key = "nurgle"},
+            {"overseers", key = "glottkin"},
+            {"overseers", key = "gutrot"},
+            {"overseers", key = "bloab"},
+            {"overseers", key = "morbidex"},
+            {"overseers", key = "orghotts"},
+            {"slavers", key = "_msla"},
+            {"slavers", key = "_sla_"},
+            {"slavers", key = "slaanesh"},
+            {"slavers", key = "sigvald"},
+            {"daemonsmiths", key = "_mtze"},
+            {"daemonsmiths", key = "_tze_"},
+            {"daemonsmiths", key = "tzeentch"},
+            {"daemonsmiths", key = "lord_of_change"},
+            {"temple"},                       -- Archaon, Kholek, unmarked lords and heroes
+        },
+    },
+}
+
+-- `t`: {key, caste, class} for a unit, {key, agent, caster} for a character. A plain
+-- string.find with no init argument: the game's own takes one and silently finds nothing.
+function GG.recruit_guild(culture, list, t)
+    local routes = GG.RECRUIT_ROUTES[culture or ""]
+    local rules = routes and routes[list]
+    if not rules then return nil end
+    for i = 1, #rules do
+        local r = rules[i]
+        if (not r.key or string.find(t.key or "", r.key))
+                and (not r.caste or GG.CASTES[r.caste][t.caste or ""])
+                and (not r.class or r.class == t.class)
+                and (not r.agent or r.agent == t.agent)
+                and (r.caster == nil or r.caster == (t.caster == true)) then
+            return r[1] or nil
+        end
+    end
+    return nil
+end
+-- END RECRUIT ROUTES
+
+-- A big unit counts double and a character four times (rate_recruit is the base). Not
+-- weighted by price: no unit interface member reads a recruitment cost.
+GG.RECRUIT_DOUBLE = {monster = true, monstrous_infantry = true, monstrous_cavalry = true,
+                     warmachine = true, chariot = true}
+
+-- AN UPGRADE IS A RECRUIT ONLY WHERE THE RACE RECRUITS BY UPGRADING (woc Ruling 9): the
+-- Warriors of Chaos get their marked units and their Chosen that way. For any other race
+-- an upgrade is not a new warrior and pays nothing.
+GG.UPGRADE_PAYS = {["wh_main_chs_chaos"] = true}
+
+-- ITS OWN LIMIT, before the guild's: rec_<guild> in the same saved gain as the guild caps.
+-- Without it one large recruiting turn fills a guild's limit and the battle won that turn
+-- pays nothing, and the Daemonsmiths, who have no limit, take whatever the turn recruits.
+-- GG.culture_of answers nil for a faction this mod does not cover, which is the gate.
+function GG.on_recruit(faction, list, t)
+    local guild = GG.recruit_guild(GG.culture_of(faction), list, t)
+    -- WHAT THE ENGINE HANDED OVER, behind the MCT debug switch: whether the events reach
+    -- AI factions, and whether unit_class() is the land_units class the rules read.
+    if GG.logging() then
+        GG.trace("recruit " .. tostring(faction) .. " " .. tostring(t.key) .. " caste="
+                 .. tostring(t.caste) .. " class=" .. tostring(t.class) .. " agent="
+                 .. tostring(t.agent) .. " caster=" .. tostring(t.caster) .. " -> "
+                 .. tostring(guild))
+    end
+    if not guild then return end
+    local amount = GG.setting("rate_recruit") or 2
+    if list == "characters" then
+        amount = amount * 4
+    elseif GG.RECRUIT_DOUBLE[t.caste or ""] then
+        amount = amount * 2
+    end
+    if amount <= 0 then return end
+    local cap = GG.setting("cap_recruit") or 20
+    if cap > 0 then
+        GG.turn_gain[faction] = GG.turn_gain[faction] or GG.load_gain(faction)
+        local k = "rec_" .. guild
+        local so_far = GG.turn_gain[faction][k] or 0
+        if so_far >= cap then
+            GG.ledger_add(faction, guild, "withheld", amount)
+            return
+        end
+        if so_far + amount > cap then
+            GG.ledger_add(faction, guild, "withheld", so_far + amount - cap)
+            amount = cap - so_far
+        end
+        GG.turn_gain[faction][k] = so_far + amount
+        GG.save_gain(faction)
+    end
+    GG.capped_grant(faction, guild, amount, "recruits")
 end
 
 -- ONE COUNT PER PROVINCE, not per settlement: public order is the province's, so a region
@@ -630,9 +1040,10 @@ function GG.temple_counts(f, r)
             end
             if pure then clean = clean + 1 end
         end
-        -- THE SKAVEN'S TAINT: a province CARRYING their corruption, the reverse of clean.
+        -- A RACE'S TAINT: a province CARRYING the corruption its temple names (Skaven for
+        -- the Grey Seers, Undivided for the Warriors of Chaos), the reverse of clean.
         if r.taint then
-            local res = fp:province():pooled_resource_manager():resource("wh3_main_corruption_skaven")
+            local res = fp:province():pooled_resource_manager():resource(r.taint)
             if not res:is_null_interface() and res:value() > 0 then tainted = tainted + 1 end
         end
     end
@@ -833,6 +1244,19 @@ GG.BUILDING_THEME_RACE = {
                        "under_empire_settlement_stronghold"}},
         {"overseers", {"skv_farm", "skv_monsters", "skv_industry",
                        "under_empire_settlement_warren"}},
+    },
+    -- THE WARRIORS OF CHAOS (woc spec §3.5). No vanilla chain belongs to a god except the
+    -- Glottkin's Nurgle gardens, so the words go by trade; read from CA's display names.
+    ["_chs"] = {
+        {"temple", {"fortress_shrine", "chaos_altar_corruption"}},
+        {"overseers", {"fortress_growth", "nurgle_garden"}},
+        {"brass", {"fortress_income", "woc_resource_"}},
+        {"immortals", {"fortress_warriors", "fortress_knights", "fortress_marauder",
+                       "chaos_altar_recruit", "chaos_altar_replenishment"}},
+        {"daemonsmiths", {"chaos_monsters", "large_monsters"}},
+        {"slavers", {"fortress_vassals", "chs_allied_outpost"}},
+        {"khanate", {"fortress_towers", "woc_chaos_altar_special_gate_towers",
+                     "woc_chaos_altar_garrison", "foreign_slot_discovery_woc"}},
     },
 }
 
@@ -1979,16 +2403,22 @@ end
 
 -- Only a guild that already knows you asks for anything: a demand from a guild at zero
 -- reputation is a penalty for a relationship you never had.
+-- THE DOUBTER ASKS NOTHING (woc spec §4.4): "Necoho requires nothing from his followers".
+-- A guild listed for a culture is never the one a demand comes from. Every demand, AI and
+-- human, is rolled here.
+GG.NO_DEMAND = {["wh_main_chs_chaos"] = {brass = true}}
+
 function GG.roll_demand(faction, turn)
     if GG.demands[faction] then return nil end
     local pool = {}
+    local quiet = GG.NO_DEMAND[GG.culture_of(faction) or ""] or {}
     for i = 1, #GG.GUILDS do
         local g = GG.GUILDS[i]
-        if (GG.get(faction, g)) > 0 then pool[#pool + 1] = g end
+        if (GG.get(faction, g)) > 0 and not quiet[g] then pool[#pool + 1] = g end
     end
     if #pool == 0 then return nil end
     local guild = pool[GG.roll(#pool)]
-    local rival = GG.RIVALS[guild]
+    local rival = GG.rival_of(faction, guild)
     local kind = "tribute"
     -- A renunciation needs something to renounce. Without favour held with the rival it
     -- would be a demand that is already satisfied, which reads as a bug.
@@ -2041,7 +2471,7 @@ function GG.demand_payable(faction)
         end
         return true, nil
     end
-    local rival = GG.RIVALS[d.guild]
+    local rival = GG.rival_of(faction, d.guild)
     if not rival then return false, "none" end
     if select(2, GG.get(faction, rival)) < d.amount then return false, "favour" end
     return true, nil
@@ -2055,7 +2485,7 @@ function GG.pay_demand(faction)
     if d.kind == "tribute" then
         cm:treasury_mod(faction, -d.amount)
     else
-        GG.spend(faction, GG.RIVALS[d.guild], d.amount)
+        GG.spend(faction, GG.rival_of(faction, d.guild), d.amount)
     end
     -- Through GG.grant, so the reward climbs ranks and drains the rival exactly as any
     -- other earning does. A paid demand is a large, chosen, one-off earn.
@@ -3389,6 +3819,11 @@ GG.SERVICES = {
     {key="food_tithe",          guild="slavers",      rank=2, cost=50,  cd=8,  kind="resource", resource="skaven_food", factor="missions", value=20, race="wh2_main_skv_skaven"},
     {key="shadows_of_eshin",    guild="khanate",      rank=3, cost=150, cd=12, kind="race_army", room=true, units="wh2_main_skv_inf_gutter_runners_0,wh2_main_skv_inf_night_runners_0", race="wh2_main_skv_skaven"},
     {key="breeding_season",     guild="overseers",    rank=4, cost=400, cd=16, kind="bundle",   turns=10, lead=true, race="wh2_main_skv_skaven"},
+    -- THE WARRIORS OF CHAOS' RACE SERVICES (2026-10-12), AFTER the Skaven rows: cooldowns
+    -- are positional.
+    {key="soul_tithe",          guild="slavers",      rank=2, cost=50,  cd=8,  kind="resource", resource="wh3_dlc20_chs_souls", factor="wh3_dlc20_souls_other", value=500, race="wh_main_chs_chaos"},
+    {key="eye_turns",           guild="daemonsmiths", rank=3, cost=150, cd=12, kind="resource", resource="wh3_dlc20_chs_eye_of_the_gods", factor="gifts_of_chaos", value=15, race="wh_main_chs_chaos"},
+    {key="skull_throne",        guild="immortals",    rank=4, cost=400, cd=16, kind="bundle",   turns=10, lead=true, race="wh_main_chs_chaos"},
 }
 
 -- ONE UNIT PER CULTURE, NOT ONE UNIT. This was a single Chaos Dwarf key, and it was the
@@ -3417,6 +3852,7 @@ GG.HIRE_UNIT_BY_CULTURE = {
     -- Swordmasters over Phoenix Guard (1,400), chosen by the user on 2026-09-24.
     ["wh2_main_hef_high_elves"]    = "wh2_main_hef_inf_swordmasters_of_hoeth_0",
     ["wh2_main_skv_skaven"]        = "wh2_main_skv_inf_stormvermin_0",
+    ["wh_main_chs_chaos"]          = "wh3_dlc20_chs_inf_chosen_mkho",
 }
 
 -- Kept because three other files still read it by name. It is the Chaos Dwarf entry of
@@ -3493,6 +3929,7 @@ GG.FLAVOURED = {
     ["wh2_main_def_dark_elves"] = {tag = "_def", feed = 70},
     ["wh2_main_hef_high_elves"] = {tag = "_hef", feed = 80},
     ["wh2_main_skv_skaven"] = {tag = "_skv", feed = 90},
+    ["wh_main_chs_chaos"] = {tag = "_chs", feed = 100},
 }
 
 -- Cached in GG.CULTURE_OF, which until now was declared and never written to: a
@@ -4076,6 +4513,9 @@ GG.EARN_ROUTES = {
     court      = {guild = "khanate",      rep = 40},
     -- UNDER-CITIES (skaven spec §4.2): Clan Eshin's trade is infiltration.
     undercity  = {guild = "khanate",      rep = 40},
+    -- GIFTS OF THE GODS (woc spec §3.2): Souls spent on a god's gifts, by the point. The
+    -- pool names the god (GG.POOL_GUILD), and each god keeps its own remainder.
+    gifts      = {per = 25, by_pool = true},
 }
 -- Which race earns by which route. CaravanCompleted is raised for Chaos Dwarf convoys and
 -- Cathay's caravans alike, so both earn by it.
@@ -4089,10 +4529,22 @@ GG.EARN_OF = {
     ["wh2_main_def_dark_elves"]    = "captives",
     ["wh2_main_hef_high_elves"]    = "court",
     ["wh2_main_skv_skaven"]        = "undercity",
+    ["wh_main_chs_chaos"]          = "gifts",
 }
 -- The pools an earning listens to, and which of their factors count.
 GG.POOL_ROUTES = {wh3_dlc25_dwf_grudge_points = "grudges", brt_chivalry = "chivalry",
-                  def_slaves = "captives"}
+                  def_slaves = "captives",
+                  -- THE WARRIORS OF CHAOS (woc spec §3.2): Souls spent, one pool per god.
+                  wh3_dlc20_chs_souls_spent_kho = "gifts", wh3_dlc20_chs_souls_spent_nur = "gifts",
+                  wh3_dlc20_chs_souls_spent_sla = "gifts", wh3_dlc20_chs_souls_spent_tze = "gifts",
+                  wh3_dlc20_chs_souls_spent_und = "gifts"}
+-- WHICH GOD A SOULS POOL PAYS. The Doubter and the Undoer have none: the Four do not deal
+-- with renegades.
+GG.POOL_GUILD = {wh3_dlc20_chs_souls_spent_kho = "immortals",
+                 wh3_dlc20_chs_souls_spent_nur = "overseers",
+                 wh3_dlc20_chs_souls_spent_sla = "slavers",
+                 wh3_dlc20_chs_souls_spent_tze = "daemonsmiths",
+                 wh3_dlc20_chs_souls_spent_und = "temple"}
 -- Captives from raiding and battle only. Chivalry from anything but "missions": Tales of
 -- Valour grants through it, and so does every mission's Chivalry reward (CA's
 -- payload.chivalry), which a mission already pays the guilds for through rate_missions.
@@ -4131,16 +4583,22 @@ GG.earn_carry = GG.earn_carry or {}
 -- PAYS `faction` BY `route` when that is its race's route: `rep` a time, or one per `per`
 -- of `amount`. Returns what the guild gained after its turn limit, and writes the Log line
 -- only when that is something.
-function GG.race_earn(faction, route, amount)
+function GG.race_earn(faction, route, amount, guild)
     local r = GG.EARN_ROUTES[route]
     if not r or not faction or not GG.race_on() then return 0 end
     if GG.EARN_OF[GG.culture_of(faction) or ""] ~= route then return 0 end
+    -- A BY-POOL ROUTE names its guild per call and keeps one remainder per guild: 20 Souls
+    -- to Khorne and 10 to Nurgle are not one Devotion to whichever came last.
+    local g = r.guild
+    if r.by_pool then g = guild end
+    if not g then return 0 end
     local n = r.rep
     if not n then
         -- SAVED AS IT CHANGES and read back when memory has none, so a load does not drop
         -- 19 Slaves towards the next point (logic audit, 2026-09-29).
-        local k = faction .. "|" .. route
-        local sk = "derpy_gg_carry_" .. faction .. "_" .. route
+        local sub = r.by_pool and ("_" .. g) or ""
+        local k = faction .. "|" .. route .. sub
+        local sk = "derpy_gg_carry_" .. faction .. "_" .. route .. sub
         if GG.earn_carry[k] == nil then
             GG.earn_carry[k] = tonumber(cm:get_saved_value(sk)) or 0
         end
@@ -4150,10 +4608,10 @@ function GG.race_earn(faction, route, amount)
         cm:set_saved_value(sk, GG.earn_carry[k])
     end
     if n <= 0 then return 0 end
-    local before = GG.get(faction, r.guild)
-    GG.capped_grant(faction, r.guild, n, route)
-    local paid = GG.get(faction, r.guild) - before
-    if paid > 0 then GG.log_add(faction, "earn", r.guild, route, paid) end
+    local before = GG.get(faction, g)
+    GG.capped_grant(faction, g, n, route)
+    local paid = GG.get(faction, g) - before
+    if paid > 0 then GG.log_add(faction, "earn", g, route, paid) end
     return paid
 end
 
@@ -4416,7 +4874,7 @@ function GG.service_cost(faction, service_key)
     -- Rivalry. Only the rival being AHEAD costs you; being behind is not a discount,
     -- because the loyalty term above already pays you for your own standing and
     -- counting it twice would make one guild free.
-    local rival = GG.RIVALS[svc.guild]
+    local rival = GG.rival_of(faction, svc.guild)
     if rival then
         local their_rank = GG.rank_of((GG.get(faction, rival)))
         local ahead = their_rank - rank
@@ -4465,7 +4923,7 @@ end
 -- in tools/gen_great_guilds.py (check_hall_mirror). Six chains per race share one
 -- superchain capped at one instance, so a settlement holds one guild's hall - that is the
 -- DB's job. This block decides who may BUILD which level, counts what stands, and pays.
-GG.HALL_TAGS = {[""] = true, ["_emp"] = true, ["_dwf"] = true, ["_brt"] = true, ["_cth"] = true, ["_ksl"] = true, ["_def"] = true, ["_hef"] = true, ["_skv"] = true}          -- races with halls
+GG.HALL_TAGS = {[""] = true, ["_emp"] = true, ["_dwf"] = true, ["_brt"] = true, ["_cth"] = true, ["_ksl"] = true, ["_def"] = true, ["_hef"] = true, ["_skv"] = true, ["_chs"] = true}          -- races with halls
 GG.HALL_RANK = {2, 4, 5}              -- rank for level 0, 1, 2; level 2 also needs the lead
 GG.HALL_REP = {4, 8, 15}              -- reputation per hall per turn, by level
 GG.HALL_OFF_MAX = 15                  -- most % a guild's halls take off its services
@@ -4920,6 +5378,10 @@ GG.TUNE_DEFAULTS = {
     cap_temple = 40,
     -- THE GREY SEERS' TAINT (skaven spec §3.2): per province carrying Skaven corruption.
     rate_temple_taint = 2,
+    -- RECRUITING (2026-10-11, GG.on_recruit): per unit, doubled for a monster or war
+    -- machine and four times for a hero or lord; at most cap_recruit per guild per turn,
+    -- under the guild's own limit. 0 switches recruiting off.
+    rate_recruit = 2, cap_recruit = 20,
 }
 
 -- Frozen order, so the packed string survives a defaults table that gains keys.
@@ -4959,6 +5421,8 @@ GG.TUNE_ORDER = {
     "rate_temple_holy",
     "cap_temple",
     "rate_temple_taint",
+    "rate_recruit",
+    "cap_recruit",
 }
 
 GG.TUNE = GG.TUNE or nil
@@ -5015,6 +5479,7 @@ GG.PRESETS = {
         hall_rep = 120,
         rate_temple_devout = 2, rate_temple_chaos = 3, rate_temple_holy = 15, cap_temple = 60,
         rate_temple_taint = 3,
+        rate_recruit = 3, cap_recruit = 30,
     },
 
     -- SLOWER, AND THE COURT PRESSES. About a quarter less per event against tighter caps,
@@ -5034,6 +5499,7 @@ GG.PRESETS = {
         hall_rep = 80,
         rate_temple_devout = 1, rate_temple_chaos = 1, rate_temple_holy = 7, cap_temple = 30,
         rate_temple_taint = 1,
+        rate_recruit = 1, cap_recruit = 15,
     },
 
     -- BRUTAL (the "ultra" key). Standing is roughly half the default rate against caps to match, the
@@ -5056,6 +5522,7 @@ GG.PRESETS = {
         hall_rep = 60,
         rate_temple_devout = 1, rate_temple_chaos = 1, rate_temple_holy = 5, cap_temple = 22,
         rate_temple_taint = 1,
+        rate_recruit = 1, cap_recruit = 10,
     },
 }
 
@@ -5126,6 +5593,9 @@ GG.TWISTS = {
     ["wh2_main_hef_high_elves"]    = {favour_cap = 150},
     -- TREACHERY: a Skaven promise is worth nothing, and every clan takes from its rival.
     ["wh2_main_skv_skaven"]        = {rate_rivalry = 150, demand_penalty = 0},
+    -- THE FICKLE GODS (woc spec §2): "jealous and fickle deities" - each god's upkeep is
+    -- half again as much, and a demand answered pays more.
+    ["wh_main_chs_chaos"]          = {rate_decay = 150, demand_reward = 150},
 }
 
 -- The percentage `faction`'s race puts on `key`: 100 when it bends nothing, when race
@@ -5637,6 +6107,48 @@ function GG.register()
         end, true)
     end
 
+    -- RECRUITING (GG.on_recruit). Both events fire for every faction in the campaign, so
+    -- GG.covered answers first and nothing is loaded or saved for anyone else. Accessors
+    -- per scripting_doc: UnitTrained -> unit (faction, unit_key, unit_caste, unit_class);
+    -- CharacterRecruited -> character (faction, character_subtype_key,
+    -- character_type_key, is_caster).
+    core:add_listener("gg_recruit_unit", "UnitTrained", true, function(context)
+        local ok, name, t = pcall(function()
+            local u = context:unit()
+            return u:faction():name(),
+                   {key = u:unit_key(), caste = u:unit_caste(), class = u:unit_class()}
+        end)
+        if not ok or not name or not GG.covered(name) then return end
+        GG.load(name); GG.on_recruit(name, "units", t); GG.save(name)
+    end, true)
+    core:add_listener("gg_recruit_character", "CharacterRecruited", true, function(context)
+        local ok, name, t = pcall(function()
+            local c = context:character()
+            return c:faction():name(),
+                   {key = c:character_subtype_key(), agent = c:character_type_key(),
+                    caster = c:is_caster()}
+        end)
+        if not ok or not name or not GG.covered(name) then return end
+        GG.load(name); GG.on_recruit(name, "characters", t); GG.save(name)
+    end, true)
+    -- UnitUpgraded -> unit, upgrade_group (scripting_doc). Whether `unit` is the unit
+    -- after the upgrade is an in-game check (woc spec §10).
+    core:add_listener("gg_recruit_upgrade", "UnitUpgraded", true, function(context)
+        local ok, name, t = pcall(function()
+            local u = context:unit()
+            return u:faction():name(),
+                   {key = u:unit_key(), caste = u:unit_caste(), class = u:unit_class()}
+        end)
+        if not ok or not name or not GG.covered(name) then return end
+        if not GG.UPGRADE_PAYS[GG.culture_of(name) or ""] then return end
+        -- A WEAPON SWAP IS NOT A MARK (final review): CA's 25 *_to_self groups hand back
+        -- the same unit for 150 gold. Filtered as wh3_dlc29_glottkin_marks_of_nurgle.lua
+        -- filters them, off upgrade_group():key().
+        local _, group = pcall(function() return context:upgrade_group():key() end)
+        if type(group) == "string" and string.sub(group, -8) == "_to_self" then return end
+        GG.load(name); GG.on_recruit(name, "units", t); GG.save(name)
+    end, true)
+
     -- THE SLAVERS' OWN SIGNAL, likewise dead. PAST TENSE on both names:
     -- CharacterSacksSettlement and CharacterRazesSettlement are the present-tense pair
     -- and carry only `loot`, while these two carry the character - which is the only
@@ -5696,7 +6208,7 @@ function GG.register()
         if not name then return end
         amount = GG.take_self(name, key, amount)
         if amount <= 0 then return end
-        GG.load(name); GG.race_earn(name, route, amount); GG.save(name)
+        GG.load(name); GG.race_earn(name, route, amount, GG.POOL_GUILD[key]); GG.save(name)
     end, true)
 
     -- RegionFactionChangeEvent carries region(), previous_faction() and reason() - no
@@ -5911,7 +6423,11 @@ GG.LEDGER_SOURCES = {"income", "battles", "research", "agents", "buildings",
                      -- THE TEMPLE'S ROUTES (2026-10-04).
                      "devout", "chaos", "holywar", "priests",
                      -- THE SKAVEN (2026-10-05).
-                     "undercity", "taint"}
+                     "undercity", "taint",
+                     -- THE WARRIORS OF CHAOS (2026-10-12).
+                     "gifts",
+                     -- RECRUITING (2026-10-11).
+                     "recruits"}
 GG.LEDGER_KNOWN = {}
 for i = 1, #GG.LEDGER_SOURCES do GG.LEDGER_KNOWN[GG.LEDGER_SOURCES[i]] = true end
 

@@ -38,7 +38,7 @@ UI_FILES = [
     "Modding Files/pack/ui/campaign ui/derpy_gg_opener.twui.xml",
     # Each race's own panel and card (gen_guilds_ui.FRAMES); GGUI.frame_path creates them.
 ] + ["Modding Files/pack/ui/campaign ui/derpy_gg_%s_%s.twui.xml" % (kind, race)
-     for race in ("brt", "cth", "def", "dwf", "emp", "hef", "ksl", "skv")
+     for race in ("brt", "chs", "cth", "def", "dwf", "emp", "hef", "ksl", "skv")
      for kind in ("panel", "card")]
 # MCT "Panel size": every file above but the opener again at Small and Large
 # (gen_guilds_ui.SIZES); GGUI.frame_path and the PATH_* sites append the suffix.

@@ -412,7 +412,7 @@ def guild_of_chain(chain, theme, race=None):
 
 - [ ] **Step 6: Run `H`, then `GEN --check` in the background.** Expected: `harness ok`. `--check` may still fail on Task 5's data (GUILDS has no temple yet), but it must report no `check_building_theme` or `check_built_effects` finding.
 
-- [ ] **Step 7: Print the share table.** Run `py "C:/Users/GAYAO-~1/AppData/Local/Temp/claude/g--Modding-for-resources/7c00cf0a-c27a-4d9a-9874-39935f60d18f/scratchpad/shares.py"` after Task 5 makes `temple` a generator guild. It lists every chain that changed guild per race, for the handoff (Task 10).
+- [ ] **Step 7: Print the share table.** Run `py "$S/shares.py"` (`$S`, the session's scratchpad) after Task 5 makes `temple` a generator guild. It lists every chain that changed guild per race, for the handoff (Task 10).
 
 ---
 
@@ -1458,7 +1458,7 @@ Fix and render again until each holds. The first pass is never done.
 
 - [ ] **Step 3: Run the full set in the background, output to a file.**
 ```
-py tools/mutate_guilds.py > "C:/Users/GAYAO-~1/AppData/Local/Temp/claude/g--Modding-for-resources/7c00cf0a-c27a-4d9a-9874-39935f60d18f/scratchpad/mutate_temple.txt" 2>&1
+py tools/mutate_guilds.py > "$S/mutate_temple.txt" 2>&1
 ```
 Do not pipe it through `tail` (that loses the exit code), and do not build while it runs. Expected: exit 0, every mutant CAUGHT, no SURVIVED, no STALE. A survivor is a missing assertion. Add it to the harness and re-run, never delete the mutant.
 

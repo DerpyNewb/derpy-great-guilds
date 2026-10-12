@@ -160,7 +160,7 @@ end
 -- rank_tx) plus how far short of the right end the figures stop (RANK_STATS_PAD). Mirrored
 -- from tools/gen_guilds_ui.py, whose check_header_inset compares the two.
 GGUI.HEADER_INSET = {[""] = 98, _brt = 148, _cth = 202, _def = 122, _dwf = 98, _emp = 134,
-                     _hef = 158, _ksl = 152, _skv = 104}
+                     _hef = 158, _ksl = 152, _skv = 104, _chs = 136}
 GGUI.HEADER_GAP = 24
 
 -- WHETHER THE GUILD'S NAME AND THESE FIGURES FIT SIDE BY SIDE, measured in the game's own
@@ -463,6 +463,16 @@ GGUI.FRAME = {
         hover = {"ui/skins/wh_main_brt_bretonnia/legacy/panel_back_tile.png", "ui/skins/default/chivalry_bar_frame.png"},
         selected = {"ui/skins/wh_main_brt_bretonnia/legacy/panel_back_tile.png", "ui/skins/default/building_frame_selected.png"},
         selected_hover = {"ui/skins/wh_main_brt_bretonnia/legacy/panel_back_tile.png", "ui/skins/default/building_frame_selected.png"},
+    },
+    -- THE WARRIORS OF CHAOS: a copy of _skv until their own frame is measured (woc plan
+    -- Task 10 replaces every value here).
+    _chs = {
+        heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
+        rim = "ui/skins/default/path_to_glory/panel_selection_stroke.png",
+        active = {"ui/skins/default/dlc25_tamurkhans_chieftains/subtitle.png", "ui/campaign ui/derpy_gg_icons/clear.png"},
+        hover = {"ui/skins/default/dlc25_tamurkhans_chieftains/subtitle.png", "ui/campaign ui/derpy_gg_icons/clear.png"},
+        selected = {"ui/skins/default/dlc25_tamurkhans_chieftains/subtitle.png", "ui/skins/default/path_to_glory/panel_selection_stroke.png"},
+        selected_hover = {"ui/skins/default/dlc25_tamurkhans_chieftains/subtitle.png", "ui/skins/default/path_to_glory/panel_selection_stroke.png"},
     },
     _cth = {
         heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
@@ -1354,7 +1364,8 @@ end
 -- %n in a loc line is the number the card fills in. One placeholder, one number: a
 -- sentence with the number in the middle is easier to translate than one built in pieces.
 function GGUI.fill(s, n)
-    return (string.gsub(s, "%%n", tostring(n)))
+    -- A % in the inserted text is a gsub capture reference, and an error: escaped.
+    return (string.gsub(s, "%%n", (string.gsub(tostring(n), "%%", "%%%%"))))
 end
 
 -- The footer's countdown to the next services. One turn left has its own words: the
@@ -1659,6 +1670,23 @@ function GGUI.demand_left(d, turn)
     return left
 end
 
+-- 0 left is the turn it is due, not a lapsed one, and 1 is singular (antislop audit
+-- 2026-10-09). The Court's card and the opener's hover both say it this way.
+function GGUI.due_text(left)
+    if left <= 0 then return GGUI.loc("demand_due_now") end
+    if left == 1 then return "1 " .. GGUI.loc("demand_due_1") end
+    return left .. " " .. GGUI.loc("demand_due")
+end
+
+-- BOUNTIES THE PLAYER HAS TAKEN, as the Bounties tab's header counts them.
+function GGUI.taken_count(faction)
+    local list, taken = GG.bounties[faction] or {}, 0
+    for i = 1, #list do
+        if list[i].taken then taken = taken + 1 end
+    end
+    return taken
+end
+
 function GGUI.draw_court(faction)
     local guild = GGUI.current_guild()
     local turn = GG.turn_now()
@@ -1677,18 +1705,12 @@ function GGUI.draw_court(faction)
         -- The amount is in the price box beside Pay; the line says what it is paid in
         -- (antislop audit 2026-10-09: the figure showed twice).
         local l1 = GGUI.loc("demand_owed") .. " " .. unit
-        if d.kind == "renounce" and GG.RIVALS[d.guild] then
-            l1 = l1 .. "  (" .. GGUI.loc_guild(GG.RIVALS[d.guild]) .. ")"
+        if d.kind == "renounce" and GG.rival_of(faction, d.guild) then
+            l1 = l1 .. "  (" .. GGUI.loc_guild(GG.rival_of(faction, d.guild)) .. ")"
         end
         -- The deadline goes orange (LOCK_COL) in its last two turns. It is the only number
-        -- on this panel with a point of no return behind it. 0 left is the turn it is due,
-        -- not a lapsed one, and 1 is singular (antislop audit 2026-10-09).
-        local l2 = left .. " " .. GGUI.loc("demand_due")
-        if left <= 0 then
-            l2 = GGUI.loc("demand_due_now")
-        elseif left == 1 then
-            l2 = "1 " .. GGUI.loc("demand_due_1")
-        end
+        -- on this panel with a point of no return behind it.
+        local l2 = GGUI.due_text(left)
         if left <= 2 then l2 = "[[col:" .. GGUI.LOCK_COL .. "]]" .. l2 .. "[[/col]]" end
         local tip = GGUI.loc_guild(d.guild) .. "  -  "
                     .. GGUI.loc("demand_desc_" .. d.kind)
@@ -1889,7 +1911,7 @@ function GGUI.refresh()
         -- THE RIVAL GIVES WAY BEFORE IT OVERLAPS: its full name, then without the article,
         -- then into the hover. Unmeasurable keeps it on the bar, as it always was.
         local rival_tip = ""
-        local rival = GG.RIVALS[guild]
+        local rival = GG.rival_of(faction, guild)
         local share = GG.setting("rate_rivalry") or 0
         if rival and share > 0 then
             local name = GGUI.loc_guild(rival)
@@ -1961,11 +1983,7 @@ function GGUI.refresh()
             -- is the one place in the mod that says out loud that they are.
             head = GGUI.rivals_line()
         elseif GGUI.TAB == 3 then
-            local list, taken = GG.bounties[faction] or {}, 0
-            for i = 1, #list do
-                if list[i].taken then taken = taken + 1 end
-            end
-            head = GGUI.loc("hdr_bounty") .. "   " .. taken .. " / "
+            head = GGUI.loc("hdr_bounty") .. "   " .. GGUI.taken_count(faction) .. " / "
                    .. #GGUI.CARD_XY .. " " .. GGUI.loc("bounty_taken")
             local view = {}
             pcall(function() view = GG.bounty_view(faction) end)
@@ -2084,6 +2102,7 @@ function GGUI.refresh()
         local me = cm:get_local_faction_name(true)
         if me then GGUI.badge(me) end
     end)
+    pcall(GGUI.write_opener_tip)
 end
 
 -- The Help tab. Four pages of its own loc, "||"-separated - which is a TOOLTIP
@@ -2437,8 +2456,13 @@ function GGUI.earned_tip(now, last, guild, faction)
     if cap > 0 then
         limit = GGUI.loc("earned_limit") .. " " .. cap .. ". " .. GGUI.loc("earned_help")
     end
+    -- WHICH RECRUITS PAY THIS GUILD (2026-10-11), per race. GGUI.loc hands back the bare
+    -- key for a race that ships no line, and a bare key is never printed.
+    local rk = "recruit_" .. guild
+    local recruits = GGUI.loc(rk)
+    recruits = (recruits ~= rk) and ("||" .. recruits) or ""
     return block(GGUI.loc("earned_now"), now[guild]) .. "||"
-           .. block(GGUI.loc("earned_last"), last[guild]) .. "||" .. limit
+           .. block(GGUI.loc("earned_last"), last[guild]) .. "||" .. limit .. recruits
 end
 
 -- THE LEAGUE TABLE FOR ONE GUILD, as tooltip lines. Five names and no more: a tooltip
@@ -3560,38 +3584,74 @@ function GGUI.actionable(faction)
     return #GGUI.actionable_items(faction)
 end
 
--- WHAT THE BADGE IS COUNTING, in words. Draw time only - it is written on hover.
+-- THE GUILDS AT A GLANCE, on the button, as the Iron Court's (asked for 2026-10-11). What is
+-- waiting on the player comes first, each with the tab it is on: those lines are
+-- actionable_items, the badge's own list, so the heading shows when and only when the badge
+-- counts. Then where the player stands. A line for something that is not happening is left
+-- out. Reads loc, so UI time only: GGUI.write_opener_tip.
 function GGUI.opener_tip(faction)
-    local parts, bounties, demand = {GGUI.loc("panel_title")}, 0, nil
     local items = GGUI.actionable_items(faction)
-    local ready = {}
+    local ready, bounties, payable = {}, 0, false
     for i = 1, #items do
         local it = items[i]
         if it.kind == "service" then
-            ready[#ready + 1] = GGUI.HELP_BULLET .. GGUI.loc_service(it.key) .. "  ("
-                                .. GGUI.loc_guild(it.guild) .. ")"
+            ready[#ready + 1] = GGUI.loc_service(it.key) .. " (" .. GGUI.loc_guild(it.guild) .. ")"
         elseif it.kind == "bounty" then
             bounties = bounties + 1
         elseif it.kind == "demand" then
-            demand = it
+            payable = true
         end
     end
-    if #items == 0 then
-        parts[#parts + 1] = GGUI.loc("opener_none")
+    local lines = {}
+    local function add(key, n) lines[#lines + 1] = GGUI.fill(GGUI.loc(key), n) end
+    local d = GG.demands[faction]
+    local function demand()
+        local unit = (d.kind == "tribute") and GGUI.loc("demand_gold") or GGUI.loc("demand_favour")
+        return GGUI.loc_guild(d.guild) .. ", " .. (d.amount or 0) .. " " .. unit .. ", "
+               .. GGUI.due_text(GGUI.demand_left(d, GG.turn_now()))
     end
-    if #ready > 0 then
-        parts[#parts + 1] = GGUI.loc("opener_ready")
-        for i = 1, #ready do parts[#parts + 1] = ready[i] end
+    if #items > 0 then
+        lines[1] = "[[col:yellow]]" .. GGUI.loc("opener_waiting") .. "[[/col]]"
+        if #ready > 0 then add("opener_ready", table.concat(ready, ", ")) end
+        if bounties > 0 then add("opener_bounties", bounties) end
+        if payable then add("opener_demand", demand()) end
+    else
+        lines[1] = GGUI.loc("opener_none")
     end
-    if bounties > 0 then
-        parts[#parts + 1] = GGUI.loc("opener_bounties") .. " " .. bounties
+    lines[#lines + 1] = ""
+    -- WHERE THE PLAYER STANDS: the best Reputation, ties to the earlier guild.
+    local best, best_rep = nil, 0
+    for _, g in ipairs(GGUI.GUILD_ORDER) do
+        local rep = GG.get(faction, g)
+        if rep > best_rep then best, best_rep = g, rep end
     end
-    if demand then
-        parts[#parts + 1] = GGUI.loc("opener_demand") .. " " .. GGUI.loc_guild(demand.guild)
+    if best then
+        add("opener_rank", GGUI.loc_rank(GG.rank_of(best_rep)) .. " (" .. GGUI.loc_guild(best)
+            .. ", " .. best_rep .. " " .. GGUI.loc("reputation") .. ")")
+    else
+        add("opener_no_rank")
     end
+    local led = {}
+    for _, g in ipairs(GGUI.GUILD_ORDER) do
+        local ok, who = pcall(function() return GG.leader_of(g, GG.culture_of(faction)) end)
+        if ok and who ~= nil and who == faction then led[#led + 1] = GGUI.loc_guild(g) end
+    end
+    if #led > 0 then add("opener_lead", table.concat(led, ", ")) end
+    local p = GG.patrons[faction]
+    if p then
+        add("opener_patron", GGUI.patron_name(p.cqi) .. " (" .. GGUI.loc_guild(p.guild) .. ")")
+    else
+        add("opener_no_patron")
+    end
+    if d and not payable then add("opener_demand_short", demand()) end
+    local taken = GGUI.taken_count(faction)
+    if taken > 0 then add("opener_taken", taken) end
+    local every = GG.rotation_turns()
+    lines[#lines + 1] = GGUI.countdown(every - GG.turn_now() % every) .. "."
     -- GREYED MID-ROUND (GGUI.gate_opener), so "click" would be a lie the button refuses.
-    parts[#parts + 1] = GGUI.loc(GGUI.player_turn() and "opener_click" or "opener_wait")
-    return table.concat(parts, "||")
+    lines[#lines + 1] = ""
+    lines[#lines + 1] = GGUI.loc(GGUI.player_turn() and "opener_click" or "opener_wait")
+    return GGUI.loc("panel_title") .. "||" .. table.concat(lines, "\n")
 end
 
 -- WRITES IT, AND RETURNS IT. The return is not decoration: the harness has no UI, so the
@@ -3749,9 +3809,31 @@ function GGUI.follow_bar()
     GGUI.btn_at = x .. "," .. y
 end
 
+-- THE OPENER'S TOOLTIP IS WRITTEN AS THE BUTTON SHOWS, never on a hover. A ComponentMouseOn
+-- listener wrote it until 2026-10-11 and nothing was ever seen: that event does not reach a
+-- component made on the ui root (the HUD hub's v1 found the same, 2026-10-01). Not from a
+-- turn handler either - a loc read there can crash turn 1 past pcall - so on the UI clock, as
+-- the button goes from hidden to shown: placed, back on the map after a turn or a CA panel,
+-- the hub's column opening. GGUI.refresh writes it too, so a purchase shows at once.
+function GGUI.write_opener_tip()
+    local me, b = GGUI.me(), comp(GGUI.BTN)
+    if me and b then set_tooltip(b, GGUI.opener_tip(me)) end
+end
+
+-- Marked before the write, so a write that throws is not retried three times a second.
+function GGUI.tip_poll()
+    local b = comp(GGUI.BTN)
+    local up = b ~= nil and b:Visible() == true
+    local was = GGUI.tip_up
+    GGUI.tip_up = up
+    if up and not was then GGUI.write_opener_tip() end
+end
+
 function GGUI.start_follow()
-    cm:repeat_real_callback(function() pcall(GGUI.follow_bar) end, GGUI.FOLLOW_MS,
-                            "gg_follow_bar")
+    cm:repeat_real_callback(function()
+        pcall(GGUI.follow_bar)
+        pcall(GGUI.tip_poll)
+    end, GGUI.FOLLOW_MS, "gg_follow_bar")
 end
 
 cm:add_first_tick_callback(function() GGUI.start_follow() end)
@@ -3955,6 +4037,15 @@ GGUI.MCT_NAMES = {
         slavers = "The Slave-Masters",
         temple = "The Grey Seers",
     },
+    ["_chs"] = {
+        brass = "The Doubter",
+        immortals = "The Blood God",
+        daemonsmiths = "The Changer of Ways",
+        khanate = "The Undoer",
+        overseers = "The Plague Lord",
+        slavers = "The Dark Prince",
+        temple = "The Undivided",
+    },
     ["_gen"] = {
         brass = "The Merchant Houses",
         immortals = "The Veterans' Company",
@@ -3985,16 +4076,6 @@ end
 
 cm:add_first_tick_callback(function() GGUI.name_mct() end)
 
--- THE OPENER'S TOOLTIP, WRITTEN ON HOVER. place_opener runs from FactionTurnStart, and a
--- loc call from a turn handler can crash at turn 1 past pcall - so the tooltip is not
--- written there. A hover is a UI event, and the text is in place before the tooltip's
--- own delay runs out.
--- WHAT IS READY, not the rules: the rules are a hover away on the panel's own title, and
--- this is the one place a player can learn whether opening the panel is worth it.
-core:add_listener("gg_opener_tip", "ComponentMouseOn", true, function(context)
-    if context.string ~= GGUI.BTN then return end
-    set_tooltip(comp(GGUI.BTN), GGUI.opener_tip(GGUI.me()))
-end, true)
 
 -- Placement starts at first tick and is re-run at turn start. Both are one-shots
 -- into the same chain; place_opener stops itself once GGUI.btn_at is set.

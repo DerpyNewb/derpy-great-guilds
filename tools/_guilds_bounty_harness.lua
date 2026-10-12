@@ -1820,6 +1820,8 @@ do
         ["wh2_main_hef_high_elves"]    = {},
         -- TREACHERY (skaven spec §2): rivalry half again, an expired demand nothing.
         ["wh2_main_skv_skaven"]        = {rate_rivalry = 60, demand_penalty = 0},
+        -- THE FICKLE GODS (woc spec §2): decay x1.5, a paid demand 120 x 1.5.
+        ["wh_main_chs_chaos"]          = {rate_decay = 150, demand_reward = 180},
     }
     for culture, bent in pairs(want) do
         race(culture)
@@ -1886,6 +1888,24 @@ do
     assert(GG.demand_tick("me", 6) == "expired", "the Skaven demand expired")
     assert(GG.get("me", "brass") == 500, "a Skaven's expired demand costs 0, got "
            .. GG.get("me", "brass"))
+    GG.demands.me, GG.demand_last.me = nil, nil
+    -- THE DOUBTER ASKS NOTHING (woc spec §4.4): a faction known only to the Doubter is
+    -- never sent a demand, and the clock does not restart; known to the Doubter and the
+    -- Undoer, only the Undoer ever asks.
+    race("wh_main_chs_chaos")
+    GG.state.me = {}
+    for _, g in ipairs(GG.GUILDS) do GG.state.me[g] = {rep = 0, fav = 0} end
+    GG.state.me.brass = {rep = 500, fav = 0}
+    GG.demands.me, GG.demand_last.me = nil, nil
+    assert(GG.roll_demand("me", 30) == nil, "the Doubter never asks")
+    assert(GG.demand_tick("me", 40) == nil and GG.demand_last.me == nil,
+           "no demand issued, so the clock is not stamped")
+    GG.state.me.khanate = {rep = 500, fav = 0}
+    for i = 1, 20 do
+        GG.demands.me = nil
+        local d = GG.roll_demand("me", 40 + i)
+        assert(d and d.guild == "khanate", "only the Undoer asks, got " .. tostring(d and d.guild))
+    end
     GG.demands.me, GG.demand_last.me = nil, nil
     race("wh2_main_hef_high_elves")
     GG.state.me = {}

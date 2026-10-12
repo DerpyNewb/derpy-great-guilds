@@ -6038,6 +6038,7 @@ end)()
         {"cr_flav_hef", "wh2_main_hef_high_elves", "_hef", 80,
          "wh2_main_hef_inf_swordmasters_of_hoeth_0"},
         {"cr_flav_skv", "wh2_main_skv_skaven", "_skv", 90, "wh2_main_skv_inf_stormvermin_0"},
+        {"cr_flav_chs", "wh_main_chs_chaos", "_chs", 100, "wh3_dlc20_chs_inf_chosen_mkho"},
     }
     for _, c in ipairs(cases) do
         local f, culture, tag, off, unit = c[1], c[2], c[3], c[4], c[5]
@@ -6914,29 +6915,49 @@ end)()
     CULTURE[E], GG.CULTURE_OF[E] = nil, nil
 end)()
 
--- ---------------------------------------------- the opener's tooltip, on hover --
+-- ------------------------------------ the opener's tooltip, as the button shows --
 -- NO LOC FROM A TURN HANDLER: place_opener runs from FactionTurnStart, and a loc call
--- there can crash at turn 1 past pcall. The tooltip is written when the button is
--- hovered instead, which is a UI event.
+-- there can crash at turn 1 past pcall. NOR ON A HOVER EVENT: ComponentMouseOn never
+-- reaches a component made on the ui root, and the tooltip it wrote was never seen in game
+-- (2026-10-11). The follow poll, on the UI clock, writes it as the button goes from hidden
+-- to shown.
 ;(function()
     local src = io.open("Modding Files/pack/script/campaign/mod/zzz_derpy_guilds_ui.lua"):read("*a")
     local body = string.match(src, "function GGUI%.place_opener%(attempt%)(.-)\nend")
     assert(body, "place_opener not found")
     assert(not string.find(body, "GGUI.loc", 1, true),
            "place_opener resolves loc, and it runs from FactionTurnStart")
-    assert(handlers["gg_opener_tip"], "no hover listener writes the opener's tooltip")
-    local tips = {}
-    local btn = {SetTooltipText = function(_, t) tips[#tips + 1] = t end}
+    assert(handlers["gg_opener_tip"] == nil, "the tooltip hangs on ComponentMouseOn again, "
+           .. "which never reaches the opener")
+    local tips, shown = {}, false
+    local btn = {SetTooltipText = function(_, t) tips[#tips + 1] = t end,
+                 Visible = function() return shown end}
     local prev_find, prev_is = find_uicomponent, is_uicomponent
+    local prev_rrc, prev_me = cm.repeat_real_callback, cm.get_local_faction_name
     is_uicomponent = function(x) return x ~= nil end
     find_uicomponent = function(_, name) if name == GGUI.BTN then return btn end end
-    handlers["gg_opener_tip"]({string = "some_other_button"})
-    assert(#tips == 0, "hovering another component must not touch the opener")
-    handlers["gg_opener_tip"]({string = GGUI.BTN})
+    cm.get_local_faction_name = function() return "cr_tip_me" end
+    local poll
+    cm.repeat_real_callback = function(_, fn) poll = fn end
+    GGUI.start_follow()
+    assert(poll, "start_follow registered no poll")
+    GGUI.tip_up = nil
+    poll()
+    assert(#tips == 0, "a hidden opener had its tooltip written")
+    shown = true
+    poll()
     assert(#tips == 2 and string.find(tips[2], "||", 1, true),
-           "hovering the opener must write its two-part tooltip, got "
-           .. tostring(tips[#tips]))
+           "the opener showing must write its two-part tooltip, got " .. tostring(tips[#tips]))
+    poll(); poll()
+    assert(#tips == 2, "written once per showing, not three times a second: " .. #tips)
+    shown = false
+    poll()
+    shown = true
+    poll()
+    assert(#tips == 4, "shown again, the tooltip must be written again: " .. #tips)
     find_uicomponent, is_uicomponent = prev_find, prev_is
+    cm.repeat_real_callback, cm.get_local_faction_name = prev_rrc, prev_me
+    GGUI.tip_up = nil
 end)()
 
 -- ------------------------------------------------ the MCT page, in their words --
@@ -7591,19 +7612,114 @@ end)()
     assert(GGUI.actionable(ME) == #GGUI.actionable_items(ME),
            "the badge must count exactly what the tooltip lists")
     made[GGUI.BTN] = true
-    handlers["gg_opener_tip"]({string = GGUI.BTN})
+    -- A PANEL REDRAW REWRITES IT, so a purchase shows on the button at once.
+    tips["root/" .. GGUI.BTN] = nil
+    assert(panel_up(), "section 0 leaves the panel open, and what follows relies on it")
+    GGUI.refresh()
     local otip = tips["root/" .. GGUI.BTN]
-    assert(has(otip, GGUI.loc_service("caravan_levy")) and has(otip, "opener_bounties")
-           and has(otip, "opener_demand") and has(otip, GGUI.loc_guild("slavers"))
+    -- Loc reads its keys back here, so what %n fills in is checked in 2b, in real English.
+    assert(has(otip, "opener_ready") and has(otip, "opener_bounties")
+           and has(otip, "opener_demand") and has(otip, "opener_waiting")
            and has(otip, "opener_click") and not has(otip, "opener_none"),
            "the opener's tooltip must name what is ready, got " .. tostring(otip))
     GG.bounties[ME], GG.demands[ME] = nil, nil
     GG.bounty_view, PREV_VIEW = PREV_VIEW, nil
     standing({})
-    handlers["gg_opener_tip"]({string = GGUI.BTN})
+    GGUI.write_opener_tip()
     assert(has(tips["root/" .. GGUI.BTN], "opener_none"),
            "with nothing to do the opener must say so")
     made[GGUI.BTN] = nil
+
+    -- ---- 2b. LAID OUT AS THE IRON COURT'S (2026-10-11), read in loc.tsv's English -------
+    -- What is waiting under a yellow heading, each line naming its tab, then where the player
+    -- stands. Real text, because the figures and names go in through %n.
+    local OLOC = {names_zhatan = "Zhatan"}
+    for line in io.lines("Modding Files/source/great_guilds/loc.tsv") do
+        local k, v = string.match(line, "^([^\t]+)\t([^\t]*)")
+        if k then OLOC[k] = v end
+    end
+    common = {get_localised_string = function(k) return OLOC[k] or "" end}
+    local keep_leader = GG.leader_of
+    GG.leader_of = function() return nil, 0 end       -- nobody leads until a case says so
+    PREV_VIEW = GG.bounty_view
+    GG.bounty_view = function(f)
+        local out = {}
+        for i = 1, #(GG.bounties[f] or {}) do out[i] = i end
+        return out
+    end
+    local function lines_of(tip)
+        local title, body = string.match(tip, "^(.-)||(.*)$")
+        assert(title == "The Great Guilds" and not has(body, "||"),
+               "one title, one body, as the court's: " .. tip)
+        local L = {}
+        for l in string.gmatch(body .. "\n", "(.-)\n") do L[#L + 1] = l end
+        return L, body
+    end
+    standing({brass = {150, 150}, slavers = {320, 0}})
+    TREASURY[ME] = 99999
+    GG.bounties[ME] = {
+        {guild = "khanate", kind = "region_take", target = "wh3_qol_r", posted = 1,
+         gold = 100, rep = 10},
+        {guild = "brass", kind = "region_take", target = "wh3_qol_r2", posted = 1,
+         taken = true, gold = 100, rep = 10}}
+    GG.demands[ME] = {guild = "slavers", kind = "tribute", amount = 100, due = GG.turn_now() + 1}
+    local L, body = lines_of(GGUI.opener_tip(ME))
+    assert(L[1] == "[[col:yellow]]Waiting for you:[[/col]]", "the heading leads, got " .. L[1])
+    for _, want in ipairs({
+            "Services ready to buy: " .. OLOC["derpy_gg_service_name_caravan_levy"]
+                .. " (The Brass Tablets)",
+            "Bounties you can take: 1. See Bounties.",
+            "A demand you can pay: The Slavers, 100 gold, 2 turns to pay. See Court.",
+            "Highest rank: Sworn (The Slavers, 320 Reputation).",
+            "No patron appointed. See Court.",
+            "Bounties in progress: 1. See Bounties.",
+            "New services in", "Click to open."}) do
+        assert(has(body, want), "missing '" .. want .. "' in:\n" .. body)
+    end
+    assert(not has(body, "You lead:") and not has(body, "cannot pay"), "said too much:\n" .. body)
+    -- Waiting lines sit under the heading and above the blank line; the summary below it.
+    local blank
+    for i = 1, #L do if L[i] == "" then blank = i break end end
+    assert(blank and has(L[blank - 1], "See Court.") and has(L[blank + 1], "Highest rank"),
+           "waiting, then a gap, then the summary:\n" .. body)
+
+    -- SHORT OF GOLD the demand leaves the heading for the summary; a patron and a lead show.
+    TREASURY[ME] = 0
+    GG.patrons[ME] = {guild = "khanate", cqi = 7}
+    local keep_char = cm.get_character_by_cqi
+    cm.get_character_by_cqi = function()
+        return {is_null_interface = function() return false end,
+                get_forename = function() return "names_zhatan" end,
+                get_surname = function() return "" end}
+    end
+    GG.leader_of = function(g)
+        if g == "slavers" then return ME, 320 end
+        if g == "khanate" then return RIVAL, 500 end       -- a rival's lead is not yours
+        return nil, 0
+    end
+    L, body = lines_of(GGUI.opener_tip(ME))
+    assert(has(body, "A demand you cannot pay yet: The Slavers, 100 gold, 2 turns to pay.")
+           and not has(body, "A demand you can pay:"), "an unpayable demand is summary:\n" .. body)
+    assert(has(body, "Patron: Zhatan (The Khanate).") and has(body, "You lead: The Slavers."),
+           "the patron and the lead:\n" .. body)
+
+    -- NOTHING AT ALL: no heading, and no rank invented; equal Reputation goes to the earlier.
+    GG.bounties[ME], GG.demands[ME], GG.patrons[ME] = nil, nil, nil
+    GG.leader_of = function() return nil, 0 end
+    standing({})
+    L, body = lines_of(GGUI.opener_tip(ME))
+    assert(L[1] == "Nothing needs you right now." and not has(body, "Waiting for you"),
+           "nothing waiting, no heading:\n" .. body)
+    assert(has(body, "No Reputation with any guild yet."), "no rank invented:\n" .. body)
+    standing({brass = {150, 0}, slavers = {150, 0}})
+    L, body = lines_of(GGUI.opener_tip(ME))
+    assert(has(body, "Highest rank: Indebted (The Brass Tablets, 150 Reputation)."),
+           "a tie goes to the earlier guild:\n" .. body)
+    -- A % in a filled-in name is text, not a gsub capture.
+    assert(GGUI.fill("Patron: %n.", "50% off") == "Patron: 50% off.", "fill broke on a %")
+    GG.leader_of, GG.bounty_view, PREV_VIEW = keep_leader, PREV_VIEW, nil
+    cm.get_character_by_cqi, TREASURY[ME] = keep_char, 99999
+    common = nil
 
     -- ---- 3. THE ARROWS SAY WHERE THEY GO -----------------------------------------------
     standing({brass = {150, 150}})
@@ -8164,6 +8280,18 @@ end)()
                .. " | " .. tostring(texts[c2 .. "card_desc_2"]))
         assert(vis[c2 .. "card_icon"] == true, "the patron card shows its glyph")
         GG.patrons[ME] = keep_p
+        -- THE RENOUNCE LINE NAMES THE RACE'S RIVAL (woc spec §4.1): a Warriors of Chaos
+        -- faction told to renounce Khorne's rival is told the Dark Prince, not Tzeentch.
+        local keep_dm, keep_cu, keep_pcs = GG.demands[ME], GG.CULTURE_OF[ME], GG.player_cultures
+        GG.CULTURE_OF[ME] = "wh_main_chs_chaos"
+        GG.player_cultures = function() return {wh_main_chs_chaos = true} end
+        GG.demands[ME] = {guild = "immortals", kind = "renounce", amount = 80, due = t_now + 4}
+        open_on(4)
+        local line = texts[c1 .. "card_desc_1"] or ""
+        assert(has(line, GGUI.loc_guild("slavers"))
+               and not has(line, GGUI.loc_guild("daemonsmiths")),
+               "the renounce line names the Dark Prince, got " .. line)
+        GG.demands[ME], GG.CULTURE_OF[ME], GG.player_cultures = keep_dm, keep_cu, keep_pcs
         GG.demands[ME].due = t_now + 4
         open_on(4)
         assert(has(texts[d2] or "", "5 " .. GGUI.loc("demand_due")), "5 left is plural, got "
@@ -9812,9 +9940,10 @@ end)()
     end
     assert(table.concat(keys, ",") == "hashut_blessing,forge_sermons,temple_tithe,zeal,"
         .. "purge_unclean,anathema,holy_war,miracle,consecration", "nine temple services")
-    -- ROW 92, positionally: the Skaven's three race rows (2026-10-05) come after it.
-    assert(GG.SERVICES[92].key == "consecration" and #GG.SERVICES == 95,
-           "the temple's rows end at row 92, before the Skaven's three")
+    -- ROW 92, positionally: the Skaven's three race rows (2026-10-05) and the Warriors of
+    -- Chaos' three (2026-10-12) come after it.
+    assert(GG.SERVICES[92].key == "consecration" and #GG.SERVICES == 98,
+           "the temple's rows end at row 92, before the Skaven's and the Warriors' three")
     -- AN OLD SAVE: six standing pairs and the 83 cooldowns it had before the temple.
     local F = "cr_temple_oldsave"
     local cds = {}
@@ -10023,6 +10152,61 @@ end)()
     cm.pending_battle_cache_faction_won_battle_against_culture = nil
     -- NO PRIESTS ROUTE (ruling 1): a Grey Seer is a lord, so no hero action pays the Seers.
     assert(GG.TEMPLE_ROUTES["wh2_main_skv_skaven"].priests == nil, "no Skaven priests route")
+    -- THE UNDIVIDED (woc spec §3.3): paid per province carrying UNDIVIDED Chaos corruption.
+    -- A Skaven-only province pays the Undivided nothing, and an Undivided-only one pays the
+    -- Grey Seers nothing: each taint names its own resource.
+    local und1 = prov(10, 0, 0, {wh3_main_corruption_chaos = 30})
+    local und2 = prov(-5, 4, 0, {wh3_main_corruption_chaos = 1, wh3_main_corruption_khorne = 9})
+    local skv_only = prov(10, 0, 0, {wh3_main_corruption_skaven = 12})
+    local kho_only = prov(10, 0, 0, {wh3_main_corruption_khorne = 40})
+    assert(earned("wh_main_chs_chaos", function(F)
+        GG.temple_turn(F, {provinces = function() return L({und1, und2, skv_only, kho_only}) end}) end)
+        == 2 * 2, "two Undivided provinces x 2; Skaven and Khorne-only provinces nothing")
+    assert(earned("wh2_main_skv_skaven", function(F)
+        GG.temple_turn(F, {provinces = function() return L({und1, skv_only}) end}) end)
+        == 1 * 2, "the Grey Seers still count only Skaven corruption")
+    -- HOLY WAR: the cache is asked with the Empire, Kislev and Cathay.
+    local asked3
+    cm.pending_battle_cache_faction_won_battle_against_culture = function(_, fk, cultures)
+        asked3 = cultures
+        return true
+    end
+    assert(earned("wh_main_chs_chaos", function(F) GG.temple_holy(F) end) == 10,
+           "a Warriors of Chaos win against the Empire pays 10")
+    assert(asked3[1] == "wh_main_emp_empire" and asked3[2] == "wh3_main_ksl_kislev"
+           and asked3[3] == "wh3_main_cth_cathay", "asked with the Empire, Kislev and Cathay")
+    cm.pending_battle_cache_faction_won_battle_against_culture = nil
+    -- PRIESTS: an unmarked Sorcerer's action pays the Undivided; a marked one the Undoer.
+    assert(earned("wh_main_chs_chaos", function(F)
+        GG.on_agent_action(F, true, "wh_main_chs_chaos_sorcerer_fire") end) == 8,
+        "an unmarked Sorcerer pays the Undivided 8")
+    local W = "cr_chs_priest"
+    local keep_pc3 = GG.player_cultures
+    GG.player_cultures = function() return {wh_main_chs_chaos = true} end
+    GG.CULTURE_OF[W], GG.state[W], GG.turn_gain[W] = "wh_main_chs_chaos", nil, {}
+    GG.load(W)
+    GG.on_agent_action(W, true, "wh3_dlc20_chs_sorcerer_metal_mtze")
+    assert(select(1, GG.get(W, "khanate")) == 8 and select(1, GG.get(W, "temple")) == 0,
+           "a marked Sorcerer pays the Undoer")
+    GG.state[W], GG.CULTURE_OF[W], GG.turn_gain[W] = nil, nil, nil
+    GG.player_cultures = keep_pc3
+    -- THE PREVIEW SEES THE UNDIVIDED (woc spec §10): GG.turn_start_pay must report the taint
+    -- route's turn-start pay, or GG.hold_lead reads the leader as behind every round.
+    local keep_gf4, keep_pc4 = cm.get_faction, GG.player_cultures
+    local T2 = "cr_chs_pay"
+    cm.get_faction = function(self, k)
+        if k == T2 then
+            return {is_null_interface = function() return false end,
+                    provinces = function() return L({und1, und2, skv_only, kho_only}) end}
+        end
+        return keep_gf4(self, k)
+    end
+    GG.CULTURE_OF[T2] = "wh_main_chs_chaos"
+    GG.player_cultures = function() return {wh_main_chs_chaos = true} end
+    assert(GG.turn_start_pay(T2, "temple") == 2 * 2,
+           "the Undivided's turn start pays two corrupted provinces x 2, got "
+           .. GG.turn_start_pay(T2, "temple"))
+    cm.get_faction, GG.player_cultures, GG.CULTURE_OF[T2] = keep_gf4, keep_pc4, nil
     GG.TUNE = keep
 end)()
 ;(function()
@@ -10038,15 +10222,17 @@ end)()
     assert(GG.TWISTS[SKV].rate_rivalry == 150 and GG.TWISTS[SKV].demand_penalty == 0,
            "Treachery: rivalry half again, an expired demand costs nothing")
     assert(GG.HALL_TAGS["_skv"], "the Skaven have halls")
+    local at = {}
+    for i, k in ipairs(GG.TUNE_ORDER) do at[k] = i end
     assert(GG.TUNE_DEFAULTS.rate_temple_taint == 2
-           and GG.TUNE_ORDER[#GG.TUNE_ORDER] == "rate_temple_taint",
-           "the taint rate, appended last")
+           and at.rate_temple_taint == at.cap_temple + 1,
+           "the taint rate, appended straight after cap_temple")
     assert(GG.LEDGER_KNOWN.undercity and GG.LEDGER_KNOWN.taint, "two new ledger sources")
-    -- APPENDED AFTER THE TEMPLE: cooldowns are saved by position.
-    local n = #GG.SERVICES
-    assert(GG.SERVICES[n - 2].key == "food_tithe" and GG.SERVICES[n - 1].key == "shadows_of_eshin"
-           and GG.SERVICES[n].key == "breeding_season", "the Skaven rows are last")
-    assert(GG.SERVICES[n - 3].key == "consecration", "the temple's last row sits before them")
+    -- APPENDED AFTER THE TEMPLE: cooldowns are saved by position, so the Skaven's rows stay
+    -- at 93-95 for good (the Warriors of Chaos' three follow, 2026-10-12).
+    assert(GG.SERVICES[93].key == "food_tithe" and GG.SERVICES[94].key == "shadows_of_eshin"
+           and GG.SERVICES[95].key == "breeding_season", "the Skaven rows are 93-95")
+    assert(GG.SERVICES[92].key == "consecration", "the temple's last row sits before them")
     assert(GG.RACE_FIRE.shadows_of_eshin == GG.RACE_FIRE.electors_muster,
            "Shadows of Eshin grants units the way the Elector's Muster does")
     -- A SAVE FROM BEFORE THE SKAVEN: a Skaven faction with no saved state loads blank.
@@ -10225,5 +10411,461 @@ end)()
     for _ in pairs(on) do n = n + 1 end
     assert(n == 5, "five guilds raised, got " .. n)
     GG.CULTURE_OF[F], GG.state[F] = nil, nil
+end)()
+;(function()
+    -- RECRUITING (2026-10-11). UnitTrained and CharacterRecruited pay the guild a recruit
+    -- belongs to. Driven through the HANDLERS, with contexts carrying exactly the
+    -- accessors scripting_doc lists for the two events and nothing more, and measured as
+    -- Reputation that moved - not as which rule a function says it picked.
+    local F, E = "cr_recruit_me", "cr_recruit_emp"
+    local CHD, EMP = "wh3_dlc23_chd_chaos_dwarfs", "wh_main_emp_empire"
+    local prev_humans, prev_getter, keep = GG.humans, cm.get_human_factions, GG.TUNE
+    GG.humans, GG.player_cultures_cache = nil, nil
+    cm.get_human_factions = function() return {F} end
+    GG.CULTURE_OF[F], GG.CULTURE_OF[E] = CHD, EMP
+    GG.TUNE = GG.unpack_tune(GG.pack_tune({}))
+    assert(handlers["gg_recruit_unit"] and handlers["gg_recruit_character"],
+           "both recruiting listeners must be registered")
+    local function fac(n) return {name = function() return n end} end
+    local function unit(f, key, caste, class)
+        handlers["gg_recruit_unit"]({unit = function() return {
+            faction = function() return fac(f) end,
+            unit_key = function() return key end,
+            unit_caste = function() return caste end,
+            unit_class = function() return class end} end})
+    end
+    local function char(f, key, agent, caster)
+        handlers["gg_recruit_character"]({character = function() return {
+            faction = function() return fac(f) end,
+            character_subtype_key = function() return key end,
+            character_type_key = function() return agent end,
+            is_caster = function() return caster end} end})
+    end
+    local function rep(f, g) return (GG.get(f, g)) end
+    local function pays(g, n, what, fn)
+        local before = rep(F, g)
+        fn()
+        local got = rep(F, g) - before
+        assert(got == n, what .. ": the " .. g .. " should gain " .. n .. ", gained " .. got)
+    end
+    local function fresh()
+        GG.state[F] = nil
+        saved["derpy_gg_" .. F] = nil
+        GG.reset_turn(F)
+    end
+
+    -- WHAT EACH RECRUIT PAYS, the approved Chaos Dwarf table (2026-10-11).
+    fresh()
+    pays("immortals", 2, "Infernal Guard",
+         function() unit(F, "wh3_dlc23_chd_inf_infernal_guard", "melee_infantry", "inf_mel") end)
+    -- A MODDED UNIT, caught by what it is: cavalry by caste, infantry by class.
+    pays("temple", 2, "the Temple Guard, a modded Bull Centaur",
+         function() unit(F, "derpy_chd_temple_guard", "melee_cavalry", "inf_mel") end)
+    pays("khanate", 2, "a modded wolf rider with no hobgoblin in its key",
+         function() unit(F, "derpy_chd_wolf_lancers", "melee_cavalry", "cav_mel") end)
+    pays("brass", 2, "Wolf Raiders (Spears), the Brass hall's family",
+         function() unit(F, "wh3_dlc23_chd_cav_hobgoblin_wolf_raiders_spears",
+                         "melee_cavalry", "cav_mel") end)
+    pays("temple", 4, "a Lammasu, the temple hall's family, doubled as a monster",
+         function() unit(F, "wh3_dlc23_chd_mon_lammasu", "monster", "inf_mel") end)
+    pays("overseers", 2, "Chaos Dwarf Warriors (Great Weapons), the Overseers' hall family",
+         function() unit(F, "wh3_dlc23_chd_inf_chaos_dwarf_warriors_great_weapons",
+                         "melee_infantry", "inf_mel") end)
+    -- ORDER: Cutthroats carry "hobgoblin" in their key and must reach the Slavers first.
+    pays("slavers", 2, "Hobgoblin Cutthroats, ahead of the hobgoblin rule",
+         function() unit(F, "wh3_dlc23_chd_inf_hobgoblin_cutthroats",
+                         "melee_infantry", "inf_mel") end)
+    pays("khanate", 2, "Hobgoblin Archers",
+         function() unit(F, "wh3_dlc23_chd_inf_hobgoblin_archers",
+                         "missile_infantry", "inf_mis") end)
+    pays("overseers", 2, "Goblin Labourers",
+         function() unit(F, "wh3_dlc23_chd_inf_goblin_labourers",
+                         "melee_infantry", "inf_mel") end)
+    pays("slavers", 4, "the Chaos Siege Giant",
+         function() unit(F, "wh3_dlc29_chd_mon_chaos_siege_giant", "monster", "inf_mel") end)
+    pays("daemonsmiths", 4, "an Iron Daemon",
+         function() unit(F, "wh3_dlc23_chd_veh_iron_daemon", "warmachine", "chariot") end)
+    pays("temple", 8, "a Sorcerer-Prophet, four times as a lord",
+         function() char(F, "wh3_dlc23_chd_sorcerer_prophet_fire", "general", true) end)
+    pays("overseers", 8, "an Overseer",
+         function() char(F, "wh3_dlc23_chd_overseer", "general", false) end)
+    pays("brass", 8, "a Convoy Overseer",
+         function() char(F, "wh3_dlc23_chd_lord_convoy_overseer", "general", false) end)
+    pays("daemonsmiths", 8, "a Daemonsmith Sorcerer",
+         function() char(F, "wh3_dlc23_chd_daemonsmith_sorcerer_fire", "wizard", true) end)
+    pays("immortals", 8, "an Infernal Castellan",
+         function() char(F, "wh3_dlc23_chd_infernal_castellan", "engineer", false) end)
+    local L = GG.ledger_read(F)
+    assert(L.now.temple and L.now.temple.recruits == 14,
+           "the ledger must book recruiting as its own source, got "
+           .. tostring(L.now.temple and L.now.temple.recruits))
+
+    -- A RACE THE PLAYER IS NOT is not covered: no grant and nothing in the save. An
+    -- Empire faction, because the Empire HAS routes - a culture without any would pass
+    -- this with the gate deleted. The saved gain is what catches it: GG.capped_grant's
+    -- own gate would still stop the grant.
+    unit(E, "wh_main_emp_inf_greatswords", "melee_infantry", "inf_mel")
+    assert(GG.state[E] == nil and saved["derpy_gg_" .. E] == nil
+           and saved["derpy_gg_gain_" .. E] == nil,
+           "an uncovered faction's recruit must leave nothing behind")
+    GG.on_recruit(E, "units", {key = "wh_main_emp_inf_greatswords", caste = "melee_infantry",
+                               class = "inf_mel"})
+    assert(saved["derpy_gg_gain_" .. E] == nil, "GG.on_recruit must refuse an uncovered faction")
+
+    -- THE RECRUITING LIMIT: 20 a guild a turn by default, and what it holds back is booked.
+    fresh()
+    pays("immortals", 20, "eleven infantry against the limit of 20", function()
+        for _ = 1, 11 do
+            unit(F, "wh3_dlc23_chd_inf_infernal_guard", "melee_infantry", "inf_mel")
+        end
+    end)
+    L = GG.ledger_read(F)
+    assert(L.now.immortals.withheld == 2, "the limit's 2 must be booked as withheld, got "
+           .. tostring(L.now.immortals.withheld))
+    -- PART OF A RECRUIT: 8 + 8 leaves 4 under the limit, so the third lord pays 4 and
+    -- books 4 withheld. 2 and 4 both divide 20, so only an 8 reaches this branch.
+    pays("temple", 20, "three Sorcerer-Prophets against the limit", function()
+        for _ = 1, 3 do char(F, "wh3_dlc23_chd_sorcerer_prophet_fire", "general", true) end
+    end)
+    L = GG.ledger_read(F)
+    assert(L.now.temple.withheld == 4, "the third lord's 4 over the limit must be booked, got "
+           .. tostring(L.now.temple.withheld))
+    -- THE DAEMONSMITHS HAVE NO GUILD LIMIT and are still bound by this one.
+    pays("daemonsmiths", 20, "six Iron Daemons against the limit", function()
+        for _ = 1, 6 do unit(F, "wh3_dlc23_chd_veh_iron_daemon", "warmachine", "chariot") end
+    end)
+    -- AND A RELOAD DOES NOT RESET IT. Session memory gone, the saved gain answers. The
+    -- Daemonsmiths, because capped_grant never saves an uncapped guild's gain - only
+    -- GG.on_recruit's own save_gain does.
+    GG.turn_gain[F] = nil
+    pays("daemonsmiths", 0, "after a reload, the limit already reached",
+         function() unit(F, "wh3_dlc23_chd_veh_iron_daemon", "warmachine", "chariot") end)
+    -- A NEW TURN does.
+    GG.reset_turn(F)
+    pays("daemonsmiths", 4, "after the turn resets",
+         function() unit(F, "wh3_dlc23_chd_veh_iron_daemon", "warmachine", "chariot") end)
+
+    -- THE SETTINGS, through a real pack/unpack round trip.
+    GG.TUNE = GG.unpack_tune(GG.pack_tune({cap_recruit = 0}))
+    fresh()
+    pays("immortals", 22, "no recruiting limit", function()
+        for _ = 1, 11 do
+            unit(F, "wh3_dlc23_chd_inf_infernal_guard", "melee_infantry", "inf_mel")
+        end
+    end)
+    GG.TUNE = GG.unpack_tune(GG.pack_tune({rate_recruit = 0}))
+    pays("immortals", 0, "recruiting switched off",
+         function() unit(F, "wh3_dlc23_chd_inf_infernal_guard", "melee_infantry", "inf_mel") end)
+
+    -- `false` PAYS NOTHING where the fallback below it would pay: The Things in the Woods
+    -- are cavalry, which Kislev's fallback gives the Tzar Guard.
+    local woods = {key = "wh3_dlc24_ksl_mon_the_things_in_the_woods",
+                   caste = "monstrous_cavalry", class = "spcl"}
+    assert(GG.recruit_guild("wh3_main_ksl_kislev", "units", woods) == nil,
+           "The Things in the Woods must pay no guild")
+    woods.key = "wh3_main_ksl_cav_winged_lancers_0"
+    assert(GG.recruit_guild("wh3_main_ksl_kislev", "units", woods) == "immortals",
+           "the cavalry fallback must still pay the Tzar Guard")
+    -- A CULTURE WITH NO ROUTES pays nothing rather than erroring.
+    assert(GG.recruit_guild("wh2_main_lzd_lizardmen", "units", woods) == nil,
+           "a culture with no routes")
+
+    GG.TUNE, GG.humans, cm.get_human_factions = keep, prev_humans, prev_getter
+    GG.player_cultures_cache = nil
+    GG.state[F], GG.state[E], GG.CULTURE_OF[F], GG.CULTURE_OF[E] = nil, nil, nil, nil
+    GG.turn_gain[F] = nil
+end)()
+;(function()
+    -- THE EARNINGS HOVER NAMES THE RECRUITS THAT PAY ITS GUILD, in the reader's own race,
+    -- with loc.tsv's text as the tooltip sweep reads it. A race that ships no line (the
+    -- generic flavour) gets nothing added - GGUI.loc's fallback is the bare key.
+    local LOC = {}
+    for line in io.lines("Modding Files/source/great_guilds/loc.tsv") do
+        local k, v = string.match(line, "^([^\t]+)\t([^\t]*)")
+        if k then LOC[k] = v end
+    end
+    local keep_common, keep_local = common, cm.get_local_faction_name
+    common = {get_localised_string = function(k) return LOC[k] or "" end}
+    local F = "cr_recruit_tip"
+    cm.get_local_faction_name = function() return F end
+    for _, case in ipairs({{"wh3_dlc23_chd_chaos_dwarfs", "immortals",
+                            "Recruiting Infernal Guard"},
+                           {"wh_main_emp_empire", "slavers", "Recruiting Free Company Militia"},
+                           {"wh2_main_skv_skaven", "temple", "Recruiting Grey Seers"}}) do
+        GG.CULTURE_OF[F] = case[1]
+        local tip = GGUI.earned_tip({}, {}, case[2], F)
+        assert(string.find(tip, case[3]), case[1] .. " " .. case[2]
+               .. ": the earnings hover must name its recruits, got: " .. tip)
+    end
+    GG.CULTURE_OF[F] = "wh2_main_lzd_lizardmen"
+    local tip = GGUI.earned_tip({}, {}, "immortals", F)
+    assert(not string.find(tip, "recruit_"), "a bare loc key printed: " .. tip)
+    common, cm.get_local_faction_name, GG.CULTURE_OF[F] = keep_common, keep_local, nil
+end)()
+;(function()
+    -- THE WARRIORS OF CHAOS (woc spec, 2026-10-12): a tenth flavour, its twist and its
+    -- three race services appended AFTER the Skaven's three.
+    local CHS = "wh_main_chs_chaos"
+    assert(GG.FLAVOURED[CHS] and GG.FLAVOURED[CHS].tag == "_chs"
+           and GG.FLAVOURED[CHS].feed == 100, "the Warriors of Chaos flavour, feed 100")
+    assert(GG.HIRE_UNIT_BY_CULTURE[CHS] == "wh3_dlc20_chs_inf_chosen_mkho",
+           "the Blood God's hire is the Chosen of Khorne")
+    assert(GG.TWISTS[CHS].rate_decay == 150 and GG.TWISTS[CHS].demand_reward == 150,
+           "the Fickle Gods: decay and a paid demand both half again")
+    assert(GG.HALL_TAGS["_chs"], "the Warriors of Chaos have halls")
+    assert(GG.LEDGER_KNOWN.gifts, "the gifts ledger source")
+    -- APPENDED AFTER THE SKAVEN: cooldowns are saved by position.
+    local n = #GG.SERVICES
+    assert(GG.SERVICES[n - 2].key == "soul_tithe" and GG.SERVICES[n - 1].key == "eye_turns"
+           and GG.SERVICES[n].key == "skull_throne", "the Warriors of Chaos rows are last")
+    assert(GG.SERVICES[n - 3].key == "breeding_season", "the Skaven's last row sits before them")
+    for i = n - 2, n do
+        assert(GG.SERVICES[i].race == CHS, GG.SERVICES[i].key .. " is a Warriors of Chaos row")
+    end
+    -- A SAVE FROM BEFORE THE WARRIORS OF CHAOS: a faction with no saved state loads blank.
+    local F = "cr_chs_old"
+    GG.CULTURE_OF[F] = CHS
+    GG.state[F] = nil
+    GG.load(F)
+    for _, g in ipairs(GG.GUILDS) do
+        local rep, fav = GG.get(F, g)
+        assert(rep == 0 and fav == 0, "a Warriors of Chaos faction loads blank on " .. g)
+    end
+    GG.state[F], GG.CULTURE_OF[F] = nil, nil
+end)()
+;(function()
+    -- PER-RACE RIVALS (woc spec §4.1): the gods' own feuds, Khorne against Slaanesh and
+    -- Nurgle against Tzeentch, and the two renegades against each other.
+    -- EVERY RACE PLAYED, or GG.culture_of answers nil and every faction reads the global
+    -- table - which would let the other-races loop below pass whatever RIVALS_RACE held.
+    local keep_pc = GG.player_cultures
+    local all = {}
+    for culture in pairs(GG.FLAVOURED) do all[culture] = true end
+    GG.player_cultures = function() return all end
+    local W = "cr_chs_rivals"
+    GG.CULTURE_OF[W] = "wh_main_chs_chaos"
+    local want = {immortals = "slavers", slavers = "immortals",
+                  overseers = "daemonsmiths", daemonsmiths = "overseers",
+                  brass = "khanate", khanate = "brass"}
+    for g, r in pairs(want) do
+        assert(GG.rival_of(W, g) == r, "the " .. g .. " god's rival is " .. r .. ", got "
+               .. tostring(GG.rival_of(W, g)))
+    end
+    assert(GG.rival_of(W, "temple") == nil, "the Undivided has no rival")
+    -- EVERY OTHER RACE KEEPS THE GLOBAL TABLE, guild by guild.
+    for culture in pairs(GG.FLAVOURED) do
+        if culture ~= "wh_main_chs_chaos" then
+            local f = "cr_rivals_" .. culture
+            GG.CULTURE_OF[f] = culture
+            for _, g in ipairs(GG.GUILDS) do
+                assert(GG.rival_of(f, g) == GG.RIVALS[g], culture .. " " .. g
+                       .. " must keep the global rival " .. tostring(GG.RIVALS[g]))
+            end
+            GG.CULTURE_OF[f] = nil
+        end
+    end
+    -- AND THE RIVALRY IS WHAT A GRANT ACTUALLY TAKES. A Khorne earning costs Slaanesh and
+    -- leaves Tzeentch alone; an Empire Immortals earning still costs its Daemonsmiths.
+    -- 500 is mid-rank (300-699), so the rival floor leaves room to lose.
+    local E = "cr_emp_rivals"
+    GG.CULTURE_OF[E] = "wh_main_emp_empire"
+    for _, f in ipairs({W, E}) do
+        GG.state[f], GG.turn_gain[f] = {}, {}
+        for _, g in ipairs(GG.GUILDS) do GG.state[f][g] = {rep = 500, fav = 0} end
+        GG.grant(f, "immortals", 100, "battles")
+    end
+    assert(GG.get(W, "slavers") < 500, "Khorne's earning takes from Slaanesh")
+    assert(GG.get(W, "daemonsmiths") == 500, "and not from Tzeentch")
+    assert(GG.get(E, "daemonsmiths") < 500, "the Empire's Immortals still take from the Daemonsmiths")
+    assert(GG.get(E, "slavers") == 500, "and not from the Slavers")
+    -- AND THE PRICE READS THE SAME RIVAL: a Blood God service costs more while the Dark
+    -- Prince stands two ranks above him, and nothing more for Tzeentch, whom the global
+    -- table makes Khorne's rival. Two ranks, not three: +30 would sit on the clamp.
+    local svc
+    for _, s in ipairs(GG.SERVICES) do
+        if s.guild == "immortals" and s.rank == 2 and not s.race then svc = s.key break end
+    end
+    for _, case in ipairs({{"slavers", 2 * GG.FAVOUR_RIVALRY}, {"daemonsmiths", 0}}) do
+        GG.state[W] = {}
+        for _, g in ipairs(GG.GUILDS) do GG.state[W][g] = {rep = 0, fav = 0} end
+        GG.state[W].immortals.rep = 100                  -- rank 2
+        GG.state[W][case[1]].rep = 700                   -- rank 4, two ahead
+        local _, mod = GG.service_cost(W, svc)
+        assert(mod == case[2], "a Blood God price with " .. case[1] .. " ahead is +"
+               .. case[2] .. "%, got " .. tostring(mod))
+    end
+    GG.state[W], GG.state[E], GG.CULTURE_OF[W], GG.CULTURE_OF[E] = nil, nil, nil, nil
+    GG.turn_gain[W], GG.turn_gain[E] = nil, nil
+    GG.player_cultures = keep_pc
+end)()
+;(function()
+    -- GIFTS OF THE GODS (woc spec §3.2): Souls spent on a god's gifts pay that god, one
+    -- Devotion per 25, and each god keeps its own remainder.
+    local keep_pc = GG.player_cultures
+    GG.player_cultures = function() return {wh_main_chs_chaos = true} end
+    local W = "cr_chs_gifts"
+    GG.CULTURE_OF[W], GG.state[W], GG.turn_gain[W] = "wh_main_chs_chaos", nil, {}
+    for _, g in ipairs(GG.GUILDS) do GG.earn_carry[W .. "|gifts_" .. g] = nil end
+    GG.load(W)
+    GG.race_earn(W, "gifts", 60, "immortals")
+    assert(select(1, GG.get(W, "immortals")) == 2, "60 Souls to Khorne pay 2, got "
+           .. tostring(select(1, GG.get(W, "immortals"))))
+    assert(cm:get_saved_value("derpy_gg_carry_" .. W .. "_gifts_immortals") == 10,
+           "Khorne keeps 10 towards the next")
+    -- 20 TO NURGLE pays nothing, and is not added to Khorne's 10.
+    GG.race_earn(W, "gifts", 20, "overseers")
+    assert(select(1, GG.get(W, "overseers")) == 0, "20 Souls to Nurgle pay nothing yet")
+    assert(select(1, GG.get(W, "immortals")) == 2, "and do not pay Khorne")
+    GG.race_earn(W, "gifts", 15, "immortals")
+    assert(select(1, GG.get(W, "immortals")) == 3, "Khorne's 10 + 15 make one more")
+    -- NO GUILD NAMED, NOTHING PAID; ANOTHER RACE'S SPENDING PAYS NOTHING.
+    assert(GG.race_earn(W, "gifts", 100, nil) == 0, "a gift with no god pays nothing")
+    local K = "cr_skv_gifts"
+    GG.CULTURE_OF[K] = "wh2_main_skv_skaven"
+    assert(GG.race_earn(K, "gifts", 100, "immortals") == 0, "only the Warriors of Chaos")
+    -- THE FIVE POOLS, AND NONE FOR THE RENEGADES.
+    local n = 0
+    for key, g in pairs(GG.POOL_GUILD) do
+        n = n + 1
+        assert(GG.POOL_ROUTES[key] == "gifts", key .. " routes to gifts")
+        assert(g ~= "brass" and g ~= "khanate", "the Four do not deal with renegades: " .. key)
+    end
+    assert(n == 5, "five Souls pools, got " .. n)
+    -- AND THE EVENT REACHES IT: a PooledResourceChanged on Tzeentch's pool pays Tzeentch.
+    assert(handlers["gg_earn_pool"], "no PooledResourceChanged listener")
+    local function fac(name)
+        return {is_null_interface = function() return false end, name = function() return name end}
+    end
+    handlers["gg_earn_pool"]({
+        resource = function() return {key = function() return "wh3_dlc20_chs_souls_spent_tze" end} end,
+        has_faction = function() return true end,
+        faction = function() return fac(W) end,
+        amount = function() return 50 end,
+        factor = function() return {is_null_interface = function() return true end} end,
+    })
+    assert(select(1, GG.get(W, "daemonsmiths")) == 2, "50 Souls to Tzeentch pay 2, got "
+           .. tostring(select(1, GG.get(W, "daemonsmiths"))))
+    GG.state[W], GG.state[K], GG.CULTURE_OF[W], GG.CULTURE_OF[K] = nil, nil, nil, nil
+    GG.turn_gain[W] = nil
+    GG.player_cultures = keep_pc
+end)()
+;(function()
+    -- RECRUITING BY MARK (woc spec §3.4) and THE BUILDING WORDS (§3.5).
+    local C = "wh_main_chs_chaos"
+    local function u(key, caste, class)
+        return GG.recruit_guild(C, "units", {key = key, caste = caste, class = class})
+    end
+    local function ch(key, agent, caster)
+        return GG.recruit_guild(C, "characters", {key = key, agent = agent, caster = caster})
+    end
+    local units = {
+        {"wh3_dlc20_chs_inf_chosen_mkho", "melee_infantry", "inf_mel", "immortals", "Chosen of Khorne"},
+        {"wh3_main_kho_cav_skullcrushers_0", "monstrous_cavalry", "cav_shk", "immortals", "Skullcrushers (_kho_)"},
+        {"wh3_dlc20_chs_inf_chosen_mnur", "melee_infantry", "inf_mel", "overseers", "Chosen of Nurgle"},
+        {"wh3_dlc29_chs_inf_putrid_blightkings_great_weapons", "melee_infantry", "inf_mel", "overseers", "Blightkings"},
+        {"wh3_dlc20_chs_inf_chosen_msla", "melee_infantry", "inf_mel", "slavers", "Chosen of Slaanesh"},
+        {"wh3_dlc20_chs_inf_chosen_mtze", "melee_infantry", "inf_mel", "daemonsmiths", "Chosen of Tzeentch"},
+        {"wh_main_chs_inf_chosen_0", "melee_infantry", "inf_mel", "temple", "unmarked Chosen"},
+        {"wh_main_chs_art_hellcannon", "warmachine", "art_fld", "temple", "the Hellcannon"},
+    }
+    for _, c in ipairs(units) do
+        local got = u(c[1], c[2], c[3])
+        assert(got == c[4], c[5] .. " pay " .. c[4] .. ", got " .. tostring(got))
+    end
+    local chars = {
+        {"wh3_dlc20_kho_valkia", "general", false, "immortals"},
+        {"wh3_dlc20_chs_daemon_prince_khorne", "general", false, "immortals"},
+        {"wh3_dlc20_nur_festus", "general", true, "overseers"},
+        {"wh3_dlc29_chs_glottkin", "general", false, "overseers"},
+        {"wh_dlc01_chs_prince_sigvald", "general", false, "slavers"},
+        {"wh3_dlc20_sla_azazel", "general", false, "slavers"},
+        {"wh3_dlc20_tze_vilitch", "general", true, "daemonsmiths"},
+        {"wh3_dlc20_chs_sorcerer_metal_mtze", "wizard", true, "daemonsmiths"},
+        {"wh_main_chs_archaon", "general", false, "temple"},
+        {"wh_main_chs_chaos_sorcerer_fire", "wizard", true, "temple"},
+        {"wh_main_chs_exalted_hero", "champion", false, "temple"},
+    }
+    for _, c in ipairs(chars) do
+        local got = ch(c[1], c[2], c[3])
+        assert(got == c[4], c[1] .. " pays " .. c[4] .. ", got " .. tostring(got))
+    end
+    -- NOTHING PAYS THE RENEGADES: they have no warriors.
+    for _, list in ipairs({"units", "characters"}) do
+        for _, r in ipairs(GG.RECRUIT_ROUTES[C][list]) do
+            assert(r[1] ~= "brass" and r[1] ~= "khanate", "a recruit pays a renegade: "
+                   .. tostring(r.key))
+        end
+    end
+    local want = {
+        wh3_dlc20_woc_dark_fortress_shrine = "temple",
+        wh3_dlc20_woc_chaos_altar_corruption = "temple",
+        wh3_dlc20_woc_dark_fortress_growth = "overseers",
+        wh3_dlc29_bch_woc_nurgle_garden_growth = "overseers",
+        wh3_dlc29_bch_woc_nurgle_garden_towers = "overseers",
+        wh3_dlc29_bch_woc_nurgle_garden_garrison = "overseers",
+        wh3_dlc20_woc_dark_fortress_income = "brass",
+        wh3_dlc20_woc_resource_gold = "brass",
+        wh3_dlc20_woc_dark_fortress_warriors = "immortals",
+        wh3_dlc20_woc_dark_fortress_knights = "immortals",
+        wh3_dlc20_woc_dark_fortress_marauder = "immortals",
+        wh3_dlc20_woc_chaos_altar_recruit = "immortals",
+        wh3_dlc20_woc_chaos_altar_replenishment = "immortals",
+        wh3_dlc20_woc_dark_fortress_chaos_monsters = "daemonsmiths",
+        wh3_dlc20_woc_dark_fortress_large_monsters = "daemonsmiths",
+        wh3_dlc20_woc_dark_fortress_vassals = "slavers",
+        wh3_main_chs_allied_outpost = "slavers",
+        wh3_dlc20_woc_dark_fortress_towers = "khanate",
+        wh3_dlc20_woc_chaos_altar_garrison = "khanate",
+        wh3_dlc20_foreign_slot_discovery_woc = "khanate",
+    }
+    for chain, g in pairs(want) do
+        assert(GG.guild_of_chain(chain, "_chs") == g, chain .. " should pay " .. g .. ", got "
+               .. tostring(GG.guild_of_chain(chain, "_chs")))
+    end
+end)()
+;(function()
+    -- AN UPGRADE PAYS ITS GOD (woc Ruling 9), for the Warriors of Chaos only. Driven
+    -- through the handler with exactly the accessors scripting_doc lists for UnitUpgraded
+    -- (unit, upgrade_group), and measured as Devotion that moved.
+    local W, D = "cr_upgrade_chs", "cr_upgrade_chd"
+    local prev_humans, prev_getter, keep = GG.humans, cm.get_human_factions, GG.TUNE
+    GG.humans, GG.player_cultures_cache = nil, nil
+    cm.get_human_factions = function() return {W, D} end
+    GG.CULTURE_OF[W], GG.CULTURE_OF[D] = "wh_main_chs_chaos", "wh3_dlc23_chd_chaos_dwarfs"
+    GG.TUNE = GG.unpack_tune(GG.pack_tune({}))
+    assert(handlers["gg_recruit_upgrade"], "the upgrade listener must be registered")
+    local function upgrade(f, key, group)
+        handlers["gg_recruit_upgrade"]({
+            unit = function() return {
+                faction = function() return {name = function() return f end} end,
+                unit_key = function() return key end,
+                unit_caste = function() return "melee_infantry" end,
+                unit_class = function() return "inf_mel" end} end,
+            upgrade_group = function() return {key = function() return group end} end})
+    end
+    local function total(f)
+        local n = 0
+        for _, g in ipairs(GG.GUILDS) do n = n + (GG.get(f, g)) end
+        return n
+    end
+    for _, f in ipairs({W, D}) do
+        GG.state[f] = nil; saved["derpy_gg_" .. f] = nil; GG.reset_turn(f)
+    end
+    local before = (GG.get(W, "immortals"))
+    upgrade(W, "wh3_dlc20_chs_inf_chosen_mkho", "wh3_dlc20_chs_warriors_kho_to_chosen")
+    local got = (GG.get(W, "immortals")) - before
+    assert(got == 2, "Warriors upgraded to Chosen of Khorne pay the Blood God 2, paid " .. got)
+    -- A WEAPON SWAP IS NOT A MARK (final review): CA's 25 *_to_self groups hand back the
+    -- same unit for 150 gold, and paying them as a recruit sold Devotion for gold.
+    before = (GG.get(W, "immortals"))
+    upgrade(W, "wh3_dlc20_chs_inf_chosen_mkho", "wh3_dlc20_chs_chosen_kho_to_self")
+    got = (GG.get(W, "immortals")) - before
+    assert(got == 0, "a Chosen of Khorne weapon swap pays the Blood God nothing, paid " .. got)
+    local chd = total(D)
+    upgrade(D, "wh3_dlc23_chd_inf_infernal_guard", "")
+    assert(total(D) == chd, "an upgrade pays nothing for a race outside GG.UPGRADE_PAYS")
+    GG.TUNE, GG.humans, cm.get_human_factions = keep, prev_humans, prev_getter
+    GG.player_cultures_cache = nil
+    for _, f in ipairs({W, D}) do GG.state[f], GG.CULTURE_OF[f] = nil, nil end
 end)()
 print("harness ok")

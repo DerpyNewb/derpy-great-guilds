@@ -754,7 +754,7 @@ def back_layers(h):
 # one picture (2026-10-04) and held by the preview's contrast check, which measured the
 # figures on every ornament at a single 48.
 RANK_STATS_PAD = {"": 48, "_emp": 84, "_dwf": 48, "_brt": 84, "_cth": 104, "_ksl": 74,
-                  "_def": 66, "_hef": 94, "_skv": 48}
+                  "_def": 66, "_hef": 94, "_skv": 48, "_chs": 66}
 
 
 # The pager and the close button are round: a chevron and a cross both want a disc,
@@ -881,6 +881,9 @@ _DIM = "#B4B4B4FF"
 _HEF_TAB = _D + "dlc27_hef_dragonships/wh3_hef_dragonships_header_tooltip.png"
 _BRT_TILE = "ui/skins/wh_main_brt_bretonnia/legacy/panel_back_tile.png"
 _CP = _D + "dlc29_skv_chaotic_plans/"
+_TC = _D + "dlc25_tamurkhans_chieftains/"
+_PG = _D + "path_to_glory/"
+_SOULS = _D + "chaos_gifts/souls_bar_"
 
 
 def _L(path, margin=0, tile=False, colour=None, offset=(0, 0), dw=0, dh=0):
@@ -1252,6 +1255,53 @@ FRAMES = {
         # 19-row trough, and fitted into 29 rows the trough would be 6.
         "track": [_L(_W2 + "ikit_panel_bar_background.png", 0, True)],
         "fill": [_L(_W2 + "ikit_panel_bar_fill.png", (0, 2, 0, 2))],
+    },
+    # THE WARRIORS OF CHAOS (woc Ruling 14): no panel of theirs has a card plate or tab
+    # states, so Tamurkhan's chieftain panel, the Path to Glory and the Gifts of Chaos lend
+    # them, with the race's own HUD bars - every file in ui2.pack, measured with PIL.
+    "_chs": {
+        # Tamurkhan's text plate, 395x200: a rusted ground at mean luminance 30 under the
+        # text, a bronze rim at rows 3-8 and 172-178 and columns 4-9 / 385-390, and spikes
+        # hanging from the bottom rim to row 195. The bottom slice keeps rim and spikes whole
+        # and tiles them along the card. DRAWN 2px PAST THE CARD on every side and 4 below:
+        # only rows and columns whose PEAK alpha is 27 or less reach outside (the spike tips
+        # are opaque, so a row average lies), which overhang_faint measures. The rim lands at
+        # card rows 96-102.
+        "card": _L(_TC + "text_holder.png", (12, 12, 28, 12), True,
+                   offset=(-2, -2), dw=4, dh=6),
+        # CA's Path to Glory tint, #FF8C00 (its active_glow_gadient is drawn #FF8C0032).
+        "heat": (_GLOW, "#FF8C0050"),
+        # The Path to Glory selection stroke: CA's own orange line at the edge, CA's 4px
+        # slices, nothing inside.
+        "rim": (_PG + "panel_selection_stroke.png", 4, None),
+        # The Gifts of Chaos' empty Undivided slot, 100x100: its dark disc runs 73px across
+        # the middle row, room for the 62px glyph.
+        "holder": (_D + "chaos_gifts/ritual_empty_slot_undivided.png", 0.5, 0.5),
+        # Tamurkhan's number plate, 68x28, as CA draws the chieftains' counts: a 2px top rim,
+        # the bottom rim and its shadow in rows 20-27, rounded 8px ends.
+        "cost": [_L(_TC + "num_holder.png", (3, 8, 8, 8))],
+        # The Warriors' own HUD bar, 740x58, its ends at native width - the eye-and-spike
+        # ornaments run to column 64 on the left and from 680 on the right. Squeezed to the
+        # strip's 46 rows as Kislev's: the caps above row 11 are opaque, so nothing may
+        # hang above it. The plate starts at row 11 of 58, row 9 of 46, hence rank_ty.
+        "rank": [_L("ui/skins/wh3_dlc20_chs_chaos/bar_small_central_left.png", (0, 64, 0, 64))],
+        "rank_tx": "70.00,0.00", "rank_ty": "8.00,0.00",
+        # The Warriors' HUD button bar, 467x71: the Skaven/High Elf shape, 85px ends, its
+        # spikes (columns 10-60 and 407-457) outside the end buttons.
+        "gbar": [_L("ui/skins/wh3_dlc20_chs_chaos/bar_small_buttons.png", (0, 85, 0, 85))],
+        # Tamurkhan's subtitle bar, 406x46, pointed ends to column 40. Standard dimmed, hover
+        # at full brightness, the open tab ringed by the Path to Glory stroke.
+        "tab": {"layers": [_L(_TC + "subtitle.png", (0, 40, 0, 40), colour=_DIM),
+                           _L(CLEAR, 4)],
+                "hover": [_L(_TC + "subtitle.png", (0, 40, 0, 40)), _L(CLEAR, 4)],
+                "selected": [_TC + "subtitle.png", _PG + "panel_selection_stroke.png"],
+                "selected_hover": [_TC + "subtitle.png", _PG + "panel_selection_stroke.png"]},
+        # The Souls bar, 272x26: its dark back under its frame, both fitted so the frame's
+        # opening (x 8-263, rows 8-18) holds the fixed fill rect; the Undivided fill CA
+        # draws in it, already the Empire's and Bretonnia's.
+        "track": (fit_track(_SOULS + "back.png", (272, 26), (8, 8, 264, 18))
+                  + fit_track(_SOULS + "frame.png", (272, 26), (8, 8, 264, 18))),
+        "fill": [_L(_SOULS + "fill_undiveded.png")],
     },
 }
 FRAME_TAGS = sorted(t for t in FRAMES if t)
@@ -3313,7 +3363,7 @@ def selftest():
         assert not check_frame_mirror(lua), check_frame_mirror(lua)
         assert not check_header_inset(lua), check_header_inset(lua)
         assert any("['_skv']" in m for m in check_header_inset(
-            lua.replace("_skv = 104}", "_skv = 56}"))), \
+            lua.replace("_skv = 104,", "_skv = 56,"))), \
             "a Skaven inset short of its pad was not reported"
         assert any("no '_hef' entry" in m for m in check_frame_mirror(
             re.sub(r"\n    _hef = \{.*?\n    \},", "", lua, flags=re.S))), \

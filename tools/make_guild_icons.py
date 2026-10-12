@@ -142,6 +142,17 @@ ICONS = {
     "skaven_slaves": "slavers_skv",
     "wh3_dlc29_skv_scruten_landmark": "temple_skv",
     "wh2_main_special_skavenblight_council13": "crest_skv",
+    # THE WARRIORS OF CHAOS (2026-10-12), CA's own art.
+    # The Four: CA's tech-tree watermarks, staged by hand (woc Ruling 15) - the mark-of-chaos
+    # icons are coloured orbs, 2-35% flat. The rest are CA's own building icons.
+    "tech_watermark_khorne": "immortals_chs",
+    "tech_watermark_nurgle": "overseers_chs",
+    "tech_watermark_slaanesh": "slavers_chs",
+    "tech_watermark_tzeentch": "daemonsmiths_chs",
+    "chaos_worship": "temple_chs",
+    "wh3_main_special_standing_stones": "brass_chs",
+    "wh3_dlc27_nor_trap_core_sabotage": "khanate_chs",
+    "chaos_dark_fortress": "crest_chs",
 }
 
 # THE SIX HALL ICONS (2026-10-04). building_culture_variants.icon names a file in
@@ -176,6 +187,17 @@ HALL_LEVEL_ICONS = {
 for _tag in ("_emp", "_dwf", "_brt", "_cth", "_ksl", "_def", "_hef", "_skv"):
     for _g in _GUILDS:
         HALL_ICONS[_CARD_STEM[_g + _tag]] = "derpy_gg_hall_" + _g + _tag
+# THE WARRIORS OF CHAOS' HALLS (2026-10-12): their cards are god symbols, so each hall takes
+# CA's own building icon for its trade instead of its card's stem (woc Ruling 15).
+HALL_ICONS.update({
+    "chaos_worship": "derpy_gg_hall_temple_chs",
+    "chaos_growth": "derpy_gg_hall_overseers_chs",
+    "chaos_income": "derpy_gg_hall_brass_chs",
+    "chaos_warriors": "derpy_gg_hall_immortals_chs",
+    "chaos_magic": "derpy_gg_hall_daemonsmiths_chs",
+    "chaos_vassals": "derpy_gg_hall_slavers_chs",
+    "chaos_towers": "derpy_gg_hall_khanate_chs",
+})
 # A per-level race's one-per-chain icon is retired (build_halls deletes it), so never copy it.
 _RETIRED = {"derpy_gg_hall_%s%s" % (_g, _t) for _t in HALL_LEVEL_ICON_TAGS for _g in _GUILDS}
 HALL_ICONS = {k: v for k, v in HALL_ICONS.items() if v not in _RETIRED}
@@ -357,7 +379,7 @@ TAB_FRAME = {
     "_dwf": "dwarf_cat_support", "_brt": "empire_cat_recruitment",
     "_cth": "cathay_cat_military", "_ksl": "kislev_cat_support",
     "_def": "dark_elves_cat_recruitment", "_hef": "high_elves_cat_recruitment",
-    "_skv": "skaven_cat_recruitment",
+    "_skv": "skaven_cat_recruitment", "_chs": "chaos_cat_recruitment",
 }
 TAB_INK = (150, 100, 14)
 TAB_GLYPH = 36                  # px square the crest is fitted into, inside a 64px scroll
@@ -508,11 +530,12 @@ def selftest():
     # EVERY FLAVOUR has all six guild icons and a crest, each from its own source.
     names = set(ICONS.values())
     assert len(names) == len(ICONS), "two sources ship under one name"
-    for tag in ("", "_emp", "_dwf", "_brt", "_cth", "_ksl", "_def", "_hef", "_skv", "_gen"):
+    for tag in ("", "_emp", "_dwf", "_brt", "_cth", "_ksl", "_def", "_hef", "_skv", "_chs",
+                "_gen"):
         for g in ("brass", "immortals", "daemonsmiths", "khanate", "overseers",
                   "slavers", "temple", "crest"):
             assert g + tag in names, "no icon ships as " + g + tag
-    assert len(set(HALL_ICONS.values())) == len(HALL_ICONS) == 63 - 7 * len(HALL_LEVEL_ICON_TAGS)
+    assert len(set(HALL_ICONS.values())) == len(HALL_ICONS) == 70 - 7 * len(HALL_LEVEL_ICON_TAGS)
     assert len(set(HALL_LEVEL_ICONS.values())) == 21 * len(HALL_LEVEL_ICON_TAGS)
     assert not set(HALL_ICONS.values()) & set(HALL_LEVEL_ICONS.values())
     assert all(v == v.lower() for v in HALL_LEVEL_ICONS.values()), "a pack path must be lowercase"

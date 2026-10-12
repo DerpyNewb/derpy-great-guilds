@@ -25,24 +25,27 @@ The code calls reputation *standing*; the player never sees that word. Reputatio
 saved values rather than pooled resources. That keeps it culture-blind: a pooled resource
 needs a row per campaign group, and a missing row fails silently.
 
-**Coverage is the player's race, and only the nine races the mod writes guilds for**
+**Coverage is the player's race, and only the ten races the mod writes guilds for**
 (`GG.covered`, `GG.FLAVOURED`). Every faction of the human's culture earns, if that culture
-is one of the nine. Any other culture gets nothing, not even when a human plays it: no
+is one of the ten. Any other culture gets nothing, not even when a human plays it: no
 opener, no reputation, no messages. Before 2026-09-24 any culture a human played was
 covered.
 
-**Flavours.** Each of the nine races has a tag (`""` Chaos Dwarfs, `_emp`, `_dwf`, `_brt`,
-`_cth`, `_ksl`, `_def`, `_hef`, `_skv`) appended to every key a player reads, and a feed offset
-(0, 10, 20, 40, 50, 60, 70, 80, 90) added to the feed indexes. A tenth, `_gen` at offset 30
+**Flavours.** Each of the ten races has a tag (`""` Chaos Dwarfs, `_emp`, `_dwf`, `_brt`,
+`_cth`, `_ksl`, `_def`, `_hef`, `_skv`, `_chs`) appended to every key a player reads, and a feed
+offset (0, 10, 20, 40, 50, 60, 70, 80, 90, 100) added to the feed indexes. One more, `_gen` at offset 30
 (`GG.GENERIC`), is read only by a message to a human of an uncovered race whom a hostile
 service hit in multiplayer. `GG.FLAVOURED` is mirrored by `FLAVOURS` in
 `gen_great_guilds.py`, and `check_flavour_mirror()` refuses a mismatch.
 
 **Seven guilds.** `GG.GUILDS` is brass, immortals, daemonsmiths, khanate, overseers, slavers,
-temple. The temple was appended last everywhere on 2026-10-04 and has no rival. Adding a
-tenth race touches about forty declaration points across the Lua and the tools; the list,
-with the check that catches each omission, is in
-`docs/history/HANDOFF_20261005_GUILDS_SKAVEN.md`.
+temple. The temple was appended last everywhere on 2026-10-04 and has no rival. Rivals are
+read per race through `GG.rival_of`: `GG.RIVALS_RACE[culture]` first (the Warriors of Chaos
+pair immortals with slavers, overseers with daemonsmiths, brass with khanate), then
+`GG.RIVALS`. Adding a race touches about forty declaration points across the Lua and the
+tools; the list, with the check that catches each omission, is in
+`docs/history/HANDOFF_20261005_GUILDS_SKAVEN.md`, and the Warriors of Chaos's additions are in
+`docs/history/HANDOFF_20261012_GUILDS_WARRIORS_OF_CHAOS.md`.
 
 ## 2. Where reputation comes from
 
@@ -55,6 +58,8 @@ with the check that catches each omission, is in
 | `gg_agent_*` | `CharacterCharacterTargetAction`, `CharacterGarrisonTargetAction` | Khanate. Also counts progress on a taken hero bounty (`GG.hero_progress`). |
 | `gg_building` | `BuildingCompleted` | The guild the building's chain belongs to (`GG.BUILDING_THEME_RACE[tag]` first, then `GG.BUILDING_THEME`, longest token match), scaled by level. |
 | `gg_sack_*` | `CharacterSackedSettlement`, `CharacterRazedSettlement` | Slavers, more for a raze. |
+| `gg_recruit_unit`, `gg_recruit_character` | `UnitTrained`, `CharacterRecruited` | The guild the recruit belongs to (`GG.on_recruit`), by the race's rules in `GG.RECRUIT_ROUTES`. |
+| `gg_recruit_upgrade` | `UnitUpgraded` | The same, for a race in `GG.UPGRADE_PAYS` (the Warriors of Chaos, whose marks are upgrades). A `*_to_self` group, CA's weapon swap, pays nothing. |
 | `gg_earn_*` | `CaravanCompleted`, `PooledResourceChanged`, `RegionFactionChangeEvent`, `ScriptEventFactionPerformsMotherlandRitual`, `RitualCompletedEvent`, `ForeignSlotManagerCreatedEvent` | The race earn routes (`GG.EARN_ROUTES`). `gg_earn_undercity` pays the Skaven's Eshin Assassins for an under-city founded, never for an allied outpost (`context:is_allied()`). |
 | `gg_undercity_building` | `ForeignSlotBuildingCompleteEvent` | An under-city building, by its owner's race words, the same as `gg_building`. Only slot sets containing `_slot_set_underempire` pay, so allied outposts, the Black Tower and sea patrols do not. |
 | `gg_mission` | `MissionSucceeded` | Every guild, or instead the payout for a bounty mission (a bounty is not also paid the blanket rate). |
@@ -128,8 +133,20 @@ Default rates (every one can be changed through MCT's Custom preset):
 | Khanate | 8 per agent action | 40 |
 | Overseers | 10 x building level | 40 |
 | Slavers | 25 per sack, more per raze | 80 |
-| Temple | 1 per devout province, 2 per clean province, 10 per holy-war battle, 2 per tainted province (Skaven) | 40 |
+| Temple | 1 per devout province, 2 per clean province, 10 per holy-war battle, 2 per province carrying the race's own corruption (Skaven, Warriors of Chaos) | 40 |
+| The god a gift is for (Warriors of Chaos) | 1 per 25 Souls spent, a remainder per god | the god's own cap |
 | Every guild | 10 per mission completed | - |
+| The recruit's guild | 2 per unit, 4 per monster or war machine, 8 per hero or lord | 20 per guild from recruiting, inside the guild's own cap |
+
+**Recruiting** (`GG.RECRUIT_ROUTES`, between the `BEGIN`/`END RECRUIT ROUTES` lines) is an
+ordered rule list per culture, first fit wins. A rule matches on a plain substring of the unit
+or subtype key, a caste group (`GG.CASTES`, read off `main_units.caste`), the `land_units`
+class, the agent type and the caster flag, so a modded unit pays without being listed. Caste and
+class are needed together: CA gives every monster and Bull Centaur the class `inf_mel`, and Bull
+Centaurs and Wolf Raiders the same caste. Each race opens with its hall families, so a guild
+hall's own unit pays that hall's guild. A rule whose guild is `false` pays nothing on purpose.
+`check_recruit_routes()` runs the block under lua.exe against every race's vanilla roster. The
+"Reputation this turn" hover names the recruits that pay each guild.
 
 ## 3. Save state
 
@@ -270,7 +287,7 @@ Run everything from the repo root.
 | Parse | `luac -p <file>` for the four scripts | Lua 5.1.5 |
 | Test | `lua tools/_guilds_harness.lua` | Runs the shipped Lua against a stubbed campaign and panel. Prints `harness ok`. |
 | Bounties | `lua tools/_guilds_bounty_harness.lua` | The bounty board against a stubbed world. Prints `bounty harness ok`. |
-| Mutation | `py tools/mutate_guilds.py` | Breaks the rules 239 ways, one at a time, in the shipped Lua; a harness must fail on each. Restores the file byte for byte. A mutant whose anchor no longer matches is reported, not skipped. |
+| Mutation | `py tools/mutate_guilds.py` | Breaks the rules 281 ways, one at a time, in the shipped Lua; a harness must fail on each. Restores the file byte for byte. A mutant whose anchor no longer matches is reported, not skipped. |
 | Opener maths | `py tools/check_guilds_anchor.py` | Extracts `GGUI.btn_anchor` from the shipped script and runs it against measured HUD geometry. |
 | Data | `py tools/gen_great_guilds.py --check`, then `--write` | Builds every DB row and loc line, and `zzz_derpy_guilds_bounty_data.lua`, and refuses on a broken rule (below). |
 | Layouts | `py tools/gen_guilds_ui.py --check`, then `--write` | Its XML emitter is `gen_guilds_emitter.py`, a deliberate copy of the Zharr Exchange's, so a fix made here cannot change that mod's output. |

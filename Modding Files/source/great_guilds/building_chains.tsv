@@ -63,3 +63,10 @@ derpy_gg_hall_khanate_skv			military	false	derpy_gg_hall_skv		2		true	false
 derpy_gg_hall_overseers_skv			military	false	derpy_gg_hall_skv		2		true	false
 derpy_gg_hall_slavers_skv			military	false	derpy_gg_hall_skv		2		true	false
 derpy_gg_hall_temple_skv			military	false	derpy_gg_hall_skv		2		true	false
+derpy_gg_hall_brass_chs			military	true	derpy_gg_hall_chs		2		true	false
+derpy_gg_hall_immortals_chs			military	true	derpy_gg_hall_chs		2		true	false
+derpy_gg_hall_daemonsmiths_chs			military	true	derpy_gg_hall_chs		2		true	false
+derpy_gg_hall_khanate_chs			military	true	derpy_gg_hall_chs		2		true	false
+derpy_gg_hall_overseers_chs			military	true	derpy_gg_hall_chs		2		true	false
+derpy_gg_hall_slavers_chs			military	true	derpy_gg_hall_chs		2		true	false
+derpy_gg_hall_temple_chs			military	true	derpy_gg_hall_chs		2		true	false

@@ -3,6 +3,43 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-10-12 - build 1C79FD97
+
+MD5 `1C79FD97EF4B0CCAAE83AB1E49EB401F`, 55,227,622 bytes. Not yet uploaded; not yet tested in
+game. Design: `docs/design/2026-10-12-great-guilds-warriors-of-chaos-design.md`; build record:
+`docs/history/HANDOFF_20261012_GUILDS_WARRIORS_OF_CHAOS.md`.
+
+- **The Warriors of Chaos, as "The Dark Gods".** The tenth race. Seven gods in the guilds'
+  slots: the Blood God, the Dark Prince, the Plague Lord, the Changer of Ways, the Doubter
+  (Necoho), the Undoer (Zuvassin) and the Undivided. Devotion instead of Reputation, Favour
+  kept; a word pass (`CHS_WORDS`) rewrites every line of the race and `check_chs_words`
+  refuses a leftover "guild", a plural verb after a god or "a" before a vowel.
+- **Rivals per race.** `GG.rival_of` reads `GG.RIVALS_RACE[culture]` before `GG.RIVALS`; the
+  other nine races' pairs are unchanged.
+- **New earning routes:** Souls spent on a god's gifts (one Devotion per 25, a remainder per
+  god); the temple's taint by named corruption resource; recruiting by mark, plus
+  `UnitUpgraded`, skipping CA's `*_to_self` weapon swaps.
+- **The Doubter never makes a demand** (`GG.NO_DEMAND`); the Fickle Gods twist.
+- **Halls** only in Dark Fortresses and the Glottkin's gardens; none trains a unit, so five
+  of seven carry a second bonus.
+- **Research bounties** now read a tech tree gated to a culture's only subculture.
+- **MCT:** the tainted-provinces slider names both corruptions it pays for.
+- 281 mutants, all caught.
+
+## 2026-10-11 - build BB7A22CE
+
+MD5 `BB7A22CE3A3643F5B0BE4C3E2447EF56`, 50,576,963 bytes. Uploaded to the Workshop. Includes
+build 190DA0F2, which was not released on its own. Record:
+`docs/history/HANDOFF_20261011_GUILDS_RECRUITING.md`.
+
+- **Recruiting pays.** `UnitTrained` and `CharacterRecruited` pay the guild a recruit belongs
+  to (`GG.on_recruit`, rules in the model's RECRUIT ROUTES block, all nine races): 2 a unit,
+  4 a monster or war machine, 8 a hero or lord, at most 20 a guild a turn.
+- **MCT:** `rate_recruit` and `cap_recruit`, in every preset.
+- **The opener has a hover again.** It had shown no tooltip since 2026-09-24: a
+  `ComponentMouseOn` listener never reaches a component made on the ui root. `GGUI.tip_poll`
+  now writes it.
+
 ## 2026-10-10 - build 587EF89E
 
 MD5 `587EF89EAFDB1E243CAEC1EB6389189E`, 50,528,055 bytes. Uploaded to the Workshop.

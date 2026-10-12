@@ -10,7 +10,7 @@ It is script-driven and self-contained. It overrides no CA file, and every DB ro
 has its own key.
 
 **Status:** playable, and tested live in Chaos Dwarf and Empire campaigns. It is on the Steam
-Workshop as [Derpy's Great Guilds](https://steamcommunity.com/sharedfiles/filedetails/?id=3815248936). Nine races take part, each with its own guild names, ranks, services and
+Workshop as [Derpy's Great Guilds](https://steamcommunity.com/sharedfiles/filedetails/?id=3815248936). Ten races take part, each with its own guild names, ranks, services and
 bounties (see [Which races take part](#which-races-take-part)).
 
 ## The seven guilds
@@ -34,10 +34,11 @@ every guild at once.
 
 The temple earns differently for each race: from devout provinces, provinces kept clean of
 Chaos, holy war against the race's old enemies, or its priests' and wizards' hero actions,
-and for the Skaven from provinces carrying Skaven corruption. Its bonuses follow each
-race's own faith too: spell resistance for the Ancestor Temples, ward save for the Grail
-and Asuryan, melee attack for Khaine, leadership for the Orthodoxy, and the Winds of Magic
-for the Colleges, the Celestial Temples, the Grey Seers and Hashut, with three services of
+for the Skaven from provinces carrying Skaven corruption, and for the Warriors of Chaos
+from provinces carrying Chaos Undivided corruption. Its bonuses follow each race's own faith
+too: spell resistance for the Ancestor Temples, ward save for the Grail and Asuryan, melee
+attack for Khaine, leadership for the Orthodoxy, and the Winds of Magic for the Colleges, the
+Celestial Temples, the Grey Seers, the Undivided and Hashut, with three services of
 its own for each race.
 
 ## How it plays
@@ -102,7 +103,7 @@ above. The panel grows with your resolution, so it is not a postage stamp at 144
 
 ### Which races take part
 
-The guilds belong to **the player's race**, and nine races have them:
+The guilds belong to **the player's race**, and ten races have them:
 
 | Race | The seven guilds |
 |---|---|
@@ -115,6 +116,12 @@ The guilds belong to **the player's race**, and nine races have them:
 | Dark Elves | The Karond Kar Traders, The Black Guard, The Convent of Ghrond, The Khainite Assassins, The Naggarond Builders, The Black Ark Corsairs, The Brides of Khaine |
 | High Elves | The Lothern Merchants, The Swordmasters, The Loremasters, The Shadow Warriors, The Ulthuan Masons, The Ellyrian Reavers, The Cult of Asuryan |
 | Skaven | The Warpstone Traders, The Stormvermin, The Skryre Warlocks, The Eshin Assassins, The Moulder Breeders, The Slave-Masters, The Grey Seers |
+| Warriors of Chaos | The Doubter, The Blood God, The Changer of Ways, The Undoer, The Plague Lord, The Dark Prince, The Undivided |
+
+The Warriors of Chaos's seven are gods, not guilds: the panel reads "The Dark Gods",
+Devotion stands in for Reputation, the gods' rivalries are their own (the Blood God and the
+Dark Prince, the Plague Lord and the Changer of Ways, the Doubter and the Undoer), and Souls
+spent on a god's gifts pay that god. Built 2026-10-12 and not yet tested in game.
 
 In a campaign played as one of these, every faction of that race runs the guilds and nobody
 else does. Any other race gets nothing: no button, no messages and no AI spending.

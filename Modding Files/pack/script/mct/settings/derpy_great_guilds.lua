@@ -243,7 +243,13 @@ local RATES = {
     {"rate_temple_holy", "The Faith Guild: holy wars", 10, 0, 60,
      "Reputation per battle won against the faith's sworn enemies."},
     {"rate_temple_taint", "The Faith Guild: tainted provinces", 2, 0, 10,
-     "Reputation per province carrying Skaven corruption, every turn. Skaven only."},
+     "Reputation per province carrying your race's own corruption, every turn: Skaven "
+     .. "corruption for the Skaven, Chaos Undivided corruption for the Warriors of Chaos."},
+    -- Not a guild: each recruit pays the guild it belongs to, named in that guild's
+    -- description.
+    {"rate_recruit", "Recruiting (the unit's guild)", 2, 0, 10,
+     "Reputation per unit recruited, paid to the guild the unit belongs to. Monsters and "
+     .. "war machines pay double, heroes and lords four times. 0 switches this off."},
     -- Not a guild: the one signal that pays EVERY GUILD. Each guild's own per-turn cap
     -- still applies, so this cannot be used to outrun them.
     {"rate_missions", "Missions (every guild)", 10, 0, 60,
@@ -287,14 +293,16 @@ local CAPS = {
     {"cap_overseers", "The Builders' Guild", 40},
     {"cap_slavers", "The Raiders' Guild", 80},
     {"cap_temple", "The Faith Guild", 40},
+    {"cap_recruit", "Recruiting", 20, "Most Reputation recruiting pays each guild in one "
+     .. "turn, inside that guild's own limit. 0 removes the limit."},
 }
 
 for i = 1, #CAPS do
-    local key, label, def = unpack(CAPS[i])
+    local key, label, def, tip = unpack(CAPS[i])
     local o = m:add_new_option(key, "slider")
     o:set_text(label .. " limit")
-    o:set_tooltip_text("Most Reputation this guild pays in one turn. 0 removes "
-        .. "the limit.")
+    o:set_tooltip_text(tip or ("Most Reputation this guild pays in one turn. 0 removes "
+        .. "the limit."))
     o:slider_set_min_max(0, 400)
     o:slider_set_step_size(5)
     o:set_default_value(def)
@@ -393,6 +401,7 @@ local PRESET_OWNED = {
     "hall_rep",
     "rate_temple_devout", "rate_temple_chaos", "rate_temple_holy", "cap_temple",
     "rate_temple_taint",
+    "rate_recruit", "cap_recruit",
 }
 -- SAYS THE NUMBER IS NOT THE ONE USED: a greyed slider keeps showing its Default (or an
 -- earlier Custom) value while the preset plays its own (logic audit, 2026-09-29).

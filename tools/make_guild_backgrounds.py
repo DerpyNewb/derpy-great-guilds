@@ -116,6 +116,15 @@ CA_ART = {
     # RACE_ART (2026-10-04): the seventh window of their own CA painting.
     "chd": "ui/loading_ui/load_images/campaign_chaos_dwarfs1.png",
     "dwf": "ui/loading_ui/load_images/campaign_dwarfs1.png",
+    # THE WARRIORS OF CHAOS (2026-10-12): one CA painting per god where CA has one - the
+    # four gods' own loading screens and the Daemons' for the Undivided - and two windows of
+    # the Warriors' own for the renegades, who have no art.
+    "chs": "ui/loading_ui/load_images/campaign_chaos1.png",
+    "chs_kho": "ui/loading_ui/load_images/campaign_khorne1.png",
+    "chs_nur": "ui/loading_ui/load_images/campaign_nurgle1.png",
+    "chs_sla": "ui/loading_ui/load_images/campaign_slaanesh1.png",
+    "chs_tze": "ui/loading_ui/load_images/campaign_tzeentch1.png",
+    "chs_dae": "ui/loading_ui/load_images/campaign_daemons1.png",
 }
 WINDOWS = {
     1: (200, 200, 990, 900), 2: (565, 200, 1355, 900), 3: (930, 200, 1720, 900),
@@ -156,6 +165,13 @@ CA_BACKGROUNDS = {
     "temple_brt": ("brt", 7), "temple_cth": ("cth", 7), "temple_ksl": ("ksl", 7),
     "temple_def": ("def", 7), "temple_hef": ("hef", 7), "temple_skv": ("skv", 7),
     "temple_gen": ("gen", 7),
+    # Window 7 of each god's painting shows that god's own host; the Daemons' 7 is the
+    # Undivided prince with the star on his chest. campaign_chaos1 is FRAMED: windows 1 and
+    # 3 run into its dark border, so the renegades take 5 (the lord under his banner) and
+    # 6 (the hooded figure by the star) - chosen from a rendered sheet of all 42 windows.
+    "immortals_chs": ("chs_kho", 7), "overseers_chs": ("chs_nur", 7),
+    "slavers_chs": ("chs_sla", 7), "daemonsmiths_chs": ("chs_tze", 7),
+    "temple_chs": ("chs_dae", 7), "brass_chs": ("chs", 5), "khanate_chs": ("chs", 6),
 }
 _PICTURES = {}
 
@@ -411,7 +427,15 @@ def selftest():
     # and every window is the panel's size and inside the painting: six windows for the six
     # older guilds (BACKGROUNDS / RACE_ART for the Chaos Dwarfs and the Dwarfs), and the
     # seventh window of that same CA picture for the temple (2026-10-04).
+    # A RACE WHOSE GODS EACH LEND A PAINTING (2026-10-12): the Warriors of Chaos draw from six
+    # CA pictures, so their seven grounds are checked together, by tag, not by picture.
+    LENT = ("chs_kho", "chs_nur", "chs_sla", "chs_tze", "chs_dae")
+    chs = dict((n[:-4], (r, w)) for n, (r, w) in CA_BACKGROUNDS.items() if n.endswith("_chs"))
+    assert sorted(chs) == sorted(list(BACKGROUNDS) + ["temple"]), sorted(chs)
+    assert len(set(chs.values())) == len(chs), "two Warriors of Chaos grounds share a window"
     for race in CA_ART:
+        if race in LENT or race == "chs":
+            continue
         mine = dict((n[:-len(race) - 1], w) for n, (r, w) in CA_BACKGROUNDS.items()
                     if r == race and n.endswith("_" + race))
         if race in ("chd", "dwf"):
