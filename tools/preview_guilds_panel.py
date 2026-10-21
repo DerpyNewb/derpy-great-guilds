@@ -97,12 +97,12 @@ def _gen():
 GG = "derpy_gg_"
 
 
-def our_files(prefix=GG):
-    return sorted(f for f in os.listdir(OURS)
+def our_files(prefix=GG, folder=OURS):
+    return sorted(f for f in os.listdir(folder)
                   if f.startswith(prefix) and f.endswith(".twui.xml"))
 
 
-def validate(prefix=GG):
+def validate(prefix=GG, folder=OURS):
     """Every hierarchy node must resolve to exactly one component definition.
 
     A GUID in <components> with no <hierarchy> node is a silent non-draw, and the reverse is
@@ -111,8 +111,8 @@ def validate(prefix=GG):
     """
     model, _r = _studio()
     out = []
-    for name in our_files(prefix):
-        src = io.open(os.path.join(OURS, name), encoding="utf-8").read()
+    for name in our_files(prefix, folder):
+        src = io.open(os.path.join(folder, name), encoding="utf-8").read()
         try:
             doc = model.Document(src)
         except Exception as exc:                                   # noqa: BLE001
@@ -130,7 +130,7 @@ def validate(prefix=GG):
     return out
 
 
-def extract_art(prefix=GG, extra=(), optional=()):
+def extract_art(prefix=GG, extra=(), optional=(), folder=OURS):
     """Pull only the art our files reference out of CA's packs, once, into the cache.
 
     TWUI Studio wants an extracted top-level `ui` folder and will not read .pack files. The
@@ -142,9 +142,10 @@ def extract_art(prefix=GG, extra=(), optional=()):
     from read_vanilla_loc import _decompress
 
     want = set(extra)
-    for f in our_files(prefix):
-        t = io.open(os.path.join(OURS, f), encoding="utf-8").read()
-        want |= set(re.findall(r'imagepath="([^"]+)"', t))
+    for f in our_files(prefix, folder):
+        t = io.open(os.path.join(folder, f), encoding="utf-8").read()
+        # an attribute value is XML-escaped: CA's own placeholder ability icon is named ..._abilitiy&spell.png
+        want |= set(p.replace("&amp;", "&") for p in re.findall(r'imagepath="([^"]+)"', t))
     # A CULTURE SKIN'S COPY of a generic file is what the game draws for that race - the
     # title plate is ui/skins/default/panel_title.png in the file and the reader's own
     # culture's plate on screen. Fetched where CA ships one; absence is not a fault.

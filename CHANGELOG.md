@@ -3,6 +3,16 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-10-21 - build 45A4BDD2
+
+MD5 `45A4BDD2CF566B8195A7318D8FAD9469`, 55,084,386 bytes. Uploaded to the Workshop 2026-10-21.
+
+- **Hall icons are CA's own again.** The Chaos Dwarf, Empire, Dwarf and Bretonnia halls drop
+  their per-level drawn icons and use CA's building icon for the trade, one per chain, like
+  the other six races. `HALL_LEVEL_ICON_TAGS` is empty in `gen_great_guilds.py` and
+  `make_guild_icons.py`; only the `icon` column of `building_culture_variants` changed.
+- `preview_guilds_panel.py`: `our_files`, `validate` and `extract_art` take a `folder`.
+
 ## 2026-10-12 - build 33EF1D54
 
 MD5 `33EF1D54FFA6AA4F20EA6EA7E86B039F`, 55,229,842 bytes. Uploaded to the Workshop 2026-10-12;
