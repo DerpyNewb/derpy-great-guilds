@@ -3,6 +3,19 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-10-29 - build 9313AF30
+
+MD5 `9313AF30AE9980895D990DA750F16620`, 55,086,208 bytes. Uploaded to the Workshop 2026-10-29;
+not yet tested in game.
+
+- **A hidden opener comes back.** A Workshop report had the Guilds button gone mid-campaign, and
+  nothing showed it again after placement. `GGUI.reshow` now shows it again on the main map
+  when the resources bar is drawn and no CA blocking panel is open. It logs one
+  `SetVisible OVERRIDDEN` line the first time. The harness covers both cases, kept hidden and
+  shown again.
+- **Hub v7.** The shared hub button does the same once it is placed, and `on_map` reads the
+  bar's `VisibleFromRoot`.
+
 ## 2026-10-21 - build 45A4BDD2
 
 MD5 `45A4BDD2CF566B8195A7318D8FAD9469`, 55,084,386 bytes. Uploaded to the Workshop 2026-10-21.
