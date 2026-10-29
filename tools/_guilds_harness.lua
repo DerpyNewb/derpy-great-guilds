@@ -6880,6 +6880,55 @@ end)()
     core.get_screen_resolution = prev_res
 end)()
 
+-- ---------------------------------------------- a hidden opener comes back --
+-- Reported 2026-10-28: the button gone mid-campaign with no way back. Something hid it and
+-- nothing ever showed it again. On the map the follow poll shows a placed button; under a CA
+-- panel, under a full-screen mod panel (the strip hidden with the HUD), unplaced or hubbed, not.
+;(function()
+    local vis, drawn, panel, hubbed = false, true, false, false
+    local BTN = setmetatable({
+        Visible = function() return vis end,
+        SetVisible = function(_, v) vis = v end,
+        Position = function() return 0, 0 end,
+    }, {__index = function() return function() end end})
+    local BAR = setmetatable({
+        Position = function() return 431, -4 end,
+        Dimensions = function() return 1019, 60 end,
+        VisibleFromRoot = function() return drawn end,
+    }, {__index = function() return function() end end})
+    local prev_find, prev_is, prev_at, prev_hub = find_uicomponent, is_uicomponent,
+                                                  GGUI.btn_at, DERPY_HUB
+    local prev_res, prev_uim = core.get_screen_resolution, cm.get_campaign_ui_manager
+    core.get_screen_resolution = function() return 1920, 1080 end
+    cm.get_campaign_ui_manager = function()
+        return {get_open_blocking_panel = function() return panel end}
+    end
+    find_uicomponent = function(_, name)
+        if name == "resources_bar" then return BAR end
+        if name == GGUI.BTN then return BTN end
+    end
+    is_uicomponent = function(x) return type(x) == "table" end
+    DERPY_HUB = {version = 1, manages = function() return hubbed end}
+    local function case(placed, want, why)
+        vis = false
+        GGUI.btn_at = placed and "placed" or nil
+        GGUI.follow_bar()
+        assert(vis == want, why)
+    end
+    case(false, false, "the poll showed a button that was never placed")
+    panel = "diplomacy_dropdown"
+    case(true, false, "the opener came back over a CA panel")
+    panel, drawn = false, false
+    case(true, false, "the opener came back over a full-screen panel that hid the strip")
+    drawn, hubbed = true, true
+    case(true, false, "the poll showed a button the hub owns")
+    hubbed = false
+    case(true, true, "a placed opener hidden on the map never came back")
+    find_uicomponent, is_uicomponent, GGUI.btn_at, DERPY_HUB = prev_find, prev_is, prev_at,
+                                                               prev_hub
+    core.get_screen_resolution, cm.get_campaign_ui_manager = prev_res, prev_uim
+end)()
+
 -- ---------------------------------------------- the opener defers to the HUD hub --
 -- With a second Derpy opener installed, one hub button takes the strip slot and shows this
 -- button in a row on hover (spec 2026-10-01). While managed, place_opener still makes,

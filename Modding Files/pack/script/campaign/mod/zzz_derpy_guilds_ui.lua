@@ -3813,10 +3813,32 @@ function GGUI.follow_bar()
     if not x then return end
     x, y = GGUI.fit_opener(x, y)
     if not x then return end
+    GGUI.reshow(b)
     local ax, ay = b:Position()
     if ax == x and ay == y then return end
     b:MoveTo(x, y)
     GGUI.btn_at = x .. "," .. y
+end
+
+-- SHOWN AGAIN IF SOMETHING ELSE HID IT (reported 2026-10-28: gone around turn 3, 30 and 55 in
+-- three campaigns, with no way back). Placement shows it once, and the hub and the Iron Court
+-- each give back only what they hid, so a hide by anything else was for good. On the map - the
+-- strip settled (follow_bar has asked btn_anchor) and drawn, no CA panel over it - a placed
+-- button is up. A full-screen mod panel hides the strip with the rest of the HUD, so the button
+-- under one is left alone. Logged once: a mod hiding it every frame would flood the log.
+function GGUI.reshow(b)
+    if b:Visible() then return end
+    local ok, panel = pcall(function()
+        return cm:get_campaign_ui_manager():get_open_blocking_panel()
+    end)
+    if ok and panel then return end
+    local bar = find_uicomponent(core:get_ui_root(), "resources_bar")
+    if not is_uicomponent(bar) or bar:VisibleFromRoot() ~= true then return end
+    b:SetVisible(true)
+    if not GGUI.reshown then
+        GGUI.reshown = true
+        GGUI.say("SetVisible OVERRIDDEN - something else hid the opener, shown again")
+    end
 end
 
 -- THE OPENER'S TOOLTIP IS WRITTEN AS THE BUTTON SHOWS, never on a hover. A ComponentMouseOn
