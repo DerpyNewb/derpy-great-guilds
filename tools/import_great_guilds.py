@@ -8,7 +8,7 @@ imported two of the eight tables, so every DB change made after it was written s
 the TSVs while the loc and the Lua reached the game - a pack whose loc described effects
 its own junction rows did not have.
 
---verify-only re-opens the SAVED pack in a fresh session and counts the rows in every
+--verify-only re-opens the SAVED pack from disk and counts the rows in every
 table, because a table that is merely present proves nothing about whether it received
 this build. It runs automatically after a save.
 """
@@ -459,20 +459,23 @@ def _pack_files():
     return out
 
 
+_key = [None]          # the key RPFM gave PACK when this process last opened it
+
+
 def _reopen(rpfm):
-    """Open the pack, closing it first. RPFM refuses to open one it already holds, so
-    a second run against the same RPFM session dies on the open rather than the work."""
-    # close_pack, singular, and it takes pack_key - NOT close_packfiles taking paths,
-    # which is the shape open_packfiles uses and is not a tool that exists.
-    try:
-        rpfm.call("close_pack", {"pack_key": PACK}, quiet=True)
-    except RuntimeError:
-        pass
-    rpfm.open_pack(PACK)
+    """Open the pack, closing this process's earlier copy first, and return its key - a
+    UUID RPFM hands out on open, not the path."""
+    rpfm.ensure_game()
+    if _key[0]:
+        try:
+            rpfm.call("close_pack", {"pack": _key[0]}, quiet=True)
+        except RuntimeError:
+            pass
+    _key[0] = rpfm.open_pack(PACK)
+    return _key[0]
 
 
 def do_import():
-    import json
     import rpfm_client as rpfm
 
     import read_pack_index as rpi
@@ -480,19 +483,18 @@ def do_import():
     files = _pack_files()
     # A HALL ICON NO LONGER STAGED (retired by make_guild_icons.py, e.g. the Empire's
     # one-per-chain icons on 2026-10-08) would ride on in the pack forever, because
-    # add_packed_files only adds. Read off the saved file before RPFM reopens it.
+    # add_files_from_disk only adds. Read off the saved file before RPFM reopens it.
     staged = {b for _a, b in files}
     gone = sorted({h[0] for h in rpi.read(PACK, HALL_ICON_DIR + "/" + HALL_ICON_PREFIX)}
                   - staged)
-    _reopen(rpfm)
+    key = _reopen(rpfm)
     if gone:
-        rpfm.call("delete_packed_files", {
-            "pack_key": PACK, "paths": json.dumps([{"File": p} for p in gone])}, quiet=True)
+        rpfm.call("delete_files", {"pack": key, "paths": gone}, quiet=True)
         print("  %-44s %d file(s)" % ("retired hall icons removed", len(gone)))
-    rpfm.call("add_packed_files", {
-        "pack_key": PACK,
-        "source_paths": [a for a, _b in files],
-        "destination_paths": json.dumps([{"File": b} for _a, b in files]),
+    rpfm.call("add_files_from_disk", {
+        "pack": key,
+        "paths": [a for a, _b in files],
+        "pack_paths": [b for _a, b in files],
     }, quiet=True)
     print("  %-44s %d file(s)" % ("scripts, ui and icons", len(files)))
 
@@ -503,27 +505,22 @@ def do_import():
         # in place - and a wrong version is a hard crash during loading with no
         # bad_mods_report, no minidump and no script log.
         try:
-            rpfm.call("delete_packed_files",
-                      {"pack_key": PACK, "paths": json.dumps([{"File": dest}])},
-                      quiet=True)
+            rpfm.call("delete_files", {"pack": key, "paths": [dest]}, quiet=True)
         except RuntimeError:
             pass
-        rpfm.call("new_packed_file", {
-            "pack_key": PACK, "path": dest,
-            # `path` is the FULL file path; the name inside the enum is ignored.
-            "new_file": json.dumps({"DB": ["derpy_great_guilds",
-                                           G.TSV_META[table][0], version]}),
+        rpfm.call("create_file", {
+            "pack": key, "path": dest, "kind": rpfm.db(G.TSV_META[table][0], version),
         }, quiet=True)
-        rpfm.call("import_tsv", {"pack_key": PACK,
+        rpfm.call("import_tsv", {"pack": key,
                                  "tsv_path": os.path.abspath(SRC + "/" + table + ".tsv"),
-                                 "table_path": dest}, quiet=True)
+                                 "path": dest}, quiet=True)
         print("  %-44s v%d" % (dest, version))
 
-    rpfm.call("import_tsv", {"pack_key": PACK,
+    rpfm.call("import_tsv", {"pack": key,
                              "tsv_path": os.path.abspath(SRC + "/loc.tsv"),
-                             "table_path": LOC_DEST}, quiet=True)
+                             "path": LOC_DEST}, quiet=True)
     print("  %-44s" % LOC_DEST)
-    rpfm.call("save_packfile", {"pack_key": PACK}, quiet=True)
+    rpfm.call("save_pack", {"pack": key}, quiet=True)
     print("saved " + PACK)
 
 
@@ -570,13 +567,13 @@ def verify_saved():
     # CLOSED AND RE-OPENED, so the rows counted below come off the file on disk rather
     # than out of the in-memory pack this process has just been writing to. A save that
     # did not land would otherwise verify perfectly against its own author.
-    _reopen(rpfm)
+    key = _reopen(rpfm)
     tmp = tempfile.mkdtemp()
     for table, dest in sorted(DB_DEST.items()):
         out = os.path.join(tmp, table + ".tsv")
         try:
-            rpfm.call("export_tsv", {"pack_key": PACK, "table_path": dest,
-                                     "tsv_path": out}, quiet=True)
+            rpfm.call("export_tsv", {"file": {"source": {"pack": key}, "path": dest},
+                                     "destination": out}, quiet=True)
         except RuntimeError as e:
             problems.append("%s is not in the saved pack: %s" % (dest, str(e)[:60]))
             continue
@@ -631,8 +628,8 @@ def verify_saved():
     # table does, so a stale one lies about all of them.
     lout = os.path.join(tmp, "loc.tsv")
     try:
-        rpfm.call("export_tsv", {"pack_key": PACK, "table_path": LOC_DEST,
-                                 "tsv_path": lout}, quiet=True)
+        rpfm.call("export_tsv", {"file": {"source": {"pack": key}, "path": LOC_DEST},
+                                 "destination": lout}, quiet=True)
     except RuntimeError as e:
         problems.append("%s is not in the saved pack: %s" % (LOC_DEST, str(e)[:60]))
     else:

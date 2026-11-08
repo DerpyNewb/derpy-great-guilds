@@ -70,7 +70,7 @@ derpy_gg_svc_blooded_agents		Blooded Heroes	faction	1	derpy_gg_khanate.png	true	
 derpy_gg_svc_sow_discord		Sow Discord	region	1	derpy_gg_khanate.png	true	false	true
 derpy_gg_svc_web_of_whispers		Web of Whispers	faction	1	derpy_gg_khanate.png	true	false	true
 derpy_gg_svc_poisoned_wells		Poisoned Wells	region	1	derpy_gg_khanate.png	true	false	true
-derpy_gg_svc_granaries		Fattened Herds	region	1	derpy_gg_overseers.png	true	false	true
+derpy_gg_svc_granaries		Slave-Built	region	1	derpy_gg_overseers.png	true	false	true
 derpy_gg_svc_road_gangs		Road Gangs	faction	1	derpy_gg_overseers.png	true	false	true
 derpy_gg_svc_enforcers		Overseer Enforcers	region	1	derpy_gg_overseers.png	true	false	true
 derpy_gg_svc_fortify		Fortify the Walls	region	1	derpy_gg_overseers.png	true	false	true

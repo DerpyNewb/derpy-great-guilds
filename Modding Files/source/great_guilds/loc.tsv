@@ -251,10 +251,10 @@ derpy_gg_service_name_poisoned_wells	Poisoned Wells	false
 derpy_gg_service_desc_poisoned_wells	[[img:ui/campaign ui/effect_bundles/growth.png]][[/img]][[img:ui/campaign ui/effect_bundles/replenishment.png]][[/img]] -25 growth in the enemy province you select, and -25% replenishment for armies there for 8 turns.||Costs 400 Favour. Cooldown: 16 turns. Needs rank 4, Favoured. Only the leader of The Khanate may buy it.	false
 effect_bundles_localised_title_derpy_gg_svc_poisoned_wells	Poisoned Wells	false
 effect_bundles_localised_description_derpy_gg_svc_poisoned_wells	Inflicted by The Khanate. -25 growth in the enemy province you select, and -25% replenishment for armies there for 8 turns.	false
-derpy_gg_service_name_granaries	Fattened Herds	false
-derpy_gg_service_desc_granaries	[[img:ui/campaign ui/effect_bundles/growth.png]][[/img]] +25 growth in the province of the settlement you select for 8 turns.||Costs 50 Favour. Cooldown: 8 turns. Needs rank 2, Indebted.	false
-effect_bundles_localised_title_derpy_gg_svc_granaries	Fattened Herds	false
-effect_bundles_localised_description_derpy_gg_svc_granaries	Bought from The Overseers with Favour. +25 growth in the province of the settlement you select for 8 turns.	false
+derpy_gg_service_name_granaries	Slave-Built	false
+derpy_gg_service_desc_granaries	[[img:ui/campaign ui/effect_bundles/treasury.png]][[/img]] -25% construction cost in the settlement you select for 8 turns.||Costs 50 Favour. Cooldown: 8 turns. Needs rank 2, Indebted.	false
+effect_bundles_localised_title_derpy_gg_svc_granaries	Slave-Built	false
+effect_bundles_localised_description_derpy_gg_svc_granaries	Bought from The Overseers with Favour. -25% construction cost in the settlement you select for 8 turns.	false
 derpy_gg_service_name_road_gangs	Road Gangs	false
 derpy_gg_service_desc_road_gangs	[[img:ui/campaign ui/effect_bundles/campaign_movement.png]][[/img]] +10% campaign movement for all your armies for 8 turns.||Costs 50 Favour. Cooldown: 8 turns. Needs rank 2, Indebted.	false
 effect_bundles_localised_title_derpy_gg_svc_road_gangs	Road Gangs	false
@@ -272,9 +272,9 @@ derpy_gg_service_desc_master_builders	[[img:ui/campaign ui/effect_bundles/constr
 effect_bundles_localised_title_derpy_gg_svc_master_builders	Master Builders	false
 effect_bundles_localised_description_derpy_gg_svc_master_builders	Bought from The Overseers with Favour. -1 turn to every building's construction time (never below one) for 10 turns.	false
 derpy_gg_service_name_public_works	Monuments to Hashut	false
-derpy_gg_service_desc_public_works	[[img:ui/campaign ui/effect_bundles/public_order.png]][[/img]][[img:ui/campaign ui/effect_bundles/growth.png]][[/img]] +4 public order and +30 growth in every province you own for 10 turns.||Costs 400 Favour. Cooldown: 16 turns. Needs rank 4, Favoured. Only the leader of The Overseers may buy it.	false
+derpy_gg_service_desc_public_works	[[img:ui/campaign ui/effect_bundles/public_order.png]][[/img]][[img:ui/campaign ui/effect_bundles/chd_workload.png]][[/img]] +4 public order and -15% Workload for Raw Materials in every province you own for 10 turns.||Costs 400 Favour. Cooldown: 16 turns. Needs rank 4, Favoured. Only the leader of The Overseers may buy it.	false
 effect_bundles_localised_title_derpy_gg_svc_public_works	Monuments to Hashut	false
-effect_bundles_localised_description_derpy_gg_svc_public_works	Bought from The Overseers with Favour. +4 public order and +30 growth in every province you own for 10 turns.	false
+effect_bundles_localised_description_derpy_gg_svc_public_works	Bought from The Overseers with Favour. +4 public order and -15% Workload for Raw Materials in every province you own for 10 turns.	false
 derpy_gg_service_name_raiding_parties	Raiding Parties	false
 derpy_gg_service_desc_raiding_parties	[[img:ui/campaign ui/effect_bundles/income.png]][[/img]] +50% income from raiding for all your armies for 8 turns.||Costs 50 Favour. Cooldown: 8 turns. Needs rank 2, Indebted.	false
 effect_bundles_localised_title_derpy_gg_svc_raiding_parties	Raiding Parties	false

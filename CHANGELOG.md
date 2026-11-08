@@ -3,6 +3,22 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-11-08 - build 417C6BEB
+
+MD5 `417C6BEB884F045C682CA37FD09B5FCC`, 55,086,420 bytes. Uploaded to the Workshop 2026-11-08;
+not yet tested in game.
+
+- **No growth for the Chaos Dwarfs.** A Workshop report: growth does nothing for them, and two
+  Overseer services gave it. Only the Chaos Dwarf flavour changes; every other race keeps growth.
+  - Fattened Herds is now **Slave-Built**: -25% construction cost in the chosen settlement.
+  - Monuments to Hashut: -15% Workload for Raw Materials in place of +30 growth.
+- `RACE_UNWANTED_EFFECTS[""]` now refuses province growth. Bundles aimed at an enemy are exempt,
+  since they land on the target's race, so Poisoned Wells keeps its growth.
+- Regenerated against current vanilla data: Glottkin's Oak of Ages (level 1) now counts for the
+  Plague Lord's built bonus.
+- The packing tools moved to RPFM 5.3's server API (`rpfm_client.py`, `import_great_guilds.py`,
+  `sync_derpy_hub.py`).
+
 ## 2026-10-29 - build 9313AF30
 
 MD5 `9313AF30AE9980895D990DA750F16620`, 55,086,208 bytes. Uploaded to the Workshop 2026-10-29;
