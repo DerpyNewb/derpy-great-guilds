@@ -1064,6 +1064,12 @@ end
 --     is relying on.
 -- And a FIRED entry is removed by CA itself, so the callback clears its own mark before it
 -- runs; the close() it calls then has nothing to release.
+-- BUT CA NEVER GIVES THE KEY BACK when it fires an entry: on_key_press_up pops it and only
+-- release_escape_key_with_callback calls steal_escape_key(false). Without the release in
+-- the callback, Escape closed the panel and then did nothing at all until the panel was
+-- reopened and closed with its X (players' reports, 2026-11-11/12). CA's own movie player
+-- releases by name after its Escape fires; this does the same. A release with other
+-- entries still stacked (the picker over the panel) keeps the key for them.
 GGUI.ESC = "derpy_gg_panel_esc"
 GGUI.ESC_HELD = GGUI.ESC_HELD or {}
 
@@ -1073,6 +1079,7 @@ function GGUI.hold_esc(name, fn)
     pcall(function()
         cm:steal_escape_key_with_callback(name, function()
             GGUI.ESC_HELD[name] = nil
+            pcall(function() cm:release_escape_key_with_callback(name) end)
             fn()
         end)
     end)

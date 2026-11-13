@@ -3,6 +3,22 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-11-13 - build 81E6AB08
+
+MD5 `81E6AB08966EBE74C4EFA1AE4A57A18F`, 55,087,027 bytes. Uploaded to the Workshop 2026-11-13.
+Build 417C6BEB below with one Lua file changed; checked in game on the shipped build and on the fix.
+
+- **Escape works again after closing the panel with it.** A Workshop report: once Escape had
+  closed the panel, the next Escape did nothing until the panel was reopened and closed with its
+  X. CA's `on_key_press_up` drops a fired key-steal entry but never gives the key back to the
+  game; only `release_escape_key_with_callback` calls `steal_escape_key(false)`, once no entry is
+  left. `GGUI.hold_esc`'s callback now releases by name, as CA's own movie player does. A
+  release with the picker still stacked over the panel keeps the key for it.
+- The harness's Escape check asserted the old behaviour (no release after the key fired). It
+  now expects exactly one release, and fails on the old code.
+- `rpfm_client.py` starts `rpfm_server` headless through the new `rpfm_mcp_bridge.py` when the
+  RPFM window is closed.
+
 ## 2026-11-08 - build 417C6BEB
 
 MD5 `417C6BEB884F045C682CA37FD09B5FCC`, 55,086,420 bytes. Uploaded to the Workshop 2026-11-08;

@@ -7618,14 +7618,17 @@ end)()
     assert(panel_up(), "the fake UI did not open the panel")
     local held = stolen[#stolen]
     assert(held and held.name == GGUI.ESC, "opening the panel must take the Escape key")
-    -- CA DROPS A FIRED ENTRY ITSELF. Releasing it again finds nothing, and CA then lets go
-    -- of the key outright if no entry is left - including a steal some other script holds.
-    -- Counted from BEFORE the key fires: the close() it runs is the release to catch.
+    -- CA DROPS A FIRED ENTRY ITSELF, BUT KEEPS THE KEY: on_key_press_up pops the entry and
+    -- never calls steal_escape_key(false); only a release by name does, once no entry is
+    -- left. So Escape must release exactly once - none left the key dead until the panel
+    -- was reopened and closed with its X (players' reports, 2026-11-11/12), and the old
+    -- check here asserted none. Counted from BEFORE the key fires, the close() included.
     local n_rel = #released
     held.fn()
     assert(not panel_up(), "Escape must close the panel")
     GGUI.close()
-    assert(#released == n_rel, "a fired Escape entry must not be released a second time")
+    assert(#released == n_rel + 1 and released[#released] == GGUI.ESC,
+        "Escape closed the panel but never gave the key back, so the player's next Escape does nothing")
     GGUI.open()
     assert(#stolen == 2 and stolen[2].name == GGUI.ESC, "a reopened panel takes Escape again")
     -- A second steal under one name is a script error in CA's own code.
