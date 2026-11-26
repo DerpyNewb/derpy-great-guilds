@@ -245,6 +245,9 @@ local RATES = {
     {"rate_temple_taint", "The Faith Guild: tainted provinces", 2, 0, 10,
      "Reputation per province carrying your race's own corruption, every turn: Skaven "
      .. "corruption for the Skaven, Chaos Undivided corruption for the Warriors of Chaos."},
+    {"rate_temple_altar", "The Faith Guild: altars to the gods", 2, 0, 10,
+     "Reputation per settlement holding an altar to your most-favoured god or to Chaos "
+     .. "Undivided, every turn. Norsca only."},
     -- Not a guild: each recruit pays the guild it belongs to, named in that guild's
     -- description.
     {"rate_recruit", "Recruiting (the unit's guild)", 2, 0, 10,
@@ -402,6 +405,7 @@ local PRESET_OWNED = {
     "rate_temple_devout", "rate_temple_chaos", "rate_temple_holy", "cap_temple",
     "rate_temple_taint",
     "rate_recruit", "cap_recruit",
+    "rate_temple_altar",
 }
 -- SAYS THE NUMBER IS NOT THE ONE USED: a greyed slider keeps showing its Default (or an
 -- earlier Custom) value while the preset plays its own (logic audit, 2026-09-29).

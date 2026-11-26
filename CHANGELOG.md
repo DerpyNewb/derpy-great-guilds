@@ -3,6 +3,43 @@
 Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry is in
 `docs/history/`.
 
+## 2026-11-26 - build BFBA9733
+
+MD5 `BFBA973329D1B14FA454C27FD9C0CDEE`, 65,957,098 bytes. Tested in game 2026-11-26; not yet
+uploaded to the Workshop.
+
+- **The Tomb Kings** are the eleventh race: The Royal Treasury, The Tomb Guard, The Liche
+  Priesthood, The Lahmian Sisterhood, The Necrotects, The Charioteer Nobles and The Cults of
+  the Gods.
+  - Mortuary Cult crafting pays the Liche Priesthood 40, and AI crafts pay too.
+  - The Cults of the Gods feud with the Lahmian Sisterhood, and the Royal Treasury has no
+    rival.
+  - Their twist: rivalry costs half again as much, and upkeep is halved.
+  - Their own services are The Royal Offering (+50 Canopic Jars), The Awakening (a Skeleton
+    Warriors and a Skeleton Spearmen regiment for the selected army) and The King's Legions
+    (+1 unit capacity for every unit for 10 turns, leader only).
+  - A service that adds units is refused with "No room" when every unit it would add is at
+    its cap. Each hall raises the cap of the unit it trains.
+- **Norsca** is the twelfth: The Monster Hunters, The Berserkers, The Shaman-Sorcerers, The
+  Skin Wolves, The Thralls, The Reavers and The Four.
+  - Spoils from the Monstrous Arcanum's hunts pay the Monster Hunters 1 Reputation per 25.
+    Pillage Spoils pay nothing.
+  - Altars raised to the gods pay the Four every turn.
+  - Their twist, Boasts: a failed bounty costs twice the Reputation, and a paid demand pays
+    half again as much.
+  - Their own services are Tithe of Spoils (+200 Spoils), The Wolf-Kin (Skin Wolves and
+    Norscan Ice Wolves for the selected army) and The Hunters' Charge (+15% charge bonus in
+    all armies for 10 turns, leader only).
+  - Halls go in ordinary Norscan settlements only, Sayl's and Throgg's included.
+- **Fixed:** CA's scripted spawns no longer pay recruit Reputation. Each Pillage paid the
+  Berserkers 16, because CA's spawned chieftain fires the recruit event twice. The fix covers
+  every `*_spawned_army` general, so Empire decrees, Dwarf grudges and the Tower of Zharr are
+  covered too.
+- Checked in game: saves from the previous build load and keep their Reputation, every new
+  race service works when bought from the panel, AI factions buy, the halls are offered and
+  pay, and Throgg, Sayl, Arkhan and Khalida each start with their race's guilds. Multiplayer
+  is not tested.
+
 ## 2026-11-13 - build 81E6AB08
 
 MD5 `81E6AB08966EBE74C4EFA1AE4A57A18F`, 55,087,027 bytes. Uploaded to the Workshop 2026-11-13.

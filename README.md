@@ -9,8 +9,8 @@ the AI factions of your own race to lead each guild.
 It is script-driven and self-contained. It overrides no CA file, and every DB row it adds
 has its own key.
 
-**Status:** playable, and tested live in Chaos Dwarf and Empire campaigns. It is on the Steam
-Workshop as [Derpy's Great Guilds](https://steamcommunity.com/sharedfiles/filedetails/?id=3815248936). Ten races take part, each with its own guild names, ranks, services and
+**Status:** playable, and tested live in Chaos Dwarf, Empire, Tomb Kings and Norsca campaigns. It is on the Steam
+Workshop as [Derpy's Great Guilds](https://steamcommunity.com/sharedfiles/filedetails/?id=3815248936). Twelve races take part, each with its own guild names, ranks, services and
 bounties (see [Which races take part](#which-races-take-part)).
 
 ## The seven guilds
@@ -34,10 +34,12 @@ every guild at once.
 
 The temple earns differently for each race: from devout provinces, provinces kept clean of
 Chaos, holy war against the race's old enemies, or its priests' and wizards' hero actions,
-for the Skaven from provinces carrying Skaven corruption, and for the Warriors of Chaos
-from provinces carrying Chaos Undivided corruption. Its bonuses follow each race's own faith
-too: spell resistance for the Ancestor Temples, ward save for the Grail and Asuryan, melee
-attack for Khaine, leadership for the Orthodoxy, and the Winds of Magic for the Colleges, the
+for the Skaven from provinces carrying Skaven corruption, for the Warriors of Chaos
+from provinces carrying Chaos Undivided corruption, and for Norsca from altars raised to the
+gods. Its bonuses follow each race's own faith
+too: spell resistance for the Ancestor Temples, ward save for the Grail, Asuryan and the gods
+of Nehekhara, melee attack for Khaine, leadership for the Orthodoxy and the Four, and the
+Winds of Magic for the Colleges, the
 Celestial Temples, the Grey Seers, the Undivided and Hashut, with three services of
 its own for each race.
 
@@ -55,14 +57,16 @@ its own for each race.
   shows one service card at Indebted, one at Sworn and one at Favoured, each drawn from a
   pool of three, and
   the cards change every 10 turns (5 to 30 in MCT). Every race also has services of its own
-  that no other race gets, at least one on show each period: 95 services in all. Examples:
+  that no other race gets, at least one on show each period: 104 services in all. Examples:
   an instant gold levy, an elite regiment added to an army, finishing your current
   technology, revealing a region through the shroud, a free building upgrade, and a paid
   malus placed on an enemy. The price drops with a guild that knows you and rises with one
   whose rival you have been courting.
 - **Rivalry.** Three pairs of guilds argue: Brass Tablets and Khanate, Immortals and
   Daemonsmiths, Overseers and Slavers. Earning with one takes reputation from its rival
-  once you reach Indebted there, but never a rank you have reached. The temple has no rival.
+  once you reach Indebted there, but never a rank you have reached. The temple has no rival,
+  except for the Tomb Kings, whose Cults of the Gods feud with the Lahmian Sisterhood while
+  their Royal Treasury has no rival.
 - **Bounties.** A board of three offers drawn from every guild. Taking one turns it into
   a real mission that pays gold and a large amount of reputation, and puts up favour with
   that guild, which you get back when you finish and lose if you fail or hand it back.
@@ -103,7 +107,7 @@ above. The panel grows with your resolution, so it is not a postage stamp at 144
 
 ### Which races take part
 
-The guilds belong to **the player's race**, and ten races have them:
+The guilds belong to **the player's race**, and twelve races have them:
 
 | Race | The seven guilds |
 |---|---|
@@ -117,11 +121,21 @@ The guilds belong to **the player's race**, and ten races have them:
 | High Elves | The Lothern Merchants, The Swordmasters, The Loremasters, The Shadow Warriors, The Ulthuan Masons, The Ellyrian Reavers, The Cult of Asuryan |
 | Skaven | The Warpstone Traders, The Stormvermin, The Skryre Warlocks, The Eshin Assassins, The Moulder Breeders, The Slave-Masters, The Grey Seers |
 | Warriors of Chaos | The Doubter, The Blood God, The Changer of Ways, The Undoer, The Plague Lord, The Dark Prince, The Undivided |
+| Tomb Kings | The Royal Treasury, The Tomb Guard, The Liche Priesthood, The Lahmian Sisterhood, The Necrotects, The Charioteer Nobles, The Cults of the Gods |
+| Norsca | The Monster Hunters, The Berserkers, The Shaman-Sorcerers, The Skin Wolves, The Thralls, The Reavers, The Four |
 
 The Warriors of Chaos's seven are gods, not guilds: the panel reads "The Dark Gods",
 Devotion stands in for Reputation, the gods' rivalries are their own (the Blood God and the
 Dark Prince, the Plague Lord and the Changer of Ways, the Doubter and the Undoer), and Souls
 spent on a god's gifts pay that god. Built 2026-10-12 and not yet tested in game.
+
+The Tomb Kings recruit under unit caps, so their guilds work with them: a service that adds
+units is refused when there is no room, and their halls raise the cap of the unit they
+train. Mortuary Cult crafting pays the Liche Priesthood, and the Royal Offering pays in
+Canopic Jars. Norsca's Monster Hunters are paid in Spoils from the Monstrous Arcanum's hunts,
+the Four are paid by altars raised to the gods, and the Tithe of Spoils pays in Spoils. A
+Norscan hall can only be built in an ordinary Norscan settlement, never in an altar. Both
+races were added 2026-11-26 and tested in game the same day.
 
 In a campaign played as one of these, every faction of that race runs the guilds and nobody
 else does. Any other race gets nothing: no button, no messages and no AI spending.

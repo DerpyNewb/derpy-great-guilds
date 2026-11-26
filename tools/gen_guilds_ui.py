@@ -754,7 +754,7 @@ def back_layers(h):
 # one picture (2026-10-04) and held by the preview's contrast check, which measured the
 # figures on every ornament at a single 48.
 RANK_STATS_PAD = {"": 48, "_emp": 84, "_dwf": 48, "_brt": 84, "_cth": 104, "_ksl": 74,
-                  "_def": 66, "_hef": 94, "_skv": 48, "_chs": 66}
+                  "_def": 66, "_hef": 94, "_skv": 48, "_chs": 66, "_tmb": 76, "_nor": 76}
 
 
 # The pager and the close button are round: a chevron and a cross both want a disc,
@@ -884,6 +884,10 @@ _CP = _D + "dlc29_skv_chaotic_plans/"
 _TC = _D + "dlc25_tamurkhans_chieftains/"
 _PG = _D + "path_to_glory/"
 _SOULS = _D + "chaos_gifts/souls_bar_"
+_NA = _D + "dlc27_nor_allegiance/"
+_NOR_BANNER = _D + "dlc27_nor_troll_expansion/icon_banner.png"
+_NOR_DIM = "#A0A0A0FF"          # the Norscan leather card, dimmed (preview, contrast)
+_NOR_GBAR = "#E6E6E6FF"         # the Norscan button bar, dimmed for the counts on it
 
 
 def _L(path, margin=0, tile=False, colour=None, offset=(0, 0), dw=0, dh=0):
@@ -1313,6 +1317,69 @@ FRAMES = {
         # The Souls bar, 272x26: its dark back under its frame, both fitted so the frame's
         # opening (x 8-263, rows 8-18) holds the fixed fill rect; the Undivided fill CA
         # draws in it, already the Empire's and Bretonnia's.
+        "track": (fit_track(_SOULS + "back.png", (272, 26), (8, 8, 264, 18))
+                  + fit_track(_SOULS + "frame.png", (272, 26), (8, 8, 264, 18))),
+        "fill": [_L(_SOULS + "fill_undiveded.png")],
+    },
+    "_tmb": {
+        "card": _L(_TC + "text_holder.png", (12, 12, 28, 12), True,
+                   offset=(-2, -2), dw=4, dh=6),
+        "heat": (_GLOW, "#30F0E050"),
+        "rim": (_TUTGLOW, (16, 16, 16, 16), "#30F0E0C0"),
+        "holder": (ICON_HOLDER, ICON_HOLDER_CX, ICON_HOLDER_CY),
+        "cost": [_L(_TC + "num_holder.png", (3, 8, 8, 8))],
+        "rank": [_L("ui/skins/wh2_dlc09_tmb_tomb_kings/bar_small_central_left.png",
+                    (0, 72, 0, 72))],
+        "rank_tx": "76.00,0.00", "rank_ty": "8.00,0.00",
+        "gbar": [_L("ui/skins/wh2_dlc09_tmb_tomb_kings/bar_small_buttons.png", (0, 85, 0, 85))],
+        "tab": {"layers": [_L(_TC + "subtitle.png", (0, 40, 0, 40), colour=_DIM),
+                           _L(CLEAR, 16, colour="#30F0E0C0")],
+                "hover": [_L(_TC + "subtitle.png", (0, 40, 0, 40)),
+                          _L(CLEAR, 16, colour="#30F0E0C0")],
+                "selected": [_TC + "subtitle.png", _TUTGLOW],
+                "selected_hover": [_TC + "subtitle.png", _TUTGLOW]},
+        "buy": {"layers": [_L(_D + "mortuary_cult_button_active.png", (0, 22, 0, 22))],
+                "hover": [_L(_D + "mortuary_cult_button_active.png", (0, 22, 0, 22)),
+                          _L(_TUTGLOW, 16, colour="#30F0E0C0")]},
+        "track": (fit_track(_SOULS + "back.png", (272, 26), (8, 8, 264, 18))
+                  + fit_track(_SOULS + "frame.png", (272, 26), (8, 8, 264, 18))),
+        "fill": [_L(_SOULS + "fill_undiveded.png")],
+    },
+    # NORSCA (2026-11-26), briefed against the Monstrous Arcanum and the Norscan allegiance
+    # panel: the race's own HUD bars and legacy leather, CA's Norscan allegiance button for
+    # the holder and the troll expansion's banner plate for price and tabs, every file
+    # measured with PIL. The Arcanum's own cloth and tab art is light parchment, which the
+    # cream text cannot sit on.
+    "_nor": {
+        # The Norscan legacy leather, 256x256, dimmed: undimmed it measures mean luminance
+        # 57. Its outer 4px are fully transparent, so it is sliced at 4 and only the leather
+        # tiled - tiled whole, it drew an 8px dark seam every 256px across each card.
+        "card": _L("ui/skins/wh_dlc08_nor_norsca/legacy/panel_back_tile.png", 4, True,
+                   colour=_NOR_DIM),
+        # CA's frost blue (ui_colours_tables ui_font_blue_light, 65/225/225): the North's ice.
+        "heat": (_GLOW, "#41E1E150"),
+        "rim": (_TUTGLOW, (16, 16, 16, 16), "#41E1E1C0"),
+        # The allegiance panel's god button, 132x132: a dark disc 80px across inside a
+        # spiked bronze ring, drawn under its size at the card's 100x106.
+        "holder": (_NA + "button_nor_allegiance_bgr.png", 0.5, 0.5),
+        # The troll expansion's banner plate, 115x34: a bronze rim on rows 4-10 and 25-32,
+        # a flat dark middle (luminance 19), 5px ends. Squeezed only in its flat middle.
+        "cost": [_L(_NOR_BANNER, (11, 6, 9, 6))],
+        # The Norscan HUD bar, 740x58, the Warriors of Chaos' shape: horned-skull ends to
+        # column 64 and from 680, the plate from row 11.
+        "rank": [_L("ui/skins/wh_dlc08_nor_norsca/bar_small_central_left.png", (0, 64, 0, 64))],
+        "rank_tx": "70.00,0.00", "rank_ty": "8.00,0.00",
+        # The Norscan HUD button bar, 467x71, horns outside the end buttons at 85px.
+        "gbar": [_L("ui/skins/wh_dlc08_nor_norsca/bar_small_buttons.png", (0, 85, 0, 85),
+                    colour=_NOR_GBAR)],
+        # The same banner plate at its own 34 rows: standard dimmed, hover full, the open tab
+        # ringed by the tutorial glow in the frost blue.
+        "tab": {"layers": [_L(_NOR_BANNER, (11, 6, 9, 6), colour=_DIM),
+                           _L(CLEAR, 16, colour="#41E1E1C0")],
+                "hover": [_L(_NOR_BANNER, (11, 6, 9, 6)), _L(CLEAR, 16, colour="#41E1E1C0")],
+                "selected": [_NOR_BANNER, _TUTGLOW],
+                "selected_hover": [_NOR_BANNER, _TUTGLOW]},
+        # The Souls bar, as the Warriors of Chaos draw it: the Norscans pray to the same four.
         "track": (fit_track(_SOULS + "back.png", (272, 26), (8, 8, 264, 18))
                   + fit_track(_SOULS + "frame.png", (272, 26), (8, 8, 264, 18))),
         "fill": [_L(_SOULS + "fill_undiveded.png")],

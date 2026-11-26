@@ -70,3 +70,17 @@ derpy_gg_hall_khanate_chs						cai_military_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0
 derpy_gg_hall_overseers_chs						cai_military_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	200	1100	
 derpy_gg_hall_slavers_chs						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	200	900	
 derpy_gg_hall_temple_chs						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	1	1	
+derpy_gg_hall_brass_tmb						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	200	1000	
+derpy_gg_hall_immortals_tmb						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	50	250	
+derpy_gg_hall_daemonsmiths_tmb						cai_military_group				3	3	1000	1000	1000	1000	0	0	-1	-1	0	0	0	0	0	0	1050	1250	
+derpy_gg_hall_khanate_tmb						cai_military_group				3	3	1000	1000	1000	1000	0	0	-1	-1	0	0	0	0	0	0	1050	1250	
+derpy_gg_hall_overseers_tmb						cai_military_group				3	3	1000	1000	1000	1000	0	0	-1	-1	0	0	0	0	0	0	1050	1250	
+derpy_gg_hall_slavers_tmb						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	200	1000	
+derpy_gg_hall_temple_tmb						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	20	125	
+derpy_gg_hall_brass_nor						cai_support_group			wh_dlc08_nor_wintertooth	3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	100	500	
+derpy_gg_hall_immortals_nor						cai_military_group				3	3	1000	1000	1000	1000	0	0	0	0	510	510	510	510	0	0	1100	1500	
+derpy_gg_hall_daemonsmiths_nor						cai_military_group				3	3	1000	1000	1000	1000	0	0	0	0	510	510	510	510	0	0	1100	1500	
+derpy_gg_hall_khanate_nor						cai_military_group				3	3	1000	1000	1000	1000	0	0	0	0	510	510	510	510	0	0	1100	1500	
+derpy_gg_hall_overseers_nor						cai_support_group			wh_dlc08_nor_wintertooth	3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	100	500	
+derpy_gg_hall_slavers_nor						cai_support_group				3	3	0	0	0	0	0	0	-1	-1	0	0	0	0	0	0	20	125	
+derpy_gg_hall_temple_nor						cai_support_group				3	3	0	0	0	0	0	0	0	0	20	20	20	20	0	0	20	125	

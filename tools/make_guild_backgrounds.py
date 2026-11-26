@@ -125,6 +125,12 @@ CA_ART = {
     "chs_sla": "ui/loading_ui/load_images/campaign_slaanesh1.png",
     "chs_tze": "ui/loading_ui/load_images/campaign_tzeentch1.png",
     "chs_dae": "ui/loading_ui/load_images/campaign_daemons1.png",
+    "tmb": "ui/loading_ui/load_images/campaign_tomb_kings1.png",
+    "tmb_lah": "ui/loading_ui/load_images/campaign_vampire_lahmian_sisterhood1.png",
+    # NORSCA (2026-11-26): CA's one Norsca loading screen, 1920x1080 - a longship, a Chaos
+    # champion aboard it, a Skin Wolf out of the smoke and a Marauder with his shield. CA
+    # ships no other Norsca or Sayl painting, so all seven grounds are windows of this one.
+    "nor": "ui/loading_ui/load_images/campaign_norsca1.png",
 }
 WINDOWS = {
     1: (200, 200, 990, 900), 2: (565, 200, 1355, 900), 3: (930, 200, 1720, 900),
@@ -172,6 +178,15 @@ CA_BACKGROUNDS = {
     "immortals_chs": ("chs_kho", 7), "overseers_chs": ("chs_nur", 7),
     "slavers_chs": ("chs_sla", 7), "daemonsmiths_chs": ("chs_tze", 7),
     "temple_chs": ("chs_dae", 7), "brass_chs": ("chs", 5), "khanate_chs": ("chs", 6),
+    "brass_tmb": ("tmb", 1), "overseers_tmb": ("tmb", 2),
+    "daemonsmiths_tmb": ("tmb", 3), "immortals_tmb": ("tmb", 4),
+    "slavers_tmb": ("tmb", 5), "temple_tmb": ("tmb", 7), "khanate_tmb": ("tmb_lah", 3),
+    # The prow and the champion to the Reavers, the hull to the Thralls who build it, the
+    # wolf against the burning sky to the Skin Wolves, the Marauder with his shield to the
+    # Berserkers - chosen from a rendered sheet of all seven (norsca spec §8).
+    "slavers_nor": ("nor", 1), "khanate_nor": ("nor", 2), "daemonsmiths_nor": ("nor", 3),
+    "overseers_nor": ("nor", 4), "brass_nor": ("nor", 5), "immortals_nor": ("nor", 6),
+    "temple_nor": ("nor", 7),
 }
 _PICTURES = {}
 
@@ -433,8 +448,12 @@ def selftest():
     chs = dict((n[:-4], (r, w)) for n, (r, w) in CA_BACKGROUNDS.items() if n.endswith("_chs"))
     assert sorted(chs) == sorted(list(BACKGROUNDS) + ["temple"]), sorted(chs)
     assert len(set(chs.values())) == len(chs), "two Warriors of Chaos grounds share a window"
+    tmb = dict((n[:-4], (r, w)) for n, (r, w) in CA_BACKGROUNDS.items() if n.endswith("_tmb"))
+    assert sorted(tmb) == sorted(list(BACKGROUNDS) + ["temple"]), sorted(tmb)
+    assert len(set(tmb.values())) == len(tmb), "two Tomb Kings grounds share a window"
+    assert [g for g, (r, w) in tmb.items() if r != "tmb"] == ["khanate"], tmb
     for race in CA_ART:
-        if race in LENT or race == "chs":
+        if race in LENT or race in ("chs", "tmb", "tmb_lah"):
             continue
         mine = dict((n[:-len(race) - 1], w) for n, (r, w) in CA_BACKGROUNDS.items()
                     if r == race and n.endswith("_" + race))

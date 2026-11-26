@@ -133,6 +133,11 @@ GG.RIVALS_RACE = {
         overseers = "daemonsmiths", daemonsmiths = "overseers",
         brass     = "khanate",      khanate      = "brass",
     },
+    ["wh2_dlc09_tmb_tomb_kings"] = {
+        khanate   = "temple",       temple       = "khanate",
+        immortals = "daemonsmiths", daemonsmiths = "immortals",
+        overseers = "slavers",      slavers      = "overseers",
+    },
 }
 
 -- The rival of `guild` for `faction`'s race. EVERY rivalry read goes through here.
@@ -498,10 +503,10 @@ function GG.turn_start_pay(faction, guild)
     if guild == "temple" then
         if not GG.covered(faction) then return 0 end
         local r = GG.temple_routes(faction)
-        if not r or not (r.devout or r.chaos or r.taint) then return 0 end
-        local ok, devout, clean, tainted = pcall(function()
+        if not r or not (r.devout or r.chaos or r.taint or r.altars) then return 0 end
+        local ok, devout, clean, tainted, altars = pcall(function()
             local f = cm:get_faction(faction)
-            if not f or f:is_null_interface() then return 0, 0, 0 end
+            if not f or f:is_null_interface() then return 0, 0, 0, 0 end
             return GG.temple_counts(f, r)
         end)
         if not ok then return 0 end
@@ -511,6 +516,8 @@ function GG.turn_start_pay(faction, guild)
                                    clean * (GG.setting("rate_temple_chaos") or 2))
                   + GG.with_patron(faction, guild,
                                    tainted * (GG.setting("rate_temple_taint") or 2))
+                  + GG.with_patron(faction, guild,
+                                   altars * (GG.setting("rate_temple_altar") or 2))
         local cap = GG.guild_cap(guild, faction)
         if cap > 0 and n > cap then n = cap end
         return n
@@ -624,6 +631,15 @@ GG.TEMPLE_ROUTES = {
         holy = {"wh_main_emp_empire", "wh3_main_ksl_kislev", "wh3_main_cth_cathay"},
         priests = {"wh_main_chs_chaos_sorcerer_fire", "wh_main_chs_chaos_sorcerer_death",
                     "wh_main_chs_chaos_sorcerer_metal", "wh_dlc07_chs_chaos_sorcerer_shadow"}},
+    ["wh2_dlc09_tmb_tomb_kings"] = {devout = true,
+        holy = {"wh_main_vmp_vampire_counts", "wh3_dlc29_nag_undead_legions"}},
+    -- THE FOUR (norsca spec §3.3): `altars` pays per altar settlement of the faction's
+    -- most-favoured god plus every Undivided altar (GG.temple_altars). Their priests are
+    -- CA's own allegiance champions, Kihar and Killgore.
+    ["wh_dlc08_nor_norsca"] = {altars = true,
+        holy = {"wh_main_emp_empire", "wh3_main_ksl_kislev", "wh_main_brt_bretonnia",
+                "wh3_main_cth_cathay"},
+        priests = {"wh_dlc08_nor_kihar", "wh3_main_ie_nor_killgore_slaymaim"}},
 }
 -- END TEMPLE ROUTES
 
@@ -938,6 +954,99 @@ GG.RECRUIT_ROUTES = {
             {"temple"},                       -- Archaon, Kholek, unmarked lords and heroes
         },
     },
+    -- Characters by key, never by `agent`: the Tomb Herald is a dignitary in one faction
+    -- and an engineer in another.
+    ["wh2_dlc09_tmb_tomb_kings"] = {
+        units = {
+            {"immortals", key = "tomb_guard"},
+            {"temple", key = "ushabti"},
+            {"slavers", key = "chariot"},
+            {"daemonsmiths", key = "necropolis_knights"},
+            {"brass", key = "nehekhara_horsemen"},
+            {"overseers", key = "tomb_scorpion"},
+            {"overseers", key = "sphinx"},
+            {"overseers", key = "heirotitan"},
+            {"overseers", key = "khemric_titan"},
+            {"overseers", key = "bone_giant"},
+            {"khanate", key = "sepulchral_stalkers"},
+            {"temple", key = "carrion"},
+            {false, key = "crypt_ghouls"},
+            {false, key = "cairn_wraiths"},
+            {false, key = "hexwraiths"},
+            {false, key = "spirit_host"},
+            {false, key = "fell_bats"},
+            {false, key = "dire_wolves"},
+            {false, key = "crypt_horrors"},
+            {false, key = "morghast"},
+            {"overseers", key = "skeleton_warriors"},
+            {"overseers", key = "skeleton_spearmen"},
+            {"overseers", key = "skeleton_archers"},
+            {"immortals", key = "nehekhara_warriors"},
+            {"slavers", caste = "cavalry"},
+            {"daemonsmiths", caste = "engines"},
+            {"immortals", caste = "infantry"},
+            {"overseers"},
+        },
+        characters = {
+            {"daemonsmiths", key = "liche"},
+            {"daemonsmiths", key = "khatep"},
+            {"overseers", key = "necrotect"},
+            {"immortals", key = "tomb_herald"},
+            {"temple", key = "khalida"},
+            {false, key = "arkhan"},
+            {"slavers"},
+        },
+    },
+    -- NORSCA (norsca spec §3.5): the chariot rule goes before the wolves, because the Ice
+    -- Wolf Chariot holds both words. Marauders pay the Reavers, whose hall trains them.
+    ["wh_dlc08_nor_norsca"] = {
+        units = {
+            {"temple", key = "wh3_dlc27_chs_"},   -- the altars' god-marked warriors
+            {"temple", key = "wh3_dlc27_kho_"},
+            {"temple", key = "wh3_dlc27_nur_"},
+            {"temple", key = "wh3_dlc27_sla_"},
+            {"temple", key = "wh3_dlc27_tze_"},
+            {"slavers", key = "chariot"},
+            {"slavers", key = "horsemen"},
+            {"slavers", key = "horsemasters"},
+            {"slavers", key = "chaos_marauders"},
+            {"immortals", key = "berserkers"},
+            {"immortals", key = "marauder_champions"},
+            {"immortals", key = "bearmen"},
+            {"immortals", key = "spearman"},
+            {"immortals", key = "flayerkin"},
+            {"khanate", key = "skinwolves"},
+            {"khanate", key = "warwolves"},
+            {"khanate", key = "warhounds"},
+            {"brass", key = "hunters"},
+            {"brass", key = "fimir"},
+            {"brass", key = "manticore"},
+            {"brass", key = "chimera"},
+            {"brass", key = "frost_wyrm"},
+            {"brass", key = "dread_maw"},
+            {"brass", key = "giant"},
+            {"brass", key = "ettin"},
+            {"overseers", key = "troll"},
+            {"daemonsmiths", key = "mammoth"},
+        },
+        characters = {
+            {"temple", key = "kihar"},
+            {"temple", key = "killgore"},
+            {"temple", key = "styrkaar"},
+            {"temple", key = "scyla"},
+            {"temple", key = "gutrot"},
+            {"daemonsmiths", key = "shaman_sorcerer"},
+            {"daemonsmiths", key = "sayl"},
+            {"khanate", key = "skin_wolf"},
+            {"khanate", key = "fimir"},
+            {"khanate", key = "beorg"},
+            {"immortals", key = "wulfrik"},
+            {"immortals", key = "marauder_chieftain"},
+            {"immortals", key = "throgg"},
+            {"immortals", agent = "general"},
+            {"immortals", agent = "champion"},
+        },
+    },
 }
 
 -- `t`: {key, caste, class} for a unit, {key, agent, caster} for a character. A plain
@@ -975,6 +1084,8 @@ GG.UPGRADE_PAYS = {["wh_main_chs_chaos"] = true}
 -- pays nothing, and the Daemonsmiths, who have no limit, take whatever the turn recruits.
 -- GG.culture_of answers nil for a faction this mod does not cover, which is the gate.
 function GG.on_recruit(faction, list, t)
+    -- CA's scripted-spawn generals (Pillage, decrees, grudges, the Tower): recruitable = false.
+    if list == "characters" and string.sub(t.key or "", -13) == "_spawned_army" then return end
     local guild = GG.recruit_guild(GG.culture_of(faction), list, t)
     -- WHAT THE ENGINE HANDED OVER, behind the MCT debug switch: whether the events reach
     -- AI factions, and whether unit_class() is the land_units class the rules read.
@@ -1047,14 +1158,39 @@ function GG.temple_counts(f, r)
             if not res:is_null_interface() and res:value() > 0 then tainted = tainted + 1 end
         end
     end
-    return devout, clean, tainted
+    return devout, clean, tainted, r.altars and GG.temple_altars(f) or 0
+end
+
+-- THE FOUR'S ALTARS (norsca spec §3.3): the settlements whose main building is an altar of
+-- the faction's MOST-FAVOURED god, plus every Undivided altar. CA's monoliths text: "It is
+-- the goal of all Northmen to gain the attention of one of these Ruinous Masters,
+-- worshipping a single deity above all others." Read off the settlement's own chain rather
+-- than CA's nor_progress_<god>_count bonus values, because the Undivided altars carry none
+-- and Sayl raises only those. Two-argument string.find: the tokens carry no pattern magic.
+GG.ALTAR_GODS = {"settlement_nor_chaos_altar_kho", "settlement_nor_chaos_altar_nur",
+                 "settlement_nor_chaos_altar_sla", "settlement_nor_chaos_altar_tze"}
+GG.ALTAR_UNDIVIDED = "settlement_nor_chaos_altar_und"
+function GG.temple_altars(f)
+    local count, und = {0, 0, 0, 0}, 0
+    local rl = f:region_list()
+    for i = 0, rl:num_items() - 1 do
+        local chain = string.lower(rl:item_at(i):settlement():primary_building_chain() or "")
+        if string.find(chain, GG.ALTAR_UNDIVIDED) then
+            und = und + 1
+        else
+            for g = 1, #GG.ALTAR_GODS do
+                if string.find(chain, GG.ALTAR_GODS[g]) then count[g] = count[g] + 1 end
+            end
+        end
+    end
+    return math.max(count[1], count[2], count[3], count[4]) + und
 end
 
 -- At the faction's turn start, AI included. `f` is the faction interface the listener holds.
 function GG.temple_turn(faction, f)
     local r = GG.temple_routes(faction)
-    if not r or not (r.devout or r.chaos or r.taint) or not f then return end
-    local ok, devout, clean, tainted = pcall(GG.temple_counts, f, r)
+    if not r or not (r.devout or r.chaos or r.taint or r.altars) or not f then return end
+    local ok, devout, clean, tainted, altars = pcall(GG.temple_counts, f, r)
     if not ok then return end
     GG.capped_grant(faction, "temple", devout * (GG.setting("rate_temple_devout") or 1),
                     "devout")
@@ -1062,6 +1198,8 @@ function GG.temple_turn(faction, f)
                     "chaos")
     GG.capped_grant(faction, "temple", tainted * (GG.setting("rate_temple_taint") or 2),
                     "taint")
+    GG.capped_grant(faction, "temple", altars * (GG.setting("rate_temple_altar") or 2),
+                    "altars")
 end
 
 -- A WON BATTLE AGAINST THE FAITH'S ENEMIES, off CA's pending-battle cache, which keeps the
@@ -1257,6 +1395,29 @@ GG.BUILDING_THEME_RACE = {
         {"slavers", {"fortress_vassals", "chs_allied_outpost"}},
         {"khanate", {"fortress_towers", "woc_chaos_altar_special_gate_towers",
                      "woc_chaos_altar_garrison", "foreign_slot_discovery_woc"}},
+    },
+    ["_tmb"] = {
+        {"temple", {"tmb_ushabti", "tmb_public_order"}},
+        {"daemonsmiths", {"tmb_estate", "arkhan_burial_mound"}},
+        {"brass", {"tmb_income"}},
+        {"slavers", {"tmb_chariots", "tmb_cavalry"}},
+        {"immortals", {"tmb_citadel"}},
+        {"khanate", {"foreign_slot_discovery_tmb", "tmb_allied_outpost", "lahmia_house"}},
+        {"overseers", {"tmb_hierotitan", "tmb_necrosphinx", "tmb_warsphinx", "tmb_scorpions"}},
+    },
+    -- NORSCA (norsca spec §3.6). The smithy and the slaves chain go to the Thralls on CA's
+    -- own words: the smith is a slave kept alive for his skills, and the slaves chain is
+    -- where captives labour out their lives.
+    ["_nor"] = {
+        {"temple", {"norsca_worship", "settlement_nor_chaos_altar"}},
+        {"overseers", {"norsca_slaves", "norsca_smith", "special_throgg_", "trolls_woods_altar"}},
+        {"brass", {"norsca_creatures", "norsca_offerings", "monster_den"}},
+        {"immortals", {"_recruitment", "_replenishment", "outpost_experience",
+                       "special_gate_towers"}},
+        {"daemonsmiths", {"norsca_chaos"}},
+        {"slavers", {"norsca_loot", "outpost_income", "norsca_port", "nor_port_altar",
+                     "_raiding", "norsca_stables", "outpost_stables", "nor_allied_outpost"}},
+        {"khanate", {"norsca_beasts", "trap_core_", "foreign_slot_discovery_nor"}},
     },
 }
 
@@ -3824,6 +3985,14 @@ GG.SERVICES = {
     {key="soul_tithe",          guild="slavers",      rank=2, cost=50,  cd=8,  kind="resource", resource="wh3_dlc20_chs_souls", factor="wh3_dlc20_souls_other", value=500, race="wh_main_chs_chaos"},
     {key="eye_turns",           guild="daemonsmiths", rank=3, cost=150, cd=12, kind="resource", resource="wh3_dlc20_chs_eye_of_the_gods", factor="gifts_of_chaos", value=15, race="wh_main_chs_chaos"},
     {key="skull_throne",        guild="immortals",    rank=4, cost=400, cd=16, kind="bundle",   turns=10, lead=true, race="wh_main_chs_chaos"},
+    {key="canopic_offering",    guild="brass",        rank=2, cost=50,  cd=8,  kind="resource", resource="tmb_canopic_jars", factor="missions", value=50, race="wh2_dlc09_tmb_tomb_kings"},
+    {key="the_awakening",       guild="daemonsmiths", rank=3, cost=150, cd=12, kind="race_army", room=true, units="wh2_dlc09_tmb_inf_skeleton_warriors_0,wh2_dlc09_tmb_inf_skeleton_spearmen_0", race="wh2_dlc09_tmb_tomb_kings"},
+    {key="kings_legions",       guild="immortals",    rank=4, cost=400, cd=16, kind="bundle",   turns=10, lead=true, race="wh2_dlc09_tmb_tomb_kings"},
+    -- NORSCA'S RACE SERVICES (norsca spec §5), AFTER the Warriors of Chaos rows: cooldowns
+    -- are positional.
+    {key="spoils_tithe",        guild="slavers",      rank=2, cost=50,  cd=8,  kind="resource", resource="wh3_dlc27_nor_spoils", factor="events", value=200, race="wh_dlc08_nor_norsca"},
+    {key="wolf_kin",            guild="khanate",      rank=3, cost=150, cd=12, kind="race_army", room=true, units="wh_dlc08_nor_mon_skinwolves_0,wh_dlc08_nor_mon_warwolves_0", race="wh_dlc08_nor_norsca"},
+    {key="monster_hunt",        guild="brass",        rank=4, cost=400, cd=16, kind="bundle",   turns=10, lead=true, race="wh_dlc08_nor_norsca"},
 }
 
 -- ONE UNIT PER CULTURE, NOT ONE UNIT. This was a single Chaos Dwarf key, and it was the
@@ -3853,6 +4022,8 @@ GG.HIRE_UNIT_BY_CULTURE = {
     ["wh2_main_hef_high_elves"]    = "wh2_main_hef_inf_swordmasters_of_hoeth_0",
     ["wh2_main_skv_skaven"]        = "wh2_main_skv_inf_stormvermin_0",
     ["wh_main_chs_chaos"]          = "wh3_dlc20_chs_inf_chosen_mkho",
+    ["wh2_dlc09_tmb_tomb_kings"]   = "wh2_dlc09_tmb_inf_tomb_guard_0",
+    ["wh_dlc08_nor_norsca"]        = "wh_dlc08_nor_inf_marauder_champions_1",
 }
 
 -- Kept because three other files still read it by name. It is the Chaos Dwarf entry of
@@ -3930,6 +4101,8 @@ GG.FLAVOURED = {
     ["wh2_main_hef_high_elves"] = {tag = "_hef", feed = 80},
     ["wh2_main_skv_skaven"] = {tag = "_skv", feed = 90},
     ["wh_main_chs_chaos"] = {tag = "_chs", feed = 100},
+    ["wh2_dlc09_tmb_tomb_kings"] = {tag = "_tmb", feed = 110},
+    ["wh_dlc08_nor_norsca"] = {tag = "_nor", feed = 120},
 }
 
 -- Cached in GG.CULTURE_OF, which until now was declared and never written to: a
@@ -4109,6 +4282,9 @@ function GG.payload(faction, s, target, points)
             -- SLAVES, through "missions" as CA's own payloads grant them
             -- (lib_campaign_mission_manager.lua:2616). Every Dark Elf faction holds them.
             cm:faction_add_pooled_resource(faction, "def_slaves", "missions", 1000)
+        elseif GG.culture_of(faction) == "wh2_dlc09_tmb_tomb_kings"
+               and GG.has_resource(faction, "tmb_canopic_jars") then
+            cm:faction_add_pooled_resource(faction, "tmb_canopic_jars", GG.TITHE_FACTOR, 150)
         else
             cm:treasury_mod(faction, 3000)
         end
@@ -4325,6 +4501,9 @@ end
 -- SHADOWS OF ESHIN (skaven ruling 3): the Menace Below's charges are not a resource a
 -- script can add to, so Eshin lends its runners instead, through the Muster's grant.
 GG.RACE_FIRE.shadows_of_eshin = GG.RACE_FIRE.electors_muster
+GG.RACE_FIRE.the_awakening = GG.RACE_FIRE.electors_muster
+-- THE WOLF-KIN (norsca spec §5): the Skin Wolves lend a pack of their own, the same way.
+GG.RACE_FIRE.wolf_kin = GG.RACE_FIRE.electors_muster
 
 -- ELECTOR'S FAVOUR: +1 Fealty to the least loyal Elector Count, through CA's own politics
 -- globals (wh2_dlc13_empire_politics.lua:949, :1943). The finder keeps only electors
@@ -4516,6 +4695,9 @@ GG.EARN_ROUTES = {
     -- GIFTS OF THE GODS (woc spec §3.2): Souls spent on a god's gifts, by the point. The
     -- pool names the god (GG.POOL_GUILD), and each god keeps its own remainder.
     gifts      = {per = 25, by_pool = true},
+    crafted    = {guild = "daemonsmiths", rep = 40},
+    -- SPOILS OF THE HUNT (norsca spec §3.2): Spoils from the Monstrous Arcanum, by the point.
+    spoils     = {guild = "brass",        per = 25},
 }
 -- Which race earns by which route. CaravanCompleted is raised for Chaos Dwarf convoys and
 -- Cathay's caravans alike, so both earn by it.
@@ -4530,6 +4712,8 @@ GG.EARN_OF = {
     ["wh2_main_hef_high_elves"]    = "court",
     ["wh2_main_skv_skaven"]        = "undercity",
     ["wh_main_chs_chaos"]          = "gifts",
+    ["wh2_dlc09_tmb_tomb_kings"]   = "crafted",
+    ["wh_dlc08_nor_norsca"]        = "spoils",
 }
 -- The pools an earning listens to, and which of their factors count.
 GG.POOL_ROUTES = {wh3_dlc25_dwf_grudge_points = "grudges", brt_chivalry = "chivalry",
@@ -4537,7 +4721,9 @@ GG.POOL_ROUTES = {wh3_dlc25_dwf_grudge_points = "grudges", brt_chivalry = "chiva
                   -- THE WARRIORS OF CHAOS (woc spec §3.2): Souls spent, one pool per god.
                   wh3_dlc20_chs_souls_spent_kho = "gifts", wh3_dlc20_chs_souls_spent_nur = "gifts",
                   wh3_dlc20_chs_souls_spent_sla = "gifts", wh3_dlc20_chs_souls_spent_tze = "gifts",
-                  wh3_dlc20_chs_souls_spent_und = "gifts"}
+                  wh3_dlc20_chs_souls_spent_und = "gifts",
+                  -- NORSCA (norsca spec §3.2): Spoils, from the hunts only.
+                  wh3_dlc27_nor_spoils = "spoils"}
 -- WHICH GOD A SOULS POOL PAYS. The Doubter and the Undoer have none: the Four do not deal
 -- with renegades.
 GG.POOL_GUILD = {wh3_dlc20_chs_souls_spent_kho = "immortals",
@@ -4551,6 +4737,8 @@ GG.POOL_GUILD = {wh3_dlc20_chs_souls_spent_kho = "immortals",
 function GG.pool_route_counts(route, factor)
     if route == "captives" then return factor == "raiding" or factor == "battles" end
     if route == "chivalry" then return factor ~= "missions" end
+    -- Spoils from the hunts only: Pillage is paid by the raze route (norsca spec §3.2).
+    if route == "spoils" then return factor == "wh3_dlc27_nor_spoils_monstrous_arcanum" end
     return true
 end
 
@@ -4923,7 +5111,7 @@ end
 -- in tools/gen_great_guilds.py (check_hall_mirror). Six chains per race share one
 -- superchain capped at one instance, so a settlement holds one guild's hall - that is the
 -- DB's job. This block decides who may BUILD which level, counts what stands, and pays.
-GG.HALL_TAGS = {[""] = true, ["_emp"] = true, ["_dwf"] = true, ["_brt"] = true, ["_cth"] = true, ["_ksl"] = true, ["_def"] = true, ["_hef"] = true, ["_skv"] = true, ["_chs"] = true}          -- races with halls
+GG.HALL_TAGS = {[""] = true, ["_emp"] = true, ["_dwf"] = true, ["_brt"] = true, ["_cth"] = true, ["_ksl"] = true, ["_def"] = true, ["_hef"] = true, ["_skv"] = true, ["_chs"] = true, ["_tmb"] = true, ["_nor"] = true}          -- races with halls
 GG.HALL_RANK = {2, 4, 5}              -- rank for level 0, 1, 2; level 2 also needs the lead
 GG.HALL_REP = {4, 8, 15}              -- reputation per hall per turn, by level
 GG.HALL_OFF_MAX = 15                  -- most % a guild's halls take off its services
@@ -5092,6 +5280,21 @@ function GG.first_halls()
     for f, _ in pairs(GG.state) do one(f) end
 end
 
+function GG.unit_room(faction, s)
+    local units = s.units
+    if s.kind == "unit" then units = GG.hire_unit(faction) end
+    if type(units) ~= "string" then return true end
+    for unit in string.gmatch(units, "[^,]+") do
+        local ok, left = pcall(function()
+            local f = cm:get_faction(faction)
+            if not f or f:is_null_interface() then return nil end
+            return f:unit_cap_remaining(unit)
+        end)
+        if not ok or type(left) ~= "number" or left ~= 0 then return true end
+    end
+    return false
+end
+
 function GG.can_buy(faction, service_key)
     local s = GG.service(service_key)
     if not s then return false, "unknown" end
@@ -5135,6 +5338,12 @@ function GG.can_buy(faction, service_key)
     end
     -- WHAT IT WORKS ON IS STILL THERE: the draw asked, and the world has moved since.
     if not GG.needs_ok(faction, s) then return false, "unavailable" end
+    -- AT THE UNIT CAP, NOTHING TO HAND OVER (tmb spec §4.2). Tomb Kings regiments are
+    -- capped by buildings (campaign_cap 0), and a grant past the cap would take the Favour
+    -- and deliver nothing: GG.buy refunds only a throw.
+    if (s.kind == "unit" or s.kind == "race_army") and not GG.unit_room(faction, s) then
+        return false, "capped"
+    end
     if GG.cooldown_left(faction, service_key) > 0 then return false, "cooldown" end
     if fav < GG.service_cost(faction, service_key) then return false, "favour" end
     return true, nil
@@ -5378,6 +5587,9 @@ GG.TUNE_DEFAULTS = {
     cap_temple = 40,
     -- THE GREY SEERS' TAINT (skaven spec §3.2): per province carrying Skaven corruption.
     rate_temple_taint = 2,
+    -- THE FOUR'S ALTARS (norsca spec §3.3): per altar of the most-favoured god, and per
+    -- Undivided altar.
+    rate_temple_altar = 2,
     -- RECRUITING (2026-10-11, GG.on_recruit): per unit, doubled for a monster or war
     -- machine and four times for a hero or lord; at most cap_recruit per guild per turn,
     -- under the guild's own limit. 0 switches recruiting off.
@@ -5423,6 +5635,7 @@ GG.TUNE_ORDER = {
     "rate_temple_taint",
     "rate_recruit",
     "cap_recruit",
+    "rate_temple_altar",
 }
 
 GG.TUNE = GG.TUNE or nil
@@ -5479,6 +5692,7 @@ GG.PRESETS = {
         hall_rep = 120,
         rate_temple_devout = 2, rate_temple_chaos = 3, rate_temple_holy = 15, cap_temple = 60,
         rate_temple_taint = 3,
+        rate_temple_altar = 3,
         rate_recruit = 3, cap_recruit = 30,
     },
 
@@ -5499,6 +5713,7 @@ GG.PRESETS = {
         hall_rep = 80,
         rate_temple_devout = 1, rate_temple_chaos = 1, rate_temple_holy = 7, cap_temple = 30,
         rate_temple_taint = 1,
+        rate_temple_altar = 1,
         rate_recruit = 1, cap_recruit = 15,
     },
 
@@ -5522,6 +5737,7 @@ GG.PRESETS = {
         hall_rep = 60,
         rate_temple_devout = 1, rate_temple_chaos = 1, rate_temple_holy = 5, cap_temple = 22,
         rate_temple_taint = 1,
+        rate_temple_altar = 1,
         rate_recruit = 1, cap_recruit = 10,
     },
 }
@@ -5596,6 +5812,9 @@ GG.TWISTS = {
     -- THE FICKLE GODS (woc spec §2): "jealous and fickle deities" - each god's upkeep is
     -- half again as much, and a demand answered pays more.
     ["wh_main_chs_chaos"]          = {rate_decay = 150, demand_reward = 150},
+    ["wh2_dlc09_tmb_tomb_kings"]   = {rate_rivalry = 150, rate_decay = 50},
+    -- BOASTS (norsca spec §2.1): a Northman who fails a boast is shamed twice over.
+    ["wh_dlc08_nor_norsca"]        = {rate_bounty_fail = 200, demand_reward = 150},
 }
 
 -- The percentage `faction`'s race puts on `key`: 100 when it bends nothing, when race
@@ -6250,6 +6469,18 @@ function GG.register()
         GG.load(name); GG.race_earn(name, "court"); GG.save(name)
     end, true)
 
+    core:add_listener("gg_earn_crafted", "RitualCompletedEvent", true, function(context)
+        local okc, cat, key, won = pcall(function()
+            local r = context:ritual()
+            return r:ritual_category(), r:ritual_key(), context:succeeded()
+        end)
+        if not okc or not won or cat ~= "CRAFTING_RITUAL" or type(key) ~= "string" then return end
+        if string.sub(key, 1, 25) == "wh3_main_tmb_confederate_" then return end
+        local name = faction_name_of(context, function() return context:performing_faction() end)
+        if not name then return end
+        GG.load(name); GG.race_earn(name, "crafted"); GG.save(name)
+    end, true)
+
     -- ForeignSlotManagerCreatedEvent carries requesting_faction() (CA's own listener,
     -- victory_objectives_config.lua:7517). Vampire covens fire it too; race_earn refuses them.
     -- So do ALLIED OUTPOSTS, which are no under-city: is_allied() tells them apart, as CA's
@@ -6426,6 +6657,9 @@ GG.LEDGER_SOURCES = {"income", "battles", "research", "agents", "buildings",
                      "undercity", "taint",
                      -- THE WARRIORS OF CHAOS (2026-10-12).
                      "gifts",
+                     "crafted",
+                     -- NORSCA (2026-11-26).
+                     "spoils", "altars",
                      -- RECRUITING (2026-10-11).
                      "recruits"}
 GG.LEDGER_KNOWN = {}

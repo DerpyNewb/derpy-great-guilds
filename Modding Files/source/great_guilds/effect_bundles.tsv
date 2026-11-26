@@ -898,6 +898,186 @@ derpy_gg_svc_holy_war_chs		The Incursion	faction	1	derpy_gg_temple_chs.png	true	
 derpy_gg_svc_miracle_chs		Flesh Remade	force	1	derpy_gg_temple_chs.png	true	false	true
 derpy_gg_svc_consecration_chs		The Star of Chaos	faction	1	derpy_gg_temple_chs.png	true	false	true
 derpy_gg_svc_skull_throne_chs		Skulls for the Skull Throne	faction	1	derpy_gg_immortals_chs.png	true	false	true
+derpy_gg_rank_brass_2_tmb		The Royal Treasury - Scribe	faction	1	derpy_gg_brass_tmb.png	true	false	true
+derpy_gg_rank_brass_3_tmb		The Royal Treasury - Vizier	faction	1	derpy_gg_brass_tmb.png	true	false	true
+derpy_gg_rank_brass_4_tmb		The Royal Treasury - Prince	faction	1	derpy_gg_brass_tmb.png	true	false	true
+derpy_gg_rank_brass_5_tmb		The Royal Treasury - Priest King	faction	1	derpy_gg_brass_tmb.png	true	false	true
+derpy_gg_lead_brass_tmb		The Royal Treasury - Foremost	faction	1	derpy_gg_brass_tmb.png	true	false	true
+derpy_gg_rank_immortals_2_tmb		The Tomb Guard - Scribe	faction	1	derpy_gg_immortals_tmb.png	true	false	true
+derpy_gg_rank_immortals_3_tmb		The Tomb Guard - Vizier	faction	1	derpy_gg_immortals_tmb.png	true	false	true
+derpy_gg_rank_immortals_4_tmb		The Tomb Guard - Prince	faction	1	derpy_gg_immortals_tmb.png	true	false	true
+derpy_gg_rank_immortals_5_tmb		The Tomb Guard - Priest King	faction	1	derpy_gg_immortals_tmb.png	true	false	true
+derpy_gg_lead_immortals_tmb		The Tomb Guard - Foremost	faction	1	derpy_gg_immortals_tmb.png	true	false	true
+derpy_gg_rank_daemonsmiths_2_tmb		The Liche Priesthood - Scribe	faction	1	derpy_gg_daemonsmiths_tmb.png	true	false	true
+derpy_gg_rank_daemonsmiths_3_tmb		The Liche Priesthood - Vizier	faction	1	derpy_gg_daemonsmiths_tmb.png	true	false	true
+derpy_gg_rank_daemonsmiths_4_tmb		The Liche Priesthood - Prince	faction	1	derpy_gg_daemonsmiths_tmb.png	true	false	true
+derpy_gg_rank_daemonsmiths_5_tmb		The Liche Priesthood - Priest King	faction	1	derpy_gg_daemonsmiths_tmb.png	true	false	true
+derpy_gg_lead_daemonsmiths_tmb		The Liche Priesthood - Foremost	faction	1	derpy_gg_daemonsmiths_tmb.png	true	false	true
+derpy_gg_rank_khanate_2_tmb		The Lahmian Sisterhood - Scribe	faction	1	derpy_gg_khanate_tmb.png	true	false	true
+derpy_gg_rank_khanate_3_tmb		The Lahmian Sisterhood - Vizier	faction	1	derpy_gg_khanate_tmb.png	true	false	true
+derpy_gg_rank_khanate_4_tmb		The Lahmian Sisterhood - Prince	faction	1	derpy_gg_khanate_tmb.png	true	false	true
+derpy_gg_rank_khanate_5_tmb		The Lahmian Sisterhood - Priest King	faction	1	derpy_gg_khanate_tmb.png	true	false	true
+derpy_gg_lead_khanate_tmb		The Lahmian Sisterhood - Foremost	faction	1	derpy_gg_khanate_tmb.png	true	false	true
+derpy_gg_rank_overseers_2_tmb		The Necrotects - Scribe	faction	1	derpy_gg_overseers_tmb.png	true	false	true
+derpy_gg_rank_overseers_3_tmb		The Necrotects - Vizier	faction	1	derpy_gg_overseers_tmb.png	true	false	true
+derpy_gg_rank_overseers_4_tmb		The Necrotects - Prince	faction	1	derpy_gg_overseers_tmb.png	true	false	true
+derpy_gg_rank_overseers_5_tmb		The Necrotects - Priest King	faction	1	derpy_gg_overseers_tmb.png	true	false	true
+derpy_gg_lead_overseers_tmb		The Necrotects - Foremost	faction	1	derpy_gg_overseers_tmb.png	true	false	true
+derpy_gg_rank_slavers_2_tmb		The Charioteer Nobles - Scribe	faction	1	derpy_gg_slavers_tmb.png	true	false	true
+derpy_gg_rank_slavers_3_tmb		The Charioteer Nobles - Vizier	faction	1	derpy_gg_slavers_tmb.png	true	false	true
+derpy_gg_rank_slavers_4_tmb		The Charioteer Nobles - Prince	faction	1	derpy_gg_slavers_tmb.png	true	false	true
+derpy_gg_rank_slavers_5_tmb		The Charioteer Nobles - Priest King	faction	1	derpy_gg_slavers_tmb.png	true	false	true
+derpy_gg_lead_slavers_tmb		The Charioteer Nobles - Foremost	faction	1	derpy_gg_slavers_tmb.png	true	false	true
+derpy_gg_rank_temple_2_tmb		The Cults of the Gods - Scribe	faction	1	derpy_gg_temple_tmb.png	true	false	true
+derpy_gg_rank_temple_3_tmb		The Cults of the Gods - Vizier	faction	1	derpy_gg_temple_tmb.png	true	false	true
+derpy_gg_rank_temple_4_tmb		The Cults of the Gods - Prince	faction	1	derpy_gg_temple_tmb.png	true	false	true
+derpy_gg_rank_temple_5_tmb		The Cults of the Gods - Priest King	faction	1	derpy_gg_temple_tmb.png	true	false	true
+derpy_gg_lead_temple_tmb		The Cults of the Gods - Foremost	faction	1	derpy_gg_temple_tmb.png	true	false	true
+derpy_gg_svc_writ_monopoly_tmb		The Royal Tax	faction	1	derpy_gg_brass_tmb.png	true	false	true
+derpy_gg_svc_long_ledger_tmb		Wealth of Nehekhara	faction	1	derpy_gg_brass_tmb.png	true	false	true
+derpy_gg_svc_oathbound_draft_tmb		Mend the Ranks	faction	1	derpy_gg_immortals_tmb.png	true	false	true
+derpy_gg_svc_astragoths_levy_tmb		Muster of the Dead	faction	1	derpy_gg_immortals_tmb.png	true	false	true
+derpy_gg_svc_forge_rite_tmb		Recovered Scrolls	faction	1	derpy_gg_daemonsmiths_tmb.png	true	false	true
+derpy_gg_svc_bound_ordnance_tmb		Secrets of Undeath	faction	1	derpy_gg_daemonsmiths_tmb.png	true	false	true
+derpy_gg_svc_knife_in_dark_tmb		A Quiet Word	faction	1	derpy_gg_khanate_tmb.png	true	false	true
+derpy_gg_svc_khans_price_tmb		Neferata's Price	faction	1	derpy_gg_khanate_tmb.png	true	false	true
+derpy_gg_svc_lash_the_gangs_tmb		Drive the Work Gangs	faction	1	derpy_gg_overseers_tmb.png	true	false	true
+derpy_gg_svc_works_of_zharr_tmb		Works of the Kings	faction	1	derpy_gg_overseers_tmb.png	true	false	true
+derpy_gg_svc_coffle_drive_tmb		Hunt the Tomb Robbers	faction	1	derpy_gg_slavers_tmb.png	true	false	true
+derpy_gg_svc_great_coffle_tmb		The Great Reclamation	faction	1	derpy_gg_slavers_tmb.png	true	false	true
+derpy_gg_svc_alms_and_bribes_tmb		Offerings to the Temples	faction	1	derpy_gg_brass_tmb.png	true	false	true
+derpy_gg_svc_mercenary_contract_tmb		Paid Retainers	faction	1	derpy_gg_brass_tmb.png	true	false	true
+derpy_gg_svc_guild_loan_tmb		A Loan from the Vaults	faction	1	derpy_gg_brass_tmb.png	true	false	true
+derpy_gg_svc_industry_charter_tmb		Quarry Charter	faction	1	derpy_gg_brass_tmb.png	true	false	true
+derpy_gg_svc_treasury_seal_tmb		Jars from the Treasury	faction	1	derpy_gg_brass_tmb.png	true	false	true
+derpy_gg_svc_bought_peace_tmb		The King's Decree	faction	1	derpy_gg_brass_tmb.png	true	false	true
+derpy_gg_svc_forced_march_tmb		The Endless March	force	1	derpy_gg_immortals_tmb.png	true	false	true
+derpy_gg_svc_drillmasters_tmb		Drilled Legions	faction	1	derpy_gg_immortals_tmb.png	true	false	true
+derpy_gg_svc_battle_standard_tmb		Standard of the King	force	1	derpy_gg_immortals_tmb.png	true	false	true
+derpy_gg_svc_field_surgeons_tmb		Rites of Restoration	force	1	derpy_gg_immortals_tmb.png	true	false	true
+derpy_gg_svc_veteran_cadre_tmb		Veteran Legions	faction	1	derpy_gg_immortals_tmb.png	true	false	true
+derpy_gg_svc_ward_runes_tmb		Hieratic Wards	force	1	derpy_gg_daemonsmiths_tmb.png	true	false	true
+derpy_gg_svc_spirit_siphon_tmb		Winds of Nehekhara	faction	1	derpy_gg_daemonsmiths_tmb.png	true	false	true
+derpy_gg_svc_forged_arms_tmb		Bronze Blades	faction	1	derpy_gg_daemonsmiths_tmb.png	true	false	true
+derpy_gg_svc_master_gunners_tmb		Catapult Crews	faction	1	derpy_gg_daemonsmiths_tmb.png	true	false	true
+derpy_gg_svc_great_work_tmb		Lore of Ages	faction	1	derpy_gg_daemonsmiths_tmb.png	true	false	true
+derpy_gg_svc_arsenal_tmb		The Royal Armoury	faction	1	derpy_gg_daemonsmiths_tmb.png	true	false	true
+derpy_gg_svc_bribed_guards_tmb		Charmed Sentries	faction	1	derpy_gg_khanate_tmb.png	true	false	true
+derpy_gg_svc_blooded_agents_tmb		Lahmian Tutelage	faction	1	derpy_gg_khanate_tmb.png	true	false	true
+derpy_gg_svc_sow_discord_tmb		Seeds of Discord	region	1	derpy_gg_khanate_tmb.png	true	false	true
+derpy_gg_svc_web_of_whispers_tmb		The Sisterhood's Web	faction	1	derpy_gg_khanate_tmb.png	true	false	true
+derpy_gg_svc_poisoned_wells_tmb		Poisoned Wells	region	1	derpy_gg_khanate_tmb.png	true	false	true
+derpy_gg_svc_granaries_tmb		Stone from the Quarries	region	1	derpy_gg_overseers_tmb.png	true	false	true
+derpy_gg_svc_road_gangs_tmb		Desert Roads	faction	1	derpy_gg_overseers_tmb.png	true	false	true
+derpy_gg_svc_enforcers_tmb		Tomb Wardens	region	1	derpy_gg_overseers_tmb.png	true	false	true
+derpy_gg_svc_fortify_tmb		Raise the Walls	region	1	derpy_gg_overseers_tmb.png	true	false	true
+derpy_gg_svc_master_builders_tmb		Master Necrotects	faction	1	derpy_gg_overseers_tmb.png	true	false	true
+derpy_gg_svc_public_works_tmb		Monuments to the Kings	faction	1	derpy_gg_overseers_tmb.png	true	false	true
+derpy_gg_svc_raiding_parties_tmb		Desert Raids	faction	1	derpy_gg_slavers_tmb.png	true	false	true
+derpy_gg_svc_captive_markets_tmb		Spoils of the Robbers	faction	1	derpy_gg_slavers_tmb.png	true	false	true
+derpy_gg_svc_slave_levy_tmb		Call the Legions	faction	1	derpy_gg_slavers_tmb.png	true	false	true
+derpy_gg_svc_pit_fights_tmb		Chariot Races	faction	1	derpy_gg_slavers_tmb.png	true	false	true
+derpy_gg_svc_great_hunt_tmb		The Great Hunt	faction	1	derpy_gg_slavers_tmb.png	true	false	true
+derpy_gg_svc_scorched_earth_tmb		Bury Them in Sand	region	1	derpy_gg_slavers_tmb.png	true	false	true
+derpy_gg_svc_hashut_blessing_tmb		Blessing of Ptra	force	1	derpy_gg_temple_tmb.png	true	false	true
+derpy_gg_svc_forge_sermons_tmb		Sermons of the Priests	region	1	derpy_gg_temple_tmb.png	true	false	true
+derpy_gg_svc_zeal_tmb		Wrath of Geheb	force	1	derpy_gg_temple_tmb.png	true	false	true
+derpy_gg_svc_purge_unclean_tmb		Purifying Rites	region	1	derpy_gg_temple_tmb.png	true	false	true
+derpy_gg_svc_anathema_tmb		The Gods' Curse	region	1	derpy_gg_temple_tmb.png	true	false	true
+derpy_gg_svc_holy_war_tmb		War of the Gods	faction	1	derpy_gg_temple_tmb.png	true	false	true
+derpy_gg_svc_miracle_tmb		The Gods' Mercy	force	1	derpy_gg_temple_tmb.png	true	false	true
+derpy_gg_svc_consecration_tmb		Consecrated Sands	faction	1	derpy_gg_temple_tmb.png	true	false	true
+derpy_gg_svc_kings_legions_tmb		The King's Legions	faction	1	derpy_gg_immortals_tmb.png	true	false	true
+derpy_gg_rank_brass_2_nor		The Monster Hunters - Marauder	faction	1	derpy_gg_brass_nor.png	true	false	true
+derpy_gg_rank_brass_3_nor		The Monster Hunters - Huskarl	faction	1	derpy_gg_brass_nor.png	true	false	true
+derpy_gg_rank_brass_4_nor		The Monster Hunters - Chieftain	faction	1	derpy_gg_brass_nor.png	true	false	true
+derpy_gg_rank_brass_5_nor		The Monster Hunters - Champion	faction	1	derpy_gg_brass_nor.png	true	false	true
+derpy_gg_lead_brass_nor		The Monster Hunters - Foremost	faction	1	derpy_gg_brass_nor.png	true	false	true
+derpy_gg_rank_immortals_2_nor		The Berserkers - Marauder	faction	1	derpy_gg_immortals_nor.png	true	false	true
+derpy_gg_rank_immortals_3_nor		The Berserkers - Huskarl	faction	1	derpy_gg_immortals_nor.png	true	false	true
+derpy_gg_rank_immortals_4_nor		The Berserkers - Chieftain	faction	1	derpy_gg_immortals_nor.png	true	false	true
+derpy_gg_rank_immortals_5_nor		The Berserkers - Champion	faction	1	derpy_gg_immortals_nor.png	true	false	true
+derpy_gg_lead_immortals_nor		The Berserkers - Foremost	faction	1	derpy_gg_immortals_nor.png	true	false	true
+derpy_gg_rank_daemonsmiths_2_nor		The Shaman-Sorcerers - Marauder	faction	1	derpy_gg_daemonsmiths_nor.png	true	false	true
+derpy_gg_rank_daemonsmiths_3_nor		The Shaman-Sorcerers - Huskarl	faction	1	derpy_gg_daemonsmiths_nor.png	true	false	true
+derpy_gg_rank_daemonsmiths_4_nor		The Shaman-Sorcerers - Chieftain	faction	1	derpy_gg_daemonsmiths_nor.png	true	false	true
+derpy_gg_rank_daemonsmiths_5_nor		The Shaman-Sorcerers - Champion	faction	1	derpy_gg_daemonsmiths_nor.png	true	false	true
+derpy_gg_lead_daemonsmiths_nor		The Shaman-Sorcerers - Foremost	faction	1	derpy_gg_daemonsmiths_nor.png	true	false	true
+derpy_gg_rank_khanate_2_nor		The Skin Wolves - Marauder	faction	1	derpy_gg_khanate_nor.png	true	false	true
+derpy_gg_rank_khanate_3_nor		The Skin Wolves - Huskarl	faction	1	derpy_gg_khanate_nor.png	true	false	true
+derpy_gg_rank_khanate_4_nor		The Skin Wolves - Chieftain	faction	1	derpy_gg_khanate_nor.png	true	false	true
+derpy_gg_rank_khanate_5_nor		The Skin Wolves - Champion	faction	1	derpy_gg_khanate_nor.png	true	false	true
+derpy_gg_lead_khanate_nor		The Skin Wolves - Foremost	faction	1	derpy_gg_khanate_nor.png	true	false	true
+derpy_gg_rank_overseers_2_nor		The Thralls - Marauder	faction	1	derpy_gg_overseers_nor.png	true	false	true
+derpy_gg_rank_overseers_3_nor		The Thralls - Huskarl	faction	1	derpy_gg_overseers_nor.png	true	false	true
+derpy_gg_rank_overseers_4_nor		The Thralls - Chieftain	faction	1	derpy_gg_overseers_nor.png	true	false	true
+derpy_gg_rank_overseers_5_nor		The Thralls - Champion	faction	1	derpy_gg_overseers_nor.png	true	false	true
+derpy_gg_lead_overseers_nor		The Thralls - Foremost	faction	1	derpy_gg_overseers_nor.png	true	false	true
+derpy_gg_rank_slavers_2_nor		The Reavers - Marauder	faction	1	derpy_gg_slavers_nor.png	true	false	true
+derpy_gg_rank_slavers_3_nor		The Reavers - Huskarl	faction	1	derpy_gg_slavers_nor.png	true	false	true
+derpy_gg_rank_slavers_4_nor		The Reavers - Chieftain	faction	1	derpy_gg_slavers_nor.png	true	false	true
+derpy_gg_rank_slavers_5_nor		The Reavers - Champion	faction	1	derpy_gg_slavers_nor.png	true	false	true
+derpy_gg_lead_slavers_nor		The Reavers - Foremost	faction	1	derpy_gg_slavers_nor.png	true	false	true
+derpy_gg_rank_temple_2_nor		The Four - Marauder	faction	1	derpy_gg_temple_nor.png	true	false	true
+derpy_gg_rank_temple_3_nor		The Four - Huskarl	faction	1	derpy_gg_temple_nor.png	true	false	true
+derpy_gg_rank_temple_4_nor		The Four - Chieftain	faction	1	derpy_gg_temple_nor.png	true	false	true
+derpy_gg_rank_temple_5_nor		The Four - Champion	faction	1	derpy_gg_temple_nor.png	true	false	true
+derpy_gg_lead_temple_nor		The Four - Foremost	faction	1	derpy_gg_temple_nor.png	true	false	true
+derpy_gg_svc_writ_monopoly_nor		The Trophy Trade	faction	1	derpy_gg_brass_nor.png	true	false	true
+derpy_gg_svc_long_ledger_nor		The Ivory Trade	faction	1	derpy_gg_brass_nor.png	true	false	true
+derpy_gg_svc_oathbound_draft_nor		Oath on the Axe	faction	1	derpy_gg_immortals_nor.png	true	false	true
+derpy_gg_svc_astragoths_levy_nor		The War-Horn Sounds	faction	1	derpy_gg_immortals_nor.png	true	false	true
+derpy_gg_svc_forge_rite_nor		Read the Bones	faction	1	derpy_gg_daemonsmiths_nor.png	true	false	true
+derpy_gg_svc_bound_ordnance_nor		The Shamans' Council	faction	1	derpy_gg_daemonsmiths_nor.png	true	false	true
+derpy_gg_svc_knife_in_dark_nor		Kin of the Pack	faction	1	derpy_gg_khanate_nor.png	true	false	true
+derpy_gg_svc_khans_price_nor		Fear of the Pack	faction	1	derpy_gg_khanate_nor.png	true	false	true
+derpy_gg_svc_lash_the_gangs_nor		Work the Thralls	faction	1	derpy_gg_overseers_nor.png	true	false	true
+derpy_gg_svc_works_of_zharr_nor		A Winter of Labour	faction	1	derpy_gg_overseers_nor.png	true	false	true
+derpy_gg_svc_coffle_drive_nor		Raiding Season	faction	1	derpy_gg_slavers_nor.png	true	false	true
+derpy_gg_svc_great_coffle_nor		Fire in the South	faction	1	derpy_gg_slavers_nor.png	true	false	true
+derpy_gg_svc_alms_and_bribes_nor		Smoke from the Pyres	faction	1	derpy_gg_brass_nor.png	true	false	true
+derpy_gg_svc_mercenary_contract_nor		Sellswords from the Wastes	faction	1	derpy_gg_brass_nor.png	true	false	true
+derpy_gg_svc_guild_loan_nor		A Hunter's Debt	faction	1	derpy_gg_brass_nor.png	true	false	true
+derpy_gg_svc_industry_charter_nor		Tanners and Carvers	faction	1	derpy_gg_brass_nor.png	true	false	true
+derpy_gg_svc_treasury_seal_nor		Fed by the Hunt	faction	1	derpy_gg_brass_nor.png	true	false	true
+derpy_gg_svc_bought_peace_nor		Feasts in the Hall	faction	1	derpy_gg_brass_nor.png	true	false	true
+derpy_gg_svc_forced_march_nor		The Red Trail	force	1	derpy_gg_immortals_nor.png	true	false	true
+derpy_gg_svc_drillmasters_nor		Blooded Young	faction	1	derpy_gg_immortals_nor.png	true	false	true
+derpy_gg_svc_battle_standard_nor		The War Totem	force	1	derpy_gg_immortals_nor.png	true	false	true
+derpy_gg_svc_field_surgeons_nor		Bind the Wounds	force	1	derpy_gg_immortals_nor.png	true	false	true
+derpy_gg_svc_veteran_cadre_nor		Veteran Huskarls	faction	1	derpy_gg_immortals_nor.png	true	false	true
+derpy_gg_svc_ward_runes_nor		Charms of Bone	force	1	derpy_gg_daemonsmiths_nor.png	true	false	true
+derpy_gg_svc_spirit_siphon_nor		Call the Winds	faction	1	derpy_gg_daemonsmiths_nor.png	true	false	true
+derpy_gg_svc_forged_arms_nor		Blessed Blades	faction	1	derpy_gg_daemonsmiths_nor.png	true	false	true
+derpy_gg_svc_master_gunners_nor		The Hellcannon's Fury	faction	1	derpy_gg_daemonsmiths_nor.png	true	false	true
+derpy_gg_svc_great_work_nor		The Great Seeing	faction	1	derpy_gg_daemonsmiths_nor.png	true	false	true
+derpy_gg_svc_arsenal_nor		Guided Throws	faction	1	derpy_gg_daemonsmiths_nor.png	true	false	true
+derpy_gg_svc_bribed_guards_nor		Scent of the Prey	faction	1	derpy_gg_khanate_nor.png	true	false	true
+derpy_gg_svc_blooded_agents_nor		Whelps of the Pack	faction	1	derpy_gg_khanate_nor.png	true	false	true
+derpy_gg_svc_sow_discord_nor		Howls in the Night	region	1	derpy_gg_khanate_nor.png	true	false	true
+derpy_gg_svc_web_of_whispers_nor		The Pack Grows	faction	1	derpy_gg_khanate_nor.png	true	false	true
+derpy_gg_svc_poisoned_wells_nor		Savaged Herds	region	1	derpy_gg_khanate_nor.png	true	false	true
+derpy_gg_svc_granaries_nor		Full Larders	region	1	derpy_gg_overseers_nor.png	true	false	true
+derpy_gg_svc_road_gangs_nor		Cleared Trails	faction	1	derpy_gg_overseers_nor.png	true	false	true
+derpy_gg_svc_enforcers_nor		Troll Wardens	region	1	derpy_gg_overseers_nor.png	true	false	true
+derpy_gg_svc_fortify_nor		Raise the Palisade	region	1	derpy_gg_overseers_nor.png	true	false	true
+derpy_gg_svc_master_builders_nor		Thrall Gangs	faction	1	derpy_gg_overseers_nor.png	true	false	true
+derpy_gg_svc_public_works_nor		Mead Halls	faction	1	derpy_gg_overseers_nor.png	true	false	true
+derpy_gg_svc_raiding_parties_nor		Raiding Bands	faction	1	derpy_gg_slavers_nor.png	true	false	true
+derpy_gg_svc_captive_markets_nor		Plunder of the Field	faction	1	derpy_gg_slavers_nor.png	true	false	true
+derpy_gg_svc_slave_levy_nor		Young Raiders	faction	1	derpy_gg_slavers_nor.png	true	false	true
+derpy_gg_svc_pit_fights_nor		Blood on the Ice	faction	1	derpy_gg_slavers_nor.png	true	false	true
+derpy_gg_svc_great_hunt_nor		The Long Raid	faction	1	derpy_gg_slavers_nor.png	true	false	true
+derpy_gg_svc_scorched_earth_nor		Burn the South	region	1	derpy_gg_slavers_nor.png	true	false	true
+derpy_gg_svc_hashut_blessing_nor		Eyes of the Four	force	1	derpy_gg_temple_nor.png	true	false	true
+derpy_gg_svc_forge_sermons_nor		Words at the Totem	region	1	derpy_gg_temple_nor.png	true	false	true
+derpy_gg_svc_zeal_nor		Fury of the Four	force	1	derpy_gg_temple_nor.png	true	false	true
+derpy_gg_svc_purge_unclean_nor		Burn the Weak	region	1	derpy_gg_temple_nor.png	true	false	true
+derpy_gg_svc_anathema_nor		Cursed by the Four	region	1	derpy_gg_temple_nor.png	true	false	true
+derpy_gg_svc_holy_war_nor		War on the South	faction	1	derpy_gg_temple_nor.png	true	false	true
+derpy_gg_svc_miracle_nor		The Gods' Gift	force	1	derpy_gg_temple_nor.png	true	false	true
+derpy_gg_svc_consecration_nor		Raise the Monoliths	faction	1	derpy_gg_temple_nor.png	true	false	true
+derpy_gg_svc_monster_hunt_nor		The Hunters' Charge	faction	1	derpy_gg_brass_nor.png	true	false	true
 derpy_gg_rank_brass_2_gen		The Merchant Houses - Known	faction	1	derpy_gg_brass_gen.png	true	false	true
 derpy_gg_rank_brass_3_gen		The Merchant Houses - Trusted	faction	1	derpy_gg_brass_gen.png	true	false	true
 derpy_gg_rank_brass_4_gen		The Merchant Houses - Honoured	faction	1	derpy_gg_brass_gen.png	true	false	true
@@ -1057,3 +1237,17 @@ derpy_gg_seat_khanate_chs		Seat of the Undoer	faction	1	derpy_gg_khanate.png	tru
 derpy_gg_seat_overseers_chs		Seat of the Plague Lord	faction	1	derpy_gg_overseers.png	true	false	true
 derpy_gg_seat_slavers_chs		Seat of the Dark Prince	faction	1	derpy_gg_slavers.png	true	false	true
 derpy_gg_seat_temple_chs		Seat of the Undivided	faction	1	derpy_gg_temple.png	true	false	true
+derpy_gg_seat_brass_tmb		Seat of the Royal Treasury	faction	1	derpy_gg_brass.png	true	false	true
+derpy_gg_seat_immortals_tmb		Seat of the Tomb Guard	faction	1	derpy_gg_immortals.png	true	false	true
+derpy_gg_seat_daemonsmiths_tmb		Seat of the Liche Priesthood	faction	1	derpy_gg_daemonsmiths.png	true	false	true
+derpy_gg_seat_khanate_tmb		Seat of the Lahmian Sisterhood	faction	1	derpy_gg_khanate.png	true	false	true
+derpy_gg_seat_overseers_tmb		Seat of the Necrotects	faction	1	derpy_gg_overseers.png	true	false	true
+derpy_gg_seat_slavers_tmb		Seat of the Charioteer Nobles	faction	1	derpy_gg_slavers.png	true	false	true
+derpy_gg_seat_temple_tmb		Seat of the Cults of the Gods	faction	1	derpy_gg_temple.png	true	false	true
+derpy_gg_seat_brass_nor		Seat of the Monster Hunters	faction	1	derpy_gg_brass.png	true	false	true
+derpy_gg_seat_immortals_nor		Seat of the Berserkers	faction	1	derpy_gg_immortals.png	true	false	true
+derpy_gg_seat_daemonsmiths_nor		Seat of the Shaman-Sorcerers	faction	1	derpy_gg_daemonsmiths.png	true	false	true
+derpy_gg_seat_khanate_nor		Seat of the Skin Wolves	faction	1	derpy_gg_khanate.png	true	false	true
+derpy_gg_seat_overseers_nor		Seat of the Thralls	faction	1	derpy_gg_overseers.png	true	false	true
+derpy_gg_seat_slavers_nor		Seat of the Reavers	faction	1	derpy_gg_slavers.png	true	false	true
+derpy_gg_seat_temple_nor		Seat of the Four	faction	1	derpy_gg_temple.png	true	false	true

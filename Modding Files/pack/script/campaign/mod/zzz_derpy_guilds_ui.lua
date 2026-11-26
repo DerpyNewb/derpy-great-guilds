@@ -168,7 +168,7 @@ end
 -- rank_tx) plus how far short of the right end the figures stop (RANK_STATS_PAD). Mirrored
 -- from tools/gen_guilds_ui.py, whose check_header_inset compares the two.
 GGUI.HEADER_INSET = {[""] = 98, _brt = 148, _cth = 202, _def = 122, _dwf = 98, _emp = 134,
-                     _hef = 158, _ksl = 152, _skv = 104, _chs = 136}
+                     _hef = 158, _ksl = 152, _skv = 104, _chs = 136, _tmb = 152, _nor = 146}
 GGUI.HEADER_GAP = 24
 
 -- WHETHER THE GUILD'S NAME AND THESE FIGURES FIT SIDE BY SIDE, measured in the game's own
@@ -481,6 +481,22 @@ GGUI.FRAME = {
         hover = {"ui/skins/default/dlc25_tamurkhans_chieftains/subtitle.png", "ui/campaign ui/derpy_gg_icons/clear.png"},
         selected = {"ui/skins/default/dlc25_tamurkhans_chieftains/subtitle.png", "ui/skins/default/path_to_glory/panel_selection_stroke.png"},
         selected_hover = {"ui/skins/default/dlc25_tamurkhans_chieftains/subtitle.png", "ui/skins/default/path_to_glory/panel_selection_stroke.png"},
+    },
+    _tmb = {
+        heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
+        rim = "ui/skins/default/tutglow_square.png",
+        active = {"ui/skins/default/dlc25_tamurkhans_chieftains/subtitle.png", "ui/campaign ui/derpy_gg_icons/clear.png"},
+        hover = {"ui/skins/default/dlc25_tamurkhans_chieftains/subtitle.png", "ui/campaign ui/derpy_gg_icons/clear.png"},
+        selected = {"ui/skins/default/dlc25_tamurkhans_chieftains/subtitle.png", "ui/skins/default/tutglow_square.png"},
+        selected_hover = {"ui/skins/default/dlc25_tamurkhans_chieftains/subtitle.png", "ui/skins/default/tutglow_square.png"},
+    },
+    _nor = {
+        heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
+        rim = "ui/skins/default/tutglow_square.png",
+        active = {"ui/skins/default/dlc27_nor_troll_expansion/icon_banner.png", "ui/campaign ui/derpy_gg_icons/clear.png"},
+        hover = {"ui/skins/default/dlc27_nor_troll_expansion/icon_banner.png", "ui/campaign ui/derpy_gg_icons/clear.png"},
+        selected = {"ui/skins/default/dlc27_nor_troll_expansion/icon_banner.png", "ui/skins/default/tutglow_square.png"},
+        selected_hover = {"ui/skins/default/dlc27_nor_troll_expansion/icon_banner.png", "ui/skins/default/tutglow_square.png"},
     },
     _cth = {
         heat = "ui/skins/default/dlc29_great_temple_of_ulric/fx_radial_blur.png",
@@ -1139,6 +1155,8 @@ function GGUI.draw_card(faction, i, s)
         label = label .. "  [[col:yellow]]" .. GGUI.loc("needs_target_short") .. "[[/col]]"
     elseif not ok and why == "unavailable" then
         need = GGUI.loc("unavailable_short")
+    elseif not ok and why == "capped" then
+        need = GGUI.loc("capped_short")
     end
     set_text(comp("card_name", card), label)
     if need then GGUI.show_need(card, label, GGUI.need_tag(need)) end
@@ -1210,6 +1228,8 @@ function GGUI.draw_card(faction, i, s)
         tip = tip .. "||" .. GGUI.loc("no_unit")
     elseif not ok and why == "unavailable" then
         tip = tip .. "||" .. GGUI.loc("unavailable")
+    elseif not ok and why == "capped" then
+        tip = tip .. "||" .. GGUI.loc("capped")
     end
     local asking = ok and GGUI.CONFIRM == s.key
     if asking then tip = tip .. "||" .. GGUI.loc("confirm_tip") end
@@ -4084,6 +4104,24 @@ GGUI.MCT_NAMES = {
         overseers = "The Plague Lord",
         slavers = "The Dark Prince",
         temple = "The Undivided",
+    },
+    ["_tmb"] = {
+        brass = "The Royal Treasury",
+        immortals = "The Tomb Guard",
+        daemonsmiths = "The Liche Priesthood",
+        khanate = "The Lahmian Sisterhood",
+        overseers = "The Necrotects",
+        slavers = "The Charioteer Nobles",
+        temple = "The Cults of the Gods",
+    },
+    ["_nor"] = {
+        brass = "The Monster Hunters",
+        immortals = "The Berserkers",
+        daemonsmiths = "The Shaman-Sorcerers",
+        khanate = "The Skin Wolves",
+        overseers = "The Thralls",
+        slavers = "The Reavers",
+        temple = "The Four",
     },
     ["_gen"] = {
         brass = "The Merchant Houses",

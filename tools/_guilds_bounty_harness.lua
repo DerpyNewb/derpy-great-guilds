@@ -1822,6 +1822,9 @@ do
         ["wh2_main_skv_skaven"]        = {rate_rivalry = 60, demand_penalty = 0},
         -- THE FICKLE GODS (woc spec §2): decay x1.5, a paid demand 120 x 1.5.
         ["wh_main_chs_chaos"]          = {rate_decay = 150, demand_reward = 180},
+        ["wh2_dlc09_tmb_tomb_kings"]   = {rate_rivalry = 60, rate_decay = 50},
+        -- BOASTS (norsca spec §2.1): a failed bounty x2, a paid demand 120 x 1.5.
+        ["wh_dlc08_nor_norsca"]        = {rate_bounty_fail = 200, demand_reward = 180},
     }
     for culture, bent in pairs(want) do
         race(culture)
@@ -1859,8 +1862,14 @@ do
     assert(GG.rival_loss(100) == 40, "a loss with no faction is the plain rule")
     race("wh3_main_ksl_kislev")
     assert(GG.decay_amount(4, "me") == 2, "Kislev's upkeep at rank 4 is halved")
+    race("wh2_dlc09_tmb_tomb_kings")
+    assert(GG.decay_amount(4, "me") == 2, "the Tomb Kings' upkeep at rank 4 is halved")
+    assert(GG.rival_loss(100, "me") == 60, "the Tomb Kings' rival takes half again: "
+           .. GG.rival_loss(100, "me"))
     race("wh_main_dwf_dwarfs")
     assert(GG.bounty_fail_cost({rep = 80}, "me") == 120, "a Dwarf's failed bounty is 150%")
+    race("wh_dlc08_nor_norsca")
+    assert(GG.bounty_fail_cost({rep = 80}, "me") == 160, "a Norscan's failed boast is 200%")
     race("wh3_dlc23_chd_chaos_dwarfs")
     GG.state.me = {}
     for _, g in ipairs(GG.GUILDS) do GG.state.me[g] = {rep = 100, fav = 0} end

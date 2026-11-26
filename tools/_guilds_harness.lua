@@ -6039,6 +6039,8 @@ end)()
          "wh2_main_hef_inf_swordmasters_of_hoeth_0"},
         {"cr_flav_skv", "wh2_main_skv_skaven", "_skv", 90, "wh2_main_skv_inf_stormvermin_0"},
         {"cr_flav_chs", "wh_main_chs_chaos", "_chs", 100, "wh3_dlc20_chs_inf_chosen_mkho"},
+        {"cr_flav_nor", "wh_dlc08_nor_norsca", "_nor", 120,
+         "wh_dlc08_nor_inf_marauder_champions_1"},
     }
     for _, c in ipairs(cases) do
         local f, culture, tag, off, unit = c[1], c[2], c[3], c[4], c[5]
@@ -10046,8 +10048,9 @@ end)()
         .. "purge_unclean,anathema,holy_war,miracle,consecration", "nine temple services")
     -- ROW 92, positionally: the Skaven's three race rows (2026-10-05) and the Warriors of
     -- Chaos' three (2026-10-12) come after it.
-    assert(GG.SERVICES[92].key == "consecration" and #GG.SERVICES == 98,
-           "the temple's rows end at row 92, before the Skaven's and the Warriors' three")
+    assert(GG.SERVICES[92].key == "consecration" and #GG.SERVICES == 104,
+           "the temple's rows end at row 92, before the Skaven's, the Warriors', the "
+           .. "Tomb Kings' and Norsca's three")
     -- AN OLD SAVE: six standing pairs and the 83 cooldowns it had before the temple.
     local F = "cr_temple_oldsave"
     local cds = {}
@@ -10604,6 +10607,15 @@ end)()
            "the ledger must book recruiting as its own source, got "
            .. tostring(L.now.temple and L.now.temple.recruits))
 
+    pays("overseers", 0, "the Tower of Zharr's spawned hobgoblin overseer",
+         function() char(F, "wh3_dlc23_chd_overseer_hobgoblin_spawned_army", "general", false) end)
+    GG.CULTURE_OF[F], GG.player_cultures_cache = "wh_dlc08_nor_norsca", nil
+    pays("immortals", 8, "a Marauder Chieftain",
+         function() char(F, "wh_main_nor_marauder_chieftain", "general", false) end)
+    pays("immortals", 0, "the chieftain Pillage spawns",
+         function() char(F, "wh3_dlc27_nor_marauder_chieftain_spawned_army", "general", false) end)
+    GG.CULTURE_OF[F], GG.player_cultures_cache = CHD, nil
+
     -- A RACE THE PLAYER IS NOT is not covered: no grant and nothing in the save. An
     -- Empire faction, because the Empire HAS routes - a culture without any would pass
     -- this with the gate deleted. The saved gain is what catches it: GG.capped_grant's
@@ -10718,12 +10730,12 @@ end)()
            "the Fickle Gods: decay and a paid demand both half again")
     assert(GG.HALL_TAGS["_chs"], "the Warriors of Chaos have halls")
     assert(GG.LEDGER_KNOWN.gifts, "the gifts ledger source")
-    -- APPENDED AFTER THE SKAVEN: cooldowns are saved by position.
-    local n = #GG.SERVICES
-    assert(GG.SERVICES[n - 2].key == "soul_tithe" and GG.SERVICES[n - 1].key == "eye_turns"
-           and GG.SERVICES[n].key == "skull_throne", "the Warriors of Chaos rows are last")
-    assert(GG.SERVICES[n - 3].key == "breeding_season", "the Skaven's last row sits before them")
-    for i = n - 2, n do
+    -- APPENDED AFTER THE SKAVEN: cooldowns are saved by position, so the Warriors' rows stay
+    -- at 96-98 for good (the Tomb Kings' and Norsca's three follow, 2026-11-26).
+    assert(GG.SERVICES[96].key == "soul_tithe" and GG.SERVICES[97].key == "eye_turns"
+           and GG.SERVICES[98].key == "skull_throne", "the Warriors of Chaos rows are 96-98")
+    assert(GG.SERVICES[95].key == "breeding_season", "the Skaven's last row sits before them")
+    for i = 96, 98 do
         assert(GG.SERVICES[i].race == CHS, GG.SERVICES[i].key .. " is a Warriors of Chaos row")
     end
     -- A SAVE FROM BEFORE THE WARRIORS OF CHAOS: a faction with no saved state loads blank.
@@ -10756,9 +10768,19 @@ end)()
                .. tostring(GG.rival_of(W, g)))
     end
     assert(GG.rival_of(W, "temple") == nil, "the Undivided has no rival")
+    local K = "cr_tmb_rivals"
+    GG.CULTURE_OF[K] = "wh2_dlc09_tmb_tomb_kings"
+    local want_k = {khanate = "temple", temple = "khanate",
+                    immortals = "daemonsmiths", daemonsmiths = "immortals",
+                    overseers = "slavers", slavers = "overseers"}
+    for g, r in pairs(want_k) do
+        assert(GG.rival_of(K, g) == r, "the Tomb Kings' " .. g .. " rival is " .. r .. ", got "
+               .. tostring(GG.rival_of(K, g)))
+    end
+    assert(GG.rival_of(K, "brass") == nil, "the Royal Treasury has no rival")
     -- EVERY OTHER RACE KEEPS THE GLOBAL TABLE, guild by guild.
     for culture in pairs(GG.FLAVOURED) do
-        if culture ~= "wh_main_chs_chaos" then
+        if culture ~= "wh_main_chs_chaos" and culture ~= "wh2_dlc09_tmb_tomb_kings" then
             local f = "cr_rivals_" .. culture
             GG.CULTURE_OF[f] = culture
             for _, g in ipairs(GG.GUILDS) do
@@ -10798,6 +10820,23 @@ end)()
         assert(mod == case[2], "a Blood God price with " .. case[1] .. " ahead is +"
                .. case[2] .. "%, got " .. tostring(mod))
     end
+    for _, case in ipairs({{"khanate", "temple"}, {"temple", "khanate"}}) do
+        GG.state[K], GG.turn_gain[K] = {}, {}
+        for _, g in ipairs(GG.GUILDS) do GG.state[K][g] = {rep = 500, fav = 0} end
+        GG.grant(K, case[1], 100, "battles")
+        assert(GG.get(K, case[2]) < 500, "a Tomb Kings " .. case[1] .. " earning takes from "
+               .. case[2])
+    end
+    GG.state[K], GG.turn_gain[K] = {}, {}
+    for _, g in ipairs(GG.GUILDS) do GG.state[K][g] = {rep = 500, fav = 0} end
+    GG.grant(K, "brass", 100, "battles")
+    for _, g in ipairs(GG.GUILDS) do
+        if g ~= "brass" then
+            assert(GG.get(K, g) == 500, "a Treasury earning takes from nobody, but " .. g
+                   .. " is " .. GG.get(K, g))
+        end
+    end
+    GG.state[K], GG.turn_gain[K], GG.CULTURE_OF[K] = nil, nil, nil
     GG.state[W], GG.state[E], GG.CULTURE_OF[W], GG.CULTURE_OF[E] = nil, nil, nil, nil
     GG.turn_gain[W], GG.turn_gain[E] = nil, nil
     GG.player_cultures = keep_pc
@@ -10971,5 +11010,563 @@ end)()
     GG.TUNE, GG.humans, cm.get_human_factions = keep, prev_humans, prev_getter
     GG.player_cultures_cache = nil
     for _, f in ipairs({W, D}) do GG.state[f], GG.CULTURE_OF[f] = nil, nil end
+end)()
+;(function()
+    local TMB = "wh2_dlc09_tmb_tomb_kings"
+    assert(GG.FLAVOURED[TMB] and GG.FLAVOURED[TMB].tag == "_tmb"
+           and GG.FLAVOURED[TMB].feed == 110, "the Tomb Kings flavour, feed 110")
+    assert(GG.HIRE_UNIT_BY_CULTURE[TMB] == "wh2_dlc09_tmb_inf_tomb_guard_0",
+           "the Tomb Kings hire the Tomb Guard")
+    assert(GG.EARN_OF[TMB] == "crafted" and GG.EARN_ROUTES.crafted.guild == "daemonsmiths"
+           and GG.EARN_ROUTES.crafted.rep == 40, "crafting pays the Liche Priesthood 40")
+    assert(GG.TWISTS[TMB].rate_rivalry == 150 and GG.TWISTS[TMB].rate_decay == 50,
+           "The dead remember: rivalry half again, decay halved")
+    assert(GG.HALL_TAGS["_tmb"], "the Tomb Kings have halls")
+    assert(GG.LEDGER_KNOWN.crafted, "the crafted ledger source")
+    assert(GG.SERVICES[99].key == "canopic_offering" and GG.SERVICES[100].key == "the_awakening"
+           and GG.SERVICES[101].key == "kings_legions", "the Tomb Kings rows are 99-101")
+    for i = 99, 101 do
+        assert(GG.SERVICES[i].race == TMB, GG.SERVICES[i].key .. " is a Tomb Kings row")
+    end
+    assert(GG.SERVICES[101].lead, "the King's Legions is the Tomb Guard's lead service")
+    assert(GG.RACE_FIRE.the_awakening == GG.RACE_FIRE.electors_muster,
+           "the Awakening grants units the way the Elector's Muster does")
+    local F = "cr_tmb_old"
+    GG.CULTURE_OF[F] = TMB
+    GG.state[F] = nil
+    GG.load(F)
+    for _, g in ipairs(GG.GUILDS) do
+        local rep, fav = GG.get(F, g)
+        assert(rep == 0 and fav == 0, "a Tomb Kings faction loads blank on " .. g)
+    end
+    GG.state[F], GG.CULTURE_OF[F] = nil, nil
+end)()
+;(function()
+    local keep_pc = GG.player_cultures
+    GG.player_cultures = function()
+        return {wh2_dlc09_tmb_tomb_kings = true, wh_main_dwf_dwarfs = true}
+    end
+    local T, D = "cr_tmb_craft", "cr_dwf_craft"
+    GG.CULTURE_OF[T], GG.CULTURE_OF[D] = "wh2_dlc09_tmb_tomb_kings", "wh_main_dwf_dwarfs"
+    assert(handlers["gg_earn_crafted"], "no RitualCompletedEvent listener for crafting")
+    local function total(f)
+        local n = 0
+        for _, g in ipairs(GG.GUILDS) do n = n + (GG.get(f, g)) end
+        return n
+    end
+    local function craft(f, key, cat, won)
+        GG.state[f], GG.turn_gain[f], saved["derpy_gg_" .. f] = nil, {}, nil
+        handlers["gg_earn_crafted"]({
+            ritual = function()
+                return {ritual_category = function() return cat end,
+                        ritual_key = function() return key end}
+            end,
+            succeeded = function() return won end,
+            performing_faction = function()
+                return {is_null_interface = function() return false end,
+                        name = function() return f end}
+            end})
+        return (GG.get(f, "daemonsmiths")), total(f)
+    end
+    local CRAFT = "wh2_dlc09_ritual_crafting_tmb_arcane_item_blue_khepra"
+    local got, all = craft(T, CRAFT, "CRAFTING_RITUAL", true)
+    assert(got == 40 and all == 40, "a craft pays the Liche Priesthood 40 and nobody else, got "
+           .. got .. " of " .. all)
+    for _, key in ipairs({"wh3_main_tmb_confederate_khalida", "wh3_main_tmb_confederate_khatep"}) do
+        got, all = craft(T, key, "CRAFTING_RITUAL", true)
+        assert(all == 0, key .. " is a confederation and pays nothing, paid " .. all)
+    end
+    got, all = craft(T, CRAFT, "CRAFTING_RITUAL", false)
+    assert(all == 0, "a failed craft pays nothing, paid " .. all)
+    got, all = craft(T, "wh2_dlc09_ritual_tmb_ptra", "STANDARD_RITUAL", true)
+    assert(all == 0, "a Great Incantation is no craft, paid " .. all)
+    got, all = craft(D, "wh2_dlc10_dwf_ritual_armour_alriks_plate", "CRAFTING_RITUAL", true)
+    assert(all == 0, "a Dwarf forge craft pays nothing, paid " .. all)
+    GG.state[T] = nil
+    handlers["gg_earn_crafted"]({ritual = function() error("no ritual") end})
+    assert(total(T) == 0, "a context that throws pays nothing")
+    for _, f in ipairs({T, D}) do
+        GG.state[f], GG.turn_gain[f], GG.CULTURE_OF[f], saved["derpy_gg_" .. f] = nil, nil, nil, nil
+    end
+    GG.player_cultures = keep_pc
+end)()
+;(function()
+    local H = "cr_tmb_hire"
+    local keep_gf, keep_h, keep_card = cm.get_faction, cm.get_human_factions, GG.on_card
+    CULTURE[H], GG.CULTURE_OF[H] = "wh2_dlc09_tmb_tomb_kings", "wh2_dlc09_tmb_tomb_kings"
+    cm.get_human_factions = function() return {H} end
+    GG.player_cultures_cache = nil
+    GG.on_card = function() return true end
+    local left, asked = 0, {}
+    cm.get_faction = function(self, k)
+        local f = keep_gf(self, k)
+        if f then
+            f.unit_cap_remaining = function(_, unit)
+                asked[#asked + 1] = unit
+                if left == "throw" then error("no such call") end
+                return left
+            end
+        end
+        return f
+    end
+    GG.state[H], GG.cooldowns[H] = nil, {}
+    GG.grant(H, "immortals", 99999)
+    local function hire()
+        asked = {}
+        return GG.can_buy(H, "hire_immortals")
+    end
+    local ok, why = hire()
+    assert(ok == false and why == "capped", "a hire at the cap is refused as capped, got "
+           .. tostring(ok) .. "/" .. tostring(why))
+    assert(asked[1] == "wh2_dlc09_tmb_inf_tomb_guard_0", "the cap asked is the Tomb Guard's, got "
+           .. tostring(asked[1]))
+    for _, n in ipairs({-1, 1}) do
+        left = n
+        ok, why = hire()
+        assert(ok == true, "a hire with unit_cap_remaining " .. n .. " is sold, got "
+               .. tostring(ok) .. "/" .. tostring(why))
+    end
+    for _, n in ipairs({"throw", nil}) do
+        left = n
+        ok = hire()
+        assert(ok == true, "an unanswered cap check refuses nothing (" .. tostring(n) .. ")")
+    end
+    local awakening = GG.service("the_awakening")
+    left = 0
+    asked = {}
+    assert(GG.unit_room(H, awakening) == false, "the Awakening with no room for either")
+    assert(#asked == 2 and asked[1] == "wh2_dlc09_tmb_inf_skeleton_warriors_0"
+           and asked[2] == "wh2_dlc09_tmb_inf_skeleton_spearmen_0",
+           "the Awakening asks about its two regiments")
+    left = -1
+    assert(GG.unit_room(H, awakening) == true, "uncapped Skeletons always fit")
+    left, asked = 0, {}
+    assert(GG.unit_room(H, GG.service("writ_monopoly")) == true and #asked == 0,
+           "a bundle service never asks the cap")
+    cm.get_faction, cm.get_human_factions, GG.on_card = keep_gf, keep_h, keep_card
+    GG.player_cultures_cache = nil
+    GG.state[H], GG.cooldowns[H], GG.CULTURE_OF[H], CULTURE[H] = nil, nil, nil, nil
+end)()
+;(function()
+    local J = "cr_tmb_tithe"
+    local keep_gf, keep_h, keep_card = cm.get_faction, cm.get_human_factions, GG.on_card
+    CULTURE[J], GG.CULTURE_OF[J] = "wh2_dlc09_tmb_tomb_kings", "wh2_dlc09_tmb_tomb_kings"
+    cm.get_human_factions = function() return {J} end
+    GG.player_cultures_cache = nil
+    GG.on_card = function() return true end
+    local holds = true
+    cm.get_faction = function(self, k)
+        local f = keep_gf(self, k)
+        if f then
+            f.pooled_resource_manager = function()
+                return {resource = function(_, key)
+                    local here = holds and key == "tmb_canopic_jars"
+                    return {is_null_interface = function() return not here end}
+                end}
+            end
+        end
+        return f
+    end
+    local function tithe()
+        GG.state[J], GG.cooldowns[J] = nil, {}
+        GG.grant(J, "slavers", 400)
+        local p, g = #pooled, #gold
+        GG.buy(J, "slave_tithe")
+        return p, g
+    end
+    local p, g = tithe()
+    assert(#pooled == p + 1 and pooled[#pooled][1] == J
+           and pooled[#pooled][2] == "tmb_canopic_jars" and pooled[#pooled][3] == "missions"
+           and pooled[#pooled][4] == 150, "a Tomb Kings tithe is 150 Canopic Jars under missions")
+    assert(#gold == g, "and no gold")
+    holds = false
+    p, g = tithe()
+    assert(#pooled == p, "a Tomb Kings faction without the jars is granted no jars")
+    assert(#gold == g + 1 and gold[#gold][2] == 3000, "it takes 3,000 gold instead")
+    holds = false
+    assert(GG.needs_ok(J, GG.service("canopic_offering")) == false,
+           "the Royal Offering needs the jars")
+    holds = true
+    assert(GG.needs_ok(J, GG.service("canopic_offering")) == true, "and passes with them")
+    cm.get_faction, cm.get_human_factions, GG.on_card = keep_gf, keep_h, keep_card
+    GG.player_cultures_cache = nil
+    GG.state[J], GG.cooldowns[J], GG.CULTURE_OF[J], CULTURE[J] = nil, nil, nil, nil
+end)()
+;(function()
+    local C = "wh2_dlc09_tmb_tomb_kings"
+    local units = {
+        {"wh2_dlc09_tmb_inf_tomb_guard_0", "melee_infantry", "immortals"},
+        {"wh2_dlc09_tmb_mon_ushabti_1", "monstrous_infantry", "temple"},
+        {"wh2_dlc09_tmb_veh_skeleton_chariot_0", "chariot", "slavers"},
+        {"wh2_dlc09_tmb_veh_skeleton_archer_chariot_0", "chariot", "slavers"},
+        {"wh2_dlc09_tmb_cav_necropolis_knights_1", "monstrous_cavalry", "daemonsmiths"},
+        {"wh2_dlc09_tmb_cav_nehekhara_horsemen_0", "melee_cavalry", "brass"},
+        {"wh2_dlc09_tmb_mon_tomb_scorpion_0", "monster", "overseers"},
+        {"wh2_dlc09_tmb_mon_necrosphinx_0", "monster", "overseers"},
+        {"wh2_dlc09_tmb_veh_khemrian_warsphinx_0", "monster", "overseers"},
+        {"wh2_dlc09_tmb_mon_heirotitan_0", "monster", "overseers"},
+        {"wh3_dlc29_tmb_mon_khemric_titan", "monster", "overseers"},
+        {"wh2_pro06_tmb_mon_bone_giant_0", "monster", "overseers"},
+        {"wh2_dlc09_tmb_mon_sepulchral_stalkers_0", "monstrous_infantry", "khanate"},
+        {"wh2_dlc09_tmb_mon_carrion_0", "war_beast", "temple"},
+        {"wh2_dlc09_tmb_inf_skeleton_warriors_0", "melee_infantry", "overseers"},
+        {"wh2_dlc09_tmb_inf_skeleton_spearmen_0", "melee_infantry", "overseers"},
+        {"wh2_dlc09_tmb_inf_skeleton_archers_0", "missile_infantry", "overseers"},
+        {"wh2_dlc09_tmb_inf_nehekhara_warriors_0", "melee_infantry", "immortals"},
+        {"wh2_dlc09_tmb_cav_skeleton_horsemen_0", "melee_cavalry", "slavers"},
+        {"wh2_dlc09_tmb_cav_skeleton_horsemen_archers_0", "missile_cavalry", "slavers"},
+        {"wh2_dlc09_tmb_art_screaming_skull_catapult_0", "warmachine", "daemonsmiths"},
+        {"wh2_dlc09_tmb_art_casket_of_souls_0", "chariot", "daemonsmiths"},
+    }
+    for _, c in ipairs(units) do
+        local got = GG.recruit_guild(C, "units", {key = c[1], caste = c[2]})
+        assert(got == c[3], c[1] .. " pays " .. c[3] .. ", got " .. tostring(got))
+    end
+    for _, c in ipairs({{"wh2_dlc09_tmb_inf_crypt_ghouls", "melee_infantry"},
+                        {"wh2_dlc09_tmb_inf_cairn_wraiths", "melee_infantry"},
+                        {"wh2_dlc09_tmb_cav_hexwraiths", "melee_cavalry"},
+                        {"wh2_dlc09_tmb_inf_spirit_host", "melee_infantry"},
+                        {"wh2_dlc09_tmb_mon_fell_bats", "war_beast"},
+                        {"wh2_dlc09_tmb_mon_dire_wolves", "war_beast"},
+                        {"wh2_dlc09_tmb_mon_crypt_horrors", "monstrous_infantry"},
+                        {"wh2_dlc09_tmb_mon_morghast_archai", "monstrous_infantry"}}) do
+        local got = GG.recruit_guild(C, "units", {key = c[1], caste = c[2]})
+        assert(got == nil, c[1] .. " serves Nagash and pays nobody, got " .. tostring(got))
+    end
+    local chars = {
+        {"wh2_dlc09_tmb_liche_priest_death", "wizard", "daemonsmiths"},
+        {"wh3_dlc29_tmb_liche_high_priest_light", "general", "daemonsmiths"},
+        {"wh2_dlc09_tmb_khatep", "general", "daemonsmiths"},
+        {"wh2_dlc09_tmb_necrotect", "engineer", "overseers"},
+        {"wh3_dlc29_tmb_tomb_herald", "engineer", "immortals"},
+        {"wh3_dlc29_tmb_tomb_herald", "dignitary", "immortals"},
+        {"wh2_dlc09_tmb_khalida", "general", "temple"},
+        {"wh2_dlc09_tmb_settra", "general", "slavers"},
+        {"wh2_dlc09_tmb_tomb_king", "general", "slavers"},
+        {"wh2_dlc09_tmb_tomb_prince", "champion", "slavers"},
+    }
+    for _, c in ipairs(chars) do
+        local got = GG.recruit_guild(C, "characters", {key = c[1], agent = c[2]})
+        assert(got == c[3], c[1] .. " pays " .. c[3] .. ", got " .. tostring(got))
+    end
+    assert(GG.recruit_guild(C, "characters", {key = "wh2_dlc09_tmb_arkhan", agent = "general"})
+           == nil, "Arkhan pays nobody")
+end)()
+;(function()
+    local function L(t)
+        return {num_items = function() return #t end,
+                item_at = function(_, i) return t[i + 1] end,
+                is_empty = function() return #t == 0 end}
+    end
+    local function prov()
+        return {regions = function() return L({{public_order = function() return 10 end}}) end}
+    end
+    local ten = {}
+    for i = 1, 10 do ten[i] = prov() end
+    local f = {provinces = function() return L(ten) end}
+    local keep_pc, keep = GG.player_cultures, GG.TUNE
+    GG.TUNE = nil
+    GG.player_cultures = function()
+        return {wh2_dlc09_tmb_tomb_kings = true, wh_main_emp_empire = true}
+    end
+    local K, E = "cr_tmb_temple", "cr_emp_temple"
+    GG.CULTURE_OF[K], GG.CULTURE_OF[E] = "wh2_dlc09_tmb_tomb_kings", "wh_main_emp_empire"
+    local function fresh(rep)
+        GG.state[K], GG.turn_gain[K] = {}, {}
+        for _, g in ipairs(GG.GUILDS) do GG.state[K][g] = {rep = rep or 500, fav = 0} end
+    end
+    local share = GG.setting_for(K, "rate_rivalry")
+    assert(share == math.floor(GG.setting("rate_rivalry") * 150 / 100),
+           "the Tomb Kings' rivalry is half again the global one, got " .. tostring(share))
+    fresh()
+    GG.temple_turn(K, f)
+    assert(GG.get(K, "temple") == 510, "ten loyal provinces pay the temples 10, got "
+           .. GG.get(K, "temple"))
+    local lost = 500 - GG.get(K, "khanate")
+    assert(lost == math.floor(10 * share / 100) and lost < 10,
+           "the Sisterhood loses " .. math.floor(10 * share / 100) .. " of a 10-province turn, lost "
+           .. lost)
+    fresh()
+    GG.state[K].khanate.rep = GG.RANKS[3]
+    GG.temple_turn(K, f)
+    assert(GG.get(K, "khanate") == GG.RANKS[3], "the Sisterhood never falls below its rank")
+    fresh()
+    GG.on_agent_action(K, true, "wh2_dlc09_tmb_liche_priest_death")
+    assert(GG.get(K, "khanate") > 500 and GG.get(K, "temple") < 500,
+           "a Liche Priest's action pays the Sisterhood and costs the temples")
+    local asked
+    local keep_won = cm.pending_battle_cache_faction_won_battle_against_culture
+    cm.pending_battle_cache_faction_won_battle_against_culture = function(_, fk, cultures)
+        asked = cultures
+        return true
+    end
+    fresh()
+    GG.temple_holy(K)
+    assert(GG.get(K, "temple") > 500 and GG.get(K, "khanate") < 500,
+           "a holy war pays the temples and costs the Sisterhood")
+    assert(asked and #asked == 2 and asked[1] == "wh_main_vmp_vampire_counts"
+           and asked[2] == "wh3_dlc29_nag_undead_legions",
+           "asked with the Vampire Counts and Nagash's legions")
+    GG.state[E], GG.turn_gain[E] = {}, {}
+    for _, g in ipairs(GG.GUILDS) do GG.state[E][g] = {rep = 500, fav = 0} end
+    GG.temple_holy(E)
+    for _, g in ipairs(GG.GUILDS) do
+        if g ~= "temple" then
+            assert(GG.get(E, g) == 500, "an Empire holy war costs " .. g .. " nothing")
+        end
+    end
+    cm.pending_battle_cache_faction_won_battle_against_culture = keep_won
+    for _, x in ipairs({K, E}) do GG.state[x], GG.turn_gain[x], GG.CULTURE_OF[x] = nil, nil, nil end
+    GG.player_cultures, GG.TUNE = keep_pc, keep
+end)()
+;(function()
+    -- NORSCA (norsca spec, 2026-11-26): an eleventh flavour, its twist, its earn route and
+    -- its three race services appended AFTER the Warriors of Chaos' three.
+    local NOR = "wh_dlc08_nor_norsca"
+    assert(GG.FLAVOURED[NOR] and GG.FLAVOURED[NOR].tag == "_nor"
+           and GG.FLAVOURED[NOR].feed == 120, "the Norsca flavour, feed 120")
+    assert(GG.HIRE_UNIT_BY_CULTURE[NOR] == "wh_dlc08_nor_inf_marauder_champions_1",
+           "the Berserkers' hire is the Marauder Champions (Great Weapons)")
+    assert(GG.TWISTS[NOR].rate_bounty_fail == 200 and GG.TWISTS[NOR].demand_reward == 150,
+           "Boasts: a failed bounty costs double, a paid demand half again")
+    assert(GG.HALL_TAGS["_nor"], "Norsca has halls")
+    assert(GG.LEDGER_KNOWN.spoils and GG.LEDGER_KNOWN.altars, "two new ledger sources")
+    assert(GG.RIVALS_RACE[NOR] == nil and GG.NO_DEMAND[NOR] == nil
+           and GG.UPGRADE_PAYS[NOR] == nil, "Norsca keeps the global rivals and rules")
+    -- APPENDED AFTER THE WARRIORS OF CHAOS: cooldowns are saved by position.
+    local n = #GG.SERVICES
+    assert(GG.SERVICES[n - 2].key == "spoils_tithe" and GG.SERVICES[n - 1].key == "wolf_kin"
+           and GG.SERVICES[n].key == "monster_hunt", "the Norsca rows are last")
+    assert(GG.SERVICES[n - 3].race ~= NOR, "and only three of them")
+    for i = n - 2, n do
+        assert(GG.SERVICES[i].race == NOR, GG.SERVICES[i].key .. " is a Norsca row")
+    end
+    assert(GG.RACE_FIRE.wolf_kin == GG.RACE_FIRE.electors_muster,
+           "the Wolf-Kin grants units the way the Elector's Muster does")
+    local s = GG.service("spoils_tithe")
+    assert(s.resource == "wh3_dlc27_nor_spoils" and s.factor == "events" and s.value == 200,
+           "Tithe of Spoils adds 200 Spoils through events")
+    -- THE TITHE IS NOT A HUNT: its own grant must not pay the Monster Hunters back.
+    assert(not GG.pool_route_counts("spoils", s.factor), "the tithe's factor is not counted")
+    -- A NEW SETTING, APPENDED: an old settings string reads the altar rate's default.
+    assert(GG.TUNE_ORDER[#GG.TUNE_ORDER] == "rate_temple_altar"
+           and GG.TUNE_DEFAULTS.rate_temple_altar == 2, "rate_temple_altar, appended, 2")
+    local fields = {}
+    for v in string.gmatch(GG.pack_tune(GG.TUNE_DEFAULTS), "[^|]+") do fields[#fields + 1] = v end
+    local t = GG.unpack_tune(table.concat(fields, "|", 1, #fields - 1))
+    assert(t.rate_temple_altar == 2 and t.cap_recruit == 20,
+           "a string from before the altars keeps every older value and the altar default")
+    -- Every preset that sets the taint rate sets the altar rate beside it ("default" sets
+    -- neither: it is TUNE_DEFAULTS).
+    for name, p in pairs(GG.PRESETS) do
+        assert((p.rate_temple_altar == nil) == (p.rate_temple_taint == nil),
+               "preset " .. name .. " sets the altar rate with the taint rate")
+    end
+    -- A SAVE FROM BEFORE NORSCA: a Norsca faction with no saved state loads blank.
+    local F = "cr_nor_old"
+    GG.CULTURE_OF[F] = NOR
+    GG.state[F] = nil
+    GG.load(F)
+    for _, g in ipairs(GG.GUILDS) do
+        local rep, fav = GG.get(F, g)
+        assert(rep == 0 and fav == 0, "a Norsca faction loads blank on " .. g)
+    end
+    GG.state[F], GG.CULTURE_OF[F] = nil, nil
+end)()
+;(function()
+    -- THE FOUR'S ALTARS (norsca spec §3.3): the most-favoured god's altar settlements plus
+    -- every Undivided altar, at rate_temple_altar; nothing for a faction with no altar.
+    local function L(t)
+        return {num_items = function() return #t end, item_at = function(_, i) return t[i + 1] end,
+                is_empty = function() return #t == 0 end}
+    end
+    local function reg(chain)
+        return {settlement = function() return {primary_building_chain = function() return chain end} end}
+    end
+    local function fac(chains)
+        local rs = {}
+        for i, c in ipairs(chains) do rs[i] = reg(c) end
+        return {provinces = function() return L({}) end, region_list = function() return L(rs) end}
+    end
+    local K, S, N = "wh3_dlc27_settlement_nor_chaos_altar_kho", "wh3_dlc27_settlement_nor_chaos_altar_sla",
+                    "wh3_dlc27_settlement_nor_chaos_altar_nur"
+    local U = "wh3_dlc27_settlement_nor_chaos_altar_und"
+    -- Hound 3 (one a port), Serpent 2, Crow 1, Undivided 2 (one a gate), and a Norscan town.
+    local world = {K, K, K .. "_special_port", S, S, N, U, U .. "_special_gate",
+                   "wh_main_NORSCA_settlement_major"}
+    assert(GG.temple_altars(fac(world)) == 3 + 2, "the Hound's 3 and the Undivided's 2")
+    assert(GG.temple_altars(fac({S, S, K})) == 2, "rival gods: the larger count only")
+    assert(GG.temple_altars(fac({U})) == 1, "Sayl's Undivided altar alone pays")
+    assert(GG.temple_altars(fac({"wh_main_NORSCA_settlement_major"})) == 0, "no altar, nothing")
+    assert(GG.temple_altars(fac({})) == 0, "no regions, nothing")
+    -- THROUGH THE TURN: a human Norsca faction's temple earns altars x 2.
+    local keep, keep_pc = GG.TUNE, GG.player_cultures
+    GG.TUNE = nil
+    GG.player_cultures = function() return {wh_dlc08_nor_norsca = true} end
+    local F = "cr_nor_altars"
+    GG.CULTURE_OF[F], GG.state[F], GG.turn_gain[F] = "wh_dlc08_nor_norsca", nil, {}
+    GG.temple_turn(F, fac(world))
+    assert(select(1, GG.get(F, "temple")) == 5 * 2, "five altars x 2 to the Four, got "
+           .. tostring(select(1, GG.get(F, "temple"))))
+    -- ANOTHER RACE WITH ALTARS IN ITS LANDS EARNS NOTHING FROM THEM.
+    local E = "cr_emp_altars"
+    GG.CULTURE_OF[E], GG.state[E], GG.turn_gain[E] = "wh_main_emp_empire", nil, {}
+    GG.player_cultures = function() return {wh_main_emp_empire = true} end
+    GG.temple_turn(E, fac({K, K, U}))
+    assert(select(1, GG.get(E, "temple")) == 0, "the Empire's temple has no altars route")
+    -- THE PREVIEW SEES THE ALTARS: GG.turn_start_pay reports them, or GG.hold_lead reads
+    -- the leader as behind every round.
+    local keep_gf = cm.get_faction
+    local T = "cr_nor_pay"
+    cm.get_faction = function(self, k)
+        if k == T then
+            local f = fac(world)
+            f.is_null_interface = function() return false end
+            return f
+        end
+        return keep_gf(self, k)
+    end
+    GG.CULTURE_OF[T] = "wh_dlc08_nor_norsca"
+    GG.player_cultures = function() return {wh_dlc08_nor_norsca = true} end
+    assert(GG.turn_start_pay(T, "temple") == 5 * 2, "the Four's turn start previews 10, got "
+           .. GG.turn_start_pay(T, "temple"))
+    -- HOLY WAR against the Empire, Kislev, Bretonnia and Cathay.
+    local asked
+    cm.pending_battle_cache_faction_won_battle_against_culture = function(_, fk, cultures)
+        asked = cultures
+        return true
+    end
+    GG.state[F], GG.turn_gain[F] = nil, {}
+    GG.temple_holy(F)
+    assert(select(1, GG.get(F, "temple")) == 10, "a Norsca win in the south pays 10")
+    assert(asked[1] == "wh_main_emp_empire" and asked[2] == "wh3_main_ksl_kislev"
+           and asked[3] == "wh_main_brt_bretonnia" and asked[4] == "wh3_main_cth_cathay",
+           "asked with the Empire, Kislev, Bretonnia and Cathay")
+    cm.pending_battle_cache_faction_won_battle_against_culture = nil
+    -- PRIESTS: Kihar and Killgore pay the Four; a Shaman-Sorcerer pays the Skin Wolves.
+    for _, case in ipairs({{"wh_dlc08_nor_kihar", 8, 0},
+                           {"wh3_main_ie_nor_killgore_slaymaim", 8, 0},
+                           {"wh_dlc08_nor_shaman_sorcerer_fire", 0, 8}}) do
+        GG.state[F], GG.turn_gain[F] = nil, {}
+        GG.load(F)
+        GG.on_agent_action(F, true, case[1])
+        assert(select(1, GG.get(F, "temple")) == case[2]
+               and select(1, GG.get(F, "khanate")) == case[3],
+               case[1] .. " pays the Four " .. case[2] .. " and the Skin Wolves " .. case[3])
+    end
+    cm.get_faction, GG.player_cultures, GG.TUNE = keep_gf, keep_pc, keep
+    for _, f in ipairs({F, E, T}) do GG.state[f], GG.turn_gain[f], GG.CULTURE_OF[f] = nil, nil, nil end
+end)()
+;(function()
+    -- SPOILS OF THE HUNT (norsca spec §3.2): Spoils from the Monstrous Arcanum pay the
+    -- Monster Hunters one Reputation per 25, with a carry; no other factor pays.
+    local keep_pc = GG.player_cultures
+    GG.player_cultures = function() return {wh_dlc08_nor_norsca = true} end
+    local W = "cr_nor_spoils"
+    GG.CULTURE_OF[W], GG.state[W], GG.turn_gain[W] = "wh_dlc08_nor_norsca", nil, {}
+    GG.earn_carry[W .. "|spoils"] = nil
+    saved["derpy_gg_carry_" .. W .. "_spoils"] = nil
+    GG.load(W)
+    assert(GG.POOL_ROUTES.wh3_dlc27_nor_spoils == "spoils" and GG.EARN_OF.wh_dlc08_nor_norsca
+           == "spoils" and GG.EARN_ROUTES.spoils.guild == "brass"
+           and GG.EARN_ROUTES.spoils.per == 25, "Spoils pay the Monster Hunters per 25")
+    assert(GG.POOL_GUILD.wh3_dlc27_nor_spoils == nil, "the route names its guild, not the pool")
+    local function fac(name)
+        return {is_null_interface = function() return false end, name = function() return name end}
+    end
+    local function spoils(amount, factor)
+        handlers["gg_earn_pool"]({
+            resource = function() return {key = function() return "wh3_dlc27_nor_spoils" end} end,
+            has_faction = function() return true end,
+            faction = function() return fac(W) end,
+            amount = function() return amount end,
+            factor = function() return {is_null_interface = function() return factor == nil end,
+                                        key = function() return factor end} end,
+        })
+    end
+    spoils(210, "wh3_dlc27_nor_spoils_monstrous_arcanum")
+    assert(select(1, GG.get(W, "brass")) == 8, "a 210-Spoils hunt pays 8, got "
+           .. tostring(select(1, GG.get(W, "brass"))))
+    assert(cm:get_saved_value("derpy_gg_carry_" .. W .. "_spoils") == 10, "10 carried")
+    spoils(15, "wh3_dlc27_nor_spoils_monstrous_arcanum")
+    assert(select(1, GG.get(W, "brass")) == 9, "the carry makes one more")
+    for _, f in ipairs({"events", "buildings", "wh3_dlc27_nor_spoils_instant_razing",
+                        "wh3_dlc27_treacheries"}) do
+        spoils(500, f)
+        assert(select(1, GG.get(W, "brass")) == 9, "Spoils through " .. f .. " pay nothing")
+    end
+    spoils(500, nil)
+    assert(select(1, GG.get(W, "brass")) == 9, "Spoils with no factor pay nothing")
+    -- ANOTHER RACE'S SPOILS PAY NOTHING.
+    local K = "cr_chs_spoils"
+    GG.CULTURE_OF[K] = "wh_main_chs_chaos"
+    assert(GG.race_earn(K, "spoils", 100) == 0, "only Norsca earns by Spoils")
+    GG.state[W], GG.CULTURE_OF[W], GG.turn_gain[W], GG.CULTURE_OF[K] = nil, nil, nil, nil
+    GG.player_cultures = keep_pc
+end)()
+;(function()
+    -- RECRUITING (norsca spec §3.5), first fit wins, and THE BUILDING WORDS (§3.6).
+    local C = "wh_dlc08_nor_norsca"
+    local units = {
+        {"wh_dlc08_nor_veh_marauder_warwolves_chariot_0", "chariot", "slavers", "the Ice Wolf Chariot (chariot before wolves)"},
+        {"wh_main_nor_cav_chaos_chariot", "chariot", "slavers", "Marauder Chariots"},
+        {"wh_main_nor_cav_marauder_horsemen_1", "missile_cavalry", "slavers", "Marauder Horsemen"},
+        {"wh3_dlc27_nor_cav_kurgan_horsemen_dualweapons", "melee_cavalry", "slavers", "Kurgan Horsemen"},
+        {"wh_main_nor_inf_chaos_marauders_1", "melee_infantry", "slavers", "Marauders, the Reavers' hall family"},
+        {"wh_dlc08_nor_inf_marauder_berserkers_0", "melee_infantry", "immortals", "Berserkers"},
+        {"wh_dlc08_nor_inf_marauder_champions_1", "melee_infantry", "immortals", "Marauder Champions"},
+        {"wh3_dlc29_chs_inf_flayerkin", "melee_infantry", "immortals", "Flayerkin"},
+        {"wh_dlc08_nor_mon_skinwolves_1", "melee_infantry", "khanate", "Skin Wolves"},
+        {"wh_dlc08_nor_mon_warwolves_0", "war_beast", "khanate", "Norscan Ice Wolves"},
+        {"wh_dlc08_nor_inf_marauder_hunters_0", "missile_infantry", "brass", "Marauder Hunters"},
+        {"wh_dlc08_nor_mon_frost_wyrm_0", "monster", "brass", "the Frost Dragon"},
+        {"wh3_dlc27_nor_mon_cursd_ettin", "monster", "brass", "a Curs'd Ettin"},
+        {"wh_main_nor_mon_chaos_trolls", "monstrous_infantry", "overseers", "Norscan Trolls"},
+        {"wh3_dlc27_throgg_mon_river_trolls_0", "monstrous_infantry", "overseers", "Throgg's trolls"},
+        {"wh_dlc08_nor_mon_war_mammoth_2", "monster", "daemonsmiths", "a War Mammoth"},
+        {"wh3_dlc27_kho_inf_chaos_warriors_2", "melee_infantry", "temple", "an altar's Khorne warriors"},
+        {"wh3_dlc27_chs_mon_chaos_spawn", "monstrous_infantry", "temple", "an altar's spawn"},
+        {"wh2_dlc11_cst_mon_animated_hulks_0", "monstrous_infantry", nil, "a captured port's hulks"},
+    }
+    for _, c in ipairs(units) do
+        local got = GG.recruit_guild(C, "units", {key = c[1], caste = c[2]})
+        assert(got == c[3], c[4] .. " pay " .. tostring(c[3]) .. ", got " .. tostring(got))
+    end
+    local chars = {
+        {"wh_dlc08_nor_kihar", "general", "temple"},
+        {"wh3_main_ie_nor_killgore_slaymaim", "general", "temple"},
+        {"wh_dlc08_nor_shaman_sorcerer_metal", "wizard", "daemonsmiths"},
+        {"wh3_dlc27_nor_sayl", "general", "daemonsmiths"},
+        {"wh_dlc08_nor_skin_wolf_werekin", "champion", "khanate"},
+        {"wh_dlc08_nor_fimir_balefiend_fire", "wizard", "khanate"},
+        {"wh_dlc08_nor_wulfrik", "general", "immortals"},
+        {"wh_main_nor_marauder_chieftain", "general", "immortals"},
+        {"wh_dlc08_nor_norscan_lord_x", "general", "immortals"},
+    }
+    for _, c in ipairs(chars) do
+        local got = GG.recruit_guild(C, "characters", {key = c[1], agent = c[2]})
+        assert(got == c[3], c[1] .. " pays " .. c[3] .. ", got " .. tostring(got))
+    end
+    local want = {
+        wh_main_NORSCA_worship = "temple",
+        wh3_dlc27_settlement_nor_chaos_altar_kho = "temple",
+        wh_main_NORSCA_smith = "overseers",
+        wh_main_NORSCA_slaves = "overseers",
+        wh3_dlc27_special_throgg_chaos_trolls_altar = "overseers",
+        wh_main_NORSCA_creatures = "brass",
+        wh_main_NORSCA_offerings = "brass",
+        wh3_dlc27_nor_chaos_altar_kho_recruitment = "immortals",
+        wh3_dlc27_nor_chaos_altar_und_replenishment = "immortals",
+        wh_main_NORSCA_chaos = "daemonsmiths",
+        wh_main_NORSCA_loot = "slavers",
+        wh_main_NORSCA_port = "slavers",
+        wh3_dlc27_nor_chaos_altar_sla_raiding = "slavers",
+        wh_main_NORSCA_beasts = "khanate",
+        wh3_dlc27_nor_trap_core_sabotage = "khanate",
+    }
+    for chain, g in pairs(want) do
+        assert(GG.guild_of_chain(chain, "_nor") == g, chain .. " should pay " .. g .. ", got "
+               .. tostring(GG.guild_of_chain(chain, "_nor")))
+    end
 end)()
 print("harness ok")

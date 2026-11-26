@@ -153,6 +153,25 @@ ICONS = {
     "wh3_main_special_standing_stones": "brass_chs",
     "wh3_dlc27_nor_trap_core_sabotage": "khanate_chs",
     "chaos_dark_fortress": "crest_chs",
+    "tmb_ income": "brass_tmb",
+    "tmb_ infantry_barracks": "immortals_tmb",
+    "tmb_ growth": "daemonsmiths_tmb",
+    "tomb_kings_city_lahmia": "khanate_tmb",
+    "tmb_settlement": "overseers_tmb",
+    "tmb_ chariot_artillery": "slavers_tmb",
+    "tmb_ushabti": "temple_tmb",
+    "tomb_kings_city_khemri": "crest_tmb",
+    # NORSCA (2026-11-26), CA's own Norscan building icons, each measured a flat silhouette
+    # (commonest colour 100% of visible pixels, 74x74). The loot pile, not the port's
+    # anchor, for the Reavers: a Kurgan raids on horseback.
+    "nor_creatures_of_chaos": "brass_nor",
+    "nor_marauders": "immortals_nor",
+    "nor_effigys_of_chaos": "daemonsmiths_nor",
+    "nor_beast_packs": "khanate_nor",
+    "nor_slaves": "overseers_nor",
+    "nor_loot_plunder": "slavers_nor",
+    "nor_chaos_worship": "temple_nor",
+    "nor_settlement": "crest_nor",
 }
 
 # THE SIX HALL ICONS (2026-10-04). building_culture_variants.icon names a file in
@@ -185,7 +204,7 @@ HALL_LEVEL_ICONS = {
     os.path.join(SRC, "codex_%s%s" % (_g, _tag), "derpy_gg_hall_%s%s_%d.png" % (_g, _tag, _n + 1)):
         "derpy_gg_hall_%s_%d%s" % (_g, _n, _tag)
     for _tag in HALL_LEVEL_ICON_TAGS for _g in _GUILDS for _n in range(3)}
-for _tag in ("_emp", "_dwf", "_brt", "_cth", "_ksl", "_def", "_hef", "_skv"):
+for _tag in ("_emp", "_dwf", "_brt", "_cth", "_ksl", "_def", "_hef", "_skv", "_tmb", "_nor"):
     for _g in _GUILDS:
         HALL_ICONS[_CARD_STEM[_g + _tag]] = "derpy_gg_hall_" + _g + _tag
 # THE WARRIORS OF CHAOS' HALLS (2026-10-12): their cards are god symbols, so each hall takes
@@ -381,6 +400,8 @@ TAB_FRAME = {
     "_cth": "cathay_cat_military", "_ksl": "kislev_cat_support",
     "_def": "dark_elves_cat_recruitment", "_hef": "high_elves_cat_recruitment",
     "_skv": "skaven_cat_recruitment", "_chs": "chaos_cat_recruitment",
+    "_tmb": "tomb_kings_cat_basic_military",
+    "_nor": "nor_cat_recruitment",
 }
 TAB_INK = (150, 100, 14)
 TAB_GLYPH = 36                  # px square the crest is fitted into, inside a 64px scroll
@@ -532,11 +553,11 @@ def selftest():
     names = set(ICONS.values())
     assert len(names) == len(ICONS), "two sources ship under one name"
     for tag in ("", "_emp", "_dwf", "_brt", "_cth", "_ksl", "_def", "_hef", "_skv", "_chs",
-                "_gen"):
+                "_tmb", "_nor", "_gen"):
         for g in ("brass", "immortals", "daemonsmiths", "khanate", "overseers",
                   "slavers", "temple", "crest"):
             assert g + tag in names, "no icon ships as " + g + tag
-    assert len(set(HALL_ICONS.values())) == len(HALL_ICONS) == 70 - 7 * len(HALL_LEVEL_ICON_TAGS)
+    assert len(set(HALL_ICONS.values())) == len(HALL_ICONS) == 84 - 7 * len(HALL_LEVEL_ICON_TAGS)
     assert len(set(HALL_LEVEL_ICONS.values())) == 21 * len(HALL_LEVEL_ICON_TAGS)
     assert not set(HALL_ICONS.values()) & set(HALL_LEVEL_ICONS.values())
     assert all(v == v.lower() for v in HALL_LEVEL_ICONS.values()), "a pack path must be lowercase"
