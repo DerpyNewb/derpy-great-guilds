@@ -5,8 +5,8 @@ Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry 
 
 ## 2026-11-26 - build BFBA9733
 
-MD5 `BFBA973329D1B14FA454C27FD9C0CDEE`, 65,957,098 bytes. Tested in game 2026-11-26; not yet
-uploaded to the Workshop.
+MD5 `BFBA973329D1B14FA454C27FD9C0CDEE`, 65,957,098 bytes. Tested in game and uploaded to the
+Workshop 2026-11-26.
 
 - **The Tomb Kings** are the eleventh race: The Royal Treasury, The Tomb Guard, The Liche
   Priesthood, The Lahmian Sisterhood, The Necrotects, The Charioteer Nobles and The Cults of
