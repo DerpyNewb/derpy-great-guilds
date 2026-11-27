@@ -1083,9 +1083,16 @@ GG.UPGRADE_PAYS = {["wh_main_chs_chaos"] = true}
 -- Without it one large recruiting turn fills a guild's limit and the battle won that turn
 -- pays nothing, and the Daemonsmiths, who have no limit, take whatever the turn recruits.
 -- GG.culture_of answers nil for a faction this mod does not cover, which is the gate.
+-- A POSITIVE START ONLY: the game's string.sub does not clamp a negative one, so
+-- sub(key, -13) on a modded 8-letter key read 8 GB past it and crashed the campaign.
+function GG.ends_with(s, tail)
+    if type(s) ~= "string" or #s < #tail then return false end
+    return string.sub(s, #s - #tail + 1) == tail
+end
+
 function GG.on_recruit(faction, list, t)
     -- CA's scripted-spawn generals (Pillage, decrees, grudges, the Tower): recruitable = false.
-    if list == "characters" and string.sub(t.key or "", -13) == "_spawned_army" then return end
+    if list == "characters" and GG.ends_with(t.key, "_spawned_army") then return end
     local guild = GG.recruit_guild(GG.culture_of(faction), list, t)
     -- WHAT THE ENGINE HANDED OVER, behind the MCT debug switch: whether the events reach
     -- AI factions, and whether unit_class() is the land_units class the rules read.
@@ -6364,7 +6371,7 @@ function GG.register()
         -- the same unit for 150 gold. Filtered as wh3_dlc29_glottkin_marks_of_nurgle.lua
         -- filters them, off upgrade_group():key().
         local _, group = pcall(function() return context:upgrade_group():key() end)
-        if type(group) == "string" and string.sub(group, -8) == "_to_self" then return end
+        if GG.ends_with(group, "_to_self") then return end
         GG.load(name); GG.on_recruit(name, "units", t); GG.save(name)
     end, true)
 

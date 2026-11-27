@@ -25,6 +25,22 @@ NO_SUCH_FACTION = {}
 -- recovery that works from one that was never written.
 FIRST_TICKS = {}
 
+-- THE GAME'S string.sub DOES NOT CLAMP A NEGATIVE START (exe+135de90, 2026-11-27). Stock Lua
+-- reads sub("abc", -13) as "abc"; the game adds the length, gets -10, zero-extends it and
+-- copies from 8 GB past the string, which is an access violation. That crashed a Dread King
+-- campaign at its first tick, from GG.on_recruit's spawned-army test on an 8-letter key.
+do
+    local stock = string.sub
+    string.sub = function(s, i, j)
+        local n = #tostring(s)
+        if type(i) == "number" and i < 0 and -i > n and n > 0 then
+            error("string.sub(" .. string.format("%q", tostring(s)) .. ", " .. i
+                  .. ") starts before the string: the game crashes on this", 2)
+        end
+        return stock(s, i, j)
+    end
+end
+
 cm = {
   set_saved_value = function(_, k, v) saved[k] = v end,
   get_saved_value = function(_, k) return saved[k] end,
@@ -10627,6 +10643,9 @@ end)()
     GG.on_recruit(E, "units", {key = "wh_main_emp_inf_greatswords", caste = "melee_infantry",
                                class = "inf_mel"})
     assert(saved["derpy_gg_gain_" .. E] == nil, "GG.on_recruit must refuse an uncovered faction")
+    local okk, errk = pcall(GG.on_recruit, E, "characters",
+                            {key = "dk", agent = "engineer", caster = false})
+    assert(okk, "a modded subtype key shorter than the suffix must be safe: " .. tostring(errk))
 
     -- THE RECRUITING LIMIT: 20 a guild a turn by default, and what it holds back is booked.
     fresh()
@@ -11004,6 +11023,8 @@ end)()
     upgrade(W, "wh3_dlc20_chs_inf_chosen_mkho", "wh3_dlc20_chs_chosen_kho_to_self")
     got = (GG.get(W, "immortals")) - before
     assert(got == 0, "a Chosen of Khorne weapon swap pays the Blood God nothing, paid " .. got)
+    local oku, erru = pcall(upgrade, W, "wh3_dlc20_chs_inf_chosen_mkho", "mk")
+    assert(oku, "a modded upgrade group shorter than the suffix must be safe: " .. tostring(erru))
     local chd = total(D)
     upgrade(D, "wh3_dlc23_chd_inf_infernal_guard", "")
     assert(total(D) == chd, "an upgrade pays nothing for a race outside GG.UPGRADE_PAYS")
