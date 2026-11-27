@@ -5,8 +5,8 @@ Builds of `derpy_great_guilds.pack`, newest first. The detail behind each entry 
 
 ## 2026-11-27 - build EE9DF939
 
-MD5 `EE9DF939B14C733F4D6CA9BB0F7101FF`, 65,957,371 bytes. Tested in game; not uploaded to the
-Workshop yet.
+MD5 `EE9DF939B14C733F4D6CA9BB0F7101FF`, 65,957,371 bytes. Tested in game and uploaded to the
+Workshop 2026-11-27.
 
 - Fixed a crash when a faction of your race recruits a modded lord or hero with a subtype key
   shorter than 13 letters. BFBA9733's `_spawned_army` check called `string.sub(key, -13)`, and
@@ -14,6 +14,8 @@ Workshop yet.
   key. Both suffix checks now go through `GG.ends_with`, which reads from a positive start.
 - The harness replaces `string.sub` with one that errors where the game's crashes, and the
   mutation list covers the new helper.
+- `import_great_guilds.py` now runs `check_lua_api` on every script and refuses to pack on a
+  finding. It never ran it before, and the check now flags a negative `string.sub` start.
 
 ## 2026-11-26 - build BFBA9733
 

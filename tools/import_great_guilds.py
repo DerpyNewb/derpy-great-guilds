@@ -410,6 +410,14 @@ def verify():
     except Exception as e:
         problems.append("UI checks could not run: %r" % (e,))
 
+    # The game's own string library and CA's API, which stock Lua cannot model. This
+    # importer never ran check_lua_api, and EE9DF939 fixed a crash it now flags.
+    import check_lua_api as API
+    docs = API.index_docs()
+    for path in SCRIPTS + [MCT_FILE]:
+        for n, kind, msg in API.check(path, docs):
+            problems.append("%s:%d %s: %s" % (os.path.basename(path), n, kind, msg))
+
     return problems
 
 
